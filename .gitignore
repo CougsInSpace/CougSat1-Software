@@ -11,3 +11,6 @@ RemoteSystemsTempFiles
 *.cproject
 *.project
 *.classpath
+
+# Visual Studio Code
+.vscode
