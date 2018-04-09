@@ -1,0 +1,13 @@
+# Mbed OS
+*.mbed
+mbed-os
+*mbed-os.lib
+*mbed_settings.*
+BUILD
+
+# Eclipse
+.metadata
+RemoteSystemsTempFiles
+*.cproject
+*.project
+*.classpath
