@@ -1,14 +1,21 @@
 package space.cougs.ground;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
+
+import space.cougs.ground.utils.CISErrors;
+import space.cougs.ground.utils.CISErrors.errors;
+
 public class CougSat1Telemetry {
 
-	private String mMode = "";
-	private String mTime = "";
+	private ModeEnum mMode = ModeEnum.NO_CONNECTION;
+	private Calendar mTime = Calendar.getInstance();
 	private int mResetCount = 0;
 	private int mIHUTemp = 0;
 	private long mIHUSdCard = 0;
 	private int mADCSTemp = 0;
-	private String mADCSStatus = "";
+	private errors mADCSStatus = CISErrors.errors.SUCCESS;
 	private double mLattitude = 0.0;
 	private double mLongitude = 0.0;
 	private double mRoll = 0.0;
@@ -22,420 +29,467 @@ public class CougSat1Telemetry {
 	private double mBattery1Current = 0.0;
 	private int mBattery0Temp = 0;
 	private int mBattery1Temp = 0;
-	private double mSP0Volatage = 0.0;
-	private double mSP1Volatage = 0.0;
-	private double mSP2Volatage = 0.0;
-	private double mSP3Volatage = 0.0;
+	private double mBattery0Heat = 0.0;
+	private double mBattery1Heat = 0.0;
+	private double mSP0Voltage = 0.0;
+	private double mSP1Voltage = 0.0;
+	private double mSP2Voltage = 0.0;
+	private double mSP3Voltage = 0.0;
 	private double mSP0Current = 0.0;
-	private double mSP1Current = 0.0;	
+	private double mSP1Current = 0.0;
 	private double mSP2Current = 0.0;
 	private double mSP3Current = 0.0;
 	private double mPowerIn = 0.0;
 	private double mPowerOut = 0.0;
 	private double m3v3RailVoltage = 0.0;
 	private double m3v3RailCurrent = 0.0;
-	private short mEPSChannels = 0;
+	private double m5vRailVoltage = 0.0;
+	private double m5vRailCurrent = 0.0;
+	private int mEPSChannels = 0;
 	private int mRCSTemp = 0;
-	private String mRCSStatus = "";
+	private errors mRCSStatus = CISErrors.errors.SUCCESS;
 	private double mTXPower = 0.0;
 	private double mRXPower = 0.0;
 	private double mRXSNR = 0.0;
 	private int mPayloadFrames = 0;
-	
-	public CougSat1Telemetry() {
-		
-		
-		
-		
+	private errors mIHUStatus = CISErrors.errors.SUCCESS;
+
+	enum ModeEnum {
+		BEACON, CHARGING, DATA_TRANSMISION, SCIENCE, ECLIPSE, SAFE, NO_CONNECTION;
 	}
 
+	public CougSat1Telemetry() {
+
+	}
+
+	private double rawToVoltage(int raw, boolean lowRange) {
+
+		if (lowRange) {
+			return (raw * 0.002);
+		}
+
+		return (raw * 0.0001);
+
+	}
+
+	private double rawToCurrent(int raw, boolean lowRange) {
+
+		if (lowRange) {
+			return (raw * 0.001);
+		}
+
+		return (raw * 0.0001);
+
+	}
 
 	public String getMode() {
-		return mMode;
+		return mMode.name();
 	}
 
+	public void setMode(int buff) {
 
-	public void setMode(String mMode) {
-		this.mMode = mMode;
+		switch (buff) {
+		case 0x31:
+			mMode = ModeEnum.BEACON;
+			break;
+		case 0x32:
+			mMode = ModeEnum.CHARGING;
+			break;
+		case 0x33:
+			mMode = ModeEnum.DATA_TRANSMISION;
+			break;
+		case 0x34:
+			mMode = ModeEnum.SCIENCE;
+			break;
+		case 0x35:
+			mMode = ModeEnum.ECLIPSE;
+			break;
+		case 0x40:
+			mMode = ModeEnum.SAFE;
+			break;
+		}
+
 	}
-
 
 	public String getTime() {
-		return mTime;
+
+		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss MM-dd-YYYY");
+
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		return format.format(mTime.getTime());
 	}
 
+	public void setTime(int buff) {
 
-	public void setTime(String mTime) {
-		this.mTime = mTime;
+		mTime.setTimeInMillis((long) buff * 1000);
+
 	}
-
 
 	public int getResetCount() {
 		return mResetCount;
 	}
 
-
 	public void setResetCount(int mResetCount) {
 		this.mResetCount = mResetCount;
 	}
-
 
 	public int getIHUTemp() {
 		return mIHUTemp;
 	}
 
-
 	public void setIHUTemp(int mIHUTemp) {
+
 		this.mIHUTemp = mIHUTemp;
 	}
-
 
 	public long getIHUSdCard() {
 		return mIHUSdCard;
 	}
 
-
 	public void setIHUSdCard(long mIHUSdCard) {
 		this.mIHUSdCard = mIHUSdCard;
 	}
-
 
 	public int getADCSTemp() {
 		return mADCSTemp;
 	}
 
-
 	public void setADCSTemp(int mADCSTemp) {
 		this.mADCSTemp = mADCSTemp;
 	}
 
-
-	public String getADCSStatus() {
+	public errors getADCSStatus() {
 		return mADCSStatus;
 	}
 
+	public void setADCSStatus(int index) {
 
-	public void setADCSStatus(String mADCSStatus) {
-		this.mADCSStatus = mADCSStatus;
+		mADCSStatus = errors.values()[index];
 	}
-
 
 	public double getLattitude() {
 		return mLattitude;
 	}
 
-
 	public void setLattitude(double mLattitude) {
-		this.mLattitude = mLattitude;
-	}
 
+		this.mLattitude = (mLattitude / 600000);
+		// System.out.println(this.mLattitude);
+	}
 
 	public double getLongitude() {
 		return mLongitude;
 	}
 
-
 	public void setLongitude(double mLongitude) {
-		this.mLongitude = mLongitude;
+		this.mLongitude = (mLongitude / 600000);
 	}
-
 
 	public double getRoll() {
 		return mRoll;
 	}
 
-
 	public void setRoll(double mRoll) {
-		this.mRoll = mRoll;
-	}
 
+		this.mRoll = (mRoll / 60.0);
+	}
 
 	public double getPitch() {
 		return mPitch;
 	}
 
-
 	public void setPitch(double mPitch) {
-		this.mPitch = mPitch;
-	}
 
+		this.mPitch = mPitch / 60.0;
+	}
 
 	public double getYaw() {
 		return mYaw;
 	}
 
-
 	public void setYaw(double mYaw) {
-		this.mYaw = mYaw;
+		this.mYaw = mYaw / 60.0;
 	}
-
 
 	public int getIFJRTemp() {
 		return mIFJRTemp;
 	}
 
-
 	public void setIFJRTemp(int mIFJRTemp) {
 		this.mIFJRTemp = mIFJRTemp;
 	}
-
 
 	public int getPMICTemp() {
 		return mPMICTemp;
 	}
 
-
 	public void setPMICTemp(int mPMICTemp) {
 		this.mPMICTemp = mPMICTemp;
 	}
-
 
 	public double getBattery0Voltage() {
 		return mBattery0Voltage;
 	}
 
+	public void setBattery0Voltage(int mBattery0Voltage, boolean lowRange) {
 
-	public void setBattery0Voltage(double mBattery0Voltage) {
-		this.mBattery0Voltage = mBattery0Voltage;
+		this.mBattery0Voltage = rawToVoltage(mBattery0Voltage, lowRange);
 	}
-
 
 	public double getBattery0Current() {
 		return mBattery0Current;
 	}
 
+	public void setBattery0Current(int mBattery0Current, boolean lowRange) {
 
-	public void setBattery0Current(double mBattery0Current) {
-		this.mBattery0Current = mBattery0Current;
+		this.mBattery0Current = rawToCurrent(mBattery0Current, lowRange);
 	}
-
 
 	public double getBattery1Voltage() {
 		return mBattery1Voltage;
 	}
 
+	public void setBattery1Voltage(int mBattery1Voltage, boolean lowRange) {
 
-	public void setBattery1Voltage(double mBattery1Voltage) {
-		this.mBattery1Voltage = mBattery1Voltage;
+		this.mBattery1Voltage = rawToVoltage(mBattery1Voltage, lowRange);
 	}
-
 
 	public double getBattery1Current() {
 		return mBattery1Current;
 	}
 
+	public void setBattery1Current(int mBattery1Current, boolean lowRange) {
 
-	public void setBattery1Current(double mBattery1Current) {
-		this.mBattery1Current = mBattery1Current;
+		this.mBattery1Current = rawToCurrent(mBattery1Current, lowRange);
 	}
-
 
 	public int getBattery0Temp() {
 		return mBattery0Temp;
 	}
 
-
 	public void setBattery0Temp(int mBattery0Temp) {
 		this.mBattery0Temp = mBattery0Temp;
 	}
-
 
 	public int getBattery1Temp() {
 		return mBattery1Temp;
 	}
 
-
 	public void setBattery1Temp(int mBattery1Temp) {
 		this.mBattery1Temp = mBattery1Temp;
 	}
 
-
-	public double getSP0Volatage() {
-		return mSP0Volatage;
+	public double getSP0Voltage() {
+		return mSP0Voltage;
 	}
 
+	public void setSP0Voltage(int mSP0Voltage, boolean lowRange) {
 
-	public void setSP0Volatage(double mSP0Volatage) {
-		this.mSP0Volatage = mSP0Volatage;
+		this.mSP0Voltage = rawToVoltage(mSP0Voltage, lowRange);
+		// System.out.println(this.mSP0Voltage);
 	}
 
-
-	public double getSP1Volatage() {
-		return mSP1Volatage;
+	public double getSP1Voltage() {
+		return mSP1Voltage;
 	}
 
+	public void setSP1Voltage(int mSP1Voltage, boolean lowRange) {
 
-	public void setSP1Volatage(double mSP1Volatage) {
-		this.mSP1Volatage = mSP1Volatage;
+		this.mSP1Voltage = rawToVoltage(mSP1Voltage, lowRange);
 	}
 
-
-	public double getSP2Volatage() {
-		return mSP2Volatage;
+	public double getSP2Voltage() {
+		return mSP2Voltage;
 	}
 
+	public void setSP2Voltage(int mSP2Voltage, boolean lowRange) {
 
-	public void setSP2Volatage(double mSP2Volatage) {
-		this.mSP2Volatage = mSP2Volatage;
+		this.mSP2Voltage = rawToVoltage(mSP2Voltage, lowRange);
 	}
 
-
-	public double getSP3Volatage() {
-		return mSP3Volatage;
+	public double getSP3Voltage() {
+		return mSP3Voltage;
 	}
 
+	public void setSP3Voltage(int mSP3Voltage, boolean lowRange) {
 
-	public void setSP3Volatage(double mSP3Volatage) {
-		this.mSP3Volatage = mSP3Volatage;
+		this.mSP3Voltage = rawToVoltage(mSP3Voltage, lowRange);
 	}
-
 
 	public double getSP0Current() {
 		return mSP0Current;
 	}
 
+	public void setSP0Current(int mSP0Current, boolean lowRange) {
 
-	public void setSP0Current(double mSP0Current) {
-		this.mSP0Current = mSP0Current;
+		this.mSP0Current = rawToCurrent(mSP0Current, lowRange);
 	}
-
 
 	public double getSP1Current() {
 		return mSP1Current;
 	}
 
+	public void setSP1Current(int mSP1Current, boolean lowRange) {
 
-	public void setSP1Current(double mSP1Current) {
-		this.mSP1Current = mSP1Current;
+		this.mSP1Current = rawToCurrent(mSP1Current, lowRange);
 	}
-
 
 	public double getSP2Current() {
 		return mSP2Current;
 	}
 
+	public void setSP2Current(int mSP2Current, boolean lowRange) {
 
-	public void setSP2Current(double mSP2Current) {
-		this.mSP2Current = mSP2Current;
+		this.mSP2Current = rawToCurrent(mSP2Current, lowRange);
 	}
-
 
 	public double getSP3Current() {
 		return mSP3Current;
 	}
 
+	public void setSP3Current(int mSP3Current, boolean lowRange) {
 
-	public void setSP3Current(double mSP3Current) {
-		this.mSP3Current = mSP3Current;
+		this.mSP3Current = rawToCurrent(mSP3Current, lowRange);
 	}
-
 
 	public double getPowerIn() {
 		return mPowerIn;
 	}
 
-
 	public void setPowerIn(double mPowerIn) {
 		this.mPowerIn = mPowerIn;
 	}
-
 
 	public double getPowerOut() {
 		return mPowerOut;
 	}
 
-
 	public void setPowerOut(double mPowerOut) {
 		this.mPowerOut = mPowerOut;
 	}
-
 
 	public double get3v3RailVoltage() {
 		return m3v3RailVoltage;
 	}
 
+	public void set3v3RailVoltage(int m3v3RailVoltage, boolean lowRange) {
 
-	public void set3v3RailVoltage(double m3v3RailVoltage) {
-		this.m3v3RailVoltage = m3v3RailVoltage;
+		this.m3v3RailVoltage = rawToVoltage(m3v3RailVoltage, lowRange);
 	}
-
 
 	public double get3v3RailCurrent() {
 		return m3v3RailCurrent;
 	}
 
+	public void set3v3RailCurrent(int m3v3RailCurrent, boolean lowRange) {
 
-	public void set3v3RailCurrent(double m3v3RailCurrent) {
-		this.m3v3RailCurrent = m3v3RailCurrent;
+		this.m3v3RailCurrent = rawToCurrent(m3v3RailCurrent, lowRange);
 	}
 
-
-	public short getEPSChannels() {
+	public int getEPSChannels() {
 		return mEPSChannels;
 	}
 
-
-	public void setEPSChannels(short mEPSChannels) {
+	public void setEPSChannels(int mEPSChannels) {
 		this.mEPSChannels = mEPSChannels;
 	}
-
 
 	public int getRCSTemp() {
 		return mRCSTemp;
 	}
 
-
 	public void setRCSTemp(int mRCSTemp) {
 		this.mRCSTemp = mRCSTemp;
 	}
 
-
-	public String getRCSStatus() {
+	public errors getRCSStatus() {
 		return mRCSStatus;
 	}
 
+	public void setRCSStatus(int mRCSStatus) {
 
-	public void setRCSStatus(String mRCSStatus) {
-		this.mRCSStatus = mRCSStatus;
+		this.mRCSStatus = CISErrors.errors.values()[mRCSStatus];
 	}
-
 
 	public double getTXPower() {
 		return mTXPower;
 	}
 
+	public void setTXPower(int mTXPower) {
 
-	public void setTXPower(double mTXPower) {
-		this.mTXPower = mTXPower;
+		this.mTXPower = (mTXPower * 0.01);
+		System.out.println(this.mTXPower);
 	}
-
 
 	public double getRXPower() {
 		return mRXPower;
 	}
 
+	public void setRXPower(int mRXPower) {
 
-	public void setRXPower(double mRXPower) {
-		this.mRXPower = mRXPower;
+		this.mRXPower = mRXPower * 0.001;
+		System.out.println(this.mRXPower);
 	}
-
 
 	public double getRXSNR() {
 		return mRXSNR;
 	}
 
+	public void setRXSNR(int mRXSNR) {
 
-	public void setRXSNR(double mRXSNR) {
-		this.mRXSNR = mRXSNR;
+		this.mRXSNR = (mRXSNR * 0.1);
+		System.out.println(this.mRXSNR);
 	}
-
 
 	public int getPayloadFrames() {
 		return mPayloadFrames;
 	}
 
-
 	public void setPayloadFrames(int mPayloadFrames) {
 		this.mPayloadFrames = mPayloadFrames;
+	}
+
+	public errors getIHUStatus() {
+		return mIHUStatus;
+	}
+
+	public void setIHUStatus(int index) {
+
+		mIHUStatus = errors.values()[index];
+	}
+
+	public double getBattery0Heat() {
+		return mBattery0Heat;
+	}
+
+	public void setBattery0Heat(double mBattery0Heat) {
+		this.mBattery0Heat = mBattery0Heat;
+	}
+
+	public double getBattery1Heat() {
+		return mBattery1Heat;
+	}
+
+	public void setBattery1Heat(double mBattery1Heat) {
+		this.mBattery1Heat = mBattery1Heat;
+	}
+
+	public double get5vRailVoltage() {
+		return m5vRailVoltage;
+	}
+
+	public void set5vRailVoltage(int m5vRailVoltage, boolean lowRange) {
+
+		this.m5vRailVoltage = rawToVoltage(m5vRailVoltage, lowRange);
+	}
+
+	public double get5vRailCurrent() {
+		return m5vRailCurrent;
+	}
+
+	public void set5vRailCurrent(int m5vRailCurrent, boolean lowRange) {
+
+		this.m5vRailCurrent = rawToCurrent(m5vRailCurrent, lowRange);
 	}
 }

@@ -21,7 +21,6 @@ public class main {
 		}
 	}
 	
-	
 	public static GUI getGUI(){
 		return gui;
 	}

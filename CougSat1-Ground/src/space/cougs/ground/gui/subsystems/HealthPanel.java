@@ -141,7 +141,7 @@ public class HealthPanel extends JPanel {
 		private void updateBars(double tXPower, double rXPower, double rxSNR) {
 
 			int newTXPower = (int) ((tXPower / 4.0) * 100.0);
-			int newRXPower = (int) ((rXPower / 4.0) * 100.0);
+			int newRXPower = (int) ((rXPower / 0.1) * 100.0);
 			int newRXSNR = (int) (((rxSNR + 30.0) / 60.0) * 100.0);
 
 			txBar.setValue(newTXPower);
@@ -246,16 +246,25 @@ public class HealthPanel extends JPanel {
 
 		}
 
-		public void updateBars(String newMode, String newTime, long newSd, int newResets, int newPayload) {
+		public void updateData(String newMode, String newTime, long newSd, int newResets, int newPayload) {
 
+			String buff = "";
 			mode.setText(newMode);
 			time.setText(newTime + "");
-			sdUsed.setText(newSd + "");
+			if (newSd > 1000000000) {
+				buff = (newSd / 1000000000) + " GB";
+			} else if (newSd > 1000000) {
+				buff = (newSd / 1000000) + " MB";
+			} else if (newSd > 1000) {
+				buff = (newSd / 1000) + " kB";
+			} else {
+				buff = (newSd) + " B";
+			}
+			sdUsed.setText(buff);
 			reset.setText(newResets + "");
 			payload.setText(newPayload + "");
 
 		}
-
 	}
 
 	private class TempHealth extends JPanel {
@@ -297,7 +306,7 @@ public class HealthPanel extends JPanel {
 	public void updateData(CougSat1Telemetry data) {
 
 		rcsHealth.updateBars(data.getTXPower(), data.getRXPower(), data.getRXSNR());
-		ihuHealth.updateBars(data.getMode(), data.getTime(), data.getIHUSdCard(), data.getResetCount(),
+		ihuHealth.updateData(data.getMode(), data.getTime(), data.getIHUSdCard(), data.getResetCount(),
 				data.getPayloadFrames());
 
 	}
