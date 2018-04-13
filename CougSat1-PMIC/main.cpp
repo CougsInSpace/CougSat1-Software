@@ -18,11 +18,13 @@
 #include <mbed.h>
 #include <rtos.h>
 #include "tools/CISError.h"
+#include "tools/CISConsole.h"
 
 /**
  * Program start routine
  * @return error code
  */
 int main(void) {
+  DEBUG("PMIC", "Initialization starting\n");
   return ERROR_SUCCESS;
 }
