@@ -19,11 +19,19 @@
 
 LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) { this->addr = addr; }
 
-float LTC2499::readVoltage(ADCChannel_t channel) {}
+float LTC2499::readVoltage(ADCChannel_t channel) {
+  int32_t rawValue = readRaw(channel);
+  return rawValue * conversionFactor;
+}
 
-uint8_t LTC2499::setPrimaryVRef(float refVoltage) {}
+uint8_t LTC2499::setVRef(float refVoltage) {
+  conversionFactor = refVoltage / ADC_FULL_SCALE;
+}
 
-uint8_t LTC2499::setSecondaryVRef(float refVoltage, ADCChannel_t channel) {}
+uint8_t LTC2499::setVRef(float refVoltage, ADCChannel_t channel) {
+  int32_t rawVRef = readRaw(channel);
+  conversionFactor = refVoltage / rawVRef;
+}
 
 int32_t LTC2499::readRaw(ADCChannel_t channel) {
   char buf[4] = {channel, ADC_CONFIG_EXT_50_60_1x, 0, 0};
