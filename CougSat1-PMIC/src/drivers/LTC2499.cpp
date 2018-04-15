@@ -17,23 +17,39 @@
 #include "tools/CISError.h"
 #include "tools/CISConsole.h"
 
-LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) { this->addr = addr; }
-
-float LTC2499::readVoltage(ADCChannel_t channel) {
-  int32_t rawValue = readRaw(channel);
-  return rawValue * conversionFactor;
+LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) {
+  this->addr = addr;
+  conversionFactor = 0.0f;
 }
 
-uint8_t LTC2499::setVRef(float refVoltage) {
-  conversionFactor = refVoltage / ADC_FULL_SCALE;
+LTC2499::LTC2499(I2C &i2c, uint8_t addr, float refVoltage) : i2c(i2c) {
+  this->addr = addr;
+  setVRef(refVoltage);
+}
+
+uint8_t LTC2499::readVoltage(ADCChannel_t channel, float *data) {
+  int32_t buf;
+  uint8_t result = readRaw(channel, &buf);
+  (*data) = (float)buf * conversionFactor;
+  return result;
+}
+
+void LTC2499::setVRef(float refVoltage) {
+  conversionFactor = refVoltage / (float)ADC_FULL_SCALE;
 }
 
 uint8_t LTC2499::setVRef(float refVoltage, ADCChannel_t channel) {
-  int32_t rawVRef = readRaw(channel);
+  int32_t rawVRef;
+  uint8_t result = readRaw(channel, &rawVRef);
+  if (result != ERROR_SUCCESS) {
+    DEBUG("LTC2499", "Error setting vRef from channel %d", channel);
+    return result;
+  }
   conversionFactor = refVoltage / rawVRef;
+  return ERROR_SUCCESS;
 }
 
-int32_t LTC2499::readRaw(ADCChannel_t channel) {
+uint8_t LTC2499::readRaw(ADCChannel_t channel, int32_t *data) {
   char buf[4] = {channel, ADC_CONFIG_EXT_50_60_1x, 0, 0};
   uint8_t result = i2c.write(addr, buf, 2);
   if (result != ERROR_SUCCESS) {
@@ -48,21 +64,20 @@ int32_t LTC2499::readRaw(ADCChannel_t channel) {
   }
 
   uint8_t prefixBits = (buf[3] >> 6) & 0x03;
-  uint32_t rawValue = (buf[3] << 18);
-  rawValue |= (buf[2] << 10);
-  rawValue |= (buf[1] << 2);
-  rawValue |= (buf[0] >> 6);
-  rawValue = rawValue & ADC_RAW_MASK;
 
   if (prefixBits == 0x03) {
     DEBUG("LTC2499", "Channel %d is overrange", channel);
-    return ADC_OVERRANGE;
-  }
-
-  if (prefixBits == 0x00) {
+    (*data) = ADC_OVERRANGE;
+  } else if (prefixBits == 0x00) {
     DEBUG("LTC2499", "Channel %d is underrange", channel);
-    return ADC_UNDERRANGE;
+    (*data) = ADC_UNDERRANGE;
+  } else {
+    int32_t rawValue = (buf[3] << 18);
+    rawValue |= (buf[2] << 10);
+    rawValue |= (buf[1] << 2);
+    rawValue |= (buf[0] >> 6);
+    (*data) = rawValue & ADC_RAW_MASK;
   }
 
-  return rawValue;
+  return ERROR_SUCCESS;
 }

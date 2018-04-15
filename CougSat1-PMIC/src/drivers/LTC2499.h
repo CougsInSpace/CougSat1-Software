@@ -59,16 +59,17 @@ typedef enum ADCChannel_t {
 class LTC2499 {
 public:
   LTC2499(I2C &i2c, uint8_t addr);
-  float readVoltage(ADCChannel_t channel);
-  uint8_t setVRef(float refVoltage);
+  LTC2499(I2C &i2c, uint8_t addr, float refVoltage);
+  uint8_t readVoltage(ADCChannel_t channel, float *data);
+  void setVRef(float refVoltage);
   uint8_t setVRef(float refVoltage, ADCChannel_t channel);
 
 private:
-  int32_t readRaw(ADCChannel_t channel);
+  uint8_t readRaw(ADCChannel_t channel, int32_t *data);
 
   I2C &i2c;
   uint8_t addr;
-  float conversionFactor = 0;
+  float conversionFactor;
 };
 
 #endif /* _SRC_DRIVERS_LTC2499_H_ */
