@@ -419,7 +419,7 @@ public class CougSat1Telemetry {
 	public void setTXPower(int mTXPower) {
 
 		this.mTXPower = (mTXPower * 0.01);
-		System.out.println(this.mTXPower);
+		//System.out.println(this.mTXPower);
 	}
 
 	public double getRXPower() {
@@ -429,7 +429,7 @@ public class CougSat1Telemetry {
 	public void setRXPower(int mRXPower) {
 
 		this.mRXPower = mRXPower * 0.001;
-		System.out.println(this.mRXPower);
+		//System.out.println(this.mRXPower);
 	}
 
 	public double getRXSNR() {
@@ -439,7 +439,7 @@ public class CougSat1Telemetry {
 	public void setRXSNR(int mRXSNR) {
 
 		this.mRXSNR = (mRXSNR * 0.1);
-		System.out.println(this.mRXSNR);
+		//System.out.println(this.mRXSNR);
 	}
 
 	public int getPayloadFrames() {
