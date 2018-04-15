@@ -20,10 +20,12 @@
 LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) {
   this->addr = addr;
   conversionFactor = 0.0f;
+  refVoltage = 0.0f;
 }
 
 LTC2499::LTC2499(I2C &i2c, uint8_t addr, float refVoltage) : i2c(i2c) {
   this->addr = addr;
+  this->refVoltage = refVoltage;
   setVRef(refVoltage);
 }
 
@@ -34,7 +36,15 @@ uint8_t LTC2499::readVoltage(ADCChannel_t channel, float *data) {
   return result;
 }
 
+uint8_t LTC2499::readInternalTemperaure(float *data) {
+  int32_t buf;
+  uint8_t result = readRaw(INT_TEMP, ADC_CONFIG_TEMP_50_60_1x, &buf);
+  (*data) = (float)buf * refVoltage / ADC_TEMP_SLOPE + ADC_ZERO_KELVIN;
+  return result;
+}
+
 void LTC2499::setVRef(float refVoltage) {
+  this->refVoltage = refVoltage;
   conversionFactor = refVoltage / (float)ADC_FULL_SCALE;
 }
 
@@ -50,7 +60,11 @@ uint8_t LTC2499::setVRef(float refVoltage, ADCChannel_t channel) {
 }
 
 uint8_t LTC2499::readRaw(ADCChannel_t channel, int32_t *data) {
-  char buf[4] = {channel, ADC_CONFIG_EXT_50_60_1x, 0, 0};
+  return readRaw(channel, ADC_CONFIG_EXT_50_60_1x, data);
+}
+
+uint8_t LTC2499::readRaw(ADCChannel_t channel, uint8_t config, int32_t *data) {
+  char buf[4] = {channel, config, 0, 0};
   uint8_t result = i2c.write(addr, buf, 2);
   if (result != ERROR_SUCCESS) {
     DEBUG("LTC2499", "Error commanding channel %d", channel);
