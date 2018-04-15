@@ -17,18 +17,38 @@
 #include "tools/CISError.h"
 #include "tools/CISConsole.h"
 
+/**
+ * @brief Construct a new LTC2499::LTC2499 object
+ *
+ * @param i2c connected to the ADC
+ * @param addr of the ADC
+ */
 LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) {
   this->addr = addr;
   conversionFactor = 0.0f;
   refVoltage = 0.0f;
 }
 
+/**
+ * @brief Construct a new LTC2499::LTC2499 object
+ *
+ * @param i2c connected to the ADC
+ * @param addr of the AC
+ * @param refVoltage at the REF+ pin (VRef / 2)
+ */
 LTC2499::LTC2499(I2C &i2c, uint8_t addr, float refVoltage) : i2c(i2c) {
   this->addr = addr;
   this->refVoltage = refVoltage;
   setVRef(refVoltage);
 }
 
+/**
+ * @brief Reads the voltage of a channel
+ *
+ * @param channel to measure
+ * @param data to store voltage value
+ * @return error code
+ */
 uint8_t LTC2499::readVoltage(ADCChannel_t channel, float *data) {
   int32_t buf;
   uint8_t result = readRaw(channel, &buf);
@@ -36,6 +56,12 @@ uint8_t LTC2499::readVoltage(ADCChannel_t channel, float *data) {
   return result;
 }
 
+/**
+ * @brief Reads the internal temperature sensor
+ *
+ * @param data to store the temperature (celsius)
+ * @return error code
+ */
 uint8_t LTC2499::readInternalTemperaure(float *data) {
   int32_t buf;
   uint8_t result = readRaw(INT_TEMP, ADC_CONFIG_TEMP_50_60_1x, &buf);
@@ -43,11 +69,24 @@ uint8_t LTC2499::readInternalTemperaure(float *data) {
   return result;
 }
 
+/**
+ * @brief Calibrates the conversion factor based on the VRef
+ *
+ * @param refVoltage at the REF+ pin (VRef / 2)
+ */
 void LTC2499::setVRef(float refVoltage) {
   this->refVoltage = refVoltage;
   conversionFactor = refVoltage / (float)ADC_FULL_SCALE;
 }
 
+/**
+ * @brief Calibrates the conversion factor based on the expected
+ *  voltage at a channel
+ *
+ * @param refVoltage at the REF+ pin (VRef / 2)
+ * @param channel to calibrate to
+ * @return error code
+ */
 uint8_t LTC2499::setVRef(float refVoltage, ADCChannel_t channel) {
   int32_t rawVRef;
   uint8_t result = readRaw(channel, &rawVRef);
@@ -59,10 +98,25 @@ uint8_t LTC2499::setVRef(float refVoltage, ADCChannel_t channel) {
   return ERROR_SUCCESS;
 }
 
+/**
+ * @brief Reads the ADC value of a channel
+ *
+ * @param channel to measure
+ * @param data to store the value
+ * @return error code
+ */
 uint8_t LTC2499::readRaw(ADCChannel_t channel, int32_t *data) {
   return readRaw(channel, ADC_CONFIG_EXT_50_60_1x, data);
 }
 
+/**
+ * @brief Reads the ADC value of a channel
+ *
+ * @param channel to measure
+ * @param config of the ADC conversion
+ * @param data to store the value
+ * @return error code
+ */
 uint8_t LTC2499::readRaw(ADCChannel_t channel, uint8_t config, int32_t *data) {
   char buf[4] = {channel, config, 0, 0};
   uint8_t result = i2c.write(addr, buf, 2);
