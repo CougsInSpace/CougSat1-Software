@@ -3,6 +3,7 @@ package space.cougs.ground.gui.subsystems;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 
@@ -16,6 +17,7 @@ import javax.swing.SwingConstants;
 import space.cougs.ground.CougSat1Telemetry;
 import space.cougs.ground.utils.CustomColors;
 import space.cougs.ground.utils.Fonts;
+import space.cougs.ground.utils.RoundButton;
 
 @SuppressWarnings("serial")
 public class HealthPanel extends JPanel {
@@ -348,6 +350,7 @@ public class HealthPanel extends JPanel {
 		private JProgressBar sp2VBar = new JProgressBar(SwingConstants.HORIZONTAL, 0, 100);
 		private JProgressBar sp2CBar = new JProgressBar(SwingConstants.HORIZONTAL, 0, 100);
 		private JProgressBar sp3VBar = new JProgressBar(SwingConstants.HORIZONTAL, 0, 100);
+		private JProgressBar sp3CBar = new JProgressBar(SwingConstants.HORIZONTAL, 0, 100);
 		private JProgressBar v3v3Bar = new JProgressBar(SwingConstants.HORIZONTAL, 0, 100);
 		private JProgressBar c3v3Bar = new JProgressBar(SwingConstants.HORIZONTAL, 0, 100);
 		private JProgressBar v5v0Bar = new JProgressBar(SwingConstants.HORIZONTAL, 0, 100);
@@ -361,16 +364,48 @@ public class HealthPanel extends JPanel {
 		private JLabel battery1 = new JLabel("Battery 1", SwingConstants.CENTER);
 		private JLabel battery1V = new JLabel("12V", SwingConstants.CENTER);
 		private JLabel battery1C = new JLabel("12A", SwingConstants.CENTER);
-		 private JLabel battHeat = new JLabel("Battery Heaters", SwingConstants.CENTER);
-		 private JLabel batt0Heat = new JLabel("12W", SwingConstants.CENTER);
-		 private JLabel batt1Heat = new JLabel("12W", SwingConstants.CENTER);
-		// private JLabel pInLabel = new JLabel("In: 12W",
-		// SwingConstants.CENTER);
-		// private JLabel pInLabel = new JLabel("In: 12W",
-		// SwingConstants.CENTER);
+		private JLabel battHeat = new JLabel("Battery Heaters", SwingConstants.CENTER);
+		private JLabel batt0Heat = new JLabel("12W", SwingConstants.CENTER);
+		private JLabel batt1Heat = new JLabel("12W", SwingConstants.CENTER);
+		private JLabel sp0 = new JLabel("Solar Panel 0", SwingConstants.CENTER);
+		private JLabel sp1 = new JLabel("Solar Panel 1", SwingConstants.CENTER);
+		private JLabel sp2 = new JLabel("Solar Panel 2", SwingConstants.CENTER);
+		private JLabel sp3 = new JLabel("Solar Panel 3", SwingConstants.CENTER);
+		private JLabel sp0V = new JLabel("12V", SwingConstants.CENTER);
+		private JLabel sp0C = new JLabel("12A", SwingConstants.CENTER);
+		private JLabel sp1V = new JLabel("12V", SwingConstants.CENTER);
+		private JLabel sp1C = new JLabel("12A", SwingConstants.CENTER);
+		private JLabel sp2V = new JLabel("12V", SwingConstants.CENTER);
+		private JLabel sp2C = new JLabel("12A", SwingConstants.CENTER);
+		private JLabel sp3V = new JLabel("12V", SwingConstants.CENTER);
+		private JLabel sp3C = new JLabel("12A", SwingConstants.CENTER);
+		private JLabel label3v3 = new JLabel("3.3V Rail", SwingConstants.CENTER);
+		private JLabel v3v3 = new JLabel("12V", SwingConstants.CENTER);
+		private JLabel c3v3 = new JLabel("12A", SwingConstants.CENTER);
+		private JLabel label5v0 = new JLabel("5.0V Rail", SwingConstants.CENTER);
+		private JLabel v5v0 = new JLabel("12V", SwingConstants.CENTER);
+		private JLabel c5v0 = new JLabel("12A", SwingConstants.CENTER);
+		private JLabel channels = new JLabel("Channels", SwingConstants.CENTER);
+
+		private JLabel ch0 = new JLabel("0", SwingConstants.CENTER);
+		private JLabel ch1 = new JLabel("1", SwingConstants.CENTER);
+		private JLabel ch2 = new JLabel("2", SwingConstants.CENTER);
+		private JLabel ch3 = new JLabel("3", SwingConstants.CENTER);
+		private JLabel ch4 = new JLabel("4", SwingConstants.CENTER);
+		private JLabel ch5 = new JLabel("5", SwingConstants.CENTER);
+		private JLabel ch6 = new JLabel("6", SwingConstants.CENTER);
+		private JLabel ch7 = new JLabel("7", SwingConstants.CENTER);
+		private JLabel ch8 = new JLabel("8", SwingConstants.CENTER);
+		private JLabel ch9 = new JLabel("9", SwingConstants.CENTER);
+		private JLabel ch10 = new JLabel("10", SwingConstants.CENTER);
+		private JLabel ch11 = new JLabel("11", SwingConstants.CENTER);
+		private JLabel ch12 = new JLabel("12", SwingConstants.CENTER);
+		private JLabel ch13 = new JLabel("13", SwingConstants.CENTER);
+
+		private JPanel channelWrapper = new JPanel();
 
 		ArrayList<JLabel> labels = new ArrayList<JLabel>();
-		ArrayList<JButton> buttons = new ArrayList<JButton>();
+		ArrayList<JLabel> channelLabels = new ArrayList<JLabel>();
 
 		public PowerHealth() {
 
@@ -386,18 +421,60 @@ public class HealthPanel extends JPanel {
 			labels.add(battHeat);
 			labels.add(batt0Heat);
 			labels.add(batt1Heat);
-			
+			labels.add(sp0);
+			labels.add(sp0V);
+			labels.add(sp0C);
+			labels.add(sp1);
+			labels.add(sp1V);
+			labels.add(sp1C);
+			labels.add(sp2);
+			labels.add(sp2V);
+			labels.add(sp2C);
+			labels.add(sp3);
+			labels.add(sp3V);
+			labels.add(sp3C);
+			labels.add(v3v3);
+			labels.add(c3v3);
+			labels.add(v5v0);
+			labels.add(c5v0);
+			labels.add(label3v3);
+			labels.add(label5v0);
+			labels.add(channels);
+
 			for (JLabel label : labels) {
 
 				label.setForeground(Color.WHITE);
 				label.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			}
 
-			for (JButton button : buttons) {
+			channelLabels.add(ch0);
+			channelLabels.add(ch1);
+			channelLabels.add(ch2);
+			channelLabels.add(ch3);
+			channelLabels.add(ch4);
+			channelLabels.add(ch5);
+			channelLabels.add(ch6);
+			channelLabels.add(ch7);
+			channelLabels.add(ch8);
+			channelLabels.add(ch9);
+			channelLabels.add(ch10);
+			channelLabels.add(ch11);
+			channelLabels.add(ch12);
+			channelLabels.add(ch13);
 
-				button.setForeground(Color.WHITE);
-				button.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
+			for (JLabel label : channelLabels) {
+
+				label.setForeground(Color.WHITE);
+				label.setOpaque(true);
+				label.setBackground(CustomColors.CRIMSON);
+				label.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			}
+
+			// for (JButton button : buttons) {
+			//
+			// button.setForeground(Color.WHITE);
+			// button.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
+			// }
 
 			this.setLayout(new GridBagLayout());
 			GridBagConstraints gbc = new GridBagConstraints();
@@ -409,24 +486,24 @@ public class HealthPanel extends JPanel {
 			gbc.weighty = 1.0;
 			gbc.gridheight = 1;
 			gbc.gridwidth = 8;
-			this.add(power, gbc);
+			this.add(power, gbc);// power label at top of screen
 
 			gbc.gridx = 0;
 			gbc.gridy = 1;
 			gbc.gridwidth = 2;
-			this.add(pInLabel, gbc);
+			this.add(pInLabel, gbc);// power in
 
 			gbc.gridwidth = 6;
 			gbc.gridx = 2;
 			this.add(pInBar, gbc);
 
 			gbc.gridy = 2;
-			gbc.gridx = 1;
+			gbc.gridx = 0;
 			gbc.gridwidth = 2;
-			this.add(pOutLabel, gbc);
+			this.add(pOutLabel, gbc);// power out
 
 			gbc.gridwidth = 6;
-			gbc.gridx = 3;
+			gbc.gridx = 2;
 			this.add(pOutBar, gbc);
 
 			gbc.gridwidth = 8;// battery 0
@@ -474,12 +551,12 @@ public class HealthPanel extends JPanel {
 			gbc.gridwidth = 6;
 			gbc.gridx = 2;
 			this.add(batt1CBar, gbc);
-			
+
 			gbc.gridwidth = 8;// battery Heat
 			gbc.gridx = 0;
 			gbc.gridy = 9;
 			this.add(battHeat, gbc);
-			
+
 			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 10;
@@ -497,17 +574,196 @@ public class HealthPanel extends JPanel {
 			gbc.gridwidth = 6;
 			gbc.gridx = 2;
 			this.add(batt1HeatBar, gbc);
-			
-			
-			
-			
-			
-			
-			
+
+			gbc.gridwidth = 8;// solar panel 0 input
+			gbc.gridx = 0;
+			gbc.gridy = 12;
+			this.add(sp0, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 13;
+			this.add(sp0V, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(sp0VBar, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 14;
+			this.add(sp0C, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(sp0CBar, gbc);
+
+			gbc.gridwidth = 8;// solar panel 1 input
+			gbc.gridx = 0;
+			gbc.gridy = 15;
+			this.add(sp1, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 16;
+			this.add(sp1V, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(sp1VBar, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 17;
+			this.add(sp1C, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(sp1CBar, gbc);
+
+			gbc.gridwidth = 8;// solar panel 2 input
+			gbc.gridx = 0;
+			gbc.gridy = 18;
+			this.add(sp2, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 19;
+			this.add(sp2V, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(sp2VBar, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 20;
+			this.add(sp2C, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(sp2CBar, gbc);
+
+			gbc.gridwidth = 8;// solar panel 3 input
+			gbc.gridx = 0;
+			gbc.gridy = 21;
+			this.add(sp3, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 22;
+			this.add(sp3V, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(sp3VBar, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 23;
+			this.add(sp3C, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(sp3CBar, gbc);
+
+			gbc.gridwidth = 8;// 3.3V rail input
+			gbc.gridx = 0;
+			gbc.gridy = 24;
+			this.add(label3v3, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 25;
+			this.add(v3v3, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(v3v3Bar, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 26;
+			this.add(c3v3, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(c3v3Bar, gbc);
+
+			gbc.gridwidth = 8;// 5.0V rail input
+			gbc.gridx = 0;
+			gbc.gridy = 27;
+			this.add(label5v0, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 28;
+			this.add(v5v0, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(v5v0Bar, gbc);
+
+			gbc.gridwidth = 2;
+			gbc.gridx = 0;
+			gbc.gridy = 29;
+			this.add(c5v0, gbc);
+
+			gbc.gridwidth = 6;
+			gbc.gridx = 2;
+			this.add(c5v0Bar, gbc);
+
+			gbc.gridwidth = 8;// channels
+			gbc.gridx = 0;
+			gbc.gridy = 30;
+			this.add(channels, gbc);
+
+			// --------------------
+
+			GridLayout gl = new GridLayout(2, 7, 5, 5);
+
+			channelWrapper.setLayout(gl);
+			channelWrapper.setBackground(CustomColors.NAVY);
+
+			channelWrapper.add(ch0);
+			channelWrapper.add(ch1);
+			channelWrapper.add(ch2);
+			channelWrapper.add(ch3);
+			channelWrapper.add(ch4);
+			channelWrapper.add(ch5);
+			channelWrapper.add(ch6);
+			channelWrapper.add(ch7);
+			channelWrapper.add(ch8);
+			channelWrapper.add(ch9);
+			channelWrapper.add(ch10);
+			channelWrapper.add(ch11);
+			channelWrapper.add(ch12);
+			channelWrapper.add(ch13);
+
+			gbc.gridy = 31;
+			this.add(channelWrapper, gbc);
 
 		}
 
 		public void updateData(CougSat1Telemetry data) {
+
+			int channels = data.getEPSChannels();
+			
+			for (int i = 0; i < channelLabels.size(); i++) {
+
+				if ((channels & (1 << i)) != 0) {
+
+					channelLabels.get(i).setBackground(Color.GREEN);
+					channelLabels.get(i).setForeground(Color.BLACK);
+
+				} else {
+
+					channelLabels.get(i).setBackground(CustomColors.CRIMSON);
+					channelLabels.get(i).setForeground(Color.WHITE);
+
+				}
+
+			}
 
 		}
 
