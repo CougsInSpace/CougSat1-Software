@@ -61,6 +61,7 @@ public class HealthPanel extends JPanel {
 		this.add(adcsHealth, gbc);
 
 		gbc.gridx = 1;
+		;
 		gbc.gridy = 0;
 		gbc.weightx = 0.6;
 		gbc.gridwidth = 1;
@@ -126,17 +127,18 @@ public class HealthPanel extends JPanel {
 			gbc.gridwidth = 1;
 			gbc.weighty = 15.0;
 			gbc.insets = new Insets(0, 20, 0, 20);
-			txBar.setBackground(CustomColors.LIGHT_GRAY);
+			txBar.setBackground(CustomColors.WSU_GRAY);
 			txBar.setForeground(CustomColors.CRIMSON);
 			this.add(txBar, gbc);
 
 			gbc.gridx = 1;
-			rxBar.setBackground(CustomColors.LIGHT_GRAY);
+			;
+			rxBar.setBackground(CustomColors.WSU_GRAY);
 			rxBar.setForeground(CustomColors.CRIMSON);
 			this.add(rxBar, gbc);
 
 			gbc.gridx = 2;
-			snrBar.setBackground(CustomColors.LIGHT_GRAY);
+			snrBar.setBackground(CustomColors.WSU_GRAY);
 			snrBar.setForeground(CustomColors.CRIMSON);
 			this.add(snrBar, gbc);
 
@@ -151,6 +153,7 @@ public class HealthPanel extends JPanel {
 
 			gbc.gridy = 2;
 			gbc.gridx = 1;
+			;
 			this.add(rxData, gbc);
 
 			gbc.gridy = 3;
@@ -227,6 +230,7 @@ public class HealthPanel extends JPanel {
 			this.add(modeLabel, gbc);
 
 			gbc.gridx = 1;
+			;
 			mode.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			mode.setForeground(Color.WHITE);
 			this.add(mode, gbc);
@@ -238,6 +242,7 @@ public class HealthPanel extends JPanel {
 			this.add(timeLabel, gbc);
 
 			gbc.gridx = 1;
+			;
 			time.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			time.setForeground(Color.WHITE);
 			this.add(time, gbc);
@@ -249,6 +254,7 @@ public class HealthPanel extends JPanel {
 			this.add(sdPieLabel, gbc);
 
 			gbc.gridx = 1;
+			;
 			sdUsed.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			sdUsed.setForeground(Color.WHITE);
 			this.add(sdUsed, gbc);
@@ -260,6 +266,7 @@ public class HealthPanel extends JPanel {
 			this.add(resetLabel, gbc);
 
 			gbc.gridx = 1;
+			;
 			reset.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			reset.setForeground(Color.WHITE);
 			this.add(reset, gbc);
@@ -271,6 +278,7 @@ public class HealthPanel extends JPanel {
 			this.add(payloadLabel, gbc);
 
 			gbc.gridx = 1;
+			;
 			payload.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			payload.setForeground(Color.WHITE);
 			this.add(payload, gbc);
@@ -294,40 +302,6 @@ public class HealthPanel extends JPanel {
 			sdUsed.setText(buff);
 			reset.setText(data.getResetCount() + "");
 			payload.setText(data.getPayloadFrames() + "");
-
-		}
-	}
-
-	private class TempHealth extends JPanel {
-
-		JLabel temp = new JLabel("Temp", SwingConstants.CENTER);
-
-		public TempHealth() {
-
-			temp.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			temp.setForeground(Color.WHITE);
-			this.add(temp);
-
-		}
-
-		public void updateData(CougSat1Telemetry data) {
-
-		}
-	}
-
-	private class ADCSHealth extends JPanel {
-
-		JLabel adcs = new JLabel("Adcs", SwingConstants.CENTER);
-
-		public ADCSHealth() {
-
-			adcs.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			adcs.setForeground(Color.WHITE);
-			this.add(adcs);
-
-		}
-
-		public void updateData(CougSat1Telemetry data) {
 
 		}
 	}
@@ -406,8 +380,37 @@ public class HealthPanel extends JPanel {
 
 		ArrayList<JLabel> labels = new ArrayList<JLabel>();
 		ArrayList<JLabel> channelLabels = new ArrayList<JLabel>();
+		ArrayList<JProgressBar> bars = new ArrayList<JProgressBar>();
 
 		public PowerHealth() {
+
+			bars.add(pInBar);
+			bars.add(pOutBar);
+			bars.add(batt0VBar);
+			bars.add(batt0CBar);
+			bars.add(batt1VBar);
+			bars.add(batt1CBar);
+			bars.add(batt0HeatBar);
+			bars.add(batt1HeatBar);
+			bars.add(sp0VBar);
+			bars.add(sp0CBar);
+			bars.add(sp1VBar);
+			bars.add(sp1CBar);
+			bars.add(sp2VBar);
+			bars.add(sp2CBar);
+			bars.add(sp3VBar);
+			bars.add(sp3CBar);
+			bars.add(v3v3Bar);
+			bars.add(c3v3Bar);
+			bars.add(v5v0Bar);
+			bars.add(c5v0Bar);
+
+			for (JProgressBar bar : bars) {
+
+				bar.setBackground(CustomColors.WSU_GRAY);
+				bar.setForeground(CustomColors.CRIMSON);
+
+			}
 
 			labels.add(power);
 			labels.add(pInLabel);
@@ -470,254 +473,269 @@ public class HealthPanel extends JPanel {
 				label.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			}
 
-			// for (JButton button : buttons) {
-			//
-			// button.setForeground(Color.WHITE);
-			// button.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			// }
-
 			this.setLayout(new GridBagLayout());
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.insets = new Insets(5, 5, 5, 5);
-			gbc.fill = GridBagConstraints.HORIZONTAL;
+			gbc.fill = GridBagConstraints.BOTH;
 			gbc.gridx = 0;
 			gbc.gridy = 0;
 			gbc.weightx = 1.0;
 			gbc.weighty = 1.0;
 			gbc.gridheight = 1;
-			gbc.gridwidth = 8;
+			gbc.gridwidth = 2;
 			this.add(power, gbc);// power label at top of screen
 
 			gbc.gridx = 0;
 			gbc.gridy = 1;
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
+			gbc.weightx = 0.1;
 			this.add(pInLabel, gbc);// power in
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(pInBar, gbc);
 
 			gbc.gridy = 2;
 			gbc.gridx = 0;
-			gbc.gridwidth = 2;
+			gbc.weightx = 0.1;
 			this.add(pOutLabel, gbc);// power out
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(pOutBar, gbc);
 
-			gbc.gridwidth = 8;// battery 0
+			gbc.gridwidth = 2;// battery 0
 			gbc.gridx = 0;
 			gbc.gridy = 3;
+			gbc.weightx = 1.0;
 			this.add(battery0, gbc);
 
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
 			gbc.gridx = 0;
 			gbc.gridy = 4;
+			gbc.weightx = 0.1;
 			this.add(battery0V, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(batt0VBar, gbc);
 
-			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 5;
+			gbc.weightx = 0.1;
 			this.add(battery0C, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(batt0CBar, gbc);
 
-			gbc.gridwidth = 8;// battery 1
+			gbc.gridwidth = 2;// battery 1
 			gbc.gridx = 0;
 			gbc.gridy = 6;
+			gbc.weightx = 1.0;
 			this.add(battery1, gbc);
 
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
 			gbc.gridx = 0;
 			gbc.gridy = 7;
+			gbc.weightx = 0.1;
 			this.add(battery1V, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(batt1VBar, gbc);
 
-			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 8;
+			gbc.weightx = 0.1;
 			this.add(battery1C, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(batt1CBar, gbc);
 
-			gbc.gridwidth = 8;// battery Heat
+			gbc.gridwidth = 2;// battery Heat
 			gbc.gridx = 0;
 			gbc.gridy = 9;
+			gbc.weightx = 1.0;
 			this.add(battHeat, gbc);
 
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
 			gbc.gridx = 0;
 			gbc.gridy = 10;
+			gbc.weightx = 0.1;
 			this.add(batt0Heat, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(batt0HeatBar, gbc);
 
-			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 11;
+			gbc.weightx = 0.1;
 			this.add(batt1Heat, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(batt1HeatBar, gbc);
 
-			gbc.gridwidth = 8;// solar panel 0 input
+			gbc.gridwidth = 2;// solar panel 0 input
 			gbc.gridx = 0;
 			gbc.gridy = 12;
+			gbc.weightx = 1.0;
 			this.add(sp0, gbc);
 
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
 			gbc.gridx = 0;
 			gbc.gridy = 13;
+			gbc.weightx = 0.1;
 			this.add(sp0V, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(sp0VBar, gbc);
 
-			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 14;
+			gbc.weightx = 0.1;
 			this.add(sp0C, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(sp0CBar, gbc);
 
-			gbc.gridwidth = 8;// solar panel 1 input
+			gbc.gridwidth = 2;// solar panel 1 input
 			gbc.gridx = 0;
 			gbc.gridy = 15;
+			gbc.weightx = 1.0;
 			this.add(sp1, gbc);
 
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
 			gbc.gridx = 0;
 			gbc.gridy = 16;
+			gbc.weightx = 0.1;
 			this.add(sp1V, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(sp1VBar, gbc);
 
-			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 17;
+			gbc.weightx = 0.1;
 			this.add(sp1C, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(sp1CBar, gbc);
 
-			gbc.gridwidth = 8;// solar panel 2 input
+			gbc.gridwidth = 2;// solar panel 2 input
 			gbc.gridx = 0;
 			gbc.gridy = 18;
+			gbc.weightx = 1.0;
 			this.add(sp2, gbc);
 
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
 			gbc.gridx = 0;
 			gbc.gridy = 19;
+			gbc.weightx = 0.1;
 			this.add(sp2V, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(sp2VBar, gbc);
 
-			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 20;
+			gbc.weightx = 0.1;
 			this.add(sp2C, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(sp2CBar, gbc);
 
-			gbc.gridwidth = 8;// solar panel 3 input
+			gbc.gridwidth = 2;// solar panel 3 input
 			gbc.gridx = 0;
 			gbc.gridy = 21;
+			gbc.weightx = 1.0;
 			this.add(sp3, gbc);
 
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
 			gbc.gridx = 0;
 			gbc.gridy = 22;
+			gbc.weightx = 0.1;
 			this.add(sp3V, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(sp3VBar, gbc);
 
-			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 23;
+			gbc.weightx = 0.1;
 			this.add(sp3C, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(sp3CBar, gbc);
 
-			gbc.gridwidth = 8;// 3.3V rail input
+			gbc.gridwidth = 2;// 3.3V rail input
 			gbc.gridx = 0;
 			gbc.gridy = 24;
+			gbc.weightx = 1.0;
 			this.add(label3v3, gbc);
 
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
 			gbc.gridx = 0;
 			gbc.gridy = 25;
+			gbc.weightx = 0.1;
 			this.add(v3v3, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(v3v3Bar, gbc);
 
-			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 26;
+			gbc.weightx = 0.1;
 			this.add(c3v3, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(c3v3Bar, gbc);
 
-			gbc.gridwidth = 8;// 5.0V rail input
+			gbc.gridwidth = 2;// 5.0V rail input
 			gbc.gridx = 0;
 			gbc.gridy = 27;
+			gbc.weightx = 1.0;
 			this.add(label5v0, gbc);
 
-			gbc.gridwidth = 2;
+			gbc.gridwidth = 1;
 			gbc.gridx = 0;
 			gbc.gridy = 28;
+			gbc.weightx = 0.1;
 			this.add(v5v0, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(v5v0Bar, gbc);
 
-			gbc.gridwidth = 2;
 			gbc.gridx = 0;
 			gbc.gridy = 29;
+			gbc.weightx = 0.1;
 			this.add(c5v0, gbc);
 
-			gbc.gridwidth = 6;
-			gbc.gridx = 2;
+			gbc.gridx = 1;
+			gbc.weightx = 0.9;
 			this.add(c5v0Bar, gbc);
 
-			gbc.gridwidth = 8;// channels
+			gbc.gridwidth = 2;// channels
 			gbc.gridx = 0;
 			gbc.gridy = 30;
+			gbc.weightx = 1.0;
 			this.add(channels, gbc);
 
+			gbc.gridwidth = 2;
 			// --------------------
 
 			GridLayout gl = new GridLayout(2, 7, 5, 5);
@@ -748,7 +766,7 @@ public class HealthPanel extends JPanel {
 		public void updateData(CougSat1Telemetry data) {
 
 			int channels = data.getEPSChannels();
-			
+
 			for (int i = 0; i < channelLabels.size(); i++) {
 
 				if ((channels & (1 << i)) != 0) {
@@ -762,11 +780,291 @@ public class HealthPanel extends JPanel {
 					channelLabels.get(i).setForeground(Color.WHITE);
 
 				}
-
 			}
+
+			pInLabel.setText(String.format("In: %.3f W", data.getPowerIn()));
+			pOutLabel.setText(String.format("Out: %.3f W", data.getPowerOut()));
+			battery0V.setText(String.format("%.3f V", data.getBattery0Voltage()));
+			battery0C.setText(String.format("%.3f A", data.getBattery0Current()));
+			battery1V.setText(String.format("%.3f V", data.getBattery1Voltage()));
+			battery1C.setText(String.format("%.3f A", data.getBattery1Current()));
+
+			if (data.getBattery0Heat() < 1000) {
+				batt0Heat.setText(String.format("%.1f mW", data.getBattery0Heat()));
+			} else {
+				batt0Heat.setText(String.format("%1.3f W", data.getBattery0Heat() * 0.001));
+			}
+			if (data.getBattery0Heat() < 1000) {
+				batt1Heat.setText(String.format("%.1f mW", data.getBattery1Heat()));
+			} else {
+				batt1Heat.setText(String.format("%1.3f W", data.getBattery1Heat() * 0.001));
+			}
+
+			sp0V.setText(String.format("%.3f V", data.getSP0Voltage()));
+			sp0C.setText(String.format("%.3f A", data.getSP0Current()));
+			sp1V.setText(String.format("%.3f V", data.getSP1Voltage()));
+			sp1C.setText(String.format("%.3f A", data.getSP1Current()));
+			sp2V.setText(String.format("%.3f V", data.getSP2Voltage()));
+			sp2C.setText(String.format("%.3f A", data.getSP2Current()));
+			sp3V.setText(String.format("%.3f V", data.getSP3Voltage()));
+			sp3C.setText(String.format("%.3f A", data.getSP3Current()));
+
+			v3v3.setText(String.format("%.3f V", data.get3v3RailVoltage()));
+			c3v3.setText(String.format("%.3f A", data.get3v3RailCurrent()));
+
+			v5v0.setText(String.format("%.3f V", data.get5vRailVoltage()));
+			c5v0.setText(String.format("%.3f A", data.get5vRailCurrent()));
+
+			pInBar.setValue((int) (data.getPowerIn() / 10.0 * 100));
+			pOutBar.setValue((int) (data.getPowerOut() / 20.0 * 100));
+
+			batt0VBar.setValue((int) (data.getBattery0Voltage() / 4.2 * 100));
+			batt0CBar.setValue((int) (data.getBattery0Current() / 3.0 * 100));
+
+			batt1VBar.setValue((int) (data.getBattery1Voltage() / 4.2 * 100));
+			batt1CBar.setValue((int) (data.getBattery1Current() / 3.0 * 100));
+
+			batt0HeatBar.setValue((int) (data.getBattery0Heat() / 1500.0 * 100));
+			batt1HeatBar.setValue((int) (data.getBattery1Heat() / 1500.0 * 100));
+
+			sp0VBar.setValue((int) (data.getSP0Voltage() / 5.5 * 100));
+			sp0CBar.setValue((int) (data.getSP0Current() / 0.6 * 100));
+			sp1VBar.setValue((int) (data.getSP1Voltage() / 5.5 * 100));
+			sp1CBar.setValue((int) (data.getSP1Current() / 0.6 * 100));
+			sp2VBar.setValue((int) (data.getSP2Voltage() / 5.5 * 100));
+			sp2CBar.setValue((int) (data.getSP2Current() / 0.6 * 100));
+			sp3VBar.setValue((int) (data.getSP3Voltage() / 5.5 * 100));
+			sp3CBar.setValue((int) (data.getSP3Current() / 0.6 * 100));
+			v3v3Bar.setValue((int) (data.get3v3RailVoltage() / 3.5 * 100));
+			c3v3Bar.setValue((int) (data.get3v3RailCurrent() / 4.0 * 100));
+
+			v5v0Bar.setValue((int) (data.get5vRailVoltage() / 5.2 * 100));
+			c5v0Bar.setValue((int) (data.get5vRailCurrent() / 2.0 * 100));
 
 		}
 
+	}
+
+	private class TempHealth extends JPanel {
+
+		private JProgressBar IHUTemp = new JProgressBar(SwingConstants.VERTICAL, 0, 100);
+		private JProgressBar ADCSTemp = new JProgressBar(SwingConstants.VERTICAL, 0, 100);
+		private JProgressBar IFJRTemp = new JProgressBar(SwingConstants.VERTICAL, 0, 100);
+		private JProgressBar PMICTemp = new JProgressBar(SwingConstants.VERTICAL, 0, 100);
+		private JProgressBar battery0Temp = new JProgressBar(SwingConstants.VERTICAL, 0, 100);
+		private JProgressBar battery1Temp = new JProgressBar(SwingConstants.VERTICAL, 0, 100);
+		private JProgressBar RCSTemp = new JProgressBar(SwingConstants.VERTICAL, 0, 100);
+
+		JLabel temp = new JLabel("Temp", SwingConstants.CENTER);
+		JLabel IHUTempLabel = new JLabel(" IHU  ", SwingConstants.CENTER);
+		JLabel ADCSTempLabel = new JLabel(" ADCS ", SwingConstants.CENTER);
+		JLabel IFJRTempLabel = new JLabel(" IFJR ", SwingConstants.CENTER);
+		JLabel PMICTempLabel = new JLabel(" PMIC ", SwingConstants.CENTER);
+		JLabel battery0TempLabel = new JLabel("Batt 0", SwingConstants.CENTER);
+		JLabel battery1TempLabel = new JLabel("Batt 1", SwingConstants.CENTER);
+		JLabel RCSTempLabel = new JLabel(" RCS  ", SwingConstants.CENTER);
+
+		JLabel IHUValue = new JLabel("", SwingConstants.CENTER);
+		JLabel ADCSValue = new JLabel("", SwingConstants.CENTER);
+		JLabel IFJRValue = new JLabel("", SwingConstants.CENTER);
+		JLabel PMICValue = new JLabel("", SwingConstants.CENTER);
+		JLabel Battery0Value = new JLabel("", SwingConstants.CENTER);
+		JLabel Battery1Value = new JLabel("", SwingConstants.CENTER);
+		JLabel RCSValue = new JLabel("", SwingConstants.CENTER);
+
+		ArrayList<JLabel> labels = new ArrayList<JLabel>();
+		ArrayList<JProgressBar> bars = new ArrayList<JProgressBar>();
+
+		public TempHealth() {
+
+			labels.add(temp);
+			labels.add(IHUTempLabel);
+			labels.add(ADCSTempLabel);
+			labels.add(IFJRTempLabel);
+			labels.add(PMICTempLabel);
+			labels.add(battery0TempLabel);
+			labels.add(battery1TempLabel);
+			labels.add(RCSTempLabel);
+
+			labels.add(IHUValue);
+			labels.add(ADCSValue);
+			labels.add(IFJRValue);
+			labels.add(PMICValue);
+			labels.add(Battery0Value);
+			labels.add(Battery1Value);
+			labels.add(RCSValue);
+
+			for (JLabel label : labels) {
+
+				label.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
+				label.setForeground(Color.WHITE);
+
+			}
+
+			bars.add(IHUTemp);
+			bars.add(ADCSTemp);
+			bars.add(IFJRTemp);
+			bars.add(PMICTemp);
+			bars.add(battery0Temp);
+			bars.add(battery1Temp);
+			bars.add(RCSTemp);
+
+			for (JProgressBar bar : bars) {
+
+				bar.setBackground(CustomColors.WSU_GRAY);
+				bar.setForeground(CustomColors.CRIMSON);
+
+			}
+
+			this.setLayout(new GridBagLayout());
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.insets = new Insets(5, 5, 5, 5);
+			gbc.fill = GridBagConstraints.VERTICAL;
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			gbc.weightx = 1.0;
+			gbc.weighty = 1.0;
+			gbc.gridheight = 1;
+			gbc.gridwidth = 21;
+			this.add(temp, gbc);
+
+			gbc.gridwidth = 3;
+			gbc.gridy = 1;
+			gbc.gridx = 0;
+			this.add(IHUValue, gbc);
+
+			gbc.gridy = 3;
+			this.add(IHUTempLabel, gbc);
+
+			gbc.gridx = 3;
+			gbc.gridy = 1;
+			this.add(ADCSValue, gbc);
+
+			gbc.gridy = 3;
+			this.add(ADCSTempLabel, gbc);
+
+			gbc.gridx = 6;
+			gbc.gridy = 1;
+			this.add(IFJRValue, gbc);
+
+			gbc.gridy = 3;
+			this.add(IFJRTempLabel, gbc);
+
+			gbc.gridx = 9;
+			gbc.gridy = 1;
+			this.add(RCSValue, gbc);
+
+			gbc.gridy = 3;
+			this.add(RCSTempLabel, gbc);
+
+			gbc.gridx = 12;
+			gbc.gridy = 1;
+			this.add(PMICValue, gbc);
+
+			gbc.gridy = 3;
+			this.add(PMICTempLabel, gbc);
+
+			gbc.gridx = 15;
+			gbc.gridy = 1;
+			this.add(Battery0Value, gbc);
+
+			gbc.gridy = 3;
+			this.add(battery0TempLabel, gbc);
+
+			gbc.gridx = 18;
+			gbc.gridy = 1;
+			this.add(Battery1Value, gbc);
+
+			gbc.gridy = 3;
+			this.add(battery1TempLabel, gbc);
+
+			gbc.fill = GridBagConstraints.BOTH;
+			gbc.insets = new Insets(0, 50, 0, 50);
+			gbc.gridy = 2;
+			gbc.gridx = 1;
+			gbc.gridwidth = 1;
+			this.add(IHUTemp, gbc);
+
+			gbc.gridx = 4;
+			this.add(ADCSTemp, gbc);
+
+			gbc.gridx = 7;
+			this.add(IFJRTemp, gbc);
+
+			gbc.gridx = 10;
+			this.add(RCSTemp, gbc);
+
+			gbc.gridx = 13;
+			this.add(PMICTemp, gbc);
+
+			gbc.gridx = 16;
+			this.add(battery0Temp, gbc);
+
+			gbc.gridx = 19;
+			this.add(battery1Temp, gbc);
+
+		}
+
+		public void updateData(CougSat1Telemetry data) {
+
+			IHUValue.setText(String.format("%d C", data.getIHUTemp()));
+			ADCSValue.setText(String.format("%d C", data.getADCSTemp()));
+			IFJRValue.setText(String.format("%d C", data.getIFJRTemp()));
+			PMICValue.setText(String.format("%d C", data.getPMICTemp()));
+			Battery0Value.setText(String.format("%d C", data.getBattery0Temp()));
+			Battery1Value.setText(String.format("%d C", data.getBattery1Temp()));
+			RCSValue.setText(String.format("%d C", data.getRCSTemp()));
+
+			IHUTemp.setValue((int) ((data.getIHUTemp() + 80) / 160.0 * 100));// -80
+																				// -
+																				// 80
+			ADCSTemp.setValue((int) ((data.getADCSTemp() + 80) / 160.0 * 100));
+			IFJRTemp.setValue((int) ((data.getIFJRTemp() + 80) / 160.0 * 100));
+			PMICTemp.setValue((int) ((data.getPMICTemp() + 80) / 160.0 * 100));
+			battery0Temp.setValue((int) ((data.getBattery0Temp() + 80) / 160.0 * 100));
+			battery1Temp.setValue((int) ((data.getBattery1Temp() + 80) / 160.0 * 100));
+			RCSTemp.setValue((int) ((data.getRCSTemp() + 80) / 160.0 * 100));
+
+			// JLabel IHUValue = new JLabel("", SwingConstants.CENTER);
+			// JLabel ADCSValue = new JLabel("", SwingConstants.CENTER);
+			// JLabel IFJRValue = new JLabel("", SwingConstants.CENTER);
+			// JLabel PMICValue = new JLabel("", SwingConstants.CENTER);
+			// JLabel Battery0Value= new JLabel("", SwingConstants.CENTER);
+			// JLabel Battery1Value = new JLabel("", SwingConstants.CENTER);
+			// JLabel RCSValue = new JLabel("", SwingConstants.CENTER);
+
+			// private JProgressBar IHUTemp = new
+			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
+			// private JProgressBar ADCSTemp = new
+			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
+			// private JProgressBar IFJRTemp = new
+			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
+			// private JProgressBar PMICTemp = new
+			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
+			// private JProgressBar battery0Temp = new
+			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
+			// private JProgressBar battery1Temp = new
+			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
+			// private JProgressBar RCSTemp = new
+			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
+		}
+	}
+
+	private class ADCSHealth extends JPanel {
+
+		JLabel adcs = new JLabel("Adcs", SwingConstants.CENTER);
+
+		public ADCSHealth() {
+
+			adcs.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
+			adcs.setForeground(Color.WHITE);
+			this.add(adcs);
+
+		}
+
+		public void updateData(CougSat1Telemetry data) {
+
+		}
 	}
 
 	public void updateData(CougSat1Telemetry data) {

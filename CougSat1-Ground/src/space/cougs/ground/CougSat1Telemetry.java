@@ -358,7 +358,7 @@ public class CougSat1Telemetry {
 	}
 
 	public void setPowerIn(double mPowerIn) {
-		this.mPowerIn = mPowerIn;
+		this.mPowerIn = mPowerIn * 0.001;
 	}
 
 	public double getPowerOut() {
@@ -366,7 +366,7 @@ public class CougSat1Telemetry {
 	}
 
 	public void setPowerOut(double mPowerOut) {
-		this.mPowerOut = mPowerOut;
+		this.mPowerOut = mPowerOut * 0.001;
 	}
 
 	public double get3v3RailVoltage() {
@@ -464,7 +464,7 @@ public class CougSat1Telemetry {
 	}
 
 	public void setBattery0Heat(double mBattery0Heat) {
-		this.mBattery0Heat = mBattery0Heat;
+		this.mBattery0Heat = mBattery0Heat * 50;
 	}
 
 	public double getBattery1Heat() {
@@ -472,7 +472,7 @@ public class CougSat1Telemetry {
 	}
 
 	public void setBattery1Heat(double mBattery1Heat) {
-		this.mBattery1Heat = mBattery1Heat;
+		this.mBattery1Heat = mBattery1Heat * 50;
 	}
 
 	public double get5vRailVoltage() {

@@ -73,10 +73,10 @@ public class PacketDecoder {
 			buff = infile.read();// reset count
 			telemetry.setResetCount(buff);
 
-			buff = infile.read();
+			buff = (byte) infile.read();//IHU temp
 			telemetry.setIHUTemp(buff);
 
-			longBuff = infile.read();
+			longBuff = infile.read();//SD CARD
 			longBuff = longBuff << 8;
 			longBuff |= infile.read();
 			longBuff = longBuff << 8;
@@ -88,12 +88,12 @@ public class PacketDecoder {
 			telemetry.setIHUSdCard(longBuff);
 
 			buff = infile.read();
-			telemetry.setIHUStatus(buff);
+			telemetry.setIHUStatus(buff);//IHUStatus
 
-			buff = infile.read();
-			telemetry.setADCSTemp(buff);
+			buff = (byte) infile.read();
+			telemetry.setADCSTemp(buff);//ADCS Temp
 
-			buff = infile.read();
+			buff = infile.read();//ADCS Status
 			telemetry.setADCSStatus(buff);
 
 			buff = infile.read();// lattitude
@@ -135,10 +135,10 @@ public class PacketDecoder {
 			buff |= infile.read();
 			telemetry.setYaw(buff);
 
-			buff = infile.read();// IFJR Temp
+			buff = (byte) infile.read();// IFJR Temp
 			telemetry.setIFJRTemp(buff);
 
-			buff = infile.read();// PMIC Temp - power
+			buff = (byte) infile.read();// PMIC Temp - power
 			telemetry.setPMICTemp(buff);
 
 			buff = infile.read();// voltage - b0
@@ -163,16 +163,16 @@ public class PacketDecoder {
 			buff2 = (buff2) & 0b111111111111;
 			telemetry.setBattery1Current(buff2, true);
 
-			buff = infile.read();// battery 0 temp
+			buff = (byte) infile.read();// battery 0 temp
 			telemetry.setBattery0Temp(buff);
 
-			buff = infile.read();// battery 1 temp
+			buff = (byte) infile.read();// battery 1 temp
 			telemetry.setBattery1Temp(buff);
 
-			buff = infile.read();// battery 0 heat?
+			buff = infile.read();// battery 0 heat
 			telemetry.setBattery0Heat(buff);
 
-			buff = infile.read();// battery 1 heat"
+			buff = infile.read();// battery 1 heat
 			telemetry.setBattery1Heat(buff);
 
 			buff = infile.read();// voltage - sp0
@@ -251,30 +251,30 @@ public class PacketDecoder {
 			buff2 = (buff2) & 0b111111111111;
 			telemetry.set5vRailCurrent(buff2, true);
 
-			buff = infile.read();
+			buff = infile.read();//Channels
 			buff = buff << 8;
 			buff |= infile.read();
 			telemetry.setEPSChannels(buff);
 
-			buff = infile.read();
+			buff = (byte) infile.read();//RCS Temp
 			telemetry.setRCSTemp(buff);
 
 			buff = infile.read();
-			telemetry.setRCSStatus(buff);
+			telemetry.setRCSStatus(buff); // RCS Status
 
 			buff = infile.read();
-			telemetry.setTXPower(buff);
+			telemetry.setTXPower(buff); // TX Power
 
 			buff = infile.read();
-			telemetry.setRXPower(buff);
+			telemetry.setRXPower(buff); // RX Power
 
 			buff = infile.read();
-			telemetry.setRXSNR(buff);
+			telemetry.setRXSNR(buff); // RX Signal Noise Ratio
 
 			buff = infile.read();
 			buff = buff << 8;
 			buff |= infile.read();
-			telemetry.setPayloadFrames(buff);
+			telemetry.setPayloadFrames(buff); //# of payload frames ready to download - aka pictures
 
 		} else if (buff == 0x80) {// diagnostic report
 			// tbd
