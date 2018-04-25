@@ -119,6 +119,7 @@ uint8_t LTC2499::readRaw(ADCChannel_t channel, int32_t *data) {
  */
 uint8_t LTC2499::readRaw(ADCChannel_t channel, uint8_t config, int32_t *data) {
   char buf[4] = {channel, config, 0, 0};
+  DEBUG("LTC2499", "Writing 0x%02x 0x%02x to 0x%02x", buf[0], buf[1], addr);
   uint8_t result = i2c.write(addr, buf, 2);
   if (result != ERROR_SUCCESS) {
     DEBUG("LTC2499", "Error commanding channel %d", channel);
