@@ -47,11 +47,13 @@ typedef enum ADCChannel_t {
   INT_TEMP = 0x80
 } ADCChannel_t;
 
+#define ADC_CONFIG_CHANNEL ((uint8_t)0xA0)
 #define ADC_CONFIG_EXT_50_60_1x ((uint8_t)0x80)
 #define ADC_CONFIG_EXT_50_60_2x ((uint8_t)0x88)
 #define ADC_CONFIG_TEMP_50_60_1x ((uint8_t)0xC0)
 
-#define ADC_RAW_MASK (0x01FFFFFF)
+#define ADC_RAW_MASK_POS (0x01FFFFFF)
+#define ADC_RAW_MASK_NEG (0xFE000000)
 
 #define ADC_OVERRANGE (0x7FFFFFFF)
 #define ADC_UNDERRANGE (0x80000000)
@@ -60,23 +62,28 @@ typedef enum ADCChannel_t {
 #define ADC_ZERO_KELVIN (-273.15f)
 #define ADC_TEMP_SLOPE (1570.0f)
 
+#define ADC_CONVERSION_TIMEOUT (200)
+
 class LTC2499 {
 public:
   LTC2499(I2C &i2c, uint8_t addr);
   LTC2499(I2C &i2c, uint8_t addr, float refVoltage);
+  uint8_t readVoltage(float *data);
   uint8_t readVoltage(ADCChannel_t channel, float *data);
   uint8_t readInternalTemperaure(float *data);
+  uint8_t selectChannel(ADCChannel_t channel);
   void setVRef(float refVoltage);
   uint8_t setVRef(float refVoltage, ADCChannel_t channel);
 
 private:
-  uint8_t readRaw(ADCChannel_t channel, int32_t *data);
-  uint8_t readRaw(ADCChannel_t channel, uint8_t config, int32_t *data);
+  uint8_t readRaw(int32_t *data);
+  uint8_t configureChannel(ADCChannel_t channel, uint8_t config);
 
   I2C &i2c;
   uint8_t addr;
   float conversionFactor;
   float refVoltage;
+  ADCChannel_t configuredChannel;
 };
 
 #endif /* _SRC_DRIVERS_LTC2499_H_ */

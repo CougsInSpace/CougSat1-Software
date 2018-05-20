@@ -23,9 +23,7 @@
 #include "drivers/LTC2499.h"
 
 I2C i2cLocal(I2C_LOCAL_SDA, I2C_LOCAL_SCL);
-I2C i2cBus(I2C_BUS_SDA, I2C_BUS_SCL);
-I2C i2cPMIC(I2C_PMIC_SDA, I2C_PMIC_SCL);
-// LTC2499 adcB(i2cLocal, 0x6A, (0.2094 / 2.0));
+LTC2499 adcB(i2cLocal, 0x2A, (1.024 / 2.0));
 
 /**
  * Program start routine
@@ -34,16 +32,12 @@ I2C i2cPMIC(I2C_PMIC_SDA, I2C_PMIC_SCL);
 int main(void) {
   DEBUG("PMIC", "Initialization starting");
   DEBUG("PMIC", "Initialization complete");
-  // float temperature;
-  wait(1.0);
-  // uint8_t result = adcB.readInternalTemperaure(&temperature);
-  char buf[4] = {0, 0, 0, 0};
-  uint8_t result = i2cLocal.write(0x6A, buf, 1);
-  if(result != ERROR_SUCCESS){
-    DEBUG("ADC-B", "Reading internal temp failed: 0x%02x", result);
-    return result;
+  uint8_t result = 0;
+  float temperature;
+  result = adcB.readInternalTemperaure(&temperature);
+  if (result != ERROR_SUCCESS) {
+    DEBUG("ADC-B", "Failed to read internal temperature: 0x%02X", result);
   }
-  // DEBUG("ADC-B", "Internal temperature: %3.0fºC", temperature);
-  DEBUG("LTC2499", "read 0x%02x 0x%02x 0x%02x 0x%02x", buf[0], buf[1], buf[2], buf[3]);
+  DEBUG("ADC-B", "Internal temperature: %4.1fC", temperature);
   return ERROR_SUCCESS;
 }
