@@ -42,7 +42,6 @@ public class main {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	public static GUI getGUI() {

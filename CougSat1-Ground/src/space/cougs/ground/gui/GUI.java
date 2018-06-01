@@ -49,13 +49,14 @@ public class GUI extends JFrame {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);// makes exit button work
 		this.pack();//
 		this.setMinimumSize(new Dimension(200, 200));
+		this.setMaximumSize(new Dimension(1366, 768));
 		this.setLocationRelativeTo(null);// centers the screen
 		this.setVisible(true); // makes GUI visible to user / makes visible
 		this.setResizable(true); // Disables the full screen mode
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		jtp.setSelectedComponent(cougSat1ScrollPane);
-
+		
 	}
 
 	public void updateData(CougSat1Telemetry data)

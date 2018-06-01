@@ -87,29 +87,36 @@ public class HealthPanel extends JPanel {
 		private JLabel rxData = new JLabel("", SwingConstants.CENTER);
 		private JLabel snrxData = new JLabel("", SwingConstants.CENTER);
 
-		public RCSHealth() {
+		ArrayList<JLabel> labels = new ArrayList<JLabel>();
+		ArrayList<JProgressBar> data = new ArrayList<JProgressBar>();
+		
+		public RCSHealth() {//Rewrites appearance of communications in the health panel
 			super();
 
-			commsLabel.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			commsLabel.setForeground(Color.WHITE);
-
-			rxLabel.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			rxLabel.setForeground(Color.WHITE);
-
-			txLabel.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			txLabel.setForeground(Color.WHITE);
-
-			snrLabel.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			snrLabel.setForeground(Color.WHITE);
-
-			rxData.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			rxData.setForeground(Color.WHITE);
-
-			txData.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			txData.setForeground(Color.WHITE);
-
-			snrxData.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			snrxData.setForeground(Color.WHITE);
+			labels.add(commsLabel);
+			labels.add(rxLabel);
+			labels.add(txLabel);
+			labels.add(snrLabel);
+			labels.add(rxData);
+			labels.add(txData);
+			labels.add(snrxData);
+			
+			
+			for (JLabel label: labels)
+			{
+				label.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
+				label.setForeground(Color.WHITE);
+			}
+			
+			data.add(txBar);
+			data.add(rxBar);
+			data.add(snrBar);
+			
+			for (JProgressBar dataPoint: data)
+			{
+				dataPoint.setBackground(CustomColors.WSU_GRAY);
+				dataPoint.setForeground(CustomColors.CRIMSON);
+			}
 
 			this.setLayout(new GridBagLayout());
 			GridBagConstraints gbc = new GridBagConstraints();
@@ -127,19 +134,12 @@ public class HealthPanel extends JPanel {
 			gbc.gridwidth = 1;
 			gbc.weighty = 15.0;
 			gbc.insets = new Insets(0, 20, 0, 20);
-			txBar.setBackground(CustomColors.WSU_GRAY);
-			txBar.setForeground(CustomColors.CRIMSON);
 			this.add(txBar, gbc);
 
 			gbc.gridx = 1;
-			;
-			rxBar.setBackground(CustomColors.WSU_GRAY);
-			rxBar.setForeground(CustomColors.CRIMSON);
 			this.add(rxBar, gbc);
 
 			gbc.gridx = 2;
-			snrBar.setBackground(CustomColors.WSU_GRAY);
-			snrBar.setForeground(CustomColors.CRIMSON);
 			this.add(snrBar, gbc);
 
 			gbc.gridx = 0;
@@ -153,7 +153,6 @@ public class HealthPanel extends JPanel {
 
 			gbc.gridy = 2;
 			gbc.gridx = 1;
-			;
 			this.add(rxData, gbc);
 
 			gbc.gridy = 3;
@@ -191,16 +190,12 @@ public class HealthPanel extends JPanel {
 		JLabel computer = new JLabel("Computer", SwingConstants.CENTER);
 		JLabel modeLabel = new JLabel("Mode:", SwingConstants.LEFT);
 		JLabel mode = new JLabel("Normal", SwingConstants.LEFT);
-
 		JLabel timeLabel = new JLabel("Time:", SwingConstants.LEFT);
 		JLabel time = new JLabel("23:59:59", SwingConstants.LEFT);
-
 		JLabel sdPieLabel = new JLabel("SD", SwingConstants.LEFT);
 		JLabel sdUsed = new JLabel("32.00 GB", SwingConstants.LEFT);
-
 		JLabel resetLabel = new JLabel("Times Reset:", SwingConstants.LEFT);
 		JLabel reset = new JLabel("1", SwingConstants.LEFT);
-
 		JLabel payloadLabel = new JLabel("Payload-Packets Ready:", SwingConstants.LEFT);
 		JLabel payload = new JLabel("100", SwingConstants.LEFT);
 
@@ -254,7 +249,7 @@ public class HealthPanel extends JPanel {
 			this.add(sdPieLabel, gbc);
 
 			gbc.gridx = 1;
-			;
+			
 			sdUsed.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			sdUsed.setForeground(Color.WHITE);
 			this.add(sdUsed, gbc);
@@ -266,7 +261,7 @@ public class HealthPanel extends JPanel {
 			this.add(resetLabel, gbc);
 
 			gbc.gridx = 1;
-			;
+			
 			reset.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			reset.setForeground(Color.WHITE);
 			this.add(reset, gbc);
@@ -278,7 +273,7 @@ public class HealthPanel extends JPanel {
 			this.add(payloadLabel, gbc);
 
 			gbc.gridx = 1;
-			;
+			
 			payload.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			payload.setForeground(Color.WHITE);
 			this.add(payload, gbc);
@@ -1025,39 +1020,24 @@ public class HealthPanel extends JPanel {
 			battery1Temp.setValue((int) ((data.getBattery1Temp() + 80) / 160.0 * 100));
 			RCSTemp.setValue((int) ((data.getRCSTemp() + 80) / 160.0 * 100));
 
-			// JLabel IHUValue = new JLabel("", SwingConstants.CENTER);
-			// JLabel ADCSValue = new JLabel("", SwingConstants.CENTER);
-			// JLabel IFJRValue = new JLabel("", SwingConstants.CENTER);
-			// JLabel PMICValue = new JLabel("", SwingConstants.CENTER);
-			// JLabel Battery0Value= new JLabel("", SwingConstants.CENTER);
-			// JLabel Battery1Value = new JLabel("", SwingConstants.CENTER);
-			// JLabel RCSValue = new JLabel("", SwingConstants.CENTER);
-
-			// private JProgressBar IHUTemp = new
-			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
-			// private JProgressBar ADCSTemp = new
-			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
-			// private JProgressBar IFJRTemp = new
-			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
-			// private JProgressBar PMICTemp = new
-			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
-			// private JProgressBar battery0Temp = new
-			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
-			// private JProgressBar battery1Temp = new
-			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
-			// private JProgressBar RCSTemp = new
-			// JProgressBar(SwingConstants.VERTICAL, 0, 100);
 		}
 	}
 
 	private class ADCSHealth extends JPanel {
 
-		JLabel adcs = new JLabel("Adcs", SwingConstants.CENTER);
+		ArrayList<JLabel> labels = new ArrayList<JLabel>();
+		JLabel adcs = new JLabel("ADCS", SwingConstants.CENTER);
 
 		public ADCSHealth() {
 
-			adcs.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
-			adcs.setForeground(Color.WHITE);
+			labels.add(adcs);
+			
+			for (JLabel label: labels)
+			{
+				label.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
+				label.setForeground(Color.WHITE);
+			}
+
 			this.add(adcs);
 
 		}
