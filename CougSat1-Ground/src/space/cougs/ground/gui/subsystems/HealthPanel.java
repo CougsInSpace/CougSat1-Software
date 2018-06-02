@@ -370,6 +370,12 @@ public class HealthPanel extends JPanel {
 		private JLabel ch11 = new JLabel("11", SwingConstants.CENTER);
 		private JLabel ch12 = new JLabel("12", SwingConstants.CENTER);
 		private JLabel ch13 = new JLabel("13", SwingConstants.CENTER);
+		private JLabel ch14 = new JLabel("14", SwingConstants.CENTER);
+		private JLabel ch15 = new JLabel("15", SwingConstants.CENTER);
+		private JLabel ch16 = new JLabel("16", SwingConstants.CENTER);
+		private JLabel ch17 = new JLabel("17", SwingConstants.CENTER);
+		private JLabel ch18 = new JLabel("18", SwingConstants.CENTER);
+		private JLabel ch19 = new JLabel("19", SwingConstants.CENTER);
 
 		private JPanel channelWrapper = new JPanel();
 
@@ -459,6 +465,12 @@ public class HealthPanel extends JPanel {
 			channelLabels.add(ch11);
 			channelLabels.add(ch12);
 			channelLabels.add(ch13);
+			channelLabels.add(ch14);
+			channelLabels.add(ch15);
+			channelLabels.add(ch16);
+			channelLabels.add(ch17);
+			channelLabels.add(ch18);
+			channelLabels.add(ch19);
 
 			for (JLabel label : channelLabels) {
 
@@ -738,20 +750,25 @@ public class HealthPanel extends JPanel {
 			channelWrapper.setLayout(gl);
 			channelWrapper.setBackground(CustomColors.NAVY);
 
-			channelWrapper.add(ch0);
-			channelWrapper.add(ch1);
-			channelWrapper.add(ch2);
-			channelWrapper.add(ch3);
-			channelWrapper.add(ch4);
-			channelWrapper.add(ch5);
-			channelWrapper.add(ch6);
-			channelWrapper.add(ch7);
-			channelWrapper.add(ch8);
-			channelWrapper.add(ch9);
-			channelWrapper.add(ch10);
-			channelWrapper.add(ch11);
-			channelWrapper.add(ch12);
-			channelWrapper.add(ch13);
+			for (JLabel ch: channelLabels)
+			{
+				channelWrapper.add(ch);
+			}
+			
+//			channelWrapper.add(ch0);
+//			channelWrapper.add(ch1);
+//			channelWrapper.add(ch2);
+//			channelWrapper.add(ch3);
+//			channelWrapper.add(ch4);
+//			channelWrapper.add(ch5);
+//			channelWrapper.add(ch6);
+//			channelWrapper.add(ch7);
+//			channelWrapper.add(ch8);
+//			channelWrapper.add(ch9);
+//			channelWrapper.add(ch10);
+//			channelWrapper.add(ch11);
+//			channelWrapper.add(ch12);
+//			channelWrapper.add(ch13);
 
 			gbc.gridy = 31;
 			this.add(channelWrapper, gbc);
@@ -1047,7 +1064,7 @@ public class HealthPanel extends JPanel {
 		}
 	}
 
-	public void updateData(CougSat1Telemetry data) {
+	public void updateData(CougSat1Telemetry data) {//updates all other branches
 
 		rcsHealth.updateData(data);
 		ihuHealth.updateData(data);
