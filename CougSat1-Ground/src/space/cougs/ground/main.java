@@ -13,6 +13,7 @@ public class main {
 		gui.updateData(new CougSat1Telemetry());
 
 		PacketDecoder packetDecoder = new PacketDecoder();
+		PacketEncoder packetEncoder = new PacketEncoder();
 
 		while (true) {
 			// File[] files = new
@@ -27,7 +28,9 @@ public class main {
 			// Pause for a second before checking again
 
 			try {
+				
 				packetDecoder.parsePacket("test/rawPackets/TestTelemetry");
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

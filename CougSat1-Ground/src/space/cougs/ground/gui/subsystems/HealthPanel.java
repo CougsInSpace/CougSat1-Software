@@ -45,32 +45,32 @@ public class HealthPanel extends JPanel {
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.weightx = 1.0;
+		gbc.weightx = 1.0;//
 		gbc.weighty = 1.0;
 		gbc.gridheight = 1;
 		gbc.gridwidth = 1;
-		this.add(ihuHealth, gbc);
+		this.add(ihuHealth, gbc);//computer
 
 		gbc.gridy = 1;
 		gbc.weighty = 0.6;
 		gbc.gridwidth = 2;
-		this.add(tempHealth, gbc);
+		this.add(tempHealth, gbc);//tempature
 
 		gbc.gridy = 2;
 		gbc.weighty = 1.0;
-		this.add(adcsHealth, gbc);
+		this.add(adcsHealth, gbc);//map
 
 		gbc.gridx = 1;
-		;
+
 		gbc.gridy = 0;
 		gbc.weightx = 0.6;
 		gbc.gridwidth = 1;
-		this.add(rcsHealth, gbc);
+		this.add(rcsHealth, gbc);//communications
 
 		gbc.weightx = 1.0;
 		gbc.gridx = 2;
 		gbc.gridheight = 3;
-		this.add(powerHealth, gbc);
+		this.add(powerHealth, gbc);//power
 
 	}
 
@@ -90,7 +90,7 @@ public class HealthPanel extends JPanel {
 		ArrayList<JLabel> labels = new ArrayList<JLabel>();
 		ArrayList<JProgressBar> data = new ArrayList<JProgressBar>();
 		
-		public RCSHealth() {//Rewrites appearance of communications in the health panel
+		public RCSHealth() { //Rewrites appearance of communications in the health panel
 			super();
 
 			labels.add(commsLabel);

@@ -55,7 +55,7 @@ public class GUI extends JFrame {
 		this.setResizable(true); // Disables the full screen mode
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-		jtp.setSelectedComponent(cougSat1ScrollPane);
+		jtp.setSelectedComponent(cougSat1ScrollPane);//temporary
 		
 	}
 
