@@ -1,9 +1,11 @@
 package space.cougs.ground;
 
-import java.io.File;
 import java.io.IOException;
 
 import space.cougs.ground.gui.GUI;
+import space.cougs.ground.packetprocessing.PacketDecoder;
+import space.cougs.ground.packetprocessing.PacketEncoder;
+import space.cougs.ground.satellites.CougSat1Telemetry;
 
 public class main {
 	static GUI gui;
@@ -28,9 +30,9 @@ public class main {
 			// Pause for a second before checking again
 
 			try {
-				
+
 				packetDecoder.parsePacket("test/rawPackets/TestTelemetry");
-				
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

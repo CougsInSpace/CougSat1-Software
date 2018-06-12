@@ -1,8 +1,11 @@
-package space.cougs.ground;
+package space.cougs.ground.packetprocessing;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import space.cougs.ground.main;
+import space.cougs.ground.satellites.CougSat1Telemetry;
 
 public class PacketDecoder {
 
@@ -73,10 +76,10 @@ public class PacketDecoder {
 			buff = infile.read();// reset count
 			telemetry.setResetCount(buff);
 
-			buff = (byte) infile.read();//IHU temp
+			buff = (byte) infile.read();// IHU temp
 			telemetry.setIHUTemp(buff);
 
-			longBuff = infile.read();//SD CARD
+			longBuff = infile.read();// SD CARD
 			longBuff = longBuff << 8;
 			longBuff |= infile.read();
 			longBuff = longBuff << 8;
@@ -88,12 +91,12 @@ public class PacketDecoder {
 			telemetry.setIHUSdCard(longBuff);
 
 			buff = infile.read();
-			telemetry.setIHUStatus(buff);//IHUStatus
+			telemetry.setIHUStatus(buff);// IHUStatus
 
 			buff = (byte) infile.read();
-			telemetry.setADCSTemp(buff);//ADCS Temp
+			telemetry.setADCSTemp(buff);// ADCS Temp
 
-			buff = infile.read();//ADCS Status
+			buff = infile.read();// ADCS Status
 			telemetry.setADCSStatus(buff);
 
 			buff = infile.read();// lattitude
@@ -251,12 +254,12 @@ public class PacketDecoder {
 			buff2 = (buff2) & 0b111111111111;
 			telemetry.set5vRailCurrent(buff2, true);
 
-			buff = infile.read();//Channels
+			buff = infile.read();// Channels
 			buff = buff << 8;
 			buff |= infile.read();
 			telemetry.setEPSChannels(buff);
 
-			buff = (byte) infile.read();//RCS Temp
+			buff = (byte) infile.read();// RCS Temp
 			telemetry.setRCSTemp(buff);
 
 			buff = infile.read();
@@ -274,7 +277,8 @@ public class PacketDecoder {
 			buff = infile.read();
 			buff = buff << 8;
 			buff |= infile.read();
-			telemetry.setPayloadFrames(buff); //# of payload frames ready to download - aka pictures
+			telemetry.setPayloadFrames(buff); // # of payload frames ready to
+												// download - aka pictures
 
 		} else if (buff == 0x80) {// diagnostic report
 			// tbd

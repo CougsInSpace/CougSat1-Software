@@ -10,7 +10,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import space.cougs.ground.CougSat1Telemetry;
+import space.cougs.ground.satellites.CougSat1Telemetry;
 import space.cougs.ground.utils.CustomColors;
 import space.cougs.ground.utils.Fonts;
 
@@ -55,13 +55,12 @@ public class GUI extends JFrame {
 		this.setResizable(true); // Disables the full screen mode
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-		jtp.setSelectedComponent(cougSat1ScrollPane);//temporary
-		
+		jtp.setSelectedComponent(cougSat1ScrollPane);// temporary
+
 	}
 
-	public void updateData(CougSat1Telemetry data)
-	{
-		
+	public void updateData(CougSat1Telemetry data) {
+
 		cougSat1Panel.upgdateData(data);
 		this.repaint();
 	}

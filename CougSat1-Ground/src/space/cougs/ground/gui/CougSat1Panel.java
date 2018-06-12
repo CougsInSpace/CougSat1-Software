@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import space.cougs.ground.CougSat1Telemetry;
 import space.cougs.ground.gui.subsystems.ADCSPanel;
 import space.cougs.ground.gui.subsystems.CameraPanel;
 import space.cougs.ground.gui.subsystems.EPSPanel;
@@ -22,6 +21,7 @@ import space.cougs.ground.gui.subsystems.IFJRPanel;
 import space.cougs.ground.gui.subsystems.IHUPanel;
 import space.cougs.ground.gui.subsystems.PlantPanel;
 import space.cougs.ground.gui.subsystems.RCSPanel;
+import space.cougs.ground.satellites.CougSat1Telemetry;
 import space.cougs.ground.utils.CustomColors;
 import space.cougs.ground.utils.Fonts;
 
@@ -134,11 +134,6 @@ class CougSat1Panel extends JPanel {
 	public void upgdateData(CougSat1Telemetry data) {
 
 		healthPanel.updateData(data);
-		
-		
-		
-		
-		
-		
+
 	}
 }

@@ -4,8 +4,8 @@ import javax.swing.JPanel;
 
 import space.cougs.ground.utils.CustomColors;
 
-public class EPSPanel extends JPanel{
-	
+public class EPSPanel extends JPanel {
+
 	public EPSPanel() {
 		super();
 		this.setBackground(CustomColors.NAVY);

@@ -8,16 +8,14 @@ import java.awt.Insets;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 
-import space.cougs.ground.CougSat1Telemetry;
+import space.cougs.ground.satellites.CougSat1Telemetry;
 import space.cougs.ground.utils.CustomColors;
 import space.cougs.ground.utils.Fonts;
-import space.cougs.ground.utils.RoundButton;
 
 @SuppressWarnings("serial")
 public class HealthPanel extends JPanel {
@@ -49,28 +47,28 @@ public class HealthPanel extends JPanel {
 		gbc.weighty = 1.0;
 		gbc.gridheight = 1;
 		gbc.gridwidth = 1;
-		this.add(ihuHealth, gbc);//computer
+		this.add(ihuHealth, gbc);// computer
 
 		gbc.gridy = 1;
 		gbc.weighty = 0.6;
 		gbc.gridwidth = 2;
-		this.add(tempHealth, gbc);//tempature
+		this.add(tempHealth, gbc);// tempature
 
 		gbc.gridy = 2;
 		gbc.weighty = 1.0;
-		this.add(adcsHealth, gbc);//map
+		this.add(adcsHealth, gbc);// map
 
 		gbc.gridx = 1;
 
 		gbc.gridy = 0;
 		gbc.weightx = 0.6;
 		gbc.gridwidth = 1;
-		this.add(rcsHealth, gbc);//communications
+		this.add(rcsHealth, gbc);// communications
 
 		gbc.weightx = 1.0;
 		gbc.gridx = 2;
 		gbc.gridheight = 3;
-		this.add(powerHealth, gbc);//power
+		this.add(powerHealth, gbc);// power
 
 	}
 
@@ -89,8 +87,9 @@ public class HealthPanel extends JPanel {
 
 		ArrayList<JLabel> labels = new ArrayList<JLabel>();
 		ArrayList<JProgressBar> data = new ArrayList<JProgressBar>();
-		
-		public RCSHealth() { //Rewrites appearance of communications in the health panel
+
+		public RCSHealth() { // Rewrites appearance of communications in the
+								// health panel
 			super();
 
 			labels.add(commsLabel);
@@ -100,20 +99,17 @@ public class HealthPanel extends JPanel {
 			labels.add(rxData);
 			labels.add(txData);
 			labels.add(snrxData);
-			
-			
-			for (JLabel label: labels)
-			{
+
+			for (JLabel label : labels) {
 				label.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 				label.setForeground(Color.WHITE);
 			}
-			
+
 			data.add(txBar);
 			data.add(rxBar);
 			data.add(snrBar);
-			
-			for (JProgressBar dataPoint: data)
-			{
+
+			for (JProgressBar dataPoint : data) {
 				dataPoint.setBackground(CustomColors.WSU_GRAY);
 				dataPoint.setForeground(CustomColors.CRIMSON);
 			}
@@ -249,7 +245,7 @@ public class HealthPanel extends JPanel {
 			this.add(sdPieLabel, gbc);
 
 			gbc.gridx = 1;
-			
+
 			sdUsed.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			sdUsed.setForeground(Color.WHITE);
 			this.add(sdUsed, gbc);
@@ -261,7 +257,7 @@ public class HealthPanel extends JPanel {
 			this.add(resetLabel, gbc);
 
 			gbc.gridx = 1;
-			
+
 			reset.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			reset.setForeground(Color.WHITE);
 			this.add(reset, gbc);
@@ -273,7 +269,7 @@ public class HealthPanel extends JPanel {
 			this.add(payloadLabel, gbc);
 
 			gbc.gridx = 1;
-			
+
 			payload.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 			payload.setForeground(Color.WHITE);
 			this.add(payload, gbc);
@@ -750,25 +746,24 @@ public class HealthPanel extends JPanel {
 			channelWrapper.setLayout(gl);
 			channelWrapper.setBackground(CustomColors.NAVY);
 
-			for (JLabel ch: channelLabels)
-			{
+			for (JLabel ch : channelLabels) {
 				channelWrapper.add(ch);
 			}
-			
-//			channelWrapper.add(ch0);
-//			channelWrapper.add(ch1);
-//			channelWrapper.add(ch2);
-//			channelWrapper.add(ch3);
-//			channelWrapper.add(ch4);
-//			channelWrapper.add(ch5);
-//			channelWrapper.add(ch6);
-//			channelWrapper.add(ch7);
-//			channelWrapper.add(ch8);
-//			channelWrapper.add(ch9);
-//			channelWrapper.add(ch10);
-//			channelWrapper.add(ch11);
-//			channelWrapper.add(ch12);
-//			channelWrapper.add(ch13);
+
+			// channelWrapper.add(ch0);
+			// channelWrapper.add(ch1);
+			// channelWrapper.add(ch2);
+			// channelWrapper.add(ch3);
+			// channelWrapper.add(ch4);
+			// channelWrapper.add(ch5);
+			// channelWrapper.add(ch6);
+			// channelWrapper.add(ch7);
+			// channelWrapper.add(ch8);
+			// channelWrapper.add(ch9);
+			// channelWrapper.add(ch10);
+			// channelWrapper.add(ch11);
+			// channelWrapper.add(ch12);
+			// channelWrapper.add(ch13);
 
 			gbc.gridy = 31;
 			this.add(channelWrapper, gbc);
@@ -1048,9 +1043,8 @@ public class HealthPanel extends JPanel {
 		public ADCSHealth() {
 
 			labels.add(adcs);
-			
-			for (JLabel label: labels)
-			{
+
+			for (JLabel label : labels) {
 				label.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().MEDIUM]);
 				label.setForeground(Color.WHITE);
 			}
@@ -1064,7 +1058,8 @@ public class HealthPanel extends JPanel {
 		}
 	}
 
-	public void updateData(CougSat1Telemetry data) {//updates all other branches
+	public void updateData(CougSat1Telemetry data) {// updates all other
+													// branches
 
 		rcsHealth.updateData(data);
 		ihuHealth.updateData(data);
