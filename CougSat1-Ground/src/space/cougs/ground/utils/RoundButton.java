@@ -8,8 +8,6 @@ import java.awt.geom.Ellipse2D.Float;
 
 import javax.swing.JButton;
 
-import com.sun.javafx.geom.Shape;
-
 public class RoundButton extends JButton {
 	public RoundButton(String label) {
 		super(label);

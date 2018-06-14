@@ -1,10 +1,11 @@
 package space.cougs.ground;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.IOException;
 
 import space.cougs.ground.gui.GUI;
-import space.cougs.ground.packetprocessing.PacketDecoder;
-import space.cougs.ground.packetprocessing.PacketEncoder;
+import space.cougs.ground.packetprocessing.packets.Telemetry;
 import space.cougs.ground.satellites.CougSat1Telemetry;
 
 public class main {
@@ -14,8 +15,8 @@ public class main {
 		gui = new GUI();// initializes the Gui
 		gui.updateData(new CougSat1Telemetry());
 
-		PacketDecoder packetDecoder = new PacketDecoder();
-		PacketEncoder packetEncoder = new PacketEncoder();
+		// PacketDecoder packetDecoder = new PacketDecoder();
+		Telemetry telemetry = new Telemetry();
 
 		while (true) {
 			// File[] files = new
@@ -29,9 +30,15 @@ public class main {
 
 			// Pause for a second before checking again
 
+			int w = gui.getContentPane().getWidth();
+			int h = gui.getContentPane().getHeight();
+
+			System.out.println(w);
+			System.out.println(h);
+
 			try {
 
-				packetDecoder.parsePacket("test/rawPackets/TestTelemetry");
+				telemetry.parsePacket("test/rawPackets/TestTelemetry");
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

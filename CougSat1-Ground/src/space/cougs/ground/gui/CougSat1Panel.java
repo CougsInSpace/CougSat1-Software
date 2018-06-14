@@ -2,9 +2,11 @@ package space.cougs.ground.gui;
 
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -38,14 +40,14 @@ class CougSat1Panel extends JPanel {
 
 	ArrayList<JButton> buttons = new ArrayList<JButton>();
 
-	JButton healthButton = new JButton("Health", new ImageIcon("resources/images/heart.png"));
-	JButton adcsButton = new JButton("Attitude", new ImageIcon("resources/images/globe.png"));
-	JButton ifjrButton = new JButton("IFJR", new ImageIcon("resources/images/terminal.png"));
-	JButton ihuButton = new JButton("Computer", new ImageIcon("resources/images/keyboard.png"));
-	JButton rcsButton = new JButton("Communication", new ImageIcon("resources/images/communications.png"));
-	JButton cameraButton = new JButton("Camera", new ImageIcon("resources/images/camera.png"));
-	JButton plantButton = new JButton("Plant", new ImageIcon("resources/images/plant.png"));
-	JButton epsButton = new JButton("Power", new ImageIcon("resources/images/battery.png"));
+	JButton healthButton = new JButton("Health", new ImageIcon("resources/images/128/heart.png"));
+	JButton adcsButton = new JButton("Attitude", new ImageIcon("resources/images/128/globe.png"));
+	JButton ifjrButton = new JButton("IFJR", new ImageIcon("resources/images/128/terminal.png"));
+	JButton ihuButton = new JButton("Computer", new ImageIcon("resources/images/128/keyboard.png"));
+	JButton rcsButton = new JButton("Communication", new ImageIcon("resources/images/128/communications.png"));
+	JButton cameraButton = new JButton("Camera", new ImageIcon("resources/images/128/camera.png"));
+	JButton plantButton = new JButton("Plant", new ImageIcon("resources/images/128/plant.png"));
+	JButton epsButton = new JButton("Power", new ImageIcon("resources/images/128/battery.png"));
 
 	JPanel subSystemWrapper = new JPanel(new CardLayout());
 
@@ -53,6 +55,7 @@ class CougSat1Panel extends JPanel {
 
 	public CougSat1Panel() {
 		super();
+		
 		// subSystemWrapper is used to switch between panels
 		subSystemWrapper.setOpaque(false);
 		subSystemWrapper.add(healthPanel, "Health");

@@ -5,7 +5,6 @@ import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class Fonts {
 
@@ -38,11 +37,11 @@ public class Fonts {
 			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/Ethnocentric.ttf")));
 			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/Monofonto.ttf")));
 			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/CodeNewRoman.ttf")));
-			//System.out.println(Arrays.toString(ge.getAvailableFontFamilyNames()));
+			// System.out.println(Arrays.toString(ge.getAvailableFontFamilyNames()));
 		} catch (IOException | FontFormatException e) {
 			e.printStackTrace();
 		}
-		
+
 		monofonto[SMALL] = new Font("Monofonto", Font.PLAIN, 16);
 		monofonto[MEDIUM] = new Font("Monofonto", Font.PLAIN, 32);
 		monofonto[LARGE] = new Font("Monofonto", Font.PLAIN, 48);

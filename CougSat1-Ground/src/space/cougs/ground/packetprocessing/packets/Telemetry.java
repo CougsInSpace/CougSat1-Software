@@ -1,4 +1,4 @@
-package space.cougs.ground.packetprocessing;
+package space.cougs.ground.packetprocessing.packets;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,12 +7,12 @@ import java.io.IOException;
 import space.cougs.ground.main;
 import space.cougs.ground.satellites.CougSat1Telemetry;
 
-public class PacketDecoder {
+public class Telemetry {
 
 	private FileInputStream infile = null;
 	private CougSat1Telemetry telemetry = new CougSat1Telemetry();
 
-	public PacketDecoder() {
+	public Telemetry() {
 
 	}
 
