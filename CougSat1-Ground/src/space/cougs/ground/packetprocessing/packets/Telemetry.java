@@ -279,6 +279,8 @@ public class Telemetry {
 			buff |= infile.read();
 			telemetry.setPayloadFrames(buff); // # of payload frames ready to
 												// download - aka pictures
+			
+			infile.close();
 
 		} else if (buff == 0x80) {// diagnostic report
 			// tbd

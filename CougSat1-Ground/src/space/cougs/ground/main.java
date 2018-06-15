@@ -33,9 +33,6 @@ public class main {
 			int w = gui.getContentPane().getWidth();
 			int h = gui.getContentPane().getHeight();
 
-			System.out.println(w);
-			System.out.println(h);
-
 			try {
 
 				telemetry.parsePacket("test/rawPackets/TestTelemetry");
