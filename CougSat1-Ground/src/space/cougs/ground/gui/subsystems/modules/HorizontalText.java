@@ -4,7 +4,9 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
 import space.cougs.ground.gui.UIScaling;
@@ -26,36 +28,48 @@ public class HorizontalText extends JComponent implements UIScaling {
 		this.divider = divider;
 		this.value = value;
 		this.setForeground(CustomColors.TEXT1);
+		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
-	
+
 		FontMetrics fontMetrics = this.getFontMetrics(this.getFont());
 		int height = fontMetrics.getHeight();
-		int width = fontMetrics.stringWidth(value);
-		
-		width = (int) (width/ (1 - divider));
-		height += 2;
-		width += 2;
-		
+		int labelWidth = fontMetrics.stringWidth(label);
+		int valueWidth = fontMetrics.stringWidth(value);
+
+		Insets insets = this.getBorder().getBorderInsets(this);
+
+		labelWidth = (int) (labelWidth / (divider));
+		valueWidth = (int) (valueWidth / (1 - divider));
+
+		int width = Math.max(labelWidth, valueWidth);
+		height += insets.bottom + insets.top;
+		width += insets.left + insets.right;
+
 		return new Dimension(width, height);
 
 	}
 
 	@Override
 	public Dimension getMinimumSize() {
-		
+
 		FontMetrics fontMetrics = this.getFontMetrics(this.getFont());
 		int height = fontMetrics.getHeight();
-		int width = fontMetrics.stringWidth(value);
-		
-		width = (int) (width/ (1 - divider));
-		height += 2;
-		width += 2;
-		
-		return new Dimension(width, height);
+		int labelWidth = fontMetrics.stringWidth(label);
+		int valueWidth = fontMetrics.stringWidth(value);
 
+		Insets insets = this.getBorder().getBorderInsets(this);
+
+		labelWidth = (int) (labelWidth / (divider));
+		valueWidth = (int) (valueWidth / (1 - divider));
+
+		int width = Math.max(labelWidth, valueWidth);
+		height += insets.bottom + insets.top;
+		width += insets.left + insets.right;
+
+		return new Dimension(width, height);
 	}
 
 	@Override
@@ -63,14 +77,14 @@ public class HorizontalText extends JComponent implements UIScaling {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		FontMetrics fontMetrics = g2d.getFontMetrics();
-		int x = 0;
+		Insets insets = this.getBorder().getBorderInsets(this);
+
+		int x = insets.left;
 		int y = this.getHeight() / 2 + fontMetrics.getAscent();
 		g2d.drawString(label, x, y);
 
-		x = (int) (this.getWidth() * divider);
+		x += (int) ((this.getWidth() - insets.left - insets.right) * divider);
 		g2d.drawString(value, x, y);
-
-		this.setMinimumSize(new Dimension(200, 200));
 
 	}
 

@@ -3,6 +3,7 @@ package space.cougs.ground.gui;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -72,7 +73,7 @@ class CougSat1 extends JPanel implements UIScaling {
 		this.add(cardSwitcher, BorderLayout.LINE_START);
 
 		this.setBackground(CustomColors.BACKGROUND1);
-//		this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		// this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 	}
 
@@ -163,7 +164,9 @@ class CougSat1 extends JPanel implements UIScaling {
 
 					component.setFont(font);
 					((JButton) component).setIcon(new ImageIcon(iconFilePath));
+
 				}
+
 			}
 
 		}
@@ -196,6 +199,19 @@ class CougSat1 extends JPanel implements UIScaling {
 				((UIScaling) component).updateUIScaling(uiScale);
 
 			}
+			if (component instanceof JPanel) {
+
+				for (Component subComponent : ((Container) component).getComponents()) {
+
+					if (subComponent instanceof UIScaling) {
+
+						((UIScaling) subComponent).updateUIScaling(uiScale);
+
+					}
+
+				}
+			}
+			
 
 		}
 

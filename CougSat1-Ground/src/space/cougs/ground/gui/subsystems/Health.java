@@ -46,7 +46,8 @@ public class Health extends JPanel implements UIScaling {
 
 		ihu = new JPanel();
 		ihu.setLayout(new BoxLayout(ihu, BoxLayout.PAGE_AXIS));
-		mode = new HorizontalText("Mode:", "Normal", 0.3);
+
+		mode = new HorizontalText("Mode:", "Normal", 0.5);
 		ihu.add(mode);
 
 		temperature = new JPanel();
