@@ -15,7 +15,7 @@ import space.cougs.ground.gui.utils.Fonts;
 
 public class GUI extends Thread implements UIScaling {
 
-	private static final int defaultHeight = 700;
+	private static final int defaultHeight = 650;
 	private static final int defaultWidth = 1200;
 
 	private final CougSat1 cougSat1;

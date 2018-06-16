@@ -1,6 +1,8 @@
 package space.cougs.ground.gui.subsystems;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -8,67 +10,88 @@ import java.awt.Insets;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 
+import space.cougs.ground.gui.UIScaling;
+import space.cougs.ground.gui.subsystems.modules.HorizontalText;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
+import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;
 import space.cougs.ground.satellites.CougSat1Telemetry;
 
 @SuppressWarnings("serial")
-public class Health extends JPanel {
+public class Health extends JPanel implements UIScaling {
 
-	IHUHealth ihuHealth = new IHUHealth();
-	TempHealth tempHealth = new TempHealth();
-	ADCSHealth adcsHealth = new ADCSHealth();
-	RCSHealth rcsHealth = new RCSHealth();
-	PowerHealth powerHealth = new PowerHealth();
+	private final JPanel ihu;
+	private final JPanel temperature;
+	private final JPanel adcs;
+	private final JPanel rcs;
+	private final JPanel power;
+
+	private final HorizontalText mode;
 
 	public Health() {
 		super();
-		this.setBackground(CustomColors.WSU_GRAY);
+
+		this.setBackground(CustomColors.BACKGROUND1);
+		this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		this.setLayout(new GridBagLayout());
-		this.setBorder(BorderFactory.createLineBorder(CustomColors.WSU_GRAY, 5));
 
-		ihuHealth.setBackground(CustomColors.NAVY);
-		tempHealth.setBackground(CustomColors.NAVY);
-		adcsHealth.setBackground(CustomColors.NAVY);
-		rcsHealth.setBackground(CustomColors.NAVY);
-		powerHealth.setBackground(CustomColors.NAVY);
+		GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
+		gbc.setFill(GridBagConstraintsWrapper.BOTH);
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.weightx = 1.0;//
-		gbc.weighty = 1.0;
-		gbc.gridheight = 1;
-		gbc.gridwidth = 1;
-		this.add(ihuHealth, gbc);// computer
+		ihu = new JPanel();
+		ihu.setLayout(new BoxLayout(ihu, BoxLayout.PAGE_AXIS));
+		mode = new HorizontalText("Mode:", "Normal", 0.3);
+		ihu.add(mode);
 
-		gbc.gridy = 1;
-		gbc.weighty = 0.6;
-		gbc.gridwidth = 2;
-		this.add(tempHealth, gbc);// tempature
+		temperature = new JPanel();
+		adcs = new JPanel();
+		rcs = new JPanel();
+		power = new JPanel();
 
-		gbc.gridy = 2;
-		gbc.weighty = 1.0;
-		this.add(adcsHealth, gbc);// map
+		this.add(ihu, gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(0, 0, 5, 5));
+		this.add(temperature, gbc.setLocation(0, 1).setSize(2, 1).setWeight(1.0, 1.0).setInsets(5, 0, 5, 5));
+		this.add(adcs, gbc.setLocation(0, 2).setSize(2, 1).setWeight(1.0, 1.0).setInsets(5, 0, 0, 5));
+		this.add(rcs, gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 5, 5, 5));
+		this.add(power, gbc.setLocation(2, 0).setSize(1, 3).setWeight(1.0, 1.0).setInsets(0, 5, 0, 0));
 
-		gbc.gridx = 1;
+		ihu.setBackground(CustomColors.BACKGROUND2);
+		temperature.setBackground(CustomColors.BACKGROUND2);
+		adcs.setBackground(CustomColors.BACKGROUND2);
+		rcs.setBackground(CustomColors.BACKGROUND2);
+		power.setBackground(CustomColors.BACKGROUND2);
 
-		gbc.gridy = 0;
-		gbc.weightx = 0.6;
-		gbc.gridwidth = 1;
-		this.add(rcsHealth, gbc);// communications
+	}
 
-		gbc.weightx = 1.0;
-		gbc.gridx = 2;
-		gbc.gridheight = 3;
-		this.add(powerHealth, gbc);// power
+	@Override
+	public void updateUIScaling(UIScale uiScale) {
+
+		for (Component component : this.getComponents()) {
+
+			if (component instanceof UIScaling) {
+
+				((UIScaling) component).updateUIScaling(uiScale);
+
+			}
+			if (component instanceof JPanel) {
+
+				for (Component subComponent : ((Container) component).getComponents()) {
+
+					if (subComponent instanceof UIScaling) {
+
+						((UIScaling) subComponent).updateUIScaling(uiScale);
+
+					}
+
+				}
+			}
+
+		}
 
 	}
 
@@ -110,8 +133,8 @@ public class Health extends JPanel {
 			data.add(snrBar);
 
 			for (JProgressBar dataPoint : data) {
-				dataPoint.setBackground(CustomColors.WSU_GRAY);
-				dataPoint.setForeground(CustomColors.CRIMSON);
+				dataPoint.setBackground(CustomColors.BACKGROUND1);
+				dataPoint.setForeground(CustomColors.BACKGROUND3);
 			}
 
 			this.setLayout(new GridBagLayout());
@@ -163,10 +186,6 @@ public class Health extends JPanel {
 
 		}
 
-		/**
-		 * 
-		 * @param data
-		 */
 		private void updateData(CougSat1Telemetry data) {
 
 			int newTXPower = (int) ((data.getTXPower() / 4.0) * 100.0);
@@ -220,7 +239,7 @@ public class Health extends JPanel {
 			gbc.gridy = 1;
 			// modeLabel.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().PLAIN_32]);
 			modeLabel.setForeground(Color.WHITE);
-			mode.setBackground(CustomColors.WSU_GRAY);
+			mode.setBackground(CustomColors.BACKGROUND1);
 			mode.setOpaque(true);
 			this.add(modeLabel, gbc);
 
@@ -408,8 +427,8 @@ public class Health extends JPanel {
 
 			for (JProgressBar bar : bars) {
 
-				bar.setBackground(CustomColors.WSU_GRAY);
-				bar.setForeground(CustomColors.CRIMSON);
+				bar.setBackground(CustomColors.BACKGROUND1);
+				bar.setForeground(CustomColors.BACKGROUND3);
 
 			}
 
@@ -476,7 +495,7 @@ public class Health extends JPanel {
 
 				label.setForeground(Color.WHITE);
 				label.setOpaque(true);
-				label.setBackground(CustomColors.CRIMSON);
+				label.setBackground(CustomColors.BACKGROUND3);
 				// label.setFont(Fonts.getInstance().codeNewRoman[Fonts.getInstance().PLAIN_32]);
 			}
 
@@ -748,26 +767,11 @@ public class Health extends JPanel {
 			GridLayout gl = new GridLayout(2, 7, 5, 5);
 
 			channelWrapper.setLayout(gl);
-			channelWrapper.setBackground(CustomColors.NAVY);
+			channelWrapper.setBackground(CustomColors.BACKGROUND2);
 
 			for (JLabel ch : channelLabels) {
 				channelWrapper.add(ch);
 			}
-
-			// channelWrapper.add(ch0);
-			// channelWrapper.add(ch1);
-			// channelWrapper.add(ch2);
-			// channelWrapper.add(ch3);
-			// channelWrapper.add(ch4);
-			// channelWrapper.add(ch5);
-			// channelWrapper.add(ch6);
-			// channelWrapper.add(ch7);
-			// channelWrapper.add(ch8);
-			// channelWrapper.add(ch9);
-			// channelWrapper.add(ch10);
-			// channelWrapper.add(ch11);
-			// channelWrapper.add(ch12);
-			// channelWrapper.add(ch13);
 
 			gbc.gridy = 31;
 			this.add(channelWrapper, gbc);
@@ -787,7 +791,7 @@ public class Health extends JPanel {
 
 				} else {
 
-					channelLabels.get(i).setBackground(CustomColors.CRIMSON);
+					channelLabels.get(i).setBackground(CustomColors.BACKGROUND3);
 					channelLabels.get(i).setForeground(Color.WHITE);
 
 				}
@@ -922,8 +926,8 @@ public class Health extends JPanel {
 
 			for (JProgressBar bar : bars) {
 
-				bar.setBackground(CustomColors.WSU_GRAY);
-				bar.setForeground(CustomColors.CRIMSON);
+				bar.setBackground(CustomColors.BACKGROUND1);
+				bar.setForeground(CustomColors.BACKGROUND3);
 
 			}
 
@@ -1065,11 +1069,11 @@ public class Health extends JPanel {
 	public void updateData(CougSat1Telemetry data) {// updates all other
 													// branches
 
-		rcsHealth.updateData(data);
-		ihuHealth.updateData(data);
-		powerHealth.updateData(data);
-		adcsHealth.updateData(data);
-		tempHealth.updateData(data);
+		// rcsHealth.updateData(data);
+		// ihuHealth.updateData(data);
+		// powerHealth.updateData(data);
+		// adcsHealth.updateData(data);
+		// tempHealth.updateData(data);
 
 	}
 }

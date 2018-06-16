@@ -10,6 +10,6 @@ public class RCS extends JPanel {
 
 	public RCS() {
 		super();
-		this.setBackground(CustomColors.NAVY);
+		this.setBackground(CustomColors.BACKGROUND2);
 	}
 }

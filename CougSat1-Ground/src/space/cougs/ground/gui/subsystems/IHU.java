@@ -10,6 +10,6 @@ public class IHU extends JPanel {
 
 	public IHU() {
 		super();
-		this.setBackground(CustomColors.NAVY);
+		this.setBackground(CustomColors.BACKGROUND2);
 	}
 }

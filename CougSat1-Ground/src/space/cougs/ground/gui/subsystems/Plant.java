@@ -10,6 +10,6 @@ public class Plant extends JPanel {
 
 	public Plant() {
 		super();
-		this.setBackground(CustomColors.NAVY);
+		this.setBackground(CustomColors.BACKGROUND2);
 	}
 }

@@ -61,7 +61,7 @@ class CougSat1 extends JPanel implements UIScaling {
 		subSystemWrapper.add(adcs, "Attitude");
 		subSystemWrapper.add(ifjr, "IFJR");
 		subSystemWrapper.add(ihu, "Computer");
-		subSystemWrapper.add(rcs, "Communication");
+		subSystemWrapper.add(rcs, "Radio");
 		subSystemWrapper.add(camera, "Camera");
 		subSystemWrapper.add(plant, "Plant");
 		subSystemWrapper.add(eps, "Power");
@@ -72,7 +72,7 @@ class CougSat1 extends JPanel implements UIScaling {
 		this.add(cardSwitcher, BorderLayout.LINE_START);
 
 		this.setBackground(CustomColors.BACKGROUND1);
-		this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+//		this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 	}
 
@@ -95,13 +95,14 @@ class CougSat1 extends JPanel implements UIScaling {
 			adcsButton = new JButton("Attitude");
 			ifjrButton = new JButton("IFJR");
 			ihuButton = new JButton("Computer");
-			rcsButton = new JButton("Communication");
+			rcsButton = new JButton("Radio");
 			cameraButton = new JButton("Camera");
 			plantButton = new JButton("Plant");
 			epsButton = new JButton("Power");
 
 			this.setOpaque(false);
 			this.setLayout(new GridLayout(0, 1, 10, 10));
+			this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 0));
 			this.add(healthButton);
 			this.add(adcsButton);
 			this.add(epsButton);
@@ -115,9 +116,10 @@ class CougSat1 extends JPanel implements UIScaling {
 				if (component instanceof JButton) {
 					((AbstractButton) component).setHorizontalAlignment(SwingConstants.LEFT);
 					((JButton) component).addActionListener(this);
-					((JButton) component).setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					((JButton) component).setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 					component.setForeground(CustomColors.TEXT1);
-					component.setFont(Fonts.BODY_16);
+					component.setFont(Fonts.BODY_24);
+					((JButton) component).setIconTextGap(15);
 				}
 			}
 			healthButton.doClick();
@@ -126,20 +128,20 @@ class CougSat1 extends JPanel implements UIScaling {
 		@Override
 		public void updateUIScaling(UIScale uiScale) {
 
-			Font font = Fonts.BODY_16;
+			Font font = Fonts.BODY_24;
 			String iconFolderPath = "resources/images/";
 
 			switch (uiScale) {
 			case SCALE_100:
-				font = Fonts.BODY_16;
+				font = Fonts.BODY_24;
 				iconFolderPath += "48/";
 				break;
 			case SCALE_150:
-				font = Fonts.BODY_24;
+				font = Fonts.BODY_36;
 				iconFolderPath += "64/";
 				break;
 			case SCALE_200:
-				font = Fonts.BODY_32;
+				font = Fonts.BODY_48;
 				iconFolderPath += "128/";
 				break;
 			case SCALE_300:
@@ -147,7 +149,7 @@ class CougSat1 extends JPanel implements UIScaling {
 				iconFolderPath += "128/";
 				break;
 			case SCALE_75:
-				font = Fonts.BODY_12;
+				font = Fonts.BODY_16;
 				iconFolderPath += "32/";
 				break;
 			default:

@@ -10,6 +10,6 @@ public class IFJR extends JPanel {
 
 	public IFJR() {
 		super();
-		this.setBackground(CustomColors.NAVY);
+		this.setBackground(CustomColors.BACKGROUND2);
 	}
 }

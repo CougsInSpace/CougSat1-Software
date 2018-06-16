@@ -10,6 +10,6 @@ public class ADCS extends JPanel {
 
 	public ADCS() {
 		super();
-		this.setBackground(CustomColors.NAVY);
+		this.setBackground(CustomColors.BACKGROUND2);
 	}
 }
