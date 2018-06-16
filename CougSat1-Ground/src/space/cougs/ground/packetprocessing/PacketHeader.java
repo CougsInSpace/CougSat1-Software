@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import space.cougs.ground.packetprocessing.packets.DownIHUShortTelemery;
-import space.cougs.ground.packetprocessing.packets.Packet;
+import space.cougs.ground.packetprocessing.downlinkpackets.IHUShortTelemery;
+import space.cougs.ground.packetprocessing.downlinkpackets.DownlinkPacket;
 
 public class PacketHeader {
 
-	private Packet currentPacket;
+	private DownlinkPacket currentPacket;
 
 	public PacketHeader() {
 
@@ -37,8 +37,8 @@ public class PacketHeader {
 
 		switch (firstByte) {
 
-		case (DownIHUShortTelemery.ID):
-			currentPacket = (Packet) new DownIHUShortTelemery();
+		case (IHUShortTelemery.ID):
+			currentPacket = (DownlinkPacket) new IHUShortTelemery();
 			break;
 		// case ()
 		// break;

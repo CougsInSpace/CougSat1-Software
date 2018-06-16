@@ -1,71 +1,132 @@
 package space.cougs.ground.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
-import space.cougs.ground.satellites.CougSat1Telemetry;
-import space.cougs.ground.utils.CustomColors;
-import space.cougs.ground.utils.Fonts;
+import space.cougs.ground.gui.utils.CustomColors;
+import space.cougs.ground.gui.utils.Fonts;
 
-@SuppressWarnings("serial")
-public class GUI extends JFrame {
+public class GUI extends Thread implements UIScaling {
 
-	private CougSat1Panel cougSat1Panel = new CougSat1Panel();
-	// private JScrollPane cougSat1ScrollPane = new JScrollPane(cougSat1Panel,
-	// JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-	// JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	private JTabbedPane jtp = new JTabbedPane();
-	private JPanel homePanel = new JPanel();
-	// private JScrollPane homeScrollPane = new JScrollPane(homePanel,
-	// JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-	// JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	private static final int defaultHeight = 700;
+	private static final int defaultWidth = 1200;
+
+	private final CougSat1 cougSat1;
+	private final JTabbedPane mainPanel;
+	private final JPanel home;
+	private final JFrame mainFrame;
+
+	private final ComponentListener componentListener = new ComponentListener() {
+
+		@Override
+		public void componentResized(ComponentEvent e) {
+
+			int height = mainFrame.getHeight();
+			int width = mainFrame.getWidth();
+
+			if (height > defaultHeight * 3 && width > defaultWidth * 3) {
+				updateUIScaling(UIScale.SCALE_300);
+			} else if (height > defaultHeight * 2 && width > defaultWidth * 2) {
+				updateUIScaling(UIScale.SCALE_200);
+			} else if (height > defaultHeight * 1.5 && width > defaultWidth * 1.5) {
+				updateUIScaling(UIScale.SCALE_150);
+			} else if (height > defaultHeight && width > defaultWidth) {
+				updateUIScaling(UIScale.SCALE_100);
+			} else {
+				updateUIScaling(UIScale.SCALE_75);
+			}
+		}
+
+		@Override
+		public void componentHidden(ComponentEvent e) { // not needed
+
+		}
+
+		@Override
+		public void componentMoved(ComponentEvent e) { // not needed
+
+		}
+
+		@Override
+		public void componentShown(ComponentEvent e) { // not needed
+
+		}
+
+	};
 
 	public GUI() {
 		super();
 
-		try {
-			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Fonts.loadFonts();
 
-		jtp.setFont(Fonts.getInstance().monofonto[Fonts.getInstance().MEDIUM]);
-		jtp.setBackground(CustomColors.WSU_GRAY);
-		jtp.setPreferredSize(new Dimension(900, 700));
-		jtp.setMinimumSize(new Dimension(200, 200));
-		// jtp.addTab(" Home ", homeScrollPane);
-		// jtp.addTab(" CougSat-1 ", cougSat1ScrollPane);
-		jtp.addTab("     Home      ", homePanel);
-		jtp.addTab("   CougSat-1   ", cougSat1Panel);
+		mainPanel = new JTabbedPane();
+		mainPanel.setBackground(CustomColors.ACCENT1);
+		mainPanel.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
+		mainPanel.setMinimumSize(new Dimension(defaultWidth, defaultHeight));
 
-		this.setIconImage(new ImageIcon("resources/images/32/rocket.png").getImage());
-		this.setTitle("CiS Ground Control");
-		this.add(jtp);
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);// makes exit button work
-		this.pack();//
-		this.setMinimumSize(new Dimension(200, 200));
-		this.setMaximumSize(new Dimension(1366, 768));
-		this.setLocationRelativeTo(null);// centers the screen
-		this.setVisible(true); // makes GUI visible to user / makes visible
-		this.setResizable(true); // Disables the full screen mode
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		cougSat1 = new CougSat1();
+		home = new JPanel();
 
-		jtp.setSelectedComponent(cougSat1Panel);// temporary
+		mainPanel.addTab("     Home      ", home);
+		mainPanel.addTab("   CougSat-1   ", cougSat1);
+		mainPanel.setSelectedComponent(cougSat1);
+
+		mainFrame = new JFrame();
+		mainFrame.setIconImage(new ImageIcon("resources/images/32/rocket.png").getImage());
+		mainFrame.setTitle("CougSat Ground Control");
+		mainFrame.add(mainPanel);
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// makes exit
+																	// button
+																	// work
+		mainFrame.pack(); // default
+		mainFrame.setLocationRelativeTo(null);// centers the screen
+		mainFrame.setVisible(true); // makes GUI visible to user / makes visible
+		mainFrame.setResizable(true); // Disables the full screen mode
+		mainFrame.addComponentListener(componentListener);
 
 	}
 
-	public void updateData(CougSat1Telemetry data) {
+	@Override
+	public void updateUIScaling(UIScale uiScale) {
 
-		cougSat1Panel.upgdateData(data);
-		this.repaint();
+		for (Component component : mainPanel.getComponents()) {
+
+			if (component instanceof UIScaling) {
+
+				((UIScaling) component).updateUIScaling(uiScale);
+
+			}
+
+		}
+
+		switch (uiScale) {
+		case SCALE_100:
+			mainPanel.setFont(Fonts.TITLE_16);
+
+			break;
+		case SCALE_150:
+			mainPanel.setFont(Fonts.TITLE_24);
+			break;
+		case SCALE_200:
+			mainPanel.setFont(Fonts.TITLE_32);
+			break;
+		case SCALE_300:
+			mainPanel.setFont(Fonts.TITLE_48);
+			break;
+		case SCALE_75:
+			mainPanel.setFont(Fonts.TITLE_12);
+			break;
+		default:
+			break;
+		}
+
 	}
 
 }
