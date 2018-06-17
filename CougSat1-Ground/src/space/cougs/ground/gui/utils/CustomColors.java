@@ -17,5 +17,6 @@ public class CustomColors {
 	public static final Color BUTTON_INACTIVE = CRIMSON;
 	public static final Color BUTTON_ACTIVE = WSU_RED;
 	public static final Color TEXT1 = Color.WHITE;
-
+	public static final Color BAR_BACKGROUND = WSU_GRAY;
+	public static final Color BAR_DEFAULT = CRIMSON;
 }

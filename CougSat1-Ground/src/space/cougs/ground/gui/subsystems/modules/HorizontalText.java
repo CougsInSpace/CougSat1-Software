@@ -5,6 +5,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -76,16 +77,21 @@ public class HorizontalText extends JComponent implements UIScaling {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		FontMetrics fontMetrics = g2d.getFontMetrics();
 		Insets insets = this.getBorder().getBorderInsets(this);
 
 		int x = insets.left;
-		int y = this.getHeight() / 2 + fontMetrics.getAscent();
+		int y = ((this.getHeight() - fontMetrics.getHeight()) / 2 + fontMetrics.getAscent());
 		g2d.drawString(label, x, y);
 
 		x += (int) ((this.getWidth() - insets.left - insets.right) * divider);
 		g2d.drawString(value, x, y);
 
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 	@Override

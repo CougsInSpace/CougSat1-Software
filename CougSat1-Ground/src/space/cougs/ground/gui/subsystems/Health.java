@@ -3,6 +3,7 @@ package space.cougs.ground.gui.subsystems;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -10,7 +11,6 @@ import java.awt.Insets;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 
 import space.cougs.ground.gui.UIScaling;
 import space.cougs.ground.gui.subsystems.modules.HorizontalText;
+import space.cougs.ground.gui.subsystems.modules.SingleVerticalBarGraph;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;
@@ -33,6 +34,14 @@ public class Health extends JPanel implements UIScaling {
 	private final JPanel power;
 
 	private final HorizontalText mode;
+	private final HorizontalText time;
+	private final HorizontalText SD;
+	private final HorizontalText reset;
+	private final HorizontalText packets;
+
+	private final SingleVerticalBarGraph rx;
+	private final SingleVerticalBarGraph tx;
+	private final SingleVerticalBarGraph snr;
 
 	public Health() {
 		super();
@@ -45,21 +54,48 @@ public class Health extends JPanel implements UIScaling {
 		gbc.setFill(GridBagConstraintsWrapper.BOTH);
 
 		ihu = new JPanel();
-		ihu.setLayout(new BoxLayout(ihu, BoxLayout.PAGE_AXIS));
+		ihu.setLayout(new GridLayout(0, 1, 5, 5));
 
-		mode = new HorizontalText("Mode:", "Normal", 0.5);
+		mode = new HorizontalText("Mode:", "Null data", 0.5);
+		time = new HorizontalText("Time:", "Null data", 0.5);
+		SD = new HorizontalText("SD:", "Null data", 0.5);
+		reset = new HorizontalText("Reset:", "Null data", 0.5);
+		packets = new HorizontalText("Packets:", "Null data", 0.5);
+
+		ihu.add(new JLabel("Computer", SwingConstants.CENTER));
 		ihu.add(mode);
+		ihu.add(time);
+		ihu.add(SD);
+		ihu.add(reset);
+		ihu.add(packets);
+
+		rcs = new JPanel();
+		rcs.setLayout(new GridBagLayout());
+
+		rx = new SingleVerticalBarGraph("RX (mW)", 0, 100, 10, .5);
+		tx = new SingleVerticalBarGraph("TX (mW)", 0, 100, 10, .5);
+		snr = new SingleVerticalBarGraph("SNR(dB)", -30, 30, 10, .5);
+
+		rcs.add(new JLabel("Radio", SwingConstants.CENTER),
+				gbc.setLocation(0, 0).setSize(3, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
+		rcs.add(rx, gbc.setLocation(0, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
+		rcs.add(tx, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
+		rcs.add(snr, gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
 
 		temperature = new JPanel();
-		adcs = new JPanel();
-		rcs = new JPanel();
+		temperature.add(new JLabel("Temperature", SwingConstants.CENTER));
+
 		power = new JPanel();
+		power.add(new JLabel("Power", SwingConstants.CENTER));
+
+		adcs = new JPanel();
+		adcs.add(new JLabel("Attitude", SwingConstants.CENTER));
 
 		this.add(ihu, gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(0, 0, 5, 5));
-		this.add(temperature, gbc.setLocation(0, 1).setSize(2, 1).setWeight(1.0, 1.0).setInsets(5, 0, 5, 5));
-		this.add(adcs, gbc.setLocation(0, 2).setSize(2, 1).setWeight(1.0, 1.0).setInsets(5, 0, 0, 5));
-		this.add(rcs, gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 5, 5, 5));
-		this.add(power, gbc.setLocation(2, 0).setSize(1, 3).setWeight(1.0, 1.0).setInsets(0, 5, 0, 0));
+		this.add(adcs, gbc.setLocation(0, 1).setSize(2, 2).setWeight(0.0, 1.0).setInsets(5, 0, 0, 5));
+		this.add(temperature, gbc.setLocation(2, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 0, 0));
+		this.add(rcs, gbc.setLocation(1, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(0, 5, 5, 5));
+		this.add(power, gbc.setLocation(2, 0).setSize(1, 2).setWeight(1.0, 1.0).setInsets(0, 5, 5, 0));
 
 		ihu.setBackground(CustomColors.BACKGROUND2);
 		temperature.setBackground(CustomColors.BACKGROUND2);
@@ -71,6 +107,28 @@ public class Health extends JPanel implements UIScaling {
 
 	@Override
 	public void updateUIScaling(UIScale uiScale) {
+
+		Font titleFont = Fonts.TITLE_16;
+
+		switch (uiScale) {
+		case SCALE_100:
+			titleFont = Fonts.TITLE_16;
+			break;
+		case SCALE_150:
+			titleFont = Fonts.TITLE_24;
+			break;
+		case SCALE_200:
+			titleFont = Fonts.TITLE_32;
+			break;
+		case SCALE_300:
+			titleFont = Fonts.TITLE_48;
+			break;
+		case SCALE_75:
+			titleFont = Fonts.TITLE_12;
+			break;
+		default:
+			break;
+		}
 
 		for (Component component : this.getComponents()) {
 
@@ -87,6 +145,10 @@ public class Health extends JPanel implements UIScaling {
 
 						((UIScaling) subComponent).updateUIScaling(uiScale);
 
+					} else if (subComponent instanceof JLabel) {
+
+						subComponent.setFont(titleFont);
+						subComponent.setForeground(CustomColors.TEXT1);
 					}
 
 				}
