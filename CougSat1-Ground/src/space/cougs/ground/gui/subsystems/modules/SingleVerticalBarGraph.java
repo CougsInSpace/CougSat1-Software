@@ -131,8 +131,8 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 		g2d.drawString(value + "", x, y);
 
 	}
-	public void setValue(int value, Color barFill)
-	{
+
+	public void setValue(int value, Color barFill) {
 		this.value = value;
 		this.barFill = barFill;
 	}
