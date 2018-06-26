@@ -1,12 +1,25 @@
 package space.cougs.ground.packetprocessing.uplinkpackets;
 
+import java.io.File;
 import java.io.IOException;
 
-public interface UplinkPacket {
+public abstract class UplinkPacket {
 
-	public static final int ID = -1;
+	private static final int MAX_PACKET_LENGTH = 1024;
+	private boolean dataLoaded = false;
 
-	public boolean encodePacket(String filePath) throws IOException;
+	public abstract File encodePacket() throws IOException;
+	
+	final boolean isDataLoaded() {
+		return dataLoaded;
+	}
 
-	boolean isDataLoaded();
+	final void setDataLoaded(boolean value) {
+		dataLoaded = value;
+	}
+
+	final int getMaxPacketLength() {
+		return MAX_PACKET_LENGTH;
+	}
+
 }

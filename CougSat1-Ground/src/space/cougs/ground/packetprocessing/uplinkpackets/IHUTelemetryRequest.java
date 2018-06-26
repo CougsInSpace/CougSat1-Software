@@ -1,6 +1,9 @@
 package space.cougs.ground.packetprocessing.uplinkpackets;
 
-public class IHUTelemetryRequest implements UplinkPacket {
+import java.io.File;
+import java.io.IOException;
+
+public class IHUTelemetryRequest extends UplinkPacket {
 
 	public boolean encodePacket(String filePath) {
 		if (!isDataLoaded()) {
@@ -14,6 +17,12 @@ public class IHUTelemetryRequest implements UplinkPacket {
 	public boolean isDataLoaded() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public File encodePacket() throws IOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

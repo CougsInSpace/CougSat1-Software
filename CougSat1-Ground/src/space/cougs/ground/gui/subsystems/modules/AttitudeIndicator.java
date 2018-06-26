@@ -14,11 +14,11 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import space.cougs.ground.gui.UIScaling.UIScale;
+import space.cougs.ground.gui.UIScaling;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
 
-public class AttitudeIndicator extends JPanel {
+public class AttitudeIndicator extends JPanel implements UIScaling {
 
 	private static final long serialVersionUID = 1L;
 
@@ -26,7 +26,7 @@ public class AttitudeIndicator extends JPanel {
 	private double longitude;
 	private double lattitude;
 	private int diameter;
-	
+
 	public AttitudeIndicator() {
 		super();
 		this.lattitude = lattitude;
@@ -37,7 +37,7 @@ public class AttitudeIndicator extends JPanel {
 
 		map = null;
 		diameter = 6;
-		
+
 		try {
 			map = ImageIO.read(new File("resources/images/map.jpg"));
 		} catch (IOException e) {
@@ -45,7 +45,6 @@ public class AttitudeIndicator extends JPanel {
 			e.printStackTrace();
 		}
 	}
-
 
 	@Override
 	public Dimension getPreferredSize() {
@@ -108,11 +107,11 @@ public class AttitudeIndicator extends JPanel {
 		x = this.getWidth() / 2;
 
 		g2d.drawString(longitudeText, x, y);
-		
+
 		x = (int) ((longitude + 180.0) / 360.0 * (x2 - x1) + insets.left);
 		y = (int) ((-lattitude + 90.0) / 180 * (y2 - y1) + insets.top);
-		
-		g2d.fillOval(x - diameter/2, y - diameter/2, diameter, diameter);
+
+		g2d.fillOval(x - diameter / 2, y - diameter / 2, diameter, diameter);
 
 	}
 
@@ -154,4 +153,3 @@ public class AttitudeIndicator extends JPanel {
 	}
 
 }
-
