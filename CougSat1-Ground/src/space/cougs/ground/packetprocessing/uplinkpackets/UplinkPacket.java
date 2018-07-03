@@ -9,8 +9,8 @@ public abstract class UplinkPacket {
 	private boolean dataLoaded = false;
 
 	public abstract File encodePacket() throws IOException;
-	
-	final boolean isDataLoaded() {
+
+	boolean isDataLoaded() {
 		return dataLoaded;
 	}
 

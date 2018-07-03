@@ -22,7 +22,7 @@ public class IFJRProgramUpload extends UplinkPacket {
 
 		Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 		File programFile = new File(programPath);
-		FileInputStream inFile = new FileInputStream(programFile);
+		FileInputStream inStream = new FileInputStream(programFile);
 		long programLength = programFile.length();
 
 		String folderPath = "upPackets/" + timeStamp.toString() + "/";
@@ -31,27 +31,50 @@ public class IFJRProgramUpload extends UplinkPacket {
 
 		// First packet
 		int serialNumber = 0;
-		FileOutputStream outFile = new FileOutputStream(new File(folderPath + serialNumber));
-		outFile.write(PacketID.IFJR_PROGRAM_UPLOAD.getID());
+		FileOutputStream outStream = new FileOutputStream(new File(folderPath + serialNumber));
+		outStream.write(PacketID.IFJR_PROGRAM_UPLOAD.getID());
 
 		// 2 - packet header, 2 - multiPacket SerialNumber, 4 - fileSize,
 		// 4 - CRC32, 1 - Null Character
 		int headerLength = 2 + 2 + 4 + 4 + programPath.length() + 1;
 		long packetLength = Math.min(getMaxPacketLength(), programLength + headerLength);
+		int packetLengthDwords = (int) Math.ceil(packetLength / 4.0);
+		outStream.write(packetLengthDwords);
 
-		while (true)// the other packets
+		outStream.write((serialNumber >> 8) & 0xFF);
+		outStream.write(serialNumber & 0xFF);
+
+		outStream.write((int) (programLength >> 24) & 0xFF);
+		outStream.write((int) (programLength >> 16) & 0xFF);
+		outStream.write((int) (programLength >> 8) & 0xFF);
+		outStream.write((int) (programLength >> 0) & 0xFF);
+
+		int i = 0;
+		while (programFile.length() > 0)// the other packets
 		{
-			while (true) {
 
+			serialNumber++;
+
+			while (i < packetLength) {
+
+				i++;
 			}
 		}
 
-		return destination;
+		inStream.close();
+		outStream.close();
 
+		return destination;
 	}
 
 	public void setProgramLocation(String programPath) {
 
 		this.programPath = programPath;
 	}
+
+	// public File createPacket(File outFile)
+	// {
+	// return outFile;
+	//
+	// }
 }
