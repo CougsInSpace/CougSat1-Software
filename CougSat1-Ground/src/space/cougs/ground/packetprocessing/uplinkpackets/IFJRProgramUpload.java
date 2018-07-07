@@ -8,6 +8,7 @@ import java.io.IOException;
 import com.sun.jmx.snmp.Timestamp;
 
 import space.cougs.ground.packetprocessing.PacketID;
+import space.cougs.ground.utils.CRC32;
 
 public class IFJRProgramUpload extends UplinkPacket {
 
@@ -22,12 +23,14 @@ public class IFJRProgramUpload extends UplinkPacket {
 
 		Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 		File programFile = new File(programPath);
-		FileInputStream inStream = new FileInputStream(programFile);
+
 		long programLength = programFile.length();
 
 		String folderPath = "upPackets/" + timeStamp.toString() + "/";
 		File destination = new File(folderPath);
 		destination.mkdirs();
+
+		FileInputStream inStream = new FileInputStream(programFile);
 
 		// First packet
 		int serialNumber = 0;
@@ -49,15 +52,35 @@ public class IFJRProgramUpload extends UplinkPacket {
 		outStream.write((int) (programLength >> 8) & 0xFF);
 		outStream.write((int) (programLength >> 0) & 0xFF);
 
-		int i = 0;
+		CRC32 crc = new CRC32();
+		crc.update(programFile);
+		int checkSum = crc.getCheckSum();
+		outStream.write((int) (checkSum >> 24) & 0xFF);
+		outStream.write((int) (checkSum >> 16) & 0xFF);
+		outStream.write((int) (checkSum >> 8) & 0xFF);
+		outStream.write((int) (checkSum >> 0) & 0xFF);
+
+		packetLength -= 12;
+		programLength -= 12;
+
+		while (packetLength > 0) {
+			outStream.write(inStream.read());
+			packetLength--;
+			programLength--;
+		}
+
 		while (programFile.length() > 0)// the other packets
 		{
-
+			packetLength = Math.min(getMaxPacketLength(), programLength + 4);
 			serialNumber++;
+			outStream.write((serialNumber >> 8) & 0xFF);
+			outStream.write(serialNumber & 0xFF);
+			
 
-			while (i < packetLength) {
-
-				i++;
+			while (packetLength > 0) {
+				outStream.write(inStream.read());
+				packetLength--;
+				programLength--;
 			}
 		}
 
@@ -72,9 +95,4 @@ public class IFJRProgramUpload extends UplinkPacket {
 		this.programPath = programPath;
 	}
 
-	// public File createPacket(File outFile)
-	// {
-	// return outFile;
-	//
-	// }
 }

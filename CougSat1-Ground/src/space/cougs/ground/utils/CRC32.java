@@ -1,5 +1,9 @@
 package space.cougs.ground.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 public class CRC32 {
 	// polynomial - x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8
 	// + x^7 + x^5 + -x^4 + x^2 + x + 1
@@ -37,16 +41,24 @@ public class CRC32 {
 			0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d, };
 
 	public CRC32() {
-
 	}
 
 	public int getCheckSum() {
-
 		return checkSum ^ 0xFFFFFFFF;
 	}
 
-	public void update(byte b) {
-		b = (byte) ((checkSum ^ b) & 0xFF);
+	public void update(int b) {
+		b = ((checkSum ^ b) & 0xFF);
 		checkSum = (checkSum >> 8) ^ TABLE[b];
+	}
+
+	public void update(File file) throws IOException {
+		FileInputStream inStream = new FileInputStream(file);
+		int b;
+
+		while ((b = inStream.read()) != -1) {
+			update(b);
+		}
+		inStream.close();
 	}
 }
