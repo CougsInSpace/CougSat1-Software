@@ -5,6 +5,8 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -18,9 +20,10 @@ import space.cougs.ground.gui.subsystems.modules.SingleVerticalBarGraph;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;
+import space.cougs.ground.satellites.CougSat;
 
 @SuppressWarnings("serial")
-public class Health extends JPanel implements UIScaling {
+public class Health extends JPanel implements UIScaling, SatelliteInfo {
 
 	private final JPanel ihu;
 	private final JPanel temperature;
@@ -28,37 +31,35 @@ public class Health extends JPanel implements UIScaling {
 	private final JPanel rcs;
 	private final JPanel power;
 
-	private final HorizontalText mode;
-	private final HorizontalText time;
-	private final HorizontalText SD;
-	private final HorizontalText reset;
-	private final HorizontalText packets;
+	private final HorizontalText mode = new HorizontalText("Mode:", "Null data", 0.5);
+	private final HorizontalText time = new HorizontalText("Time:", "Null data", 0.5);
+	private final HorizontalText SD = new HorizontalText("SD:", "Null data", 0.5);
+	private final HorizontalText reset = new HorizontalText("Reset:", "Null data", 0.5);
+	private final HorizontalText status = new HorizontalText("Status:", "Null data", 0.5);
 
-	private final SingleVerticalBarGraph rx;
-	private final SingleVerticalBarGraph tx;
-	private final SingleVerticalBarGraph snr;
+	private final SingleVerticalBarGraph rx = new SingleVerticalBarGraph("RX (mW)", 0, 100, 10, .5);
+	private final SingleVerticalBarGraph tx = new SingleVerticalBarGraph("TX (mW)", 0, 100, 10, .5);
+	private final SingleVerticalBarGraph snr = new SingleVerticalBarGraph("SNR(dB)", -30, 30, 10, .5);
 
-	private final SingleVerticalBarGraph ihuTemp;
-	private final SingleVerticalBarGraph adcsTemp;
-	private final SingleVerticalBarGraph ifjrTemp;
-	private final SingleVerticalBarGraph pmicTemp;
-	private final SingleVerticalBarGraph rcsTemp;
-	private final SingleVerticalBarGraph avgTemp;
-	private final SingleVerticalBarGraph pv0Temp;
-	private final SingleVerticalBarGraph pv1Temp;
-	private final SingleVerticalBarGraph pv2Temp;
-	private final SingleVerticalBarGraph pv3Temp;
-	private final SingleVerticalBarGraph pv4Temp;
-	private final SingleVerticalBarGraph pv5Temp;
-	private final SingleVerticalBarGraph pv6Temp;
-	private final SingleVerticalBarGraph pv7Temp;
-	private final SingleVerticalBarGraph batteryATemp;
-	private final SingleVerticalBarGraph batteryBTemp;
+	private final SingleVerticalBarGraph ihuTemp = new SingleVerticalBarGraph("IHU ", -50, 80, 10, .4);
+	private final SingleVerticalBarGraph adcsTemp = new SingleVerticalBarGraph("ADCS", -50, 80, 10, .4);
+	private final SingleVerticalBarGraph ifjrTemp = new SingleVerticalBarGraph("IFJR", -50, 80, 10, .4);
+	private final SingleVerticalBarGraph pmicTemp = new SingleVerticalBarGraph("PMIC", -50, 80, 10, .4);
+	private final SingleVerticalBarGraph rcsTemp = new SingleVerticalBarGraph("RCS ", -50, 80, 10, .4);
+	private final SingleVerticalBarGraph avgTemp = new SingleVerticalBarGraph("AVG ", -50, 80, 10, .4);
+	private final SingleVerticalBarGraph batteryATemp = new SingleVerticalBarGraph("BatA", -50, 80, 10, .4);
+	private final SingleVerticalBarGraph batteryBTemp = new SingleVerticalBarGraph("BatB", -50, 80, 10, .4);
+
+	private final List<SingleVerticalBarGraph> pvTemps = new ArrayList<SingleVerticalBarGraph>();
 
 	private final Map map;
 
 	public Health() {
 		super();
+
+		for (int i = 0; i < 8; i++) {
+			pvTemps.add(new SingleVerticalBarGraph("PV " + i, -50, 80, 10, .4));
+		}
 
 		this.setBackground(CustomColors.BACKGROUND1);
 		this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -70,25 +71,15 @@ public class Health extends JPanel implements UIScaling {
 		ihu = new JPanel();
 		ihu.setLayout(new GridLayout(0, 1, 5, 5));
 
-		mode = new HorizontalText("Mode:", "Null data", 0.5);
-		time = new HorizontalText("Time:", "Null data", 0.5);
-		SD = new HorizontalText("SD:", "Null data", 0.5);
-		reset = new HorizontalText("Reset:", "Null data", 0.5);
-		packets = new HorizontalText("Packets:", "Null data", 0.5);
-
 		ihu.add(new JLabel("Computer", SwingConstants.CENTER));
 		ihu.add(mode);
 		ihu.add(time);
 		ihu.add(SD);
 		ihu.add(reset);
-		ihu.add(packets);
+		ihu.add(status);
 
 		rcs = new JPanel();
 		rcs.setLayout(new GridBagLayout());
-
-		rx = new SingleVerticalBarGraph("RX (mW)", 0, 100, 10, .5);
-		tx = new SingleVerticalBarGraph("TX (mW)", 0, 100, 10, .5);
-		snr = new SingleVerticalBarGraph("SNR(dB)", -30, 30, 10, .5);
 
 		rcs.add(new JLabel("Radio", SwingConstants.CENTER),
 				gbc.setLocation(0, 0).setSize(3, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
@@ -98,23 +89,6 @@ public class Health extends JPanel implements UIScaling {
 
 		temperature = new JPanel();
 		temperature.setLayout(new GridBagLayout());
-
-		ihuTemp = new SingleVerticalBarGraph("IHU ", -50, 80, 10, .4);
-		adcsTemp = new SingleVerticalBarGraph("ADCS", -50, 80, 10, .4);
-		ifjrTemp = new SingleVerticalBarGraph("IFJR", -50, 80, 10, .4);
-		pmicTemp = new SingleVerticalBarGraph("PMIC", -50, 80, 10, .4);
-		rcsTemp = new SingleVerticalBarGraph("RCS ", -50, 80, 10, .4);
-		avgTemp = new SingleVerticalBarGraph("AVG ", -50, 80, 10, .4);
-		batteryATemp = new SingleVerticalBarGraph("BatA", -50, 80, 10, .4);
-		batteryBTemp = new SingleVerticalBarGraph("BatB", -50, 80, 10, .4);
-		pv0Temp = new SingleVerticalBarGraph("PV 0", -50, 80, 10, .4);
-		pv1Temp = new SingleVerticalBarGraph("PV 1", -50, 80, 10, .4);
-		pv2Temp = new SingleVerticalBarGraph("PV 2", -50, 80, 10, .4);
-		pv3Temp = new SingleVerticalBarGraph("PV 3", -50, 80, 10, .4);
-		pv4Temp = new SingleVerticalBarGraph("PV 4", -50, 80, 10, .4);
-		pv5Temp = new SingleVerticalBarGraph("PV 5", -50, 80, 10, .4);
-		pv6Temp = new SingleVerticalBarGraph("PV 6", -50, 80, 10, .4);
-		pv7Temp = new SingleVerticalBarGraph("PV 7", -50, 80, 10, .4);
 
 		temperature.add(new JLabel("Temperature (°C)", SwingConstants.CENTER),
 				gbc.setLocation(0, 0).setSize(14, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
@@ -127,14 +101,12 @@ public class Health extends JPanel implements UIScaling {
 		temperature.add(batteryBTemp, gbc.setLocation(7, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
 		temperature.add(avgTemp, gbc.setLocation(8, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
 
-		temperature.add(pv0Temp, gbc.setLocation(1, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(pv1Temp, gbc.setLocation(2, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(pv2Temp, gbc.setLocation(3, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(pv3Temp, gbc.setLocation(4, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(pv4Temp, gbc.setLocation(5, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(pv5Temp, gbc.setLocation(6, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(pv6Temp, gbc.setLocation(7, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(pv7Temp, gbc.setLocation(8, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
+		gbc.setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5);
+
+		for (int i = 0; i < 8; i++) {
+
+			temperature.add(pvTemps.get(i), gbc.setLocation(i + 1, 2));
+		}
 
 		power = new JPanel();
 		power.add(new JLabel("Power", SwingConstants.CENTER));
@@ -207,12 +179,37 @@ public class Health extends JPanel implements UIScaling {
 						subComponent.setFont(titleFont);
 						subComponent.setForeground(CustomColors.TEXT1);
 					}
-
 				}
 			}
-
 		}
-
 	}
 
+	@Override
+	public void updateSatellite(CougSat satellite) {
+
+		mode.setValue(satellite.getMode());
+		time.setValue(satellite.getTime());
+		SD.setValue(String.valueOf(satellite.getSDCard()));
+		reset.setValue(String.valueOf(satellite.getResetCount()));
+		status.setValue(satellite.getErrorStatus().toString());
+
+		rx.setValue((int) satellite.getRXPower() * 1000, CustomColors.BAR_DEFAULT);
+		tx.setValue((int) satellite.getTxPower() * 1000, CustomColors.BAR_DEFAULT);
+		snr.setValue((int) satellite.getRXSNR(), CustomColors.BAR_DEFAULT);
+
+		ihuTemp.setValue(satellite.getIHUTemp(), CustomColors.BAR_DEFAULT);
+		adcsTemp.setValue(satellite.getADCSTemp(), CustomColors.BAR_DEFAULT);
+		ifjrTemp.setValue(satellite.getIFJRTemp(), CustomColors.BAR_DEFAULT);
+		pmicTemp.setValue(satellite.getPMICTemp(), CustomColors.BAR_DEFAULT);
+		rcsTemp.setValue(satellite.getRCSTemp(), CustomColors.BAR_DEFAULT);
+		batteryATemp.setValue(satellite.getBatteryATemp(), CustomColors.BAR_DEFAULT);
+		batteryBTemp.setValue(satellite.getBatteryBTemp(), CustomColors.BAR_DEFAULT);
+		for (int i = 0; i < 8; i++) {
+			pvTemps.get(i).setValue(satellite.getPVTemp(i), CustomColors.BAR_DEFAULT);
+		}
+		// avg temp
+
+		map.setValue(satellite.getLattitude(), satellite.getLongitude());
+
+	}
 }

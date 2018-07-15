@@ -24,10 +24,12 @@ import space.cougs.ground.gui.subsystems.IFJR;
 import space.cougs.ground.gui.subsystems.IHU;
 import space.cougs.ground.gui.subsystems.Plant;
 import space.cougs.ground.gui.subsystems.RCS;
+import space.cougs.ground.gui.subsystems.SatelliteInfo;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
+import space.cougs.ground.satellites.CougSat;
 
-class CougSat1 extends JPanel implements UIScaling {
+class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,7 +46,7 @@ class CougSat1 extends JPanel implements UIScaling {
 
 	CardSwitcher cardSwitcher;
 
-	public CougSat1() {
+	public CougSat1GUI() {
 		super();
 
 		this.setLayout(new BorderLayout());
@@ -208,12 +210,23 @@ class CougSat1 extends JPanel implements UIScaling {
 						((UIScaling) subComponent).updateUIScaling(uiScale);
 
 					}
-
 				}
 			}
-			
+		}
+	}
+
+	@Override
+	public void updateSatellite(CougSat satellite) {
+
+		for (Component component : subSystemWrapper.getComponents()) {
+
+			if (component instanceof SatelliteInfo) {
+
+				((SatelliteInfo) component).updateSatellite(satellite);
+
+			}
 
 		}
-
+		this.repaint();
 	}
 }

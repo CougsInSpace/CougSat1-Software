@@ -12,13 +12,15 @@ import javax.swing.JTabbedPane;
 
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
+import space.cougs.ground.satellites.CougSat1;
+import space.cougs.ground.satellites.CougSat;
 
 public class GUI extends Thread implements UIScaling {
 
 	private static final int defaultHeight = 650;
 	private static final int defaultWidth = 1200;
 
-	private final CougSat1 cougSat1;
+	private final CougSat1GUI cougSat1GUI;
 	private final JTabbedPane mainPanel;
 	private final JPanel home;
 	private final JFrame mainFrame;
@@ -71,12 +73,12 @@ public class GUI extends Thread implements UIScaling {
 		mainPanel.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
 		mainPanel.setMinimumSize(new Dimension(defaultWidth, defaultHeight));
 
-		cougSat1 = new CougSat1();
+		cougSat1GUI = new CougSat1GUI();
 		home = new JPanel();
 
 		mainPanel.addTab("     Home      ", home);
-		mainPanel.addTab("   CougSat-1   ", cougSat1);
-		mainPanel.setSelectedComponent(cougSat1);
+		mainPanel.addTab("   CougSat-1   ", cougSat1GUI);
+		mainPanel.setSelectedComponent(cougSat1GUI);
 
 		mainFrame = new JFrame();
 		mainFrame.setIconImage(new ImageIcon("resources/images/32/rocket.png").getImage());
@@ -127,6 +129,13 @@ public class GUI extends Thread implements UIScaling {
 			break;
 		}
 
+	}
+
+	public void update(CougSat satellite) {
+
+		if (satellite instanceof CougSat1) {
+			cougSat1GUI.updateSatellite(satellite);
+		}
 	}
 
 }

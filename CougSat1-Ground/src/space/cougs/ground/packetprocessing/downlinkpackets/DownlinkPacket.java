@@ -3,18 +3,12 @@ package space.cougs.ground.packetprocessing.downlinkpackets;
 import java.io.File;
 import java.io.IOException;
 
+import space.cougs.ground.satellites.CougSat;
+
 public abstract class DownlinkPacket {
 
 	public static final int ID = -1;
-	private boolean packetDecoded = false;
 
-	public abstract boolean decodePacket(File file) throws IOException;
+	public abstract boolean decodePacket(File file, CougSat satellite) throws IOException;
 
-	boolean isPacketDecoded() {
-		return packetDecoded;
-	}
-
-	final void setPacketDecoded(boolean value) {
-		packetDecoded = value;
-	}
 }

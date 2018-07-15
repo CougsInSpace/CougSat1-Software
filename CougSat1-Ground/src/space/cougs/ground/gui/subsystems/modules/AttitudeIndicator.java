@@ -29,8 +29,8 @@ public class AttitudeIndicator extends JPanel implements UIScaling {
 
 	public AttitudeIndicator() {
 		super();
-//		this.lattitude = lattitude;
-//		this.longitude = longitude;
+		// this.lattitude = lattitude;
+		// this.longitude = longitude;
 
 		this.setForeground(CustomColors.TEXT1);
 		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

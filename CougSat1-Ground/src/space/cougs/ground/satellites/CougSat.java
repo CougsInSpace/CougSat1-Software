@@ -6,11 +6,9 @@ import java.util.TimeZone;
 
 import space.cougs.ground.utils.CISErrors;
 
-public class CougSat1Telemetry {
+public abstract class CougSat {
 
-	public CougSat1Telemetry() {
-
-	}
+	public abstract int getID();
 
 	private ModeEnum mode = ModeEnum.NO_CONNECTION;
 	private int ihuTemp = 0;
@@ -73,9 +71,9 @@ public class CougSat1Telemetry {
 		BEACON, CHARGING, DATA_TRANSMISION, SCIENCE, ECLIPSE, SAFE, NO_CONNECTION;
 	}
 
-	public ModeEnum getMode() {
+	public String getMode() {
 
-		return mode;
+		return mode.name();
 	}
 
 	public void setMode(int buff) {
@@ -105,7 +103,7 @@ public class CougSat1Telemetry {
 
 	public String getTime() {
 
-		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss MM-dd-YYYY");
+		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 
 		format.setTimeZone(TimeZone.getTimeZone("UTC"));
 
