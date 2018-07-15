@@ -75,7 +75,6 @@ public class IFJRProgramUpload extends UplinkPacket {
 			serialNumber++;
 			outStream.write((serialNumber >> 8) & 0xFF);
 			outStream.write(serialNumber & 0xFF);
-			
 
 			while (packetLength > 0) {
 				outStream.write(inStream.read());

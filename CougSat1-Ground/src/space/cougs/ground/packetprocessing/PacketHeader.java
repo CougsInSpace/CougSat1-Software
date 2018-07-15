@@ -4,8 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import space.cougs.ground.packetprocessing.downlinkpackets.IHUShortTelemery;
 import space.cougs.ground.packetprocessing.downlinkpackets.DownlinkPacket;
+import space.cougs.ground.packetprocessing.downlinkpackets.Payload1Configuration;
+import space.cougs.ground.packetprocessing.downlinkpackets.Payload2Configuration;
+import space.cougs.ground.packetprocessing.downlinkpackets.Payload3Configuration;
+import space.cougs.ground.packetprocessing.downlinkpackets.RadioConfiguration;
+import space.cougs.ground.packetprocessing.downlinkpackets.Telemetry;
 
 public class PacketHeader {
 
@@ -17,14 +21,15 @@ public class PacketHeader {
 
 	public void decodePacketSwitcher(String filePath) {
 
+		File file = new File(filePath);
 		int firstByte = -1;
 		try {
 
-			FileInputStream infile = new FileInputStream(new File(filePath));
+			FileInputStream inFile = new FileInputStream(file);
 
-			firstByte = infile.read();
+			firstByte = inFile.read();
 
-			infile.close();
+			inFile.close();
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -37,15 +42,20 @@ public class PacketHeader {
 
 		switch (firstByte) {
 
-		case (IHUShortTelemery.ID):
-			currentPacket = (DownlinkPacket) new IHUShortTelemery();
+		case Telemetry.ID:
+			currentPacket = new Telemetry();
 			break;
-		// case ()
-		// break;
+		case RadioConfiguration.ID:
+			break;
+		case Payload1Configuration.ID:
+			break;
+		case Payload2Configuration.ID:
+			break;
+		case Payload3Configuration.ID:
+			break;
 		}
-
 		try {
-			currentPacket.decodePacket(filePath);
+			currentPacket.decodePacket(file);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

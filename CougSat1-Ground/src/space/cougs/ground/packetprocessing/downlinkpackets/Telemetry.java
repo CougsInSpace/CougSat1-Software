@@ -5,284 +5,95 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import space.cougs.ground.satellites.CougSat1Telemetry;
+import space.cougs.ground.utils.FileUtils;
+import space.cougs.ground.utils.Units;
 
-public class Telemetry {
+public class Telemetry extends DownlinkPacket {
 
-	private FileInputStream infile = null;
+	public static final int ID = 0x28;
+	private FileInputStream inFile = null;
 	private CougSat1Telemetry telemetry = new CougSat1Telemetry();
 
 	public Telemetry() {
 
 	}
 
-	public void parsePacket(String filePath) throws IOException {
+	public boolean decodePacket(File file) throws IOException {
 
-		infile = new FileInputStream(new File(filePath));
+		inFile = new FileInputStream(file);
 
-		int buff = (int) infile.read();// two f's strong buffer
+		inFile.read();// Recipient/header/command ID
+		inFile.read();// length
 
-		int sender = (buff >> 5) & 0b111;// checks for who is sending/recieving
-											// packet
-
-		switch (sender) {
-
-		case 0:// ground
-				// invalid
-			break;
-		case 1:// ADCS
-			break;
-		case 2:// IFJR
-			break;
-		case 3:// IHU
-			parseIHU();
-			break;
-		case 4:// PMIC
-			break;
-		case 5:// RCS
-			break;
-		case 6:// payload - checks for multipacket
-			break;
-		case 7:// camera - checks for multipacket
+		telemetry.setMode(inFile.read());// mode
+		telemetry.setIHUTemp(Units.rawToTemp(inFile.read()));// IHU Temp
+		telemetry.setTime(Units.rawToTime(FileUtils.readNextBytes(inFile, 4)));
+		telemetry.setSDCard(FileUtils.readNextBytes(inFile, 5));
+		telemetry.setResetCount(inFile.read());
+		telemetry.setErrorStatus(inFile.read());
+		telemetry.setADCSTemp(Units.rawToTemp(inFile.read()));
+		telemetry.setLattitude(Units.rawToGeographicCoordinate(FileUtils.readNextBytes(inFile, 4)));
+		telemetry.setLongitude(Units.rawToGeographicCoordinate(FileUtils.readNextBytes(inFile, 4)));
+		telemetry.setRoll(FileUtils.readNextBytes(inFile, 2));
+		telemetry.setPitch(FileUtils.readNextBytes(inFile, 2));
+		telemetry.setYaw(FileUtils.readNextBytes(inFile, 2));
+		telemetry.setXPWMOut((int) FileUtils.readNextBytes(inFile, 2));
+		telemetry.setYPWMOut((int) FileUtils.readNextBytes(inFile, 2));
+		telemetry.setZPWMOut((int) FileUtils.readNextBytes(inFile, 2));
+		telemetry.setXCurrent((int) FileUtils.readNextBytes(inFile, 2));
+		telemetry.setYCurrent((int) FileUtils.readNextBytes(inFile, 2));
+		telemetry.setZCurrent((int) FileUtils.readNextBytes(inFile, 2));
+		telemetry.setIFJRTemp(Units.rawToTemp(inFile.read()));
+		telemetry.setPMICTemp(Units.rawToTemp(inFile.read()));
+		telemetry.setBatteryATemp(Units.rawToTemp(inFile.read()));
+		telemetry.setBatteryBTemp(Units.rawToTemp(inFile.read()));
+		telemetry.setReg3V3ATemp(Units.rawToTemp(inFile.read()));
+		telemetry.setReg3V3BTemp(Units.rawToTemp(inFile.read()));
+		for (int i = 0; i < 8; i++) {
+			telemetry.setPVTemp(i, Units.rawToTemp(inFile.read()));
 		}
-
-		// update telemetry
-
-		// CougSatGround.getGUI().updateData(telemetry);
-		infile.close();
-	}
-
-	private void parseIHU() throws IOException {
-		infile.read();// length of packet - only relevent on multipacket
-
-		int buff = infile.read();// command 0x81 or 0x80
-		long longBuff = 0;// for longs - aka memory storage
-		int buff2 = 0;// for the 12 bit voltage/current
-
-		if (buff == 0x81) {// standard telemetry downlink
-
-			buff = infile.read();// mode as enum type
-			telemetry.setMode(buff);
-
-			buff = infile.read();// time stuff
-			buff = buff << 8;
-			buff |= infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setTime(buff);
-
-			buff = infile.read();// reset count
-			telemetry.setResetCount(buff);
-
-			buff = (byte) infile.read();// IHU temp
-			telemetry.setIHUTemp(buff);
-
-			longBuff = infile.read();// SD CARD
-			longBuff = longBuff << 8;
-			longBuff |= infile.read();
-			longBuff = longBuff << 8;
-			longBuff |= infile.read();
-			longBuff = longBuff << 8;
-			longBuff |= infile.read();
-			longBuff = longBuff << 8;
-			longBuff |= infile.read();
-			telemetry.setIHUSdCard(longBuff);
-
-			buff = infile.read();
-			telemetry.setIHUStatus(buff);// IHUStatus
-
-			buff = (byte) infile.read();
-			telemetry.setADCSTemp(buff);// ADCS Temp
-
-			buff = infile.read();// ADCS Status
-			telemetry.setADCSStatus(buff);
-
-			buff = infile.read();// lattitude
-			buff = buff << 8;
-			buff |= infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setLattitude(buff);
-
-			buff = infile.read();// longitude
-			buff = buff << 8;
-			buff |= infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setLongitude(buff);
-
-			buff = infile.read();// roll
-			buff = buff << 8;
-			buff |= infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setRoll(buff);
-
-			buff = infile.read();// pitch
-			buff = buff << 8;
-			buff |= infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setPitch(buff);
-
-			buff = infile.read();// yaw
-			buff = buff << 8;
-			buff |= infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setYaw(buff);
-
-			buff = (byte) infile.read();// IFJR Temp
-			telemetry.setIFJRTemp(buff);
-
-			buff = (byte) infile.read();// PMIC Temp - power
-			telemetry.setPMICTemp(buff);
-
-			buff = infile.read();// voltage - b0
-			buff = buff << 8;
-			buff2 = infile.read();
-			buff = buff + buff2;
-			buff = buff >> 4;
-			telemetry.setBattery0Voltage(buff, true);
-			buff2 = buff2 << 8;// current - b0
-			buff2 |= infile.read();
-			buff2 = (buff2) & 0b111111111111;
-			telemetry.setBattery0Current(buff2, true);
-
-			buff = infile.read();// voltage - b1
-			buff = buff << 8;
-			buff2 = infile.read();
-			buff = buff + buff2;
-			buff = buff >> 4;
-			telemetry.setBattery1Voltage(buff, true);
-			buff2 = buff2 << 8;// current - b1
-			buff2 |= infile.read();
-			buff2 = (buff2) & 0b111111111111;
-			telemetry.setBattery1Current(buff2, true);
-
-			buff = (byte) infile.read();// battery 0 temp
-			telemetry.setBattery0Temp(buff);
-
-			buff = (byte) infile.read();// battery 1 temp
-			telemetry.setBattery1Temp(buff);
-
-			buff = infile.read();// battery 0 heat
-			telemetry.setBattery0Heat(buff);
-
-			buff = infile.read();// battery 1 heat
-			telemetry.setBattery1Heat(buff);
-
-			buff = infile.read();// voltage - sp0
-			buff = buff << 8;
-			buff2 = infile.read();
-			buff = buff + buff2;
-			buff = buff >> 4;
-			telemetry.setSP0Voltage(buff, true);
-			buff2 = buff2 << 8;// current - sp0
-			buff2 |= infile.read();
-			buff2 = (buff2) & 0b111111111111;
-			telemetry.setSP0Current(buff2, true);
-
-			buff = infile.read();// voltage - sp1
-			buff = buff << 8;
-			buff2 = infile.read();
-			buff = buff + buff2;
-			buff = buff >> 4;
-			telemetry.setSP1Voltage(buff, true);
-			buff2 = buff2 << 8;// current - sp1
-			buff2 |= infile.read();
-			buff2 = (buff2) & 0b111111111111;
-			telemetry.setSP1Current(buff2, true);
-
-			buff = infile.read();// voltage - sp2
-			buff = buff << 8;
-			buff2 = infile.read();
-			buff = buff + buff2;
-			buff = buff >> 4;
-			telemetry.setSP2Voltage(buff, true);
-			buff2 = buff2 << 8;// current - sp2
-			buff2 |= infile.read();
-			buff2 = (buff2) & 0b111111111111;
-			telemetry.setSP2Current(buff2, true);
-
-			buff = infile.read();// voltage - sp3
-			buff = buff << 8;
-			buff2 = infile.read();
-			buff = buff + buff2;
-			buff = buff >> 4;
-			telemetry.setSP3Voltage(buff, true);
-			buff2 = buff2 << 8;// current - sp3
-			buff2 |= infile.read();
-			buff2 = (buff2) & 0b111111111111;
-			telemetry.setSP3Current(buff2, true);
-
-			buff = infile.read();// total power coming out of solar converters
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setPowerIn(buff);
-
-			buff = infile.read();// total power being used on the sat
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setPowerOut(buff);
-
-			buff = infile.read();// voltage - 3.3v rail
-			buff = buff << 8;
-			buff2 = infile.read();
-			buff = buff | buff2;
-			buff = buff >> 4;
-			telemetry.set3v3RailVoltage(buff, true);
-			buff2 = buff2 << 8;// current - 3.3v rail
-			buff2 |= infile.read();
-			buff2 = (buff2) & 0b111111111111;
-			telemetry.set3v3RailCurrent(buff2, true);
-
-			buff = infile.read();// voltage - 5.0v rail
-			buff = buff << 8;
-			buff2 = infile.read();
-			buff = buff + buff2;
-			buff = buff >> 4;
-			telemetry.set5vRailVoltage(buff, true);
-			buff2 = buff2 << 8;// current - 5.0v rail
-			buff2 |= infile.read();
-			buff2 = (buff2) & 0b111111111111;
-			telemetry.set5vRailCurrent(buff2, true);
-
-			buff = infile.read();// Channels
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setEPSChannels(buff);
-
-			buff = (byte) infile.read();// RCS Temp
-			telemetry.setRCSTemp(buff);
-
-			buff = infile.read();
-			telemetry.setRCSStatus(buff); // RCS Status
-
-			buff = infile.read();
-			telemetry.setTXPower(buff); // TX Power
-
-			buff = infile.read();
-			telemetry.setRXPower(buff); // RX Power
-
-			buff = infile.read();
-			telemetry.setRXSNR(buff); // RX Signal Noise Ratio
-
-			buff = infile.read();
-			buff = buff << 8;
-			buff |= infile.read();
-			telemetry.setPayloadFrames(buff); // # of payload frames ready to
-												// download - aka pictures
-
-			infile.close();
-
-		} else if (buff == 0x80) {// diagnostic report
-			// tbd
+		for (int i = 0; i < 8; i++) {
+			telemetry.setMPPTTemp(i, Units.rawToTemp(inFile.read()));
 		}
+		for (int i = 0; i < 8; i++) {
+			telemetry.setPVVoltage(i, Units.rawToVoltage(FileUtils.readNextBytes(inFile, 2)));
+			telemetry.setPVCurrent(i, Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		}
+		telemetry.setBatteryAVoltage(Units.rawToVoltage(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setBatteryACurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setBatteryBVoltage(Units.rawToVoltage(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setBatteryBCurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setReg3V3AVoltage(Units.rawToVoltage(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setReg3V3ACurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setReg3V3BVoltage(Units.rawToVoltage(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setReg3V3BCurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		for (int i = 0; i < 13; i++) {
+			telemetry.setPR3V3Current(i, Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		}
+		for (int i = 0; i < 7; i++) {
+			telemetry.setPRBattCurrent(i, Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		}
+		for (int i = 0; i < 4; i++) {
+			telemetry.setPV3V3Current(i, Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		}
+		telemetry.setPRBatteryHeaterACurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setPRBatteryHeaterBCurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setPRDeployablesCurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setPVSwitchingState((FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setOutputSwitchingState(FileUtils.readNextBytes(inFile, 7));
+		telemetry.setEnergyLevel(Units.rawToEnergy(inFile.read()));
+		telemetry.setRCSTemp(Units.rawToTemp(inFile.read()));
+		telemetry.setRXTemp(Units.rawToTemp(inFile.read()));
+		telemetry.setTXTemp(Units.rawToTemp(inFile.read()));
+		telemetry.setAMPTemp(Units.rawToTemp(inFile.read()));
+		telemetry.setRXPower(Units.rawToPower(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setRXSNR(Units.rawToDecibels(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setBadPacketCount((int) FileUtils.readNextBytes(inFile, 2));
+		telemetry.setRXCenterFrequency(Units.rawToFrequency(FileUtils.readNextBytes(inFile, 3)));
+		telemetry.setTXCenterFrequency(Units.rawToFrequency(FileUtils.readNextBytes(inFile, 3)));
+		telemetry.setTxPower(Units.rawToPower(FileUtils.readNextBytes(inFile, 2)));
+		telemetry.setTxAmplifierVoltage(Units.rawToVoltage(FileUtils.readNextBytes(inFile, 2)));
+
+		return true;
 	}
 }

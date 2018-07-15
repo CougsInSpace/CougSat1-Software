@@ -1,5 +1,6 @@
 package space.cougs.ground;
 
+import java.io.File;
 import java.io.IOException;
 
 import space.cougs.ground.gui.GUI;
@@ -27,12 +28,20 @@ public class CougSatGround {
 
 			// Pause for a second before checking again
 
-			// int w = gui.getContentPane().getWidth();
-			// int h = gui.getContentPane().getHeight();
-
+			// int bytes[] = { 0x12, 0x34, 0x56, 0x78, 0x90 };
+			// String string = "Math is not fun!";
+			// CRC32 crcTest = new CRC32();
+			//
+			// for (int b : string.getBytes()) {
+			// crcTest.update(b);
+			// }
+			//
+			// int test = crcTest.getCheckSum();
+			//
+			// System.out.printf("%X\n", test);
 			try {
 
-				telemetry.parsePacket("test/rawPackets/TestTelemetry");
+				telemetry.decodePacket(new File("test/rawPackets/TestTelemetry"));
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
