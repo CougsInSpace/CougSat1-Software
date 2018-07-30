@@ -463,12 +463,12 @@ public abstract class CougSat {
 		this.energyLevel = energyLevel;
 	}
 
-	public int getRCSTemp() {
+	public int getCommsTemp() {
 		return commsTemp;
 	}
 
-	public void setRCSTemp(int rcsTemp) {
-		this.commsTemp = rcsTemp;
+	public void setCommsTemp(int commsTemp) {
+		this.commsTemp = commsTemp;
 	}
 
 	public int getRXTemp() {

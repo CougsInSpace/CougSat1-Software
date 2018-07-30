@@ -18,12 +18,12 @@ import javax.swing.SwingConstants;
 
 import space.cougs.ground.gui.subsystems.ADCS;
 import space.cougs.ground.gui.subsystems.Camera;
+import space.cougs.ground.gui.subsystems.Comms;
 import space.cougs.ground.gui.subsystems.EPS;
 import space.cougs.ground.gui.subsystems.Health;
 import space.cougs.ground.gui.subsystems.IFJR;
 import space.cougs.ground.gui.subsystems.IHU;
 import space.cougs.ground.gui.subsystems.Plant;
-import space.cougs.ground.gui.subsystems.RCS;
 import space.cougs.ground.gui.subsystems.SatelliteInfo;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
@@ -37,7 +37,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 	private final ADCS adcs;
 	private final IFJR ifjr;
 	private final IHU ihu; // Internal houskeeping unit shhhh
-	private final RCS rcs;
+	private final Comms comms;
 	private final Camera camera; // camera data
 	private final Plant plant; // images of plant
 	private final EPS eps; // power?
@@ -55,7 +55,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 		adcs = new ADCS();
 		ifjr = new IFJR();
 		ihu = new IHU();
-		rcs = new RCS();
+		comms = new Comms();
 		camera = new Camera();
 		plant = new Plant();
 		eps = new EPS();
@@ -64,7 +64,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 		subSystemWrapper.add(adcs, "Attitude");
 		subSystemWrapper.add(ifjr, "IFJR");
 		subSystemWrapper.add(ihu, "Computer");
-		subSystemWrapper.add(rcs, "Radio");
+		subSystemWrapper.add(comms, "Radio");
 		subSystemWrapper.add(camera, "Camera");
 		subSystemWrapper.add(plant, "Plant");
 		subSystemWrapper.add(eps, "Power");
@@ -87,7 +87,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 		private final JButton adcsButton;
 		private final JButton ifjrButton;
 		private final JButton ihuButton;
-		private final JButton rcsButton;
+		private final JButton commsButton;
 		private final JButton cameraButton;
 		private final JButton plantButton;
 		private final JButton epsButton;
@@ -98,7 +98,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 			adcsButton = new JButton("Attitude");
 			ifjrButton = new JButton("IFJR");
 			ihuButton = new JButton("Computer");
-			rcsButton = new JButton("Radio");
+			commsButton = new JButton("Radio");
 			cameraButton = new JButton("Camera");
 			plantButton = new JButton("Plant");
 			epsButton = new JButton("Power");
@@ -111,7 +111,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 			this.add(epsButton);
 			this.add(ifjrButton);
 			this.add(ihuButton);
-			this.add(rcsButton);
+			this.add(commsButton);
 			this.add(cameraButton);
 			this.add(plantButton);
 

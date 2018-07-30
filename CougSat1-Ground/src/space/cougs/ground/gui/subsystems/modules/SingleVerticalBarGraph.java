@@ -26,7 +26,7 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 	private final int max;
 	private final double barWidth;
 
-	private int value;
+	private double value;
 	private Font sideFont;
 	private Color barFill;
 
@@ -34,6 +34,7 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 
 		this.label = label;
 		this.min = min;
+		
 		this.max = max;
 		this.value = value;
 		this.barWidth = barWidth;
@@ -126,40 +127,40 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 
 		g2d.setColor(this.getForeground());
 		g2d.setFont(sideFont);
-		x = (barWidth - sideFontMetrics.stringWidth(value + "")) / 2 + insets.left;
+		x = (barWidth - sideFontMetrics.stringWidth(String.format("%.1f", value))) / 2 + insets.left;
 		y = y - sideFontMetrics.getDescent();
-		g2d.drawString(value + "", x, y);
+		g2d.drawString(String.format("%.1f", value), x, y);
 
 	}
 
-	public void setValue(int value, Color barFill) {
-		this.value = value;
+	public void setValue(double d, Color barFill) {
+		this.value = d;
 		this.barFill = barFill;
 	}
 
 	@Override
 	public void updateUIScaling(UIScale uiScale) {
-		this.setFont(Fonts.BODY_16);
+		this.setFont(Fonts.BODY_12);
 
 		switch (uiScale) {
 		case SCALE_100:
-			sideFont = Fonts.CONSOLE_16;
+			sideFont = Fonts.CONSOLE_12;
 			this.setFont(Fonts.BODY_16);
 			break;
 		case SCALE_150:
-			sideFont = Fonts.CONSOLE_24;
+			sideFont = Fonts.CONSOLE_18;
 			this.setFont(Fonts.BODY_24);
 			break;
 		case SCALE_200:
-			sideFont = Fonts.CONSOLE_32;
+			sideFont = Fonts.CONSOLE_24;
 			this.setFont(Fonts.BODY_32);
 			break;
 		case SCALE_300:
-			sideFont = Fonts.CONSOLE_48;
+			sideFont = Fonts.CONSOLE_36;
 			this.setFont(Fonts.BODY_48);
 			break;
 		case SCALE_75:
-			sideFont = Fonts.CONSOLE_12;
+			sideFont = Fonts.CONSOLE_8;
 			this.setFont(Fonts.BODY_12);
 			break;
 		default:

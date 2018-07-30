@@ -75,13 +75,17 @@ public class Telemetry extends DownlinkPacket {
 		for (int i = 0; i < 4; i++) {
 			satellite.setPV3V3Current(i, Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
 		}
-		satellite.setPRBatteryHeaterACurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
+		long temp = FileUtils.readNextBytes(inFile, 2);
+		System.out.printf("PR BatteryHeater %d\n", temp);
+
+		System.out.printf("%f\n",Units.rawToCurrent(temp));
+		satellite.setPRBatteryHeaterACurrent(Units.rawToCurrent(temp));
 		satellite.setPRBatteryHeaterBCurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
 		satellite.setPRDeployablesCurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
 		satellite.setPVSwitchingState((FileUtils.readNextBytes(inFile, 2)));
 		satellite.setOutputSwitchingState(FileUtils.readNextBytes(inFile, 7));
 		satellite.setEnergyLevel(Units.rawToEnergy(inFile.read()));
-		satellite.setRCSTemp(Units.rawToTemp(inFile.read()));
+		satellite.setCommsTemp(Units.rawToTemp(inFile.read()));
 		satellite.setRXTemp(Units.rawToTemp(inFile.read()));
 		satellite.setTXTemp(Units.rawToTemp(inFile.read()));
 		satellite.setAMPTemp(Units.rawToTemp(inFile.read()));

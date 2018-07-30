@@ -7,17 +7,17 @@ public final class Units {
 
 	public static double rawToVoltage(long raw) {
 
-		return raw * 0.0001;
+		return raw /10000.0;
 	}
 
 	public static double rawToCurrent(long raw) {
 
-		return (short) raw * 0.00015;
+		return raw / 15000.0;
 	}
 
 	public static double rawToPower(long raw) {
 
-		return raw * 0.000250;
+		return raw * 25000.0;
 	}
 
 	public static int rawToEnergy(long raw) {
