@@ -30,7 +30,7 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 	private double warningLow;
 	private double dangerHigh;
 	private double dangerLow;
-	
+
 	private Font sideFont = Fonts.CONSOLE_12;
 	private Color barFill = CustomColors.BAR_DEFAULT;
 
@@ -154,7 +154,7 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 
 		double value = ((this.max - this.value) / this.max);
 
-		if ((value <= dangerLow || ((value) >= dangerHight))) {
+		if ((value <= dangerLow || ((value) >= dangerHigh))) {
 			this.barFill = Color.RED;
 		} else if ((value) <= warningLow || (value) >= warningHigh) {
 			this.barFill = Color.YELLOW;

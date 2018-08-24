@@ -38,37 +38,37 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 	private final HorizontalText reset = new HorizontalText("Reset:", "        ", 0.5);
 	private final HorizontalText status = new HorizontalText("Status:", "        ", 0.5);
 
-	private final SingleVerticalBarGraph rx = new SingleVerticalBarGraph("RX (mW)", 0, 100, 10, 0.6, false);
-	private final SingleVerticalBarGraph tx = new SingleVerticalBarGraph("TX (mW)", 0, 100, 10, 0.6, false);
-	private final SingleVerticalBarGraph snr = new SingleVerticalBarGraph("SNR(dB)", -30, 30, 10, 0.6, false);
+	private final SingleVerticalBarGraph rx = new SingleVerticalBarGraph("RX (mW)", 0, 100, 10, 0.6, false, 1.0, 0.2 ,1.0, 0.1);
+	private final SingleVerticalBarGraph tx = new SingleVerticalBarGraph("TX (mW)", 0, 100, 10, 0.6, false, 0.8, 0.0 ,0.9, 0.0);
+	private final SingleVerticalBarGraph snr = new SingleVerticalBarGraph("SNR(dB)", -30, 30, 10, 0.6, false, 1.0, 0.2 ,1.0, 0.1);
 
-	private final SingleVerticalBarGraph ihuTemp = new SingleVerticalBarGraph("IHU ", -50, 80, 10, 0.5, false);
-	private final SingleVerticalBarGraph adcsTemp = new SingleVerticalBarGraph("ADCS", -50, 80, 10, 0.5, false);
-	private final SingleVerticalBarGraph ifjrTemp = new SingleVerticalBarGraph("IFJR", -50, 80, 10, 0.5, false);
-	private final SingleVerticalBarGraph pmicTemp = new SingleVerticalBarGraph("PMIC", -50, 80, 10, 0.5, false);
-	private final SingleVerticalBarGraph commsTemp = new SingleVerticalBarGraph("COMMS ", -50, 80, 10, 0.5, false);
-	private final SingleVerticalBarGraph avgTemp = new SingleVerticalBarGraph("AVG ", -50, 80, 10, 0.5, false);
-	private final SingleVerticalBarGraph batteryATemp = new SingleVerticalBarGraph("BatA", -50, 80, 10, 0.5, false);
-	private final SingleVerticalBarGraph batteryBTemp = new SingleVerticalBarGraph("BatB", -50, 80, 10, 0.5, false);
+	private final SingleVerticalBarGraph ihuTemp = new SingleVerticalBarGraph("IHU ", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph adcsTemp = new SingleVerticalBarGraph("ADCS", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph ifjrTemp = new SingleVerticalBarGraph("IFJR", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph pmicTemp = new SingleVerticalBarGraph("PMIC", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph commsTemp = new SingleVerticalBarGraph("COMMS ", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph avgTemp = new SingleVerticalBarGraph("AVG ", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph batteryATemp = new SingleVerticalBarGraph("BatA", -50, 80, 10, 0.5, false, 0.8, 0.4, 0.9, 0.3);
+	private final SingleVerticalBarGraph batteryBTemp = new SingleVerticalBarGraph("BatB", -50, 80, 10, 0.5, false, 0.8, 0.4, 0.9, 0.3);
 
 	private final List<SingleVerticalBarGraph> pvTemps = new ArrayList<SingleVerticalBarGraph>();
 
-	private final SingleVerticalBarGraph avgPVVoltageIn = new SingleVerticalBarGraph(" PV V ", 0, 3, 10, 0.5, false);
-	private final SingleVerticalBarGraph sumPVCurrent = new SingleVerticalBarGraph(" PV I ", 0, 2, 20, 0.5, false);
-	private final SingleVerticalBarGraph sumPR3V3Current = new SingleVerticalBarGraph("PR-3 I", 0, 8, 10, 0.5, false);
-	private final SingleVerticalBarGraph sumBatteryPR = new SingleVerticalBarGraph("PR-B I", 0, 8, 10, 0.5, false);
-	private final SingleVerticalBarGraph sumPV3V3Current = new SingleVerticalBarGraph("PV-3 I", 0, 2, 10, 0.5, false);
-	private final SingleVerticalBarGraph battHeaterA = new SingleVerticalBarGraph("BH-A I", 0, 5, 10, 0.5, false);
-	private final SingleVerticalBarGraph battHeaterB = new SingleVerticalBarGraph("BH-B I", 0, 5, 10, 0.5, false);
-	private final SingleVerticalBarGraph prDeployCurrent = new SingleVerticalBarGraph("PR-D I", 0, 3, 10, 0.5, false);
-	private final SingleVerticalBarGraph battACurrent = new SingleVerticalBarGraph("I", 0, 6, 10, 0.5, false);
-	private final SingleVerticalBarGraph battAVoltage = new SingleVerticalBarGraph("V", 0, 5, 10, 0.5, false);
-	private final SingleVerticalBarGraph battBCurrent = new SingleVerticalBarGraph("I", 0, 6, 10, 0.5, false);
-	private final SingleVerticalBarGraph battBVoltage = new SingleVerticalBarGraph("V", 0, 5, 10, 0.5, false);
-	private final SingleVerticalBarGraph regulator3V3AVoltage = new SingleVerticalBarGraph("V", 0, 4, 10, 0.5, false);
-	private final SingleVerticalBarGraph regulator3V3ACurrent = new SingleVerticalBarGraph("I", 0, 4, 10, 0.5, false);
-	private final SingleVerticalBarGraph regulator3V3BVoltage = new SingleVerticalBarGraph("V", 0, 4, 10, 0.5, false);
-	private final SingleVerticalBarGraph regulator3V3BCurrent = new SingleVerticalBarGraph("I", 0, 4, 10, 0.5, false);
+	private final SingleVerticalBarGraph avgPVVoltageIn = new SingleVerticalBarGraph(" PV V ", 0, 3, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph sumPVCurrent = new SingleVerticalBarGraph(" PV I ", 0, 2, 20, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph sumPR3V3Current = new SingleVerticalBarGraph("PR-3 I", 0, 8, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph sumBatteryPR = new SingleVerticalBarGraph("PR-B I", 0, 8, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph sumPV3V3Current = new SingleVerticalBarGraph("PV-3 I", 0, 2, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph battHeaterA = new SingleVerticalBarGraph("BH-A I", 0, 5, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph battHeaterB = new SingleVerticalBarGraph("BH-B I", 0, 5, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph prDeployCurrent = new SingleVerticalBarGraph("PR-D I", 0, 3, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph battACurrent = new SingleVerticalBarGraph("I", 0, 6, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph battAVoltage = new SingleVerticalBarGraph("V", 0, 5, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph battBCurrent = new SingleVerticalBarGraph("I", 0, 6, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph battBVoltage = new SingleVerticalBarGraph("V", 0, 5, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph regulator3V3AVoltage = new SingleVerticalBarGraph("V", 0, 4, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph regulator3V3ACurrent = new SingleVerticalBarGraph("I", 0, 4, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph regulator3V3BVoltage = new SingleVerticalBarGraph("V", 0, 4, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph regulator3V3BCurrent = new SingleVerticalBarGraph("I", 0, 4, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
 
 	private final Map map = new Map(46.7304889, -117.1750474, 1.25);
 
@@ -116,7 +116,7 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 
 		for (int i = 0; i < 8; i++) {
 
-			pvTemps.add(new SingleVerticalBarGraph("PV " + i, -50, 80, 10, 0.5, false));
+			pvTemps.add(new SingleVerticalBarGraph("PV " + i, -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1));
 			temperature.add(pvTemps.get(i), gbc.setLocation(i + 1, 2));
 		}
 
