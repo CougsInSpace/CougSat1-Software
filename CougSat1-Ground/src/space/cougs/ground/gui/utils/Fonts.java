@@ -41,6 +41,7 @@ public class Fonts {
 			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/Ethnocentric.ttf")));
 			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/Monofonto.ttf")));
 			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("resources/fonts/CodeNewRoman.ttf")));
+			// Prints out all the different fonts for debugging purposes
 			// System.out.println(Arrays.toString(ge.getAvailableFontFamilyNames()));
 		} catch (IOException | FontFormatException e) {
 			e.printStackTrace();

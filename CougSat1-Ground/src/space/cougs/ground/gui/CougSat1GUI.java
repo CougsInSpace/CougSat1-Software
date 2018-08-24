@@ -17,12 +17,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import space.cougs.ground.gui.subsystems.ADCS;
+import space.cougs.ground.gui.subsystems.CDH;
 import space.cougs.ground.gui.subsystems.Camera;
 import space.cougs.ground.gui.subsystems.Comms;
 import space.cougs.ground.gui.subsystems.EPS;
 import space.cougs.ground.gui.subsystems.Health;
 import space.cougs.ground.gui.subsystems.IFJR;
-import space.cougs.ground.gui.subsystems.IHU;
 import space.cougs.ground.gui.subsystems.Plant;
 import space.cougs.ground.gui.subsystems.SatelliteInfo;
 import space.cougs.ground.gui.utils.CustomColors;
@@ -33,32 +33,23 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 
 	private static final long serialVersionUID = 1L;
 
-	private final Health health; // all telemetry data
-	private final ADCS adcs;
-	private final IFJR ifjr;
-	private final IHU ihu; // Internal houskeeping unit shhhh
-	private final Comms comms;
-	private final Camera camera; // camera data
-	private final Plant plant; // images of plant
-	private final EPS eps; // power?
+	private final Health health = new Health(); // all telemetry data
+	private final ADCS adcs = new ADCS();;
+	private final IFJR ifjr = new IFJR();;
+	private final CDH ihu = new CDH(); // Internal houskeeping unit shhhh
+	private final Comms comms = new Comms();
+	private final Camera camera = new Camera(); // camera data
+	private final Plant plant = new Plant(); // images of plant
+	private final EPS eps = new EPS(); // power?
 
-	JPanel subSystemWrapper = new JPanel(new CardLayout());
+	private final JPanel subSystemWrapper = new JPanel(new CardLayout());
 
-	CardSwitcher cardSwitcher;
+	private final CardSwitcher cardSwitcher = new CardSwitcher();
 
-	public CougSat1GUI() {
+	CougSat1GUI() {
 		super();
 
 		this.setLayout(new BorderLayout());
-
-		health = new Health();
-		adcs = new ADCS();
-		ifjr = new IFJR();
-		ihu = new IHU();
-		comms = new Comms();
-		camera = new Camera();
-		plant = new Plant();
-		eps = new EPS();
 
 		subSystemWrapper.add(health, "Health");
 		subSystemWrapper.add(adcs, "Attitude");
@@ -69,13 +60,11 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 		subSystemWrapper.add(plant, "Plant");
 		subSystemWrapper.add(eps, "Power");
 		subSystemWrapper.setOpaque(false);
-		this.add(subSystemWrapper, BorderLayout.CENTER);
 
-		cardSwitcher = new CardSwitcher();
+		this.add(subSystemWrapper, BorderLayout.CENTER);
 		this.add(cardSwitcher, BorderLayout.LINE_START);
 
 		this.setBackground(CustomColors.BACKGROUND1);
-		// this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 	}
 
@@ -83,25 +72,16 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 
 		private static final long serialVersionUID = 1L;
 
-		private final JButton healthButton;
-		private final JButton adcsButton;
-		private final JButton ifjrButton;
-		private final JButton ihuButton;
-		private final JButton commsButton;
-		private final JButton cameraButton;
-		private final JButton plantButton;
-		private final JButton epsButton;
+		private final JButton healthButton = new JButton("Health");
+		private final JButton adcsButton = new JButton("Attitude");
+		private final JButton ifjrButton = new JButton("IFJR");
+		private final JButton ihuButton = new JButton("Computer");
+		private final JButton commsButton = new JButton("Radio");
+		private final JButton cameraButton = new JButton("Camera");
+		private final JButton plantButton = new JButton("Plant");
+		private final JButton epsButton = new JButton("Power");
 
-		CardSwitcher() {
-
-			healthButton = new JButton("Health");
-			adcsButton = new JButton("Attitude");
-			ifjrButton = new JButton("IFJR");
-			ihuButton = new JButton("Computer");
-			commsButton = new JButton("Radio");
-			cameraButton = new JButton("Camera");
-			plantButton = new JButton("Plant");
-			epsButton = new JButton("Power");
+		private CardSwitcher() {
 
 			this.setOpaque(false);
 			this.setLayout(new GridLayout(0, 1, 10, 10));
@@ -123,6 +103,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 					component.setForeground(CustomColors.TEXT1);
 					component.setFont(Fonts.BODY_24);
 					((JButton) component).setIconTextGap(15);
+					((JButton) component).setFocusable(false);
 				}
 			}
 			healthButton.doClick();
@@ -135,6 +116,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 			String iconFolderPath = "resources/images/";
 
 			switch (uiScale) {
+			default:
 			case SCALE_100:
 				font = Fonts.BODY_24;
 				iconFolderPath += "48/";
@@ -155,8 +137,6 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 				font = Fonts.BODY_16;
 				iconFolderPath += "32/";
 				break;
-			default:
-				break;
 			}
 
 			for (Component component : this.getComponents()) {
@@ -168,9 +148,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 					((JButton) component).setIcon(new ImageIcon(iconFilePath));
 
 				}
-
 			}
-
 		}
 
 		@Override

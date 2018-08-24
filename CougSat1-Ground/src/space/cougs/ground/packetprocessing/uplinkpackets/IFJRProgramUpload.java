@@ -7,12 +7,18 @@ import java.io.IOException;
 
 import com.sun.jmx.snmp.Timestamp;
 
-import space.cougs.ground.packetprocessing.PacketID;
 import space.cougs.ground.utils.CRC32;
 
 public class IFJRProgramUpload extends UplinkPacket {
 
-	private String programPath;
+	private final String programPath;
+	private static final int IFJR_PROGRAM_UPLOAD = 0x04;
+
+	public IFJRProgramUpload(String programPath) {
+
+		this.programPath = programPath;
+		setDataLoaded(true);
+	}
 
 	@Override
 	public File encodePacket() throws IOException {
@@ -26,7 +32,7 @@ public class IFJRProgramUpload extends UplinkPacket {
 
 		long programLength = programFile.length();
 
-		String folderPath = "upPackets/" + timeStamp.toString() + "/";
+		String folderPath = "UplinkPackets/" + timeStamp.toString() + "/";
 		File destination = new File(folderPath);
 		destination.mkdirs();
 
@@ -35,7 +41,7 @@ public class IFJRProgramUpload extends UplinkPacket {
 		// First packet
 		int serialNumber = 0;
 		FileOutputStream outStream = new FileOutputStream(new File(folderPath + serialNumber));
-		outStream.write(PacketID.IFJR_PROGRAM_UPLOAD.getID());
+		outStream.write(IFJR_PROGRAM_UPLOAD);
 
 		// 2 - packet header, 2 - multiPacket SerialNumber, 4 - fileSize,
 		// 4 - CRC32, 1 - Null Character
@@ -87,11 +93,6 @@ public class IFJRProgramUpload extends UplinkPacket {
 		outStream.close();
 
 		return destination;
-	}
-
-	public void setProgramLocation(String programPath) {
-
-		this.programPath = programPath;
 	}
 
 }

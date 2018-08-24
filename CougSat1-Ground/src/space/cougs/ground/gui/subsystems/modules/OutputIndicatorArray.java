@@ -8,5 +8,6 @@ public class OutputIndicatorArray extends JPanel {
 
 	public OutputIndicatorArray() {
 
+		//TODO
 	}
 }

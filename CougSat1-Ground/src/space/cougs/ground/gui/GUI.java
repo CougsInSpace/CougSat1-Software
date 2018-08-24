@@ -12,18 +12,21 @@ import javax.swing.JTabbedPane;
 
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
-import space.cougs.ground.satellites.CougSat1;
+import space.cougs.ground.gui.utils.Home;
 import space.cougs.ground.satellites.CougSat;
+import space.cougs.ground.satellites.CougSat1;
 
-public class GUI extends Thread implements UIScaling {
+public class GUI extends JPanel implements UIScaling {
 
+	private static final long serialVersionUID = 1L;
 	private static final int defaultHeight = 650;
 	private static final int defaultWidth = 1200;
 
-	private final CougSat1GUI cougSat1GUI;
-	private final JTabbedPane mainPanel;
-	private final JPanel home;
+	private final CougSat1GUI cougSat1GUI = new CougSat1GUI();
+	private final JTabbedPane mainPanel = new JTabbedPane();
+	private final JPanel home = new Home();
 	private final JFrame mainFrame;
+//	BufferedImage CISLogo;
 
 	private final ComponentListener componentListener = new ComponentListener() {
 
@@ -68,13 +71,10 @@ public class GUI extends Thread implements UIScaling {
 
 		Fonts.loadFonts();
 
-		mainPanel = new JTabbedPane();
+
 		mainPanel.setBackground(CustomColors.ACCENT1);
 		mainPanel.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
 		mainPanel.setMinimumSize(new Dimension(defaultWidth, defaultHeight));
-
-		cougSat1GUI = new CougSat1GUI();
-		home = new JPanel();
 
 		mainPanel.addTab("     Home      ", home);
 		mainPanel.addTab("   CougSat-1   ", cougSat1GUI);
@@ -90,9 +90,7 @@ public class GUI extends Thread implements UIScaling {
 		mainFrame.pack(); // default
 		mainFrame.setLocationRelativeTo(null);// centers the screen
 		mainFrame.setVisible(true); // makes GUI visible to user / makes visible
-		mainFrame.setResizable(true); // Disables the full screen mode
 		mainFrame.addComponentListener(componentListener);
-
 	}
 
 	@Override
@@ -103,15 +101,12 @@ public class GUI extends Thread implements UIScaling {
 			if (component instanceof UIScaling) {
 
 				((UIScaling) component).updateUIScaling(uiScale);
-
 			}
-
 		}
 
 		switch (uiScale) {
 		case SCALE_100:
 			mainPanel.setFont(Fonts.TITLE_16);
-
 			break;
 		case SCALE_150:
 			mainPanel.setFont(Fonts.TITLE_24);
@@ -137,5 +132,4 @@ public class GUI extends Thread implements UIScaling {
 			cougSat1GUI.updateSatellite(satellite);
 		}
 	}
-
 }

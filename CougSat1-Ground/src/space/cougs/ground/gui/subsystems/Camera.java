@@ -9,6 +9,7 @@ public class Camera extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	public Camera() {
+		//TODO
 		super();
 		this.setBackground(CustomColors.BACKGROUND2);
 	}

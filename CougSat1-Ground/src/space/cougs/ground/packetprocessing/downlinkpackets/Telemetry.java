@@ -11,7 +11,6 @@ import space.cougs.ground.utils.Units;
 public class Telemetry extends DownlinkPacket {
 
 	public static final int ID = 0x08;
-	private FileInputStream inFile = null;
 
 	public Telemetry() {
 
@@ -19,7 +18,7 @@ public class Telemetry extends DownlinkPacket {
 
 	public boolean decodePacket(File file, CougSat satellite) throws IOException {
 
-		inFile = new FileInputStream(file);
+		FileInputStream inFile = new FileInputStream(file);
 
 		inFile.read();// Recipient/header/command ID
 		inFile.read();// length
@@ -75,11 +74,8 @@ public class Telemetry extends DownlinkPacket {
 		for (int i = 0; i < 4; i++) {
 			satellite.setPV3V3Current(i, Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
 		}
-		long temp = FileUtils.readNextBytes(inFile, 2);
-		System.out.printf("PR BatteryHeater %d\n", temp);
-
-		System.out.printf("%f\n",Units.rawToCurrent(temp));
-		satellite.setPRBatteryHeaterACurrent(Units.rawToCurrent(temp));
+		
+		satellite.setPRBatteryHeaterACurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
 		satellite.setPRBatteryHeaterBCurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
 		satellite.setPRDeployablesCurrent(Units.rawToCurrent(FileUtils.readNextBytes(inFile, 2)));
 		satellite.setPVSwitchingState((FileUtils.readNextBytes(inFile, 2)));
@@ -97,6 +93,9 @@ public class Telemetry extends DownlinkPacket {
 		satellite.setTxPower(Units.rawToPower(FileUtils.readNextBytes(inFile, 2)));
 		satellite.setTxAmplifierVoltage(Units.rawToVoltage(FileUtils.readNextBytes(inFile, 2)));
 
-		return true;
+		int lastByte = inFile.read();
+		inFile.close();
+
+		return lastByte == -1;
 	}
 }

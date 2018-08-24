@@ -1,6 +1,7 @@
 package space.cougs.ground.satellites;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -278,16 +279,16 @@ public abstract class CougSat {
 		return reg3V3ATemp;
 	}
 
-	public void setReg3V3ATemp(int reg3v3aTemp) {
-		reg3V3ATemp = reg3v3aTemp;
+	public void setReg3V3ATemp(int reg3V3ATemp) {
+		this.reg3V3ATemp = reg3V3ATemp;
 	}
 
 	public int getReg3V3BTemp() {
 		return reg3V3BTemp;
 	}
 
-	public void setReg3V3BTemp(int reg3v3bTemp) {
-		reg3V3BTemp = reg3v3bTemp;
+	public void setReg3V3BTemp(int reg3V3BTemp) {
+		this.reg3V3BTemp = reg3V3BTemp;
 	}
 
 	public int getPVTemp(int i) {
@@ -310,12 +311,22 @@ public abstract class CougSat {
 		return pvVoltage[i];
 	}
 
+	public double getPVVoltageIn() {
+
+		return Arrays.stream(pvVoltage).average().getAsDouble();
+	}
+
 	public void setPVVoltage(int i, double pvVoltage) {
 		this.pvVoltage[i] = pvVoltage;
 	}
 
 	public double getPVCurrent(int i) {
 		return pvCurrent[i];
+	}
+
+	public double getPVCurrent() {
+
+		return Arrays.stream(pvCurrent).sum();
 	}
 
 	public void setPVCurrent(int i, double pvCurrent) {
@@ -390,12 +401,21 @@ public abstract class CougSat {
 		return pr3V3Current[i];
 	}
 
+	public double getPR3V3Current() {
+		return Arrays.stream(pr3V3Current).sum();
+	}
+
 	public void setPR3V3Current(int i, double pr3v3Current) {
 		pr3V3Current[i] = pr3v3Current;
 	}
 
 	public double getPRBattCurrent(int i) {
 		return prBattCurrent[i];
+	}
+	
+	public double getBatteryPR() {
+		
+		return Arrays.stream(prBattCurrent).sum();
 	}
 
 	public void setPRBattCurrent(int i, double prBattCurrent) {
@@ -404,6 +424,10 @@ public abstract class CougSat {
 
 	public double getPV3V3Current(int i) {
 		return pv3V3Current[i];
+	}
+	public double getPV3V3Current() {
+
+		return Arrays.stream(pv3V3Current).sum();
 	}
 
 	public void setPV3V3Current(int i, double pv3v3Current) {
@@ -439,7 +463,7 @@ public abstract class CougSat {
 	}
 
 	public void setPVSwitchingState(long pvSwitchingState) {
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < this.pvSwitchingState.length; i++) {
 			this.pvSwitchingState[i] = ((pvSwitchingState >> i) & 0x1) == 0x1;
 		}
 	}
@@ -450,7 +474,7 @@ public abstract class CougSat {
 
 	public void setOutputSwitchingState(long outputSwitchingState) {
 
-		for (int i = 0; i < 54; i++) {
+		for (int i = 0; i < this.outputSwitchingState.length; i++) {
 			this.outputSwitchingState[i] = ((outputSwitchingState >> i) & 0x1) == 0x1;
 		}
 	}
@@ -535,7 +559,7 @@ public abstract class CougSat {
 		this.txCenterFrequency = txCenterFrequency;
 	}
 
-	public double getTxPower() {
+	public double getTXPower() {
 		return txPower;
 	}
 

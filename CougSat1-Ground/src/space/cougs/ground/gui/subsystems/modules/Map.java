@@ -22,12 +22,13 @@ public class Map extends JComponent implements UIScaling {
 
 	private static final long serialVersionUID = 1L;
 
-	private BufferedImage map;
+	private BufferedImage map = null;
 	private double longitude;
 	private double lattitude;
-	private int diameter;
+	private int diameter = 6;
+	private final double aspectRatio;
 
-	public Map(double lattitude, double longitude) {
+	public Map(double lattitude, double longitude, Double aspectRatio) {
 
 		super();
 		this.lattitude = lattitude;
@@ -36,13 +37,17 @@ public class Map extends JComponent implements UIScaling {
 		this.setForeground(CustomColors.TEXT1);
 		this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-		map = null;
-		diameter = 6;
 		try {
 			map = ImageIO.read(new File("resources/images/map.jpg"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+
+		if (aspectRatio == null) {
+			this.aspectRatio = map.getWidth() / (double) map.getHeight();
+		} else {
+			this.aspectRatio = aspectRatio;
 		}
 
 	}
@@ -94,11 +99,12 @@ public class Map extends JComponent implements UIScaling {
 		int x2 = this.getWidth() - insets.right;
 		int y1 = insets.top;
 		int y2 = this.getHeight() - insets.bottom - fontMetrics.getHeight();
+		y2 = (int) Math.min(y2, (x2 - x1) / aspectRatio);
 
 		g2d.drawImage(map, x1, y1, x2, y2, 0, 0, map.getWidth(), map.getHeight(), null);
 
 		int x = insets.left;
-		int y = this.getHeight() - insets.bottom - fontMetrics.getDescent();
+		int y = y2 + fontMetrics.getAscent();
 
 		String lattitudeText = String.format("%10.6f° N", this.lattitude);
 		String longitudeText = String.format("%11.6f° E", this.longitude);
@@ -108,11 +114,11 @@ public class Map extends JComponent implements UIScaling {
 		x = this.getWidth() / 2;
 
 		g2d.drawString(longitudeText, x, y);
-		
+
 		x = (int) ((longitude + 180.0) / 360.0 * (x2 - x1) + insets.left);
 		y = (int) ((-lattitude + 90.0) / 180 * (y2 - y1) + insets.top);
-		
-		g2d.fillOval(x - diameter/2, y - diameter/2, diameter, diameter);
+
+		g2d.fillOval(x - diameter / 2, y - diameter / 2, diameter, diameter);
 
 	}
 

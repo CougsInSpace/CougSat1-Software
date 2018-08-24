@@ -21,29 +21,36 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 	private static final long serialVersionUID = 1L;
 
 	private final String label;
-
+	private final boolean printMinMax;
 	private final int min;
 	private final int max;
 	private final double barWidth;
-
 	private double value;
-	private Font sideFont;
-	private Color barFill;
+	private double warningHigh;
+	private double warningLow;
+	private double dangerHigh;
+	private double dangerLow;
+	
+	private Font sideFont = Fonts.CONSOLE_12;
+	private Color barFill = CustomColors.BAR_DEFAULT;
 
-	public SingleVerticalBarGraph(String label, int min, int max, int value, double barWidth) {
+	public SingleVerticalBarGraph(String label, int min, int max, int value, double barWidth, boolean printMinMax,
+			double warningHigh, double warningLow, double dangerHigh, double dangerLow) {
 
 		this.label = label;
 		this.min = min;
-		
 		this.max = max;
 		this.value = value;
 		this.barWidth = barWidth;
-
-		sideFont = Fonts.CONSOLE_12;
+		this.printMinMax = printMinMax;
+		this.warningHigh = warningHigh;
+		this.warningLow = warningLow;
+		this.dangerHigh = dangerHigh;
+		this.dangerLow = dangerLow;
 
 		this.setForeground(CustomColors.TEXT1);
 		this.setBackground(CustomColors.BAR_BACKGROUND);
-		barFill = CustomColors.BAR_DEFAULT;
+
 		this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
 	}
@@ -94,7 +101,6 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		// g2d.drawRect(0, 0, this.getWidth() - 1, this.getHeight() - 1);
 
 		FontMetrics fontMetrics = this.getFontMetrics(this.getFont());
 		FontMetrics sideFontMetrics = this.getFontMetrics(sideFont);
@@ -104,31 +110,36 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 		int adjustedWidth = this.getWidth() - insets.left - insets.right;
 		int adjustedHeight = this.getHeight() - insets.left - insets.right;
 
-		int x = (adjustedWidth - fontMetrics.stringWidth(label)) / 2 + insets.left;
-		int y = this.getHeight() - insets.bottom - fontMetrics.getDescent();
-
-		g2d.drawString(label, x, y);
-
 		int barHeight = adjustedHeight - fontMetrics.getHeight();
 		int barWidth = (int) (adjustedWidth * this.barWidth);
+		int rectX = (printMinMax) ? insets.left : (adjustedWidth - barWidth) / 2 + insets.left;
+
 		g2d.setColor(this.getBackground());
-		g2d.fillRect(insets.left, insets.top, barWidth, barHeight);
+		g2d.fillRect(rectX, insets.top, barWidth, barHeight);
+
+		int x = Math.max((barWidth - fontMetrics.stringWidth(label)) / 2, 0) + rectX;
+		int y = this.getHeight() - insets.bottom - fontMetrics.getDescent();
 
 		g2d.setColor(this.getForeground());
-		g2d.setFont(sideFont);
-		g2d.drawString(" " + max, insets.left + barWidth, insets.top + sideFontMetrics.getAscent());
+		g2d.drawString(label, x, y);
 
-		g2d.drawString(" " + min, insets.left + barWidth, insets.top + barHeight);
+		g2d.setFont(sideFont);
+
+		if (printMinMax) {
+			g2d.drawString(" " + max, insets.left + barWidth, insets.top + sideFontMetrics.getAscent());
+			g2d.drawString(" " + min, insets.left + barWidth, insets.top + barHeight);
+		}
 
 		barHeight = (int) (barHeight * (value - min) / (double) (max - min));
 		y = this.getHeight() - fontMetrics.getHeight() - insets.bottom - barHeight;
 		g2d.setColor(barFill);
-		g2d.fillRect(insets.left, y, barWidth, barHeight);
+		g2d.fillRect(rectX, y, barWidth, barHeight);
 
 		g2d.setColor(this.getForeground());
 		g2d.setFont(sideFont);
-		x = (barWidth - sideFontMetrics.stringWidth(String.format("%.1f", value))) / 2 + insets.left;
+		x = (barWidth - sideFontMetrics.stringWidth(String.format("%.1f", value))) / 2 + rectX;
 		y = y - sideFontMetrics.getDescent();
+		y = Math.min(adjustedHeight - fontMetrics.getHeight(), Math.max(sideFontMetrics.getAscent(), y));
 		g2d.drawString(String.format("%.1f", value), x, y);
 
 	}
@@ -136,6 +147,20 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
 	public void setValue(double d, Color barFill) {
 		this.value = d;
 		this.barFill = barFill;
+	}
+
+	public void setValue(double d) {
+		this.value = d;
+
+		double value = ((this.max - this.value) / this.max);
+
+		if ((value <= dangerLow || ((value) >= dangerHight))) {
+			this.barFill = Color.RED;
+		} else if ((value) <= warningLow || (value) >= warningHigh) {
+			this.barFill = Color.YELLOW;
+		} else {
+			this.barFill = Color.GREEN;
+		}
 	}
 
 	@Override

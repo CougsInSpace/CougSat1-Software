@@ -8,8 +8,10 @@ public class FileUtils {
 	public static final long readNextBytes(FileInputStream file, int numberOfBytes) throws IOException {
 		long buff = 0;
 
-		for (int i = 0; i < numberOfBytes; i++) {
+		while (numberOfBytes > 0)
+		{
 			buff = buff << 8 | file.read();
+			numberOfBytes--;
 		}
 
 		return buff;

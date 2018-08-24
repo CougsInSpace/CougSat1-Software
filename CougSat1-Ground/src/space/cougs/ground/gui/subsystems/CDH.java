@@ -4,11 +4,12 @@ import javax.swing.JPanel;
 
 import space.cougs.ground.gui.utils.CustomColors;
 
-public class IHU extends JPanel {
+public class CDH extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	public IHU() {
+	public CDH() {
+		//TODO
 		super();
 		this.setBackground(CustomColors.BACKGROUND2);
 	}

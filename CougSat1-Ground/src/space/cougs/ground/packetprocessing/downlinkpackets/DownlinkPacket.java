@@ -7,8 +7,6 @@ import space.cougs.ground.satellites.CougSat;
 
 public abstract class DownlinkPacket {
 
-	public static final int ID = -1;
-
 	public abstract boolean decodePacket(File file, CougSat satellite) throws IOException;
 
 }

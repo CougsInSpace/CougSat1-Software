@@ -9,6 +9,7 @@ public class IFJR extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	public IFJR() {
+		// TODO
 		super();
 		this.setBackground(CustomColors.BACKGROUND2);
 	}

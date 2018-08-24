@@ -13,11 +13,15 @@ import space.cougs.ground.packetprocessing.downlinkpackets.Payload3Configuration
 import space.cougs.ground.packetprocessing.downlinkpackets.RadioConfiguration;
 import space.cougs.ground.packetprocessing.downlinkpackets.Telemetry;
 import space.cougs.ground.satellites.CougSat;
+import space.cougs.ground.utils.CISErrors;
 
 public class PacketHeader {
 
 	private final List<CougSat> satellites = new ArrayList<CougSat>();
 	private DownlinkPacket currentPacket;
+	private static int firstByte = -1;
+	private static final int MASK_COMMAND_ID = 0x1F;
+	private static final int MASK_SENDER_ID = 0xE0;//
 
 	public PacketHeader() {
 
@@ -26,7 +30,7 @@ public class PacketHeader {
 	public boolean decodePacketSwitcher(String filePath) {
 
 		File file = new File(filePath);
-		int firstByte = -1;
+
 		try {
 
 			FileInputStream inFile = new FileInputStream(file);
@@ -40,11 +44,12 @@ public class PacketHeader {
 			e.printStackTrace();
 		}
 		if (firstByte == -1) {
-			System.out.printf("Error 4 - Incorrect filePath for %s", filePath);
+			System.out.printf("Error %d - %s %s", CISErrors.FILE_NOT_FOUND, CISErrors.FILE_NOT_FOUND.toString(),
+					filePath);
 			return false;
 		}
 
-		switch (firstByte & 0x1F) {
+		switch (firstByte & MASK_COMMAND_ID) {
 
 		case Telemetry.ID:
 			currentPacket = new Telemetry();
@@ -60,7 +65,7 @@ public class PacketHeader {
 		}
 
 		for (CougSat satellite : satellites) {
-			if (satellite.getID() == (firstByte & 0xE0)) {
+			if (satellite.getID() == (firstByte & MASK_SENDER_ID)) {
 
 				try {
 					return currentPacket.decodePacket(file, satellite);

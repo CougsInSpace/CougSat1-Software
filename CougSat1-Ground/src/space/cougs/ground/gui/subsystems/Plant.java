@@ -9,6 +9,7 @@ public class Plant extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	public Plant() {
+		//TODO
 		super();
 		this.setBackground(CustomColors.BACKGROUND2);
 	}

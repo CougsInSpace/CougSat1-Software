@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class IHUTelemetryRequest extends UplinkPacket {
+	//TODO
 
 	public boolean encodePacket(String filePath) {
 		if (!isDataLoaded()) {
