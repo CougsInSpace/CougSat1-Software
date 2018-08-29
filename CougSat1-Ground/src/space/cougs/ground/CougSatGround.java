@@ -9,6 +9,7 @@ public class CougSatGround {
 	private static final GUI gui = new GUI();
 	private static final CougSat1 cougSat1 = new CougSat1();
 	private static final PacketHeader packetHeader = new PacketHeader();
+	private static final String versionNumber = "1.0.0";
 
 	public static void main(String[] args) {
 		packetHeader.addSatellite((CougSat) cougSat1);
@@ -39,4 +40,9 @@ public class CougSatGround {
 		// }
 		// }
 	}
+
+	public static String getVersionnumber() {
+		return versionNumber;
+	}
+	
 }

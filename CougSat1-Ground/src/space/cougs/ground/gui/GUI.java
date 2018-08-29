@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import space.cougs.ground.CougSatGround;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.gui.utils.Home;
@@ -82,7 +83,7 @@ public class GUI extends JPanel implements UIScaling {
 
 		mainFrame = new JFrame();
 		mainFrame.setIconImage(new ImageIcon("resources/images/32/rocket.png").getImage());
-		mainFrame.setTitle("CougSat Ground Control");
+		mainFrame.setTitle("CougSat Ground Control v" + CougSatGround.getVersionnumber());
 		mainFrame.add(mainPanel);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// makes exit
 																	// button

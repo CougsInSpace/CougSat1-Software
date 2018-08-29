@@ -265,16 +265,16 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 	public void updateSatellite(CougSat satellite) {
 		map.setValue(satellite.getLattitude(), satellite.getLongitude());
 
-		adcsTemp.setValue(String.format(" %s°", satellite.getADCSTemp()));
-		roll.setValue(String.format(" %s°", satellite.getRoll()));
-		pitch.setValue(String.format(" %s°", satellite.getPitch()));
-		yaw.setValue(String.format(" %s°", satellite.getYaw()));
-		xPWMOut.setValue(String.format(" %s", satellite.getXPWMOut()));
-		yPWMOut.setValue(String.format(" %s", satellite.getYPWMOut()));
-		zPWMOut.setValue(String.format(" %s", satellite.getZPWMOut()));
-		xCurrent.setValue(String.format(" %s", satellite.getXCurrent()));
-		yCurrent.setValue(String.format(" %s", satellite.getYCurrent()));
-		zCurrent.setValue(String.format(" %s", satellite.getZCurrent()));
+		adcsTemp.setValue(String.format(" %d°", satellite.getADCSTemp()));
+		roll.setValue(String.format(" %6.2f°", satellite.getRoll()));
+		pitch.setValue(String.format(" %6.2f°", satellite.getPitch()));
+		yaw.setValue(String.format(" %6.2f°", satellite.getYaw()));
+		xPWMOut.setValue(String.format(" %d", satellite.getXPWMOut()));
+		yPWMOut.setValue(String.format(" %d", satellite.getYPWMOut()));
+		zPWMOut.setValue(String.format(" %d", satellite.getZPWMOut()));
+		xCurrent.setValue(String.format(" %f", satellite.getXCurrent()));
+		yCurrent.setValue(String.format(" %f", satellite.getYCurrent()));
+		zCurrent.setValue(String.format(" %f", satellite.getZCurrent()));
 		
 		
 		

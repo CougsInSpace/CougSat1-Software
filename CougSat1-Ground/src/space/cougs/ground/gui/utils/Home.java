@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import space.cougs.ground.CougSatGround;
 import space.cougs.ground.gui.UIScaling;
 
 public class Home extends JPanel implements UIScaling {
@@ -43,7 +44,7 @@ public class Home extends JPanel implements UIScaling {
 		}
 
 		JLabel LogoText = new JLabel();
-		LogoText.setText("CIS Patch Notes V1.0.1");
+		LogoText.setText("CIS Patch Notes " + CougSatGround.getVersionnumber());
 
 		this.add(LogoText, gbc.setLocation(0, 1).setSize(3, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
 
