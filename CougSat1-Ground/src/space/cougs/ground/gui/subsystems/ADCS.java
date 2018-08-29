@@ -76,7 +76,7 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 		panelWrapper.setBackground(CustomColors.BACKGROUND1);
 
 		earthPanel.setLayout(new GridBagLayout());
-		earthPanel.add(new JLabel("Lattitude"),
+		earthPanel.add(new JLabel("Latitude"),
 				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 		earthPanel.add(lattCoordinates, gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
 		earthPanel.add(new JLabel("°N"), gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
