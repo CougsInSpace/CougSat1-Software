@@ -38,37 +38,62 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 	private final HorizontalText reset = new HorizontalText("Reset:", "        ", 0.5);
 	private final HorizontalText status = new HorizontalText("Status:", "        ", 0.5);
 
-	private final SingleVerticalBarGraph rx = new SingleVerticalBarGraph("RX (mW)", 0, 100, 10, 0.6, false, 1.0, 0.2 ,1.0, 0.1);
-	private final SingleVerticalBarGraph tx = new SingleVerticalBarGraph("TX (mW)", 0, 100, 10, 0.6, false, 0.8, 0.0 ,0.9, 0.0);
-	private final SingleVerticalBarGraph snr = new SingleVerticalBarGraph("SNR(dB)", -30, 30, 10, 0.6, false, 1.0, 0.2 ,1.0, 0.1);
+	private final SingleVerticalBarGraph rx = new SingleVerticalBarGraph("RX (mW)", 0, 100, 10, 0.6, false, 1.0, 0.2,
+			1.0, 0.1);
+	private final SingleVerticalBarGraph tx = new SingleVerticalBarGraph("TX (mW)", 0, 100, 10, 0.6, false, 0.8, 0.0,
+			0.9, 0.0);
+	private final SingleVerticalBarGraph snr = new SingleVerticalBarGraph("SNR(dB)", -30, 30, 10, 0.6, false, 1.0, 0.2,
+			1.0, 0.1);
 
-	private final SingleVerticalBarGraph ihuTemp = new SingleVerticalBarGraph("IHU ", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph adcsTemp = new SingleVerticalBarGraph("ADCS", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph ifjrTemp = new SingleVerticalBarGraph("IFJR", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph pmicTemp = new SingleVerticalBarGraph("PMIC", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph commsTemp = new SingleVerticalBarGraph("COMMS ", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph avgTemp = new SingleVerticalBarGraph("AVG ", -50, 80, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph batteryATemp = new SingleVerticalBarGraph("BatA", -50, 80, 10, 0.5, false, 0.8, 0.4, 0.9, 0.3);
-	private final SingleVerticalBarGraph batteryBTemp = new SingleVerticalBarGraph("BatB", -50, 80, 10, 0.5, false, 0.8, 0.4, 0.9, 0.3);
+	private final SingleVerticalBarGraph ihuTemp = new SingleVerticalBarGraph("IHU ", -50, 80, 10, 0.5, false, 0.7, 0.3,
+			0.9, 0.1);
+	private final SingleVerticalBarGraph adcsTemp = new SingleVerticalBarGraph("ADCS", -50, 80, 10, 0.5, false, 0.7,
+			0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph ifjrTemp = new SingleVerticalBarGraph("IFJR", -50, 80, 10, 0.5, false, 0.7,
+			0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph pmicTemp = new SingleVerticalBarGraph("PMIC", -50, 80, 10, 0.5, false, 0.7,
+			0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph commsTemp = new SingleVerticalBarGraph("COMMS ", -50, 80, 10, 0.5, false, 0.7,
+			0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph batteryATemp = new SingleVerticalBarGraph("BatA", -50, 80, 10, 0.5, false, 0.8,
+			0.4, 0.9, 0.3);
+	private final SingleVerticalBarGraph batteryBTemp = new SingleVerticalBarGraph("BatB", -50, 80, 10, 0.5, false, 0.8,
+			0.4, 0.9, 0.3);
 
 	private final List<SingleVerticalBarGraph> pvTemps = new ArrayList<SingleVerticalBarGraph>();
 
-	private final SingleVerticalBarGraph avgPVVoltageIn = new SingleVerticalBarGraph(" PV V ", 0, 3, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph sumPVCurrent = new SingleVerticalBarGraph(" PV I ", 0, 2, 20, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph sumPR3V3Current = new SingleVerticalBarGraph("PR-3 I", 0, 8, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph sumBatteryPR = new SingleVerticalBarGraph("PR-B I", 0, 8, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph sumPV3V3Current = new SingleVerticalBarGraph("PV-3 I", 0, 2, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph battHeaterA = new SingleVerticalBarGraph("BH-A I", 0, 5, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph battHeaterB = new SingleVerticalBarGraph("BH-B I", 0, 5, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph prDeployCurrent = new SingleVerticalBarGraph("PR-D I", 0, 3, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph battACurrent = new SingleVerticalBarGraph("I", 0, 6, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph battAVoltage = new SingleVerticalBarGraph("V", 0, 5, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph battBCurrent = new SingleVerticalBarGraph("I", 0, 6, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph battBVoltage = new SingleVerticalBarGraph("V", 0, 5, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph regulator3V3AVoltage = new SingleVerticalBarGraph("V", 0, 4, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph regulator3V3ACurrent = new SingleVerticalBarGraph("I", 0, 4, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph regulator3V3BVoltage = new SingleVerticalBarGraph("V", 0, 4, 10, 0.5, false, 0.7, 0.3, 0.9, 0.1);
-	private final SingleVerticalBarGraph regulator3V3BCurrent = new SingleVerticalBarGraph("I", 0, 4, 10, 0.5, false, 0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph avgPVVoltageIn = new SingleVerticalBarGraph(" PV V ", 0, 3, 10, 0.5, false,
+			0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph sumPVCurrent = new SingleVerticalBarGraph(" PV I ", 0, 2, 20, 0.5, false, 0.7,
+			0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph sumPR3V3Current = new SingleVerticalBarGraph("PR-3 I", 0, 8, 10, 0.5, false,
+			0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph sumBatteryPR = new SingleVerticalBarGraph("PR-B I", 0, 8, 10, 0.5, false, 0.7,
+			0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph sumPV3V3Current = new SingleVerticalBarGraph("PV-3 I", 0, 2, 10, 0.5, false,
+			0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph battHeaterA = new SingleVerticalBarGraph("BH-A I", 0, 5, 10, 0.5, false, 0.7,
+			0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph battHeaterB = new SingleVerticalBarGraph("BH-B I", 0, 5, 10, 0.5, false, 0.7,
+			0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph prDeployCurrent = new SingleVerticalBarGraph("PR-D I", 0, 3, 10, 0.5, false,
+			0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph battACurrent = new SingleVerticalBarGraph("I", 0, 6, 10, 0.5, false, 0.7, 0.0,
+			0.9, 0.0);
+	private final SingleVerticalBarGraph battAVoltage = new SingleVerticalBarGraph("V", 0, 5, 10, 0.5, false, 0.7, 0.3,
+			0.9, 0.1);
+	private final SingleVerticalBarGraph battBCurrent = new SingleVerticalBarGraph("I", 0, 6, 10, 0.5, false, 0.7, 0.0,
+			0.9, 0.0);
+	private final SingleVerticalBarGraph battBVoltage = new SingleVerticalBarGraph("V", 0, 5, 10, 0.5, false, 0.7, 0.3,
+			0.9, 0.1);
+	private final SingleVerticalBarGraph regulator3V3AVoltage = new SingleVerticalBarGraph("V", 0, 4, 10, 0.5, false,
+			0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph regulator3V3ACurrent = new SingleVerticalBarGraph("I", 0, 4, 10, 0.5, false,
+			0.7, 0.0, 0.9, 0.0);
+	private final SingleVerticalBarGraph regulator3V3BVoltage = new SingleVerticalBarGraph("V", 0, 4, 10, 0.5, false,
+			0.7, 0.3, 0.9, 0.1);
+	private final SingleVerticalBarGraph regulator3V3BCurrent = new SingleVerticalBarGraph("I", 0, 4, 10, 0.5, false,
+			0.7, 0.0, 0.9, 0.0);
 
 	private final Map map = new Map(46.7304889, -117.1750474, 1.25);
 
@@ -95,24 +120,22 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 
 		comms.add(new TitleLabel("Radio", SwingConstants.CENTER),
 				gbc.setLocation(0, 0).setSize(3, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		comms.add(rx, gbc.setLocation(0, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		comms.add(tx, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		comms.add(snr, gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
+		comms.add(rx, gbc.setLocation(0, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		comms.add(tx, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		comms.add(snr, gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 1.0));
 
 		temperature.setLayout(new GridBagLayout());
 
 		temperature.add(new TitleLabel("Temperature (°C)", SwingConstants.CENTER),
-				gbc.setLocation(0, 0).setSize(14, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		temperature.add(ihuTemp, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(adcsTemp, gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(ifjrTemp, gbc.setLocation(3, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(pmicTemp, gbc.setLocation(4, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(commsTemp, gbc.setLocation(5, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(batteryATemp, gbc.setLocation(6, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(batteryBTemp, gbc.setLocation(7, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		temperature.add(avgTemp, gbc.setLocation(8, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-
-		gbc.setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5);
+				gbc.setLocation(0, 0).setSize(14, 1).setWeight(0.0, 0.0));
+		temperature.add(ihuTemp, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		temperature.add(adcsTemp, gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		temperature.add(ifjrTemp, gbc.setLocation(3, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		temperature.add(pmicTemp, gbc.setLocation(4, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		temperature.add(commsTemp, gbc.setLocation(5, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		temperature.add(batteryATemp, gbc.setLocation(6, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		temperature.add(batteryBTemp, gbc.setLocation(7, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		// gbc.setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5);
 
 		for (int i = 0; i < 8; i++) {
 
@@ -123,33 +146,33 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 		power.setLayout(new GridBagLayout());
 
 		power.add(new TitleLabel("Power", SwingConstants.CENTER),
-				gbc.setLocation(0, 0).setSize(14, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		power.add(avgPVVoltageIn, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		power.add(sumPVCurrent, gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		power.add(sumPR3V3Current, gbc.setLocation(3, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		power.add(sumBatteryPR, gbc.setLocation(4, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		power.add(sumPV3V3Current, gbc.setLocation(5, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		power.add(battHeaterA, gbc.setLocation(6, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		power.add(battHeaterB, gbc.setLocation(7, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		power.add(prDeployCurrent, gbc.setLocation(8, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
+				gbc.setLocation(0, 0).setSize(14, 1).setWeight(0.0, 0.0));
+		power.add(avgPVVoltageIn, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(sumPVCurrent, gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(sumPR3V3Current, gbc.setLocation(3, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(sumBatteryPR, gbc.setLocation(4, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(sumPV3V3Current, gbc.setLocation(5, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(battHeaterA, gbc.setLocation(6, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(battHeaterB, gbc.setLocation(7, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(prDeployCurrent, gbc.setLocation(8, 1).setSize(1, 1).setWeight(1.0, 1.0));
 		power.add(battAVoltage, gbc.setLocation(1, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 0, 5));
-		power.add(battACurrent, gbc.setLocation(2, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 0, 5));
-		power.add(battBVoltage, gbc.setLocation(3, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 0, 5));
-		power.add(battBCurrent, gbc.setLocation(4, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 0, 5));
-		power.add(regulator3V3AVoltage, gbc.setLocation(5, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 0, 5));
-		power.add(regulator3V3ACurrent, gbc.setLocation(6, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 0, 5));
-		power.add(regulator3V3BVoltage, gbc.setLocation(7, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 0, 5));
-		power.add(regulator3V3BCurrent, gbc.setLocation(8, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 0, 5));
+		power.add(battACurrent, gbc.setLocation(2, 2).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(battBVoltage, gbc.setLocation(3, 2).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(battBCurrent, gbc.setLocation(4, 2).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(regulator3V3AVoltage, gbc.setLocation(5, 2).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(regulator3V3ACurrent, gbc.setLocation(6, 2).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(regulator3V3BVoltage, gbc.setLocation(7, 2).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(regulator3V3BCurrent, gbc.setLocation(8, 2).setSize(1, 1).setWeight(1.0, 1.0));
 		power.add(prDeployCurrent, gbc.setLocation(8, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
 
 		power.add(new JLabel(" Battery A ", SwingConstants.CENTER),
 				gbc.setLocation(1, 4).setSize(2, 1).setWeight(0.0, 0.0).setInsets(0, 5, 5, 5));
 		power.add(new JLabel(" Battery B ", SwingConstants.CENTER),
-				gbc.setLocation(3, 4).setSize(2, 1).setWeight(0.0, 0.0).setInsets(0, 5, 5, 5));
+				gbc.setLocation(3, 4).setSize(2, 1).setWeight(0.0, 0.0));
 		power.add(new JLabel("Regulator A", SwingConstants.CENTER),
-				gbc.setLocation(5, 4).setSize(2, 1).setWeight(0.0, 0.0).setInsets(0, 5, 5, 5));
+				gbc.setLocation(5, 4).setSize(2, 1).setWeight(0.0, 0.0));
 		power.add(new JLabel("Regulator B", SwingConstants.CENTER),
-				gbc.setLocation(7, 4).setSize(2, 1).setWeight(0.0, 0.0).setInsets(0, 5, 5, 5));
+				gbc.setLocation(7, 4).setSize(2, 1).setWeight(0.0, 0.0));
 
 		avgPVVoltageIn.setToolTipText("Solar Panel Average Voltage In");
 		sumPVCurrent.setToolTipText("Sum of Solar Panel Current");
@@ -172,7 +195,7 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 
 		adcs.add(new TitleLabel("Attitude", SwingConstants.CENTER),
 				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		adcs.add(map, gbc.setLocation(0, 1).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
+		adcs.add(map, gbc.setLocation(0, 1).setSize(1, 1).setWeight(1.0, 1.0));
 
 		this.add(ihu, gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(0, 0, 5, 5));
 		this.add(adcs, gbc.setLocation(0, 1).setSize(2, 2).setWeight(0.0, 1.0).setInsets(5, 0, 0, 5));
@@ -238,13 +261,12 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 				for (Component subComponent : ((Container) component).getComponents()) {
 
 					if (subComponent instanceof UIScaling) {
-
+						
 						((UIScaling) subComponent).updateUIScaling(uiScale);
-
+						
 					} else if (subComponent instanceof JLabel && !(subComponent instanceof TitleLabel)) {
-
+						
 						subComponent.setFont(titleFont);
-
 					}
 				}
 			}
@@ -295,6 +317,5 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 		regulator3V3BCurrent.setValue(satellite.getReg3V3BCurrent());
 
 		map.setValue(satellite.getLattitude(), satellite.getLongitude());
-
 	}
 }

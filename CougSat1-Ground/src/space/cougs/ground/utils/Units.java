@@ -27,7 +27,7 @@ public final class Units {
 
 	public static double rawToGeographicCoordinate(long raw) {
 
-		return (int) raw * 10.0e-6 / 60.0; // 10 min/LSB
+		return (int) raw * 10.0e-6 / 60.0; // 10 µmin/LSB
 	}
 
 	public static Calendar rawToTime(long raw) {
@@ -50,17 +50,17 @@ public final class Units {
 
 	public static double rawToDecibels(long raw) {
 
-		return (short) raw * 0.001;
+		return (short) raw * 0.001; // 1 mdB/LSB
 	}
 
 	public static int rawToFrequency(long raw) {
 
-		return (int) raw * 100;
+		return (int) raw * 100; // 100 Hz/LSB
 	}
 
 	public static double rawToDataRate(long raw) {
 
-		return Math.pow(raw, 2);
+		return Math.pow(raw, 2); // 1 sqrt(bps)/LSB
 	}
-
+ 
 }

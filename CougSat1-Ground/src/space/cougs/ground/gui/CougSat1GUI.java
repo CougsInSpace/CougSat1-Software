@@ -34,9 +34,9 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 	private static final long serialVersionUID = 1L;
 
 	private final Health health = new Health(); // all telemetry data
-	private final ADCS adcs = new ADCS();;
-	private final IFJR ifjr = new IFJR();;
-	private final CDH ihu = new CDH(); // Internal houskeeping unit shhhh
+	private final ADCS adcs = new ADCS();
+	private final IFJR ifjr = new IFJR();
+	private final CDH cdh = new CDH(); // Internal houskeeping unit shhhh
 	private final Comms comms = new Comms();
 	private final Camera camera = new Camera(); // camera data
 	private final Plant plant = new Plant(); // images of plant
@@ -54,7 +54,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 		subSystemWrapper.add(health, "Health");
 		subSystemWrapper.add(adcs, "Attitude");
 		subSystemWrapper.add(ifjr, "IFJR");
-		subSystemWrapper.add(ihu, "Computer");
+		subSystemWrapper.add(cdh, "Computer");
 		subSystemWrapper.add(comms, "Radio");
 		subSystemWrapper.add(camera, "Camera");
 		subSystemWrapper.add(plant, "Plant");
@@ -75,7 +75,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 		private final JButton healthButton = new JButton("Health");
 		private final JButton adcsButton = new JButton("Attitude");
 		private final JButton ifjrButton = new JButton("IFJR");
-		private final JButton ihuButton = new JButton("Computer");
+		private final JButton cdhButton = new JButton("Computer");
 		private final JButton commsButton = new JButton("Radio");
 		private final JButton cameraButton = new JButton("Camera");
 		private final JButton plantButton = new JButton("Plant");
@@ -90,7 +90,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 			this.add(adcsButton);
 			this.add(epsButton);
 			this.add(ifjrButton);
-			this.add(ihuButton);
+			this.add(cdhButton);
 			this.add(commsButton);
 			this.add(cameraButton);
 			this.add(plantButton);

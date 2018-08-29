@@ -63,7 +63,8 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 
 		super();
 		this.setBackground(CustomColors.BACKGROUND2);
-
+		this.setBorder(BorderFactory.createLineBorder(CustomColors.BACKGROUND1, 10));
+		
 		GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
 		gbc.setFill(GridBagConstraintsWrapper.BOTH);
 
@@ -194,15 +195,15 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 			attitudeButton.setHorizontalAlignment(SwingConstants.CENTER);
 			celestialButton.setHorizontalAlignment(SwingConstants.CENTER);
 
-			this.add(earthButton, gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-			this.add(attitudeButton, gbc.setLocation(2, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-			this.add(celestialButton, gbc.setLocation(3, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
+			this.add(earthButton, gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 0, 10, 5));
+			this.add(attitudeButton, gbc.setLocation(2, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 5, 10, 5));
+			this.add(celestialButton, gbc.setLocation(3, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 5, 10, 0));
 
 			for (Component component : this.getComponents()) {
 				if (component instanceof JButton) {
 					((AbstractButton) component).setHorizontalAlignment(SwingConstants.LEFT);
 					((JButton) component).addActionListener(this);
-					((JButton) component).setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+					((JButton) component).setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
 					component.setForeground(CustomColors.TEXT1);
 					component.setFont(Fonts.BODY_16);
 					((JButton) component).setIconTextGap(15);
@@ -239,6 +240,7 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 				if (component instanceof JButton) {
 
 					component.setFont(font);
+					component.setForeground(CustomColors.TEXT1);
 
 				}
 			}
@@ -265,19 +267,17 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 	public void updateSatellite(CougSat satellite) {
 		map.setValue(satellite.getLattitude(), satellite.getLongitude());
 
-		adcsTemp.setValue(String.format(" %d°", satellite.getADCSTemp()));
+		adcsTemp.setValue(String.format(" %d°C", satellite.getADCSTemp()));
 		roll.setValue(String.format(" %6.2f°", satellite.getRoll()));
 		pitch.setValue(String.format(" %6.2f°", satellite.getPitch()));
 		yaw.setValue(String.format(" %6.2f°", satellite.getYaw()));
 		xPWMOut.setValue(String.format(" %d", satellite.getXPWMOut()));
 		yPWMOut.setValue(String.format(" %d", satellite.getYPWMOut()));
 		zPWMOut.setValue(String.format(" %d", satellite.getZPWMOut()));
-		xCurrent.setValue(String.format(" %f", satellite.getXCurrent()));
-		yCurrent.setValue(String.format(" %f", satellite.getYCurrent()));
-		zCurrent.setValue(String.format(" %f", satellite.getZCurrent()));
-		
-		
-		
+		xCurrent.setValue(String.format(" %fA", satellite.getXCurrent()));
+		yCurrent.setValue(String.format(" %fA", satellite.getYCurrent()));
+		zCurrent.setValue(String.format(" %fA", satellite.getZCurrent()));
+
 	}
 
 	@Override
@@ -291,13 +291,46 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 
 			}
 			if (component instanceof JPanel) {
-
 				for (Component subComponent : ((Container) component).getComponents()) {
-
 					if (subComponent instanceof UIScaling) {
 
 						((UIScaling) subComponent).updateUIScaling(uiScale);
 
+					}
+				}
+			}
+		}
+
+		Font font = Fonts.BODY_16;
+
+		switch (uiScale) {
+		default:
+		case SCALE_100:
+			font = Fonts.BODY_16;
+			break;
+		case SCALE_150:
+			font = Fonts.BODY_24;
+			break;
+		case SCALE_200:
+			font = Fonts.BODY_32;
+			break;
+		case SCALE_300:
+			font = Fonts.BODY_48;
+			break;
+		case SCALE_75:
+			font = Fonts.BODY_12;
+			break;
+		}
+
+		for (Component component : panelWrapper.getComponents()) {
+			if (component instanceof JPanel) {
+
+				for (Component subComponent : ((Container) component).getComponents()) {
+					subComponent.setForeground(CustomColors.TEXT1);
+					subComponent.setFont(font);
+					
+					if (subComponent instanceof JButton) {
+						subComponent.setBackground(CustomColors.BACKGROUND2);
 					}
 				}
 			}
