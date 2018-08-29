@@ -27,6 +27,8 @@ public class Map extends JComponent implements UIScaling {
 	private double lattitude;
 	private int diameter = 6;
 	private final double aspectRatio;
+	private final String longitudeText = String.format("%11.6f° E", this.longitude);
+	private final String lattitudeText = String.format("%10.6f° N", this.lattitude);
 
 	public Map(double lattitude, double longitude, Double aspectRatio) {
 
@@ -49,14 +51,12 @@ public class Map extends JComponent implements UIScaling {
 		} else {
 			this.aspectRatio = aspectRatio;
 		}
-
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
 
 		FontMetrics fontMetrics = this.getFontMetrics(this.getFont());
-		String longitudeText = String.format("%11.6f° E", this.longitude);
 
 		Insets insets = this.getBorder().getBorderInsets(this);
 
@@ -66,14 +66,12 @@ public class Map extends JComponent implements UIScaling {
 		width += insets.left + insets.right;
 		height += insets.top + insets.bottom;
 		return new Dimension(width, height);
-
 	}
 
 	@Override
 	public Dimension getMinimumSize() {
 
 		FontMetrics fontMetrics = this.getFontMetrics(this.getFont());
-		String longitudeText = String.format("%11.6f° E", this.longitude);
 
 		Insets insets = this.getBorder().getBorderInsets(this);
 
@@ -100,26 +98,26 @@ public class Map extends JComponent implements UIScaling {
 		int y1 = insets.top;
 		int y2 = this.getHeight() - insets.bottom - fontMetrics.getHeight();
 		y2 = (int) Math.min(y2, (x2 - x1) / aspectRatio);
+		int newWidth = (int) (y2 * aspectRatio);
+
+		x1 = (this.getWidth() / 2) - (newWidth / 2);
+		x2 = x1 + newWidth;
 
 		g2d.drawImage(map, x1, y1, x2, y2, 0, 0, map.getWidth(), map.getHeight(), null);
 
 		int x = insets.left;
 		int y = y2 + fontMetrics.getAscent();
 
-		String lattitudeText = String.format("%10.6f° N", this.lattitude);
-		String longitudeText = String.format("%11.6f° E", this.longitude);
-
-		g2d.drawString(lattitudeText, x, y);
+		g2d.drawString(lattitudeText, x1 - insets.left, y);
 
 		x = this.getWidth() / 2;
 
-		g2d.drawString(longitudeText, x, y);
+		g2d.drawString(longitudeText, x2 - fontMetrics.stringWidth(longitudeText), y);
 
 		x = (int) ((longitude + 180.0) / 360.0 * (x2 - x1) + insets.left);
 		y = (int) ((-lattitude + 90.0) / 180 * (y2 - y1) + insets.top);
 
-		g2d.fillOval(x - diameter / 2, y - diameter / 2, diameter, diameter);
-
+		g2d.fillOval(x1 + x - diameter / 2, y - diameter / 2, diameter, diameter);
 	}
 
 	public void setValue(double lattitude, double longitude) {
@@ -156,7 +154,5 @@ public class Map extends JComponent implements UIScaling {
 		default:
 			break;
 		}
-
 	}
-
 }

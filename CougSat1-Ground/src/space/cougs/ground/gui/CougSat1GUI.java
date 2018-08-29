@@ -203,7 +203,6 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 				((SatelliteInfo) component).updateSatellite(satellite);
 
 			}
-
 		}
 		this.repaint();
 	}
