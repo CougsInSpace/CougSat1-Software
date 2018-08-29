@@ -18,8 +18,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import space.cougs.ground.gui.UIScaling;
+import space.cougs.ground.gui.subsystems.modules.HorizontalText;
 import space.cougs.ground.gui.subsystems.modules.Map;
-import space.cougs.ground.gui.subsystems.modules.TitleLabel;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;
@@ -40,8 +40,24 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 	private final JPanel attitudePanel = new JPanel();
 	private final JPanel celestialPanel = new JPanel();
 
-	private final JTextField earthLattCoordinates = new JTextField();
-	private final JTextField earthLongCoordinates = new JTextField();
+	private final JTextField lattCoordinates = new JTextField();
+	private final JTextField longCoordinates = new JTextField();
+	private final JTextField rightAscensionCoordinates = new JTextField();
+	private final JTextField leftAscensionCoordinates = new JTextField();
+	private final JTextField rollCoordinates = new JTextField();
+	private final JTextField yawCoordinates = new JTextField();
+	private final JTextField pitchCoordinates = new JTextField();
+
+	private final HorizontalText adcsTemp = new HorizontalText("Temp:", "        ", 0.5);
+	private final HorizontalText roll = new HorizontalText("Roll:", "        ", 0.5);
+	private final HorizontalText pitch = new HorizontalText("Pitch:", "        ", 0.5);
+	private final HorizontalText yaw = new HorizontalText("Yaw:", "        ", 0.5);
+	private final HorizontalText xPWMOut = new HorizontalText("Temp:", "        ", 0.5);
+	private final HorizontalText yPWMOut = new HorizontalText("Temp:", "        ", 0.5);
+	private final HorizontalText zPWMOut = new HorizontalText("Temp:", "        ", 0.5);
+	private final HorizontalText xCurrent = new HorizontalText("X Current:", "        ", 0.5);
+	private final HorizontalText yCurrent = new HorizontalText("Y Current:", "        ", 0.5);
+	private final HorizontalText zCurrent = new HorizontalText("Z Current:", "        ", 0.5);
 
 	public ADCS() {
 
@@ -56,19 +72,18 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 		coordinatePanel.setLayout(new BorderLayout());
 
 		panelWrapper.setOpaque(false);
+		panelWrapper.setBackground(CustomColors.BACKGROUND1);
 
 		earthPanel.setLayout(new GridBagLayout());
 		earthPanel.add(new JLabel("Lattitude"),
 				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		earthPanel.add(earthLattCoordinates,
-				gbc.setLocation(1, 0).setSize(2, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
-		earthPanel.add(new JLabel("°"), gbc.setLocation(2, 0).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		earthPanel.add(lattCoordinates, gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		earthPanel.add(new JLabel("°"), gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 
 		earthPanel.add(new JLabel("Longitude"),
 				gbc.setLocation(0, 1).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		earthPanel.add(earthLongCoordinates,
-				gbc.setLocation(1, 1).setSize(2, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
-		earthPanel.add(new JLabel("°"), gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		earthPanel.add(longCoordinates, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		earthPanel.add(new JLabel("°"), gbc.setLocation(2, 1).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 
 		earthPanel.add(new JButton("Transmit"),
 				gbc.setLocation(0, 2).setSize(3, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
@@ -76,19 +91,19 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 		panelWrapper.add(earthPanel, "Earth");
 
 		attitudePanel.setLayout(new GridBagLayout());
-		attitudePanel.add(new JLabel("Lattitude"),
+		attitudePanel.add(new JLabel("Right Ascension"),
 				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		attitudePanel.add(earthLattCoordinates,
-				gbc.setLocation(1, 0).setSize(2, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		attitudePanel.add(rightAscensionCoordinates,
+				gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
 		attitudePanel.add(new JLabel("°"),
-				gbc.setLocation(2, 0).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+				gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 
-		attitudePanel.add(new JLabel("Longitude"),
+		attitudePanel.add(new JLabel("Left Ascension"),
 				gbc.setLocation(0, 1).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		attitudePanel.add(earthLongCoordinates,
-				gbc.setLocation(1, 1).setSize(2, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		attitudePanel.add(leftAscensionCoordinates,
+				gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
 		attitudePanel.add(new JLabel("°"),
-				gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+				gbc.setLocation(2, 1).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 
 		attitudePanel.add(new JButton("Transmit"),
 				gbc.setLocation(0, 2).setSize(3, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
@@ -96,32 +111,53 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 		panelWrapper.add(attitudePanel, "Attitude");
 
 		celestialPanel.setLayout(new GridBagLayout());
-		celestialPanel.add(new JLabel("Lattitude"),
+		celestialPanel.add(new JLabel("Roll"),
 				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		celestialPanel.add(earthLattCoordinates,
-				gbc.setLocation(1, 0).setSize(2, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		celestialPanel.add(rollCoordinates,
+				gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
 		celestialPanel.add(new JLabel("°"),
-				gbc.setLocation(2, 0).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+				gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 
-		celestialPanel.add(new JLabel("Longitude"),
+		celestialPanel.add(new JLabel("Pitch"),
 				gbc.setLocation(0, 1).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		celestialPanel.add(earthLongCoordinates,
-				gbc.setLocation(1, 1).setSize(2, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		celestialPanel.add(pitchCoordinates,
+				gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
 		celestialPanel.add(new JLabel("°"),
-				gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+				gbc.setLocation(2, 1).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 
+		celestialPanel.add(new JLabel("Yaw"),
+				gbc.setLocation(0, 2).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
+		celestialPanel.add(yawCoordinates,
+				gbc.setLocation(1, 2).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		celestialPanel.add(new JLabel("°"),
+				gbc.setLocation(2, 2).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 		celestialPanel.add(new JButton("Transmit"),
-				gbc.setLocation(0, 2).setSize(3, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+				gbc.setLocation(0, 3).setSize(3, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
 		celestialPanel.setBackground(CustomColors.BACKGROUND1);
 		panelWrapper.add(celestialPanel, "Celestial");
 
 		coordinatePanel.add(panelWrapper, BorderLayout.CENTER);
 		coordinatePanel.add(cardSwitcher, BorderLayout.PAGE_START);
+		coordinatePanel.setBackground(CustomColors.BACKGROUND2);
+		this.add(coordinatePanel, gbc.setLocation(2, 2).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
 
+		telemetryPanel.setLayout(new GridBagLayout());
+		telemetryPanel.add(adcsTemp, gbc.setLocation(0, 1).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.add(roll, gbc.setLocation(0, 2).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.add(pitch, gbc.setLocation(0, 3).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.add(yaw, gbc.setLocation(0, 4).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.add(xPWMOut, gbc.setLocation(0, 5).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.add(yPWMOut, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.add(zPWMOut, gbc.setLocation(1, 2).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.add(xCurrent, gbc.setLocation(1, 3).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.add(yCurrent, gbc.setLocation(1, 4).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.add(zCurrent, gbc.setLocation(1, 5).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
+		telemetryPanel.setBackground(CustomColors.BACKGROUND1);
+		attitudeIndicator.setBackground(CustomColors.BACKGROUND1);
+
+		this.add(telemetryPanel, gbc.setLocation(1, 2).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 		this.add(map, gbc.setLocation(0, 0).setSize(3, 2).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		this.add(attitudeIndicator, gbc.setLocation(0, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		this.add(telemetryPanel, gbc.setLocation(1, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
-		this.add(coordinatePanel, gbc.setLocation(2, 2).setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
+		this.add(attitudeIndicator, gbc.setLocation(0, 2).setSize(1, 1).setWeight(1.0, 0.0).setInsets(5, 5, 5, 5));
 
 		for (Component component : this.getComponents()) {
 
@@ -168,7 +204,7 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 					((JButton) component).addActionListener(this);
 					((JButton) component).setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 					component.setForeground(CustomColors.TEXT1);
-					component.setFont(Fonts.BODY_24);
+					component.setFont(Fonts.BODY_16);
 					((JButton) component).setIconTextGap(15);
 					((JButton) component).setFocusable(false);
 				}
@@ -178,8 +214,34 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 
 		@Override
 		public void updateUIScaling(UIScale uiScale) {
-			// TODO Auto-generated method stub
+			Font font = Fonts.BODY_16;
 
+			switch (uiScale) {
+			default:
+			case SCALE_100:
+				font = Fonts.BODY_16;
+				break;
+			case SCALE_150:
+				font = Fonts.BODY_24;
+				break;
+			case SCALE_200:
+				font = Fonts.BODY_32;
+				break;
+			case SCALE_300:
+				font = Fonts.BODY_48;
+				break;
+			case SCALE_75:
+				font = Fonts.BODY_12;
+				break;
+			}
+
+			for (Component component : this.getComponents()) {
+				if (component instanceof JButton) {
+
+					component.setFont(font);
+
+				}
+			}
 		}
 
 		@Override
@@ -206,27 +268,6 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 
 	@Override
 	public void updateUIScaling(UIScale uiScale) {
-		Font titleFont = Fonts.BODY_16;
-
-		switch (uiScale) {
-		case SCALE_100:
-			titleFont = Fonts.BODY_16;
-			break;
-		case SCALE_150:
-			titleFont = Fonts.BODY_24;
-			break;
-		case SCALE_200:
-			titleFont = Fonts.BODY_32;
-			break;
-		case SCALE_300:
-			titleFont = Fonts.BODY_48;
-			break;
-		case SCALE_75:
-			titleFont = Fonts.BODY_12;
-			break;
-		default:
-			break;
-		}
 
 		for (Component component : this.getComponents()) {
 
@@ -242,10 +283,6 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 					if (subComponent instanceof UIScaling) {
 
 						((UIScaling) subComponent).updateUIScaling(uiScale);
-
-					} else if (subComponent instanceof JLabel && !(subComponent instanceof TitleLabel)) {
-
-						subComponent.setFont(titleFont);
 
 					}
 				}
