@@ -52,9 +52,9 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 	private final HorizontalText roll = new HorizontalText("Roll:", "        ", 0.5);
 	private final HorizontalText pitch = new HorizontalText("Pitch:", "        ", 0.5);
 	private final HorizontalText yaw = new HorizontalText("Yaw:", "        ", 0.5);
-	private final HorizontalText xPWMOut = new HorizontalText("Temp:", "        ", 0.5);
-	private final HorizontalText yPWMOut = new HorizontalText("Temp:", "        ", 0.5);
-	private final HorizontalText zPWMOut = new HorizontalText("Temp:", "        ", 0.5);
+	private final HorizontalText xPWMOut = new HorizontalText("X PWM Out:", "        ", 0.5);
+	private final HorizontalText yPWMOut = new HorizontalText("Y PWM Out:", "        ", 0.5);
+	private final HorizontalText zPWMOut = new HorizontalText("Z PWM Out:", "        ", 0.5);
 	private final HorizontalText xCurrent = new HorizontalText("X Current:", "        ", 0.5);
 	private final HorizontalText yCurrent = new HorizontalText("Y Current:", "        ", 0.5);
 	private final HorizontalText zCurrent = new HorizontalText("Z Current:", "        ", 0.5);
@@ -264,6 +264,20 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 	@Override
 	public void updateSatellite(CougSat satellite) {
 		map.setValue(satellite.getLattitude(), satellite.getLongitude());
+
+		adcsTemp.setValue(String.format(" %s°", satellite.getADCSTemp()));
+		roll.setValue(String.format(" %s°", satellite.getRoll()));
+		pitch.setValue(String.format(" %s°", satellite.getPitch()));
+		yaw.setValue(String.format(" %s°", satellite.getYaw()));
+		xPWMOut.setValue(String.format(" %s", satellite.getXPWMOut()));
+		yPWMOut.setValue(String.format(" %s", satellite.getYPWMOut()));
+		zPWMOut.setValue(String.format(" %s", satellite.getZPWMOut()));
+		xCurrent.setValue(String.format(" %s", satellite.getXCurrent()));
+		yCurrent.setValue(String.format(" %s", satellite.getYCurrent()));
+		zCurrent.setValue(String.format(" %s", satellite.getZCurrent()));
+		
+		
+		
 	}
 
 	@Override
