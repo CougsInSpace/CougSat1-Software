@@ -13,7 +13,6 @@ import javax.swing.JTabbedPane;
 import space.cougs.ground.CougSatGround;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
-import space.cougs.ground.gui.utils.Home;
 import space.cougs.ground.satellites.CougSat;
 import space.cougs.ground.satellites.CougSat1;
 
@@ -27,7 +26,7 @@ public class GUI extends JPanel implements UIScaling {
 	private final JTabbedPane mainPanel = new JTabbedPane();
 	private final JPanel home = new Home();
 	private final JFrame mainFrame;
-//	BufferedImage CISLogo;
+
 
 	private final ComponentListener componentListener = new ComponentListener() {
 

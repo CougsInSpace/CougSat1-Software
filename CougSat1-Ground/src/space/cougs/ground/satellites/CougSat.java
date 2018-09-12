@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import space.cougs.ground.utils.CISErrors;
-import space.cougs.ground.utils.Units;
 
 public abstract class CougSat {
 
@@ -413,9 +412,9 @@ public abstract class CougSat {
 	public double getPRBattCurrent(int i) {
 		return prBattCurrent[i];
 	}
-	
+
 	public double getBatteryPR() {
-		
+
 		return Arrays.stream(prBattCurrent).sum();
 	}
 
@@ -426,6 +425,7 @@ public abstract class CougSat {
 	public double getPV3V3Current(int i) {
 		return pv3V3Current[i];
 	}
+
 	public double getPV3V3Current() {
 
 		return Arrays.stream(pv3V3Current).sum();

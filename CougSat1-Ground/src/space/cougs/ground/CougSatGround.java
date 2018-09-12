@@ -9,7 +9,7 @@ public class CougSatGround {
 	private static final GUI gui = new GUI();
 	private static final CougSat1 cougSat1 = new CougSat1();
 	private static final PacketHeader packetHeader = new PacketHeader();
-	private static final String versionNumber = "1.0.2";
+	private static final String versionNumber = "1.0.3";
 
 	public static void main(String[] args) {
 		packetHeader.addSatellite((CougSat) cougSat1);
@@ -27,18 +27,6 @@ public class CougSatGround {
 		// e.printStackTrace();
 		// }
 
-		// TODO
-		// while (true) {
-		//
-		// try {
-		//
-		// Thread.sleep(1000);
-		//
-		// } catch (InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// }
 	}
 
 	public static String getVersionnumber() {
