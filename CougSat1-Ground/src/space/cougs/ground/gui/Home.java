@@ -3,6 +3,7 @@ package space.cougs.ground.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
@@ -17,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.UIManager;
 
 import space.cougs.ground.CougSatGround;
 import space.cougs.ground.gui.subsystems.modules.ImageModule;
@@ -98,12 +100,10 @@ public class Home extends JPanel implements UIScaling {
 		patchNotesBodyText.setEditable(false);
 		patchNotesBodyText.setVisible(true);
 
-		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
 		this.add(scroll, gbc.setLocation(0, 4).setSize(2, 1).setWeight(1.0, 0.25).setInsets(5, 5, 5, 5));
 		this.setBackground(CustomColors.BACKGROUND2);
 		this.repaint();
-
+		
 	}
 
 	@Override
@@ -161,7 +161,7 @@ public class Home extends JPanel implements UIScaling {
 			if (component instanceof JTextArea) {
 				component.setFont(bodyfont);
 				component.setBackground(CustomColors.BACKGROUND1);
-//				component.setForeground(Color.white);
+				// component.setForeground(Color.white);
 			}
 			for (Component subComponent : ((Container) component).getComponents()) {
 
@@ -170,7 +170,7 @@ public class Home extends JPanel implements UIScaling {
 
 						subsubComponent.setFont(bodyfont);
 						subsubComponent.setBackground(CustomColors.BACKGROUND1);
-//						subsubComponent.setForeground(Color.white);
+						// subsubComponent.setForeground(Color.white);
 					}
 				}
 			}
