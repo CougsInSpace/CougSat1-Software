@@ -23,7 +23,7 @@
 #include "drivers/LTC2499.h"
 
 I2C i2cLocal(I2C_LOCAL_SDA, I2C_LOCAL_SCL);
-LTC2499 adcB(i2cLocal, 0x2A, (1.024 / 2.0));
+LTC2499 adcB(i2cLocal, 0x2A, (1.024f / 2.0f), 1.0f);
 
 /**
  * Program start routine
@@ -33,11 +33,22 @@ int main(void) {
   DEBUG("PMIC", "Initialization starting");
   DEBUG("PMIC", "Initialization complete");
   uint8_t result = 0;
-  float temperature;
-  result = adcB.readInternalTemperaure(&temperature);
+  float buf;
+  result = adcB.readInternalTemperaure(&buf);
   if (result != ERROR_SUCCESS) {
     DEBUG("ADC-B", "Failed to read internal temperature: 0x%02X", result);
   }
-  DEBUG("ADC-B", "Internal temperature: %4.1fC", temperature);
+  DEBUG("ADC-B", "Internal temperature: %4.1fC", buf);
+  result = adcB.selectChannel(SINGLE_0);
+  if (result != ERROR_SUCCESS) {
+    DEBUG("ADC-B", "Failed to select channel single_0: 0x%02X", result);
+  }
+  while (true) {
+    result = adcB.readVoltage(&buf);
+    if (result != ERROR_SUCCESS) {
+      DEBUG("ADC-B", "Failed to read channel single_0: 0x%02X", result);
+    }
+    DEBUG("ADC-B", "Channel 0 (Single): %5.3fV", buf);
+  }
   return ERROR_SUCCESS;
 }

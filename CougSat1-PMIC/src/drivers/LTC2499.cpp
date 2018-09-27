@@ -37,10 +37,10 @@ LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) {
  * @param addr of the AC
  * @param refVoltage at the REF+ pin (VRef / 2)
  */
-LTC2499::LTC2499(I2C &i2c, uint8_t addr, float refVoltage) : i2c(i2c) {
+LTC2499::LTC2499(I2C &i2c, uint8_t addr, float refVoltage, float gain) : i2c(i2c) {
   this->addr = addr;
   this->refVoltage = refVoltage;
-  setVRef(refVoltage);
+  setVRef(refVoltage, gain);
 }
 
 /**
@@ -127,15 +127,16 @@ uint8_t LTC2499::configureChannel(ADCChannel_t channel, uint8_t config) {
  * @brief Calibrates the conversion factor based on the VRef
  *
  * @param refVoltage at the REF+ pin (VRef / 2)
+ * @param gain of the ADC inputs
  */
-void LTC2499::setVRef(float refVoltage) {
+void LTC2499::setVRef(float refVoltage, float gain) {
   this->refVoltage = refVoltage;
-  conversionFactor = refVoltage / (float)ADC_FULL_SCALE;
+  conversionFactor = refVoltage / (float)ADC_FULL_SCALE * gain;
 }
 
 /**
  * @brief Calibrates the conversion factor based on the expected
- *  voltage at a channel
+ *  voltage at a channel. The exernal gain is automatically compensated
  *
  * @param refVoltage at the REF+ pin (VRef / 2)
  * @param channel to calibrate to

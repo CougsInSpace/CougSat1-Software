@@ -19,7 +19,7 @@
 
 #include "mbed.h"
 
-typedef enum ADCChannel_t {
+typedef enum ADCChannel {
   DIFF_0 = 0xA0,
   DIFF_2 = 0xA1,
   DIFF_4 = 0xA2,
@@ -67,12 +67,12 @@ typedef enum ADCChannel_t {
 class LTC2499 {
 public:
   LTC2499(I2C &i2c, uint8_t addr);
-  LTC2499(I2C &i2c, uint8_t addr, float refVoltage);
+  LTC2499(I2C &i2c, uint8_t addr, float refVoltage, float gain);
   uint8_t readVoltage(float *data);
   uint8_t readVoltage(ADCChannel_t channel, float *data);
   uint8_t readInternalTemperaure(float *data);
   uint8_t selectChannel(ADCChannel_t channel);
-  void setVRef(float refVoltage);
+  void setVRef(float refVoltage, float gain);
   uint8_t setVRef(float refVoltage, ADCChannel_t channel);
 
 private:
