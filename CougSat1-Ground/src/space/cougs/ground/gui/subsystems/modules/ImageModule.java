@@ -27,14 +27,17 @@ public class ImageModule extends JPanel {
 		g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-		Rectangle rec = this.getBounds();
+		Rectangle rect = this.getBounds();
 
-		int y = 0;
-		int x = rec.width / 2 - rec.height / 2;
-		
-		int temp = Math.min(rec.height, rec.width);
+		double aspectRatio = (double) image.getWidth() / image.getHeight();
 
-		g2d.drawImage(image, x, y, temp, temp, null);
+		int height = rect.height;
+		int width = Math.min(rect.width, (int) (rect.height * aspectRatio));
+		height = (int) (width / aspectRatio);
+
+		int x = (rect.width - width) / 2;
+		int y = (rect.height - height) / 2;
+		g2d.drawImage(image, x, y, width, height, null);
 
 	}
 

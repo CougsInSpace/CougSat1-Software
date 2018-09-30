@@ -261,11 +261,11 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 				for (Component subComponent : ((Container) component).getComponents()) {
 
 					if (subComponent instanceof UIScaling) {
-						
+
 						((UIScaling) subComponent).updateUIScaling(uiScale);
-						
+
 					} else if (subComponent instanceof JLabel && !(subComponent instanceof TitleLabel)) {
-						
+
 						subComponent.setFont(titleFont);
 					}
 				}
