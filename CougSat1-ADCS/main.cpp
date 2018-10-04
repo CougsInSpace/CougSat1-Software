@@ -14,7 +14,7 @@
  *
  * Initializes IHU object and starts the eventQueue
  */
-
+//Necessary header files including CISError.h
 #include <mbed.h>
 #include <rtos.h>
 #include "tools/CISError.h"
@@ -23,6 +23,8 @@
  * Program start routine
  * @return error code
  */
+
+//The main method that takes void as an argument.
 int main(void) {
   return ERROR_SUCCESS;
 }
