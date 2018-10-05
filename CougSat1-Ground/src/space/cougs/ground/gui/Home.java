@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -54,6 +55,23 @@ public class Home extends JPanel implements UIScaling {
 	private static final JTextField altitude = new JTextField();
 	private static final JTextField rfRecieverDescription = new JTextField();
 
+	private static final JPanel decoderPanel = new JPanel();
+	private static final JCheckBox uploadToServer = new JCheckBox("Upload to Server");
+	private static final JCheckBox trackDoppler = new JCheckBox("Track Doppler");
+	private static final JCheckBox storePayload = new JCheckBox("Store Payload");
+	private static final JCheckBox leftSteroChannel = new JCheckBox("Use Left Stero Channel");
+	private static final JCheckBox swapIQ = new JCheckBox("Swap Iq");
+	private static final JCheckBox fixDroppedBits = new JCheckBox("Fix Dropped Bits");
+
+	private static final JPanel debugPanel = new JPanel();
+	private static final JCheckBox enableLogging = new JCheckBox("Enable Logging");
+	private static final JCheckBox debugFrames = new JCheckBox("Debug Frames");
+	private static final JCheckBox debugFields = new JCheckBox("Debug Fields");
+	private static final JCheckBox debugValues = new JCheckBox("Debug Values");
+	private static final JCheckBox debugClock = new JCheckBox("Debug Clock");
+	private static final JCheckBox debugAudio = new JCheckBox("Debug Missed Audio");
+	private static final JCheckBox debugSignal = new JCheckBox("Debug Find Signal");
+
 	private static BufferedImage CISLogo;
 	private static ImageModule logoPanel;
 
@@ -92,7 +110,7 @@ public class Home extends JPanel implements UIScaling {
 		filesAndDirectories.add(new JLabel("Log Files Directory:"),
 				gbc.setLocation(0, 3).setSize(1, 1).setWeight(0.0, 0.0));
 		filesAndDirectories.add(new JLabel(System.getProperty("user.dir")), gbc.setLocation(1, 2).setSize(2, 1));
-		optionsPanel.add(filesAndDirectories, gbc.setLocation(0, 1).setSize(1, 1));
+		optionsPanel.add(filesAndDirectories, gbc.setLocation(0, 1).setSize(2, 1));
 
 		groundStationParams.setLayout(new GridBagLayout());
 		groundStationParams.setBackground(CustomColors.BACKGROUND1);
@@ -112,20 +130,31 @@ public class Home extends JPanel implements UIScaling {
 		groundStationParams.add(rfRecieverDescription, gbc.setLocation(1, 6));
 
 		optionsPanel.add(groundStationParams, gbc.setLocation(0, 2).setSize(3, 1).setWeight(0.0, 0.0));
+
+		decoderPanel.setLayout(new GridBagLayout());
+		decoderPanel.add(new TitleLabel("Decoder Options"), gbc.setLocation(0, 0).setSize(1, 1));
+		decoderPanel.add(uploadToServer, gbc.setLocation(0, 1));
+		decoderPanel.add(trackDoppler, gbc.setLocation(0, 2));
+		decoderPanel.add(storePayload, gbc.setLocation(0, 3));
+		decoderPanel.add(leftSteroChannel, gbc.setLocation(0, 4));
+		decoderPanel.add(swapIQ, gbc.setLocation(0, 5));
+		decoderPanel.add(fixDroppedBits, gbc.setLocation(0, 6));
+		optionsPanel.add(decoderPanel, gbc.setLocation(0, 3).setWeight(1.0, 0.0));
+
+		debugPanel.setLayout(new GridBagLayout());
+		debugPanel.add(new TitleLabel("Debug Options"), gbc.setLocation(0, 0).setWeight(0.0, 0.0));
+		debugPanel.add(enableLogging, gbc.setLocation(0, 1));
+		debugPanel.add(debugFrames , gbc.setLocation(0, 2));
+		debugPanel.add(debugFields , gbc.setLocation(0, 3));
+		debugPanel.add(debugValues , gbc.setLocation(0, 4));
+		debugPanel.add(debugClock , gbc.setLocation(0, 5));
+		debugPanel.add(debugAudio , gbc.setLocation(0, 6));
+		debugPanel.add(debugSignal , gbc.setLocation(0, 7));
+		optionsPanel.add(debugPanel, gbc.setLocation(1, 3).setSize(1, 1).setWeight(1.0, 0.0));
+
 		this.add(optionsPanel, gbc.setLocation(2, 0).setSize(1, 5).setWeight(0.0, 1.0).setInsets(5, 5, 5, 5));
 
-		// JFileChooser chooser = new JFileChooser();
-		// FileNameExtensionF2lter filter = new FileNameExtensionFilter(
-		// "JPG & GIF Images", "jpg", "gif");
-		// chooser.setFileFilter(filter);
-		// int returnVal = chooser.showOpenDialog(null);
-		// if(returnVal == JFileChooser.APPROVE_OPTION) {
-		// System.out.println("You chose to open this file: " +
-		// chooser.getSelectedFile().getName());
-		// }
-
 		// Information Panel
-
 		aboutPanel.setLayout(new GridBagLayout());
 		aboutPanel.setBackground(CustomColors.BACKGROUND2);
 		aboutPanel.add(aboutPanelHeader, gbc.setLocation(0, 1).setSize(2, 1).setWeight(1.0, 0.0));
@@ -155,8 +184,9 @@ public class Home extends JPanel implements UIScaling {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		patchNotesPanel.add(patchNotesScroll, gbc.setLocation(0, 4).setSize(2, 1).setWeight(1.0, 0.25).setInsets(5, 5, 5, 5));
+
+		patchNotesPanel.add(patchNotesScroll,
+				gbc.setLocation(0, 4).setSize(2, 1).setWeight(1.0, 0.25).setInsets(5, 5, 5, 5));
 		this.add(patchNotesPanel, gbc.setLocation(0, 3).setSize(2, 1).setWeight(1.0, 0.0));
 
 		this.setBackground(CustomColors.BACKGROUND2);
@@ -212,6 +242,7 @@ public class Home extends JPanel implements UIScaling {
 			} else if (component instanceof JTextArea) {
 				component.setFont(bodyfont);
 				component.setBackground(CustomColors.BACKGROUND1);
+				component.setBackground(Color.red);
 			}
 			for (Component subComponent : ((Container) component).getComponents()) {
 				if (subComponent instanceof TitleLabel) {
@@ -233,14 +264,16 @@ public class Home extends JPanel implements UIScaling {
 						subsubComponent.setForeground(Color.white);
 					} else if (subsubComponent instanceof JLabel) {
 						subsubComponent.setFont(bodyfont);
-					} else if (subsubComponent instanceof JTextArea) {
-						subsubComponent.setFont(bodyfont);
-						subsubComponent.setBackground(CustomColors.BACKGROUND1);
-						((JTextComponent) subsubComponent).setEditable(false);
-						subsubComponent.setVisible(true);
 					} else if (subsubComponent instanceof JTextField) {
 						subsubComponent.setFont(bodyfont);
-
+					}
+					for (Component subsubsubComponent : ((Container) subsubComponent).getComponents()) {
+						if (subsubsubComponent instanceof JTextArea) {
+							subsubsubComponent.setFont(bodyfont);
+							subsubsubComponent.setBackground(CustomColors.BACKGROUND1);
+							((JTextComponent) subsubsubComponent).setEditable(false);
+							subsubsubComponent.setVisible(true);
+						}
 					}
 				}
 			}
