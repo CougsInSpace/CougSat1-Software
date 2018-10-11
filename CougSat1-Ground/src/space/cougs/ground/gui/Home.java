@@ -41,8 +41,9 @@ public class Home extends JPanel implements UIScaling {
 	private static final JScrollPane patchNotesScroll = new JScrollPane(patchNotesBodyText);
 
 	private static final JPanel aboutPanel = new JPanel();
-	private static final JTextArea aboutPanelBody = new JTextArea("");
 	private static final TitleLabel aboutPanelHeader = new TitleLabel("About GroundStation", SwingConstants.CENTER);
+	private static final JTextArea aboutPanelBody = new JTextArea("");
+	private static final JScrollPane aboutPanelScroll = new JScrollPane(aboutPanelBody);
 
 	private static final JPanel optionsPanel = new JPanel();
 	private static final JPanel filesAndDirectories = new JPanel();
@@ -82,7 +83,6 @@ public class Home extends JPanel implements UIScaling {
 		gbc.setFill(GridBagConstraintsWrapper.BOTH);
 
 		this.setLayout(new GridBagLayout());
-		this.setBackground(CustomColors.BACKGROUND4);
 
 		// CIS Logo
 		try {
@@ -94,7 +94,7 @@ public class Home extends JPanel implements UIScaling {
 
 		logoPanel = new ImageModule(CISLogo);
 		logoPanel.setBackground(CustomColors.BACKGROUND1);
-		this.add(logoPanel, gbc.setLocation(0, 0).setSize(2, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5));
+		this.add(logoPanel, gbc.setLocation(0, 0).setSize(1, 1).setWeight(1.0, 2.0).setInsets(5, 5, 5, 5));
 
 		// options Panel
 		optionsPanel.setLayout(new GridBagLayout());
@@ -132,6 +132,7 @@ public class Home extends JPanel implements UIScaling {
 		optionsPanel.add(groundStationParams, gbc.setLocation(0, 2).setSize(3, 1).setWeight(0.0, 0.0));
 
 		decoderPanel.setLayout(new GridBagLayout());
+		decoderPanel.setBackground(CustomColors.BACKGROUND1);
 		decoderPanel.add(new TitleLabel("Decoder Options"), gbc.setLocation(0, 0).setSize(1, 1));
 		decoderPanel.add(uploadToServer, gbc.setLocation(0, 1));
 		decoderPanel.add(trackDoppler, gbc.setLocation(0, 2));
@@ -142,14 +143,15 @@ public class Home extends JPanel implements UIScaling {
 		optionsPanel.add(decoderPanel, gbc.setLocation(0, 3).setWeight(1.0, 0.0));
 
 		debugPanel.setLayout(new GridBagLayout());
+		debugPanel.setBackground(CustomColors.BACKGROUND1);
 		debugPanel.add(new TitleLabel("Debug Options"), gbc.setLocation(0, 0).setWeight(0.0, 0.0));
 		debugPanel.add(enableLogging, gbc.setLocation(0, 1));
-		debugPanel.add(debugFrames , gbc.setLocation(0, 2));
-		debugPanel.add(debugFields , gbc.setLocation(0, 3));
-		debugPanel.add(debugValues , gbc.setLocation(0, 4));
-		debugPanel.add(debugClock , gbc.setLocation(0, 5));
-		debugPanel.add(debugAudio , gbc.setLocation(0, 6));
-		debugPanel.add(debugSignal , gbc.setLocation(0, 7));
+		debugPanel.add(debugFrames, gbc.setLocation(0, 2));
+		debugPanel.add(debugFields, gbc.setLocation(0, 3));
+		debugPanel.add(debugValues, gbc.setLocation(0, 4));
+		debugPanel.add(debugClock, gbc.setLocation(0, 5));
+		debugPanel.add(debugAudio, gbc.setLocation(0, 6));
+		debugPanel.add(debugSignal, gbc.setLocation(0, 7));
 		optionsPanel.add(debugPanel, gbc.setLocation(1, 3).setSize(1, 1).setWeight(1.0, 0.0));
 
 		this.add(optionsPanel, gbc.setLocation(2, 0).setSize(1, 5).setWeight(0.0, 1.0).setInsets(5, 5, 5, 5));
@@ -158,9 +160,9 @@ public class Home extends JPanel implements UIScaling {
 		aboutPanel.setLayout(new GridBagLayout());
 		aboutPanel.setBackground(CustomColors.BACKGROUND2);
 		aboutPanel.add(aboutPanelHeader, gbc.setLocation(0, 1).setSize(2, 1).setWeight(1.0, 0.0));
-		aboutPanel.add(aboutPanelBody, gbc.setLocation(0, 2).setSize(2, 1));
-		aboutPanelBody.setText("-Body-\n\n\n\n\n\n\n\n\n");
-		this.add(aboutPanel, gbc.setLocation(0, 1).setSize(1, 1).setWeight(1.0, 0.0));
+		aboutPanel.add(aboutPanelScroll, gbc.setLocation(0, 2).setSize(2, 1).setWeight(1.0, 1.0));
+		aboutPanelBody.setText("body");
+		this.add(aboutPanel, gbc.setLocation(0, 1).setSize(1, 1).setWeight(1.0, 1.0));
 
 		// Patch Notes
 		patchNotesPanel.setLayout(new GridBagLayout());
@@ -186,8 +188,8 @@ public class Home extends JPanel implements UIScaling {
 		}
 
 		patchNotesPanel.add(patchNotesScroll,
-				gbc.setLocation(0, 4).setSize(2, 1).setWeight(1.0, 0.25).setInsets(5, 5, 5, 5));
-		this.add(patchNotesPanel, gbc.setLocation(0, 3).setSize(2, 1).setWeight(1.0, 0.0));
+				gbc.setLocation(0, 4).setSize(2, 1).setWeight(1.0, 1.0));
+		this.add(patchNotesPanel, gbc.setLocation(0, 3).setSize(1, 1).setWeight(1.0, 1.0));
 
 		this.setBackground(CustomColors.BACKGROUND2);
 		this.repaint();
@@ -266,6 +268,9 @@ public class Home extends JPanel implements UIScaling {
 						subsubComponent.setFont(bodyfont);
 					} else if (subsubComponent instanceof JTextField) {
 						subsubComponent.setFont(bodyfont);
+					} else if (subsubComponent instanceof JCheckBox) {
+						subsubComponent.setFont(bodyfont);
+						subsubComponent.setBackground(CustomColors.BACKGROUND1);
 					}
 					for (Component subsubsubComponent : ((Container) subsubComponent).getComponents()) {
 						if (subsubsubComponent instanceof JTextArea) {
