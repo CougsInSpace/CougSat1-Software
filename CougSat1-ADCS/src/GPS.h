@@ -88,13 +88,13 @@ class GPS {
 	bool mode;
 	
 	// Utility functions
-	GPSFixData nmeaToGPSFixData(char *nmew);
-	GPSLatLong nmeaToLatLong(char *nmea);
-	GPSDOP nmeaToGDOP(char *nmea);
-	GPSGSV nmeaToGPGSV(char *nmea);
-	GPSRMC nmeaToRMC(char *nmea);
-	GPSVTG nmeaToVTG(char *nmea);
-	GPSZDA nmeaToZDA(char *nmea);
+	GPSFixData nmeaToGPSFixData(unsigned char *nmew);
+	GPSLatLong nmeaToLatLong(unsigned char *nmea);
+	GPSDOP nmeaToGDOP(unsigned char *nmea);
+	GPSGSV nmeaToGPGSV(unsigned char *nmea);
+	GPSRMC nmeaToRMC(unsigned char *nmea);
+	GPSVTG nmeaToVTG(unsigned char *nmea);
+	GPSZDA nmeaToZDA(unsigned char *nmea);
 };
 
 #endif /* !SRC_SYSTEMINTERFACES_GPS_H_ */

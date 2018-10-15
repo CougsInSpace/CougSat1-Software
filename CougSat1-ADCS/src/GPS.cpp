@@ -26,17 +26,14 @@ GPS::~GPS(){
 	// free up any dynamic memory allocation
 }
 
-// TODO: implement
 GPS::uint8 getTemp() const{
 	return this->temp;
 }
 
-// TODO: implement
 GPS::bool getMode() const{
 	return this->mode;
 }
 
-// TODO: implement
 void GPS::setMode(bool nMode){
 	if(this->mode != nMode){
 		this->mode = nMode;
@@ -46,6 +43,7 @@ void GPS::setMode(bool nMode){
 // TODO: implement
 bool GPS::beginConnection(void){
 	// Open a connection with the GPS using mbed Serial object
+	// pins shall be defined in ADCSpins.h
 	// ie. Serial gps(GPS_PIN1, GPS_PIN2);
 }
 
@@ -61,7 +59,7 @@ void GPS::read(){
 	// Parse data into usable format for subscribers of this data
 }
 
-// Private Utility Functions
+// Private Utility Functions for parsing NMEA data
 // TODO: implement
 GPSFixData GPS::nmeaToGPSFixData(unsigned char *nmea){
 	// Parse NMEA GPSFixData into usable format for subcribers of this data
