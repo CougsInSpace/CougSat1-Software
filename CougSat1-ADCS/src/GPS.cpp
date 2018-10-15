@@ -9,8 +9,8 @@
 /**
  * @file GPS.cpp
  * @author Cody Sigvartson
- * @date 7 October 2018
- * @brief Controls all intracommunication on the satellite
+ * @date 14 October 2018
+ * @brief Provides an interface to the on-board GPS 
  *
 */
 
