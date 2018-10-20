@@ -37,7 +37,7 @@ LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) {
  * @param addr of the AC
  * @param refVoltage at the REF+ pin (VRef / 2)
  */
-LTC2499::LTC2499(I2C &i2c, uint8_t addr, float refVoltage, float gain) : i2c(i2c) {
+LTC2499::LTC2499(I2C &i2c, uint8_t addr, double refVoltage, double gain) : i2c(i2c) {
   this->addr = addr;
   this->refVoltage = refVoltage;
   setVRef(refVoltage, gain);
@@ -49,10 +49,10 @@ LTC2499::LTC2499(I2C &i2c, uint8_t addr, float refVoltage, float gain) : i2c(i2c
  * @param data to store voltage value
  * @return error code
  */
-uint8_t LTC2499::readVoltage(float *data) {
+uint8_t LTC2499::readVoltage(double *data) {
   int32_t buf;
   uint8_t result = readRaw(&buf);
-  (*data) = (float)buf * conversionFactor;
+  (*data) = (double)buf * conversionFactor;
   return result;
 }
 
@@ -63,7 +63,7 @@ uint8_t LTC2499::readVoltage(float *data) {
  * @param data to store voltage value
  * @return error code
  */
-uint8_t LTC2499::readVoltage(ADCChannel_t channel, float *data) {
+uint8_t LTC2499::readVoltage(ADCChannel_t channel, double *data) {
   int32_t buf;
   uint8_t result = selectChannel(channel);
   if (result != ERROR_SUCCESS) {
@@ -75,7 +75,7 @@ uint8_t LTC2499::readVoltage(ADCChannel_t channel, float *data) {
     DEBUG("LTC2499", "Error reading temperature channel");
     return result;
   }
-  (*data) = (float)buf * conversionFactor;
+  (*data) = (double)buf * conversionFactor;
   return result;
 }
 
@@ -85,7 +85,7 @@ uint8_t LTC2499::readVoltage(ADCChannel_t channel, float *data) {
  * @param data to store the temperature (celsius)
  * @return error code
  */
-uint8_t LTC2499::readInternalTemperaure(float *data) {
+uint8_t LTC2499::readInternalTemperaure(double *data) {
   int32_t buf;
   uint8_t result = configureChannel(INT_TEMP, ADC_CONFIG_TEMP_50_60_1x);
   if (result != ERROR_SUCCESS) {
@@ -94,15 +94,43 @@ uint8_t LTC2499::readInternalTemperaure(float *data) {
   }
   result = readRaw(&buf);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error reading temperatue channel");
+    DEBUG("LTC2499", "Error reading temperature channel");
     return result;
   }
-  (*data) = (float)buf * refVoltage / ADC_TEMP_SLOPE + ADC_ZERO_KELVIN;
+  (*data) = (double)buf * refVoltage / ADC_TEMP_SLOPE + ADC_ZERO_KELVIN;
   return result;
 }
 
-uint8_t LTC2499::selectChannel(ADCChannel_t channel) {
-  return configureChannel(channel, ADC_CONFIG_EXT_50_60_1x);
+/**
+ * @brief Selects the next channel to read
+ * Waits up to 200ms for configure to happen if blocking
+ *
+ * @param channel to select
+ * @param blocking or not
+ * @return error code
+ */
+uint8_t LTC2499::selectChannel(ADCChannel_t channel, bool blocking) {
+  uint8_t result = 0;
+  uint8_t conversionTimeout = ADC_CONVERSION_TIMEOUT;
+  // Typical 1x conversions will take definitely less than 200ms
+  // LTC2499 cannot be communicated to during conversion process
+  // LTC2499 returns NACK during conversion process
+  // Wait 5ms at a time up to 200ms
+  do {
+    result = configureChannel(channel, ADC_CONFIG_EXT_50_60_1x);
+    if (result != ERROR_SUCCESS) {
+      if (conversionTimeout <= 0) {
+        DEBUG("LTC2499", "Error selecting channel %d", configuredChannel);
+        return ERROR_NACK;
+      } else {
+        wait_ms(5);
+        conversionTimeout -= 5;
+      }
+    } else {
+      blocking = false;
+    }
+  } while(blocking);
+  return result;
 }
 
 /**
@@ -129,9 +157,9 @@ uint8_t LTC2499::configureChannel(ADCChannel_t channel, uint8_t config) {
  * @param refVoltage at the REF+ pin (VRef / 2)
  * @param gain of the ADC inputs
  */
-void LTC2499::setVRef(float refVoltage, float gain) {
+void LTC2499::setVRef(double refVoltage, double gain) {
   this->refVoltage = refVoltage;
-  conversionFactor = refVoltage / (float)ADC_FULL_SCALE * gain;
+  conversionFactor = refVoltage / (double)ADC_FULL_SCALE * gain;
 }
 
 /**
@@ -142,7 +170,7 @@ void LTC2499::setVRef(float refVoltage, float gain) {
  * @param channel to calibrate to
  * @return error code
  */
-uint8_t LTC2499::setVRef(float refVoltage, ADCChannel_t channel) {
+uint8_t LTC2499::setVRef(double refVoltage, ADCChannel_t channel) {
   int32_t rawVRef;
   uint8_t result = selectChannel(channel);
   if (result != ERROR_SUCCESS) {
@@ -160,19 +188,20 @@ uint8_t LTC2499::setVRef(float refVoltage, ADCChannel_t channel) {
 
 /**
  * @brief Reads the ADC value of last configured channel
- * Waits up to 200ms for conversion to happen
+ * Waits up to 200ms for conversion to happen if blocking
  *
  * @param data to store the value
+ * @param blocking or not
  * @return error code
  */
-uint8_t LTC2499::readRaw(int32_t *data) {
+uint8_t LTC2499::readRaw(int32_t *data, bool blocking) {
   char buf[4] = {0, 0, 0, 0};
   uint8_t result = 0;
   // Typical 1x conversions will take definitely less than 200ms
   // LTC2499 returns NACK during conversion process
   // Wait 5ms at a time up to 200ms
   uint8_t conversionTimeout = ADC_CONVERSION_TIMEOUT;
-  while (true) {
+  do {
     result = i2c.read(addr, buf, 4);
     if (result != ERROR_SUCCESS) {
       if (conversionTimeout <= 0) {
@@ -183,9 +212,9 @@ uint8_t LTC2499::readRaw(int32_t *data) {
         conversionTimeout -= 5;
       }
     } else {
-      break;
+      blocking = false;
     }
-  }
+  } while(blocking);
 
   DEBUG("LTC2499", "Raw 0x%02X%02X%02X%02X", buf[0], buf[1], buf[2], buf[3]);
 

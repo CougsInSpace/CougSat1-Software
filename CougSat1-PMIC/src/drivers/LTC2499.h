@@ -67,22 +67,22 @@ typedef enum ADCChannel {
 class LTC2499 {
 public:
   LTC2499(I2C &i2c, uint8_t addr);
-  LTC2499(I2C &i2c, uint8_t addr, float refVoltage, float gain);
-  uint8_t readVoltage(float *data);
-  uint8_t readVoltage(ADCChannel_t channel, float *data);
-  uint8_t readInternalTemperaure(float *data);
-  uint8_t selectChannel(ADCChannel_t channel);
-  void setVRef(float refVoltage, float gain);
-  uint8_t setVRef(float refVoltage, ADCChannel_t channel);
+  LTC2499(I2C &i2c, uint8_t addr, double refVoltage, double gain);
+  uint8_t readVoltage(double *data);
+  uint8_t readVoltage(ADCChannel_t channel, double *data);
+  uint8_t readInternalTemperaure(double *data);
+  uint8_t selectChannel(ADCChannel_t channel, bool blocking = true);
+  void setVRef(double refVoltage, double gain);
+  uint8_t setVRef(double refVoltage, ADCChannel_t channel);
 
 private:
-  uint8_t readRaw(int32_t *data);
+  uint8_t readRaw(int32_t *data, bool blocking = true);
   uint8_t configureChannel(ADCChannel_t channel, uint8_t config);
 
   I2C &i2c;
   uint8_t addr;
-  float conversionFactor;
-  float refVoltage;
+  double conversionFactor;
+  double refVoltage;
   ADCChannel_t configuredChannel;
 };
 
