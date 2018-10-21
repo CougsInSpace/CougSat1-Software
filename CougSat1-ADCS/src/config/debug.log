@@ -1,4 +1,0 @@
-[1016/225320:INFO:(0)] WebCore is now online.
-[1016/225320:INFO:(0)] Running Awesomium 1.7.5.1
-[1016/225325:ERROR:ssl_client_socket_nss.cc(1529)] handshake with server eecs.wsu.edu:443 failed; NSS error code -12190, net_error -107
-[1016/225325:ERROR:ssl_client_socket_nss.cc(1529)] handshake with server eecs.wsu.edu:443 failed; NSS error code -12286, net_error -113
