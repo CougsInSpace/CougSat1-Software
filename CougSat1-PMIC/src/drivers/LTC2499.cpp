@@ -25,8 +25,8 @@
  */
 LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) {
   this->addr = addr;
-  conversionFactor = 0.0f;
-  refVoltage = 0.0f;
+  conversionFactor = 0.0;
+  refVoltage = 0.0;
   configuredChannel = DIFF_0;
 }
 
