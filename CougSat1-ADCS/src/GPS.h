@@ -31,7 +31,6 @@
 
 #define MSG_SIZE 120 // max size of NEMA response is 120 chars
 #define GPS_ACK_TIMEOUT_MS 1000 // default wait time for how long the sender should wait for ack
-#define GPS_DEFAULT_BAUDRATE 9600 // default baud rate of GPS receiver
 
 class GPS {
   public:
@@ -64,7 +63,7 @@ class GPS {
 	Serial &gps;
 	
 	// Digital pin interfaces (mbed.h)
-	DigitalIn &resetPin; 
+	DigitalIn &resetPin;
 	DigitalOut &pulsePin; // sends a 1hz pulse to adjust clock
 	
 	// GPS attributes
@@ -78,14 +77,14 @@ class GPS {
 	float longitude;
     int32_t altitude; // meters above sea level
     uint32_t speed; // speed over ground in knots
-    uint8_t date; // date 
+    uint8_t date; // date
 
 	// Utility functions
 	uint8_t rmcParser(uint8_t *nmea);
     uint8_t sendCommand(uint8_t messageid, uint8_t *messagebody, uint32_t bodylen); // uses default timeout specified by TIMEOUTMS
     uint8_t sendCommand(uint8_t messageid, uint8_t *messagebody, uint32_t bodylen, uint32_T timemout);
     uint8_t sendPacket(uint8_t *packet, uint32_t size, uint32_t timeout);
-	void GPS::printPacket(uint8_t *packet, uint32_t size);
+	void printPacket(uint8_t *packet, uint32_t size);
 	// Initialize the GPS to default state
 	void initialize();
 };
