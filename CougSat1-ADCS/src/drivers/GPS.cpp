@@ -9,7 +9,7 @@
 /**
  * @file GPS.cpp
  * @author Cody Sigvartson
- * @date 21 October 2018
+ * @date 22 October 2018
  * @brief Provides an interface to the on-board GPS 
  *
 */
@@ -19,18 +19,13 @@
 #include "tools/CISError.h"
 
 // TODO: implement
-GPS::GPS(Serial &gps, DigitalIn &gpsResetPin, DigitalOut &gpsPulsePin, bool mode) : gps(gps), resetPin(gpsResetPin), pulsePin(gpsPulsePin){
-	this->mode = mode;
-	initialize();
+GPS::GPS(Serial &serial, DigitalIn &reset, DigitalOut &pulse, bool mode) : serial(serial), reset(reset), pulse(pulse){
+	this->nmeaState = 0x0; // disable all nmea messages
 }
 
 // TODO: implement
 GPS::~GPS(){
 	// free up any dynamic memory allocation
-}
-
-GPS::uint8 getTemp() const{
-	return this->temp;
 }
 
 GPS::bool getMode() const{
@@ -61,23 +56,17 @@ uint8_t GPS::getDate() const{
 	return this->date;
 }
 
-void GPS::setMode(bool nMode){
-	if(this->mode != nMode){
-		this->mode = nMode;
-	}
-}
-
 // TODO: implement
-void GPS::read(){
+uint8_t GPS::read(){
 	// Read NMEA data from the GPS using mbed API
-	// ie. gps.read(uint8_t *buffer, int length, const event_callback_t &callback, int event=SERIAL_EVENT_RX_COMPLETE, unsigned char char_match=SERIAL_RESERVED_CHAR_MATCH)
+	// ie. serial.read(uint8_t *buffer, int length, const event_callback_t &callback, int event=SERIAL_EVENT_RX_COMPLETE, unsigned char char_match=SERIAL_RESERVED_CHAR_MATCH)
 	// Parse data into usable format for subscribers of this data
 }
 
 // Attribute:
-// 0 = only update RAM
-// 1 = update RAM and flash
-uint8_t GPS::setUpdateRate(uint8_t frequency, uint8_t attribute)
+// RAM_ONLY = only update RAM
+// RAM_FLASH = update RAM and flash
+uint8_t GPS::setUpdateRate(uint8_t frequency, Attributes_t attribute)
 {
     DEBUG("GPS","Setting update rate\n");
     uint8_t messageBody[2];
@@ -95,20 +84,21 @@ uint8_t GPS::resetReceiver(bool reboot)
     memset(messageBody, 0, 1);
     messageBody[0] = reboot ? 1 : 0;
     uint8_t code = sendCommand(0x04, messageBody, 1, 10000);
-    if (code == GPS_NORMAL)
+    if (code == ERROR_SUCCESS)
     {
         delay(500);
 		// TODO: restart the gps
-        gps.end();
-        gps.begin(GPS_DEFAULT_BAUDRATE);
     }
+	else{
+		DEBUG("GPS", "Unable to reset receiver\n")
+	}
     return code;
 }
 
 // Attribute:
-// 0 = only update RAM
-// 1 = update RAM and flash
-uint8_t GPS::configNMEA(char messageName, bool enable, uint8_t attribute)
+// RAM_ONLY = only update RAM
+// RAM_FLASH = update RAM and flash
+uint8_t GPS::configNMEA(uint8_t messageName, bool enable, Attributes_t attribute)
 {
     DEBUG("GPS","Configuring a NMEA string\n");
     if (enable)
@@ -119,27 +109,13 @@ uint8_t GPS::configNMEA(char messageName, bool enable, uint8_t attribute)
 }
 
 // Attribute:
-// 0 = only update RAM
-// 1 = update RAM and flash
-// 2 = temporarily enabled
-char GPS::configPowerSave(bool enable, uint8_t attribute)
-{
-    DEBUG("GPS","Configuring Power Save mode\n");
-    char messageBody[2];
-    memset(messageBody, 0, 2);
-    messageBody[0] = enable ? 1 : 0;
-    messageBody[1] = attribute;
-    return sendCommand(0x0C, messageBody, 2);
-}
-
-// Attribute:
-// 0 = only update RAM
-// 1 = update RAM and flash
-char GPS::configNMEA(char nmeaByte, uint8_t attribute)
+// RAM_ONLY = only update RAM
+// RAM_FLASH = update RAM and flash
+uint8_t GPS::configNMEA(uint8_t nmeaByte, Attributes_t attribute)
 {
     DEBUG("GPS","Configuring all NMEA strings\n");
     nmeaState = nmeaByte;
-    char messageBody[8];
+    uint8_t messageBody[8];
     memset(messageBody, 0, 8);
 	// determine which nmea sentences are enabled/disabled
 	messageBody[0] = (nmeaState >> NMEA_GGA) & 1;
@@ -151,6 +127,30 @@ char GPS::configNMEA(char nmeaByte, uint8_t attribute)
     messageBody[6] = (nmeaState >> NMEA_ZDA) & 1;
     messageBody[7] = attribute;
     return sendCommand(0x08, messageBody, 8);
+}
+
+// Attribute:
+// RAM_ONLY = only update RAM
+// RAM_FLASH = update RAM and flash
+// TEMP = temporarily enabled
+uint8_t GPS::configPowerSave(bool enable, Attributes_t attribute)
+{
+    DEBUG("GPS","Configuring Power Save mode\n");
+    uint8_t messageBody[2];
+    memset(messageBody, 0, 2);
+    messageBody[0] = enable ? 1 : 0;
+    messageBody[1] = attribute;
+    return sendCommand(0x0C, messageBody, 2);
+}
+
+void GPS::setMode(bool nMode){
+	// this will ultimately call sendCommand() to wake/sleep the GPS
+}
+
+// TODO: implement
+uint8_t GPS::initialize(){
+	// This function should initialize the GPS into a "default" state
+	// Use the sendCommand() function to configure the GPS
 }
 
 // Private Utility Functions for parsing NMEA data
@@ -174,11 +174,6 @@ uint8_t GPS::rmcParser(uint8_t *nmea){
 	*/
 }
 
-uint8_t GPS::sendCommand(uint8_t messageId, uint8_t *messageBody, uint32_t bodyLen)
-{
-    return sendCommand(messageId, messageBody, bodyLen, GPS_ACK_TIMEOUT_MS);
-}
-
 uint8_t GPS::sendCommand(uint8_t messageId, uint8_t *messageBody, uint32_t bodyLen, uint32_t timeout)
 {
     DEBUG("GPS","sending command\n");
@@ -196,6 +191,8 @@ uint8_t GPS::sendCommand(uint8_t messageId, uint8_t *messageBody, uint32_t bodyL
     packet[4] = messageId;
 
     // calculate checksum
+	// We should implement a general CougSat error detection class
+	// to perform checksums, CRCs, etc
     uint8_t checksum = messageId;
     for (int i = 5; i < packetLength - 3; i++)
     {
@@ -214,7 +211,7 @@ uint8_t GPS::sendCommand(uint8_t messageId, uint8_t *messageBody, uint32_t bodyL
     DEBUG("GPS","response code ");
     DEBUG("GPS",code);
 
-    if (code != GPS_NORMAL)
+    if (code != ERROR_SUCCESS)
     {
         DEBUG("GPS","failed, trying again\n");
         code = sendPacket(packet, packetLength, timeout / 2);
@@ -229,34 +226,34 @@ uint8_t GPS::sendPacket(uint8_t *packet, int32_t size, uint32_t timeout)
     uint8_t c = 0;
     uint8_t last = 0;
     bool response = false;
-    gps.write(packet, size);
-    // TODO: wait for repsonse, need to use different API to get current
+    serial.write(packet, size);
+    // TODO: wait for ACK, need to use different API to get current
 	// time in ms
     for(uint32_t start = millis(); millis() - start < timeout;)
     {
-        while (gps.available())
+        while (serial.available())
         {
-            c = gps.read();
+            c = serial.read();
             if (last == 0xA0 && c == 0xA1 && response == false)
                 response = true;
             if (response && last == 0x83)
             {
                 if (c == packet[4]) // packet[4] = messageid
-                    return GPS_NORMAL;
+                    return ERROR_SUCCESS;
                 else
-                    return GPS_UNKNOWN;
+                    return ERROR_UNKNOWN_COMMAND;
             }
             else if (response && last == 0x84)
             {
                 if (c == packet[4]) // packet[4] = messageid
-                    return GPS_NACK;
+                    return ERROR_NACK;
                 else
-                    return GPS_UNKNOWN;
+                    return ERROR_UNKNOWN_COMMAND;
             }
             last = c;
         }
     }
-    return GPS_TIMEOUT;
+    return ERROR_WAIT_TIMEOUT;
 }
 
 void GPS::printPacket(uint8_t *packet, uint32_t size)
@@ -271,11 +268,4 @@ void GPS::printPacket(uint8_t *packet, uint32_t size)
     }
     DEBUG("GPS","}");
 }
-
-// TODO: implement
-void GPS::initialize(){
-	// This function should initialize the GPS into a "default" state
-	// Use the sendCommand() function to configure the GPS
-}
-
 // END GPS_CPP IMPLEMENTATION
