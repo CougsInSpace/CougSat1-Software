@@ -13,6 +13,7 @@
  * @brief Controls all intracommunication on the satellite
  *
  * ADCS Tasks:
+ *	-Initialize subsystems
  *  -Read 4x IMUs
  *  -Read 1x GPS
 	-Reach out to hbridge, provide it a PWM duty cycle signal to tell it how much we want it to run and	which direction

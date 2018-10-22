@@ -7,9 +7,9 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file GPS.cpp
+ * @file GPS.h
  * @author Cody Sigvartson
- * @date 14 October 2018
+ * @date 21 October 2018
  * @brief Provides an interface for the on-board GPS 
  *
 */
@@ -17,84 +17,77 @@
 #ifndef SRC_SYSTEMINTERFACES_GPS_H_
 #define SRC_SYSTEMINTERFACES_GPS_H_
 
-#typedef unsigned char uint8
-
 #include <mbed.h>
-#include <rtos.h>
-#include <filesystem/fat/FATFileSystem.h>
-#include "drivers/SDBlockDevice.h"
+#include <DigitalIn.h>
+#include <DigitalOut.h>
 #include "ADCSPins.h"
 
-// TODO: define this
-typedef struct GPSFixData{
-	
-}GPSFixData;
+// Error codes
+#define GPS_NORMAL     0;
+#define GPS_NACK       1;
+#define GPS_TIMEOUT    2;
+#define GPS_INVALIDARG 3;
+#define GPS_UNKNOWN    4;
 
-// TODO: define this
-typedef struct GPSLatLong{
-	
-}GPSLatLong;
-
-// TODO: define this
-typedef struct GPSDOP{
-	
-}GPSDOP;
-
-// TODO: define this
-typedef struct GPSGSV{
-	
-}GPSGSV;
-
-// TODO: define this
-typedef struct GPSRMC{
-	
-}GPSRMC;
-
-// TODO: define this
-typedef struct GPSVTG{
-	
-}GPSVTG;
-
-// TODO: define this
-typedef struct GPSZDA{
-	
-}GPSZDA;
+#define MSG_SIZE 120 // max size of NEMA response is 120 chars
+#define GPS_ACK_TIMEOUT_MS 1000 // default wait time for how long the sender should wait for ack
+#define GPS_DEFAULT_BAUDRATE 9600 // default baud rate of GPS receiver
 
 class GPS {
   public:
-    GPS(bool mode);
+    GPS(Serial &gps, DigitalIn &gpsResetPin, DigitalOut &gpsPulsePin, bool mode);
     ~GPS();
  
-	uint8 getTemp() const;
+	// Accessors
+	uint8_t getTemp() const;
 	bool getMode() const;
+	uint32_t getUtcTime() const;
+	float getLat() const;
+	float getLong() const;
+	int32_t getAltitude() const;
+	uint32_t getSpeedOverGround() const;
+	uint8_t getDate() const;
+	
+	// Mutators
 	void setMode(bool nMode);
-	bool beginConnection(void);
-	bool closeConnection(void);
+	
 	void read();
+	
+	// GPS configuration methods
+    uint8_t setUpdateRate(uint8_t frequency, uint8_t attribute);
+    uint8_t resetReceiver(bool reboot);
+    uint8_t configNMEA(uint8_t messageName, bool enable, uint8_t attribute);
+    uint8_t configNMEA(uint8_t nmeaByte, uint8_t attribute);
+    uint8_t configPowerSave(bool enable, uint8_t attribute);
   private:
-    //System interfaces
-    ADCS adcs;
-	IHU ihu;
-	
-    //Hardware drivers
-    SDBlockDevice sd;
-    FATFileSystem fs;
-	
 	// Serial interface (mbed.h)
-	Serial gps;
+	Serial &gps;
+	
+	// Digital pin interfaces (mbed.h)
+	DigitalIn &resetPin; 
+	DigitalOut &pulsePin; // sends a 1hz pulse to adjust clock
 	
 	// GPS attributes
-	uint8 temp;
+	uint8_t temp;
 	bool mode;
+	uint8_t nmeaState; // stores current configuration of which NMEA strings are enabled
 	
+	// RMC attributes
+    uint32_t utcTime; // UTC time in hundredths of a second
+	float lat;
+	float longitude;
+    int32_t altitude; // meters above sea level
+    uint32_t speed; // speed over ground in knots
+    uint8_t date; // date 
+
 	// Utility functions
-	GPSFixData nmeaToGPSFixData(unsigned char *nmew);
-	GPSLatLong nmeaToLatLong(unsigned char *nmea);
-	GPSDOP nmeaToGDOP(unsigned char *nmea);
-	GPSGSV nmeaToGPGSV(unsigned char *nmea);
-	GPSRMC nmeaToRMC(unsigned char *nmea);
-	GPSVTG nmeaToVTG(unsigned char *nmea);
-	GPSZDA nmeaToZDA(unsigned char *nmea);
+	uint8_t rmcParser(uint8_t *nmea);
+    uint8_t sendCommand(uint8_t messageid, uint8_t *messagebody, uint32_t bodylen); // uses default timeout specified by TIMEOUTMS
+    uint8_t sendCommand(uint8_t messageid, uint8_t *messagebody, uint32_t bodylen, uint32_T timemout);
+    uint8_t sendPacket(uint8_t *packet, uint32_t size, uint32_t timeout);
+	void GPS::printPacket(uint8_t *packet, uint32_t size);
+	// Initialize the GPS to default state
+	void initialize();
 };
 
 #endif /* !SRC_SYSTEMINTERFACES_GPS_H_ */
