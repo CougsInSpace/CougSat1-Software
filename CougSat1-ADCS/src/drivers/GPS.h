@@ -35,7 +35,7 @@ typedef enum attributes : uint8_t{
 
 class GPS {
   public:
-    GPS(Serial &serial, DigitalIn &reset, DigitalOut &pulse, bool mode);
+    GPS(Serial &serial, DigitalOut &reset, DigitalIn &pulse, bool mode);
     ~GPS();
  
 	// Accessors
@@ -66,8 +66,8 @@ class GPS {
 	Serial &serial;
 	
 	// Digital pin interfaces (mbed.h)
-	DigitalIn &reset;
-	DigitalOut &pulse; // sends a 1hz pulse to adjust clock
+	DigitalOut &reset;
+	DigitalIn &pulse; // sends a 1hz pulse to adjust clock
 	
 	// GPS attributes
 	uint8_t nmeaState; // stores current configuration of which NMEA strings are enabled

@@ -19,7 +19,7 @@
 #include "tools/CISError.h"
 
 // TODO: implement
-GPS::GPS(Serial &serial, DigitalIn &reset, DigitalOut &pulse, bool mode) : serial(serial), reset(reset), pulse(pulse){
+GPS::GPS(Serial &serial, DigitalOut &reset, DigitalIn &pulse, bool mode) : serial(serial), reset(reset), pulse(pulse){
 	this->nmeaState = 0x0; // disable all nmea messages
 }
 
