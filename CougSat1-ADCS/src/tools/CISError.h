@@ -28,12 +28,12 @@
 #define ERROR_INVALID_PASSWORD  (0x09) //Authentication failed
 #define ERROR_WRITE             (0x0A) //Failed during write operation
 #define ERROR_READ              (0x0B) //Failed during read operation
-#define ERROR_NACK              (0x0C) //No acknowledgement
+#define ERROR_NACK              (0x0C) //No acknowledgment
 #define ERROR_OPEN_FAILED       (0x0D) //The system cannot open the device or file
 #define ERROR_DISK_FULL         (0x0E) //There is not enough space in the disk
 #define ERROR_BUSY              (0x0F) //The specified resource is in use
 #define ERROR_ALREADY_EXISTS    (0x10) //Cannot create a file that already exists
-#define ERROR_QUEUE_OVERFLOW    (0x11) //The queue is at maximum capactity
+#define ERROR_QUEUE_OVERFLOW    (0x11) //The queue is at maximum capacity
 #define ERROR_WAIT_TIMEOUT      (0x12) //The operation timed out
 #define ERROR_WATCHDOG          (0x13) //The watchdog was not pet properly
 #define ERROR_INVALID_ADDRESS   (0x14) //Attempt to access invalid address
