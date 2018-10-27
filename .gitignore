@@ -14,6 +14,7 @@ RemoteSystemsTempFiles
 
 # Visual Studio Code
 .vscode
+*.code-workspace
 
 # Microsoft Office Lock Files
 *~$*
