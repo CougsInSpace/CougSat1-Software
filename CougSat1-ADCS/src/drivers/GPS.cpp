@@ -28,7 +28,7 @@ GPS::~GPS(){
 	// free up any dynamic memory allocation
 }
 
-GPS::bool getMode() const{
+bool GPS::getMode() const{
 	return this->mode;
 }
 
@@ -74,7 +74,6 @@ uint8_t GPS::setUpdateRate(uint8_t frequency, Attributes_t attribute)
     messageBody[0] = frequency;
     messageBody[1] = attribute;
     return sendCommand(0x0E, messageBody, 2);
-}
 }
 
 uint8_t GPS::resetReceiver(bool reboot)
