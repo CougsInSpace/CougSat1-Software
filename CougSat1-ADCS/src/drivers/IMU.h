@@ -19,22 +19,6 @@
 
 #include <mbed.h>
 
-typedef struct {
-	
-}imu_offsets;
-
-typedef struct {
-	uint16_t x;
-	uint16_t y;
-	uint16_t z;
-	uint16_t w;
-}quat_data;
-
-typedef struct {
-	uint16_t x;
-	uint16_t y;
-	uint16_t z;
-}sensor_data;
 
 class IMU{
 	public:
@@ -54,11 +38,11 @@ class IMU{
 	}imu_register_address;
 	
 	int8_t getTemp(void);
-	void   setMode(imu_operating_mode mode);
-	void   setPowerMode(imu_power_mode mode);
-	void   getSensorOffsets(imu_offsets &offsets);
-	void   setSensorOffsets(imu_offsets &offsets);
-	void   read(sensor_data &gyro_data, sensor_data &mag_data, sensor_data &accel_data, quat_data &quaternian);
+	uint8_t   setMode(imu_operating_mode mode);
+	uint8_t   setPowerMode(imu_power_mode mode);
+	uint8_t   getSensorOffsets(imu_offsets &offsets);
+	uint8_t   setSensorOffsets(imu_offsets &offsets);
+	uint8_t   read();
 	
 	
 	
@@ -69,6 +53,19 @@ class IMU{
 	
 	imu_operating_mode _mode; // current opperating mode of the imu
 	uint8_t            _address;//address of the imu
+	uint16_t           _accelX;
+	uint16_t           _accelY;
+	uint16_t           _accelZ;
+	uint16_t           _gyroX;
+	uint16_t           _gyroY;
+	uint16_t           _gyroZ;
+	uint16_t           _magX;
+	uint16_t           _magY;
+	uint16_t           _magZ;
+	uint16_t           _quatX;
+	uint16_t           _quatY;
+	uint16_t           _quatZ;
+	uint16_t           _quatW;
 	
 }
 
