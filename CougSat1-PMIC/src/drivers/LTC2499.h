@@ -19,7 +19,7 @@
 
 #include "mbed.h"
 
-typedef enum ADCChannel {
+typedef enum LTC2499Channel {
   DIFF_0 = 0xA0,
   DIFF_2 = 0xA1,
   DIFF_4 = 0xA2,
@@ -45,45 +45,46 @@ typedef enum ADCChannel {
   SINGLE_14 = 0xB7,
   SINGLE_15 = 0xBF,
   INT_TEMP = 0x80
-} ADCChannel_t;
+} LTC2499Channel_t;
 
-#define ADC_CONFIG_CHANNEL ((uint8_t)0xA0)
-#define ADC_CONFIG_EXT_50_60_1x ((uint8_t)0x80)
-#define ADC_CONFIG_EXT_50_60_2x ((uint8_t)0x88)
-#define ADC_CONFIG_TEMP_50_60_1x ((uint8_t)0xC0)
+#define LTC2499_CONFIG_CHANNEL ((uint8_t)0xA0)
+#define LTC2499_CONFIG_EXT_50_60_1x ((uint8_t)0x80)
+#define LTC2499_CONFIG_EXT_50_60_2x ((uint8_t)0x88)
+#define LTC2499_CONFIG_TEMP_50_60_1x ((uint8_t)0xC0)
 
-#define ADC_RAW_MASK_POS (0x01FFFFFF)
-#define ADC_RAW_MASK_NEG (0xFE000000)
+#define LTC2499_RAW_MASK_POS (0x01FFFFFF)
+#define LTC2499_RAW_MASK_NEG (0xFE000000)
 
-#define ADC_OVERRANGE (0x7FFFFFFF)
-#define ADC_UNDERRANGE (0x80000000)
-#define ADC_FULL_SCALE (0x01000000)
+#define LTC2499_OVERRANGE (0x7FFFFFFF)
+#define LTC2499_UNDERRANGE (0x80000000)
+#define LTC2499_FULL_SCALE (0x01000000)
 
-#define ADC_ZERO_KELVIN (-273.15f)
-#define ADC_TEMP_SLOPE (1570.0f)
+#define LTC2499_ZERO_KELVIN (-273.15f)
+#define LTC2499_TEMP_SLOPE (1570.0f)
 
-#define ADC_CONVERSION_TIMEOUT (200)
+#define LTC2499_CONVERSION_TIMEOUT (200)
 
 class LTC2499 {
 public:
   LTC2499(I2C &i2c, uint8_t addr);
   LTC2499(I2C &i2c, uint8_t addr, double refVoltage, double gain);
   uint8_t readVoltage(double *data);
-  uint8_t readVoltage(ADCChannel_t channel, double *data);
+  uint8_t readVoltage(LTC2499Channel_t channel, double *data);
   uint8_t readInternalTemperaure(double *data);
-  uint8_t selectChannel(ADCChannel_t channel, bool blocking = true);
+  uint8_t selectChannel(LTC2499Channel_t channel, bool blocking = true);
   void setVRef(double refVoltage, double gain);
-  uint8_t setVRef(double refVoltage, ADCChannel_t channel);
+  uint8_t setVRef(double refVoltage, double gain, LTC2499Channel_t channel);
+  double getRefPin();
 
 private:
   uint8_t readRaw(int32_t *data, bool blocking = true);
-  uint8_t configureChannel(ADCChannel_t channel, uint8_t config);
+  uint8_t configureChannel(LTC2499Channel_t channel, uint8_t config);
 
   I2C &i2c;
   uint8_t addr;
   double conversionFactor;
-  double refVoltage;
-  ADCChannel_t configuredChannel;
+  double vRefVoltage;
+  LTC2499Channel_t configuredChannel;
 };
 
 #endif /* _SRC_DRIVERS_LTC2499_H_ */

@@ -23,7 +23,7 @@
 #include "drivers/LTC2499.h"
 
 I2C i2cLocal(I2C_LOCAL_SDA, I2C_LOCAL_SCL);
-LTC2499 adcB(i2cLocal, 0x2A, (1.024f / 2.0f), 1.0f);
+LTC2499 adcB(i2cLocal, 0x2A, 1.024, 1.0);
 
 /**
  * Program start routine
