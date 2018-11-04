@@ -23,17 +23,23 @@
  * Voltage fraction is the voltage of the thermistor / the thermistor's source
  * voltage
  *
- * @param voltageFraction25C proportion of thermistor at 25°C
- * @param voltageFraction85C proportion of thermistor at 25°C
+ * @param voltageFraction25C proportion of thermistor at 270K
+ * @param voltageFraction85C proportion of thermistor at 350K
  */
-Thermistor::Thermistor(double voltageFraction25C,
-                                     double voltageFraction85C) {
+Thermistor::Thermistor(double voltageFraction270K,
+                                     double voltageFraction350K) {
   // resistance = 1/fraction - 1
-  // beta = ln(R25/R85)/(1/(25C in kelvin)-1/(85c in kelvin))
+  // beta = ln(R25/R85)/(1/(270)-1/(350K))
 }
 
+/**
+ * @brief Gets the temperature of the thermistor
+ * 
+ * @param data to read into
+ * @return uint8_t error code
+ */
 uint8_t Thermistor::getTemperature(double *data) {
   // Read voltage fraction of thermistor (Vtherm/Vsource)
-  // resistance = (1/fraction -1)/resistance25C
+  // resistance = (1/fraction -1)/resistance270K
   // temp = 1/(1/(25c in kelvin)+ln(resistance)/beta)
 }

@@ -7,26 +7,35 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file Thermistor.h
+ * @file PowerNode.h
  * @author Bradley Davis
  * @date 3 Nov 2018
- * @brief A class for a temperature sensor (thermistor based)
+ * @brief A class for a power node consisting of switching, and current
+ * monitoring
  *
  */
 
-#ifndef _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_
-#define _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_
+#ifndef _SRC_COMPONENTS_POWER_NODE_H_
+#define _SRC_COMPONENTS_POWER_NODE_H_
 
+#include "drivers/LTC2499.h"
 #include "mbed.h"
 
-class Thermistor {
+class PowerNode {
 public:
-  Thermistor(double voltageFraction270K, double voltageFraction350K);
-  uint8_t getTemperature(double* data);
+  PowerNode(LTC2499 &adc, LTC2499Channel_t channel, double shunt);
+  void getSwitch(bool *pathA, bool *pathB);
+  uint8_t getCurrent(double *current);
+
+  virtual uint8_t setSwitch(bool pathA, bool pathB) = 0;
 
 private:
-    double resistance270K;
-    double beta;
+  LTC2499 &adc;
+  LTC2499Channel_t channel;
+
+  double shunt;
+  bool pathA;
+  bool pathB;
 };
 
-#endif /* _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_ */
+#endif /* _SRC_COMPONENTS_POWER_NODE_H_ */

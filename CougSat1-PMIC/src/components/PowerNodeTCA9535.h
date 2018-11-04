@@ -7,26 +7,33 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file Thermistor.h
+ * @file PowerNodeTCA9535.h
  * @author Bradley Davis
  * @date 3 Nov 2018
- * @brief A class for a temperature sensor (thermistor based)
+ * @brief A class for a power node consisting of switching, and current
+ * monitoring whose switches are connected to a TCA9535 GPIO expander
  *
  */
 
-#ifndef _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_
-#define _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_
+#ifndef _SRC_COMPONENTS_POWER_NODE_TCA9535_H_
+#define _SRC_COMPONENTS_POWER_NODE_TCA9535_H_
 
+#include "components/PowerNode.h"
+#include "drivers/TCA9535.h"
 #include "mbed.h"
 
-class Thermistor {
+class PowerNodeTCA9535 : public PowerNode {
 public:
-  Thermistor(double voltageFraction270K, double voltageFraction350K);
-  uint8_t getTemperature(double* data);
+  PowerNodeTCA9535(LTC2499 &adc, LTC2499Channel_t channel, double shunt,
+                   TCA9535 &gpio, GPIOExpanderPin_t switchA,
+                   GPIOExpanderPin_t switchB);
+
+  uint8_t setSwitch(bool pathA, bool pathB);
 
 private:
-    double resistance270K;
-    double beta;
+  TCA9535 &gpio;
+  GPIOExpanderPin_t switchA;
+  GPIOExpanderPin_t switchB;
 };
 
-#endif /* _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_ */
+#endif /* _SRC_COMPONENTS_POWER_NODE_TCA9535_H_ */
