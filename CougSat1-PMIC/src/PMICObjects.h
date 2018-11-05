@@ -13,6 +13,10 @@
  * @brief Instantiates all of the PMIC objects
  *
  */
+
+#ifndef _SRC_PMIC_OBJECTS_H_
+#define _SRC_PMIC_OBJECTS_H_
+
 #include "PMICConfiguration.h"
 #include "PMICPins.h"
 #include "components/PowerNode.h"
@@ -219,3 +223,5 @@ Thermistor thermistorsPVBoard[] = {
     Thermistor(adcPV3, PIN_ADC_TEMP_FRONT_BOTTOM,
                THERM_CAL_PV3_FRONT_BOTTOM_270K,
                THERM_CAL_PV3_FRONT_BOTTOM_350K)};
+
+#endif /* _SRC_PMIC_OBJECTS_H_ */
