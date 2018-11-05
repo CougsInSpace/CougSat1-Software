@@ -48,4 +48,5 @@ PowerNodeTCA9535::PowerNodeTCA9535(LTC2499 &adc, LTC2499Channel_t channel,
  */
 uint8_t PowerNodeTCA9535::setSwitch(bool pathA, bool pathB) {
   // change each switch accordingly
+  return ERROR_NOT_SUPPORTED;
 }

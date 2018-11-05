@@ -56,9 +56,15 @@ typedef enum LTC2499Channel {
 } LTC2499Channel_t;
 
 #define LTC2499_CONFIG_CHANNEL ((uint8_t)0xA0)
-#define LTC2499_CONFIG_EXT_50_60_1x ((uint8_t)0x80)
-#define LTC2499_CONFIG_EXT_50_60_2x ((uint8_t)0x88)
-#define LTC2499_CONFIG_TEMP_50_60_1x ((uint8_t)0xC0)
+#define LTC2499_CONFIG_EXT_50_60_1x ((uint8_t)0x80)  // 147ms
+#define LTC2499_CONFIG_EXT_50_1x ((uint8_t)0x90)     // 160ms
+#define LTC2499_CONFIG_EXT_60_1x ((uint8_t)0xA0)     // 134ms
+#define LTC2499_CONFIG_EXT_50_60_2x ((uint8_t)0x88)  // 74ms
+#define LTC2499_CONFIG_EXT_50_2x ((uint8_t)0x98)     // 80ms
+#define LTC2499_CONFIG_EXT_60_2x ((uint8_t)0xA8)     // 67ms
+#define LTC2499_CONFIG_TEMP_50_60_1x ((uint8_t)0xC0) // 147ms
+#define LTC2499_CONFIG_TEMP_50_1x ((uint8_t)0xD0)    // 160ms
+#define LTC2499_CONFIG_TEMP_60_1x ((uint8_t)0xE0)    // 134ms
 
 #define LTC2499_RAW_MASK_POS (0x01FFFFFF)
 #define LTC2499_RAW_MASK_NEG (0xFE000000)
@@ -67,7 +73,6 @@ typedef enum LTC2499Channel {
 #define LTC2499_UNDERRANGE (0x80000000)
 #define LTC2499_FULL_SCALE (0x01000000)
 
-#define LTC2499_ZERO_KELVIN (-273.15f)
 #define LTC2499_TEMP_SLOPE (1570.0f)
 
 #define LTC2499_CONVERSION_TIMEOUT (200)
@@ -78,6 +83,8 @@ public:
   LTC2499(I2C &i2c, uint8_t addr, double refVoltage, double gain);
   uint8_t readVoltage(double *data);
   uint8_t readVoltage(LTC2499Channel_t channel, double *data);
+  uint8_t readVoltageSelectNext(double *data, LTC2499Channel_t nextChannel,
+                                bool blocking = true);
   uint8_t readInternalTemperaure(double *data);
   uint8_t selectChannel(LTC2499Channel_t channel, bool blocking = true);
   void setVRef(double refVoltage, double gain);

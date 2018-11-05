@@ -43,4 +43,5 @@ PowerNodeDirect::PowerNodeDirect(LTC2499 &adc, LTC2499Channel_t channel,
  */
 uint8_t PowerNodeDirect::setSwitch(bool pathA, bool pathB) {
   // change each switch accordingly
+  return ERROR_NOT_SUPPORTED;
 }

@@ -26,8 +26,7 @@ public:
   PowerNode(LTC2499 &adc, LTC2499Channel_t channel, double shunt);
   void getSwitch(bool *pathA, bool *pathB);
   uint8_t getCurrent(double *current);
-
-  virtual uint8_t setSwitch(bool pathA, bool pathB) = 0;
+  uint8_t setSwitch(bool pathA, bool pathB);
 
 private:
   LTC2499 &adc;

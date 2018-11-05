@@ -13,8 +13,8 @@
  * @brief Contains all hardware pins as constants
  */
 
-#ifndef _SRC_PMICPINS_H_
-#define _SRC_PMICPINS_H_
+#ifndef _SRC_PMIC_PINS_H_
+#define _SRC_PMIC_PINS_H_
 
 /*************************** Backplance Connections ***************************/
 #define PIN_CTRL_SYNC (PB_9)
@@ -187,21 +187,26 @@
 
 /******************************** Solar Panel *********************************/
 // Each panel has the same pins but different addresses to the I²C devices
-#define PIN_MPPT_XSHUT_A () // GPIO - PV0, PV1, PV2, PV3
-#define PIN_MPPT_XSHUT_B () // GPIO - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVIN_A ()   // ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVIN_B ()   // ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVOUT_A ()  // ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVOUT_B ()  // ADC - PV0, PV1, PV2, PV3
+#define PIN_MPPT_XSHUT_A (P01) // GPIO - PV0, PV1, PV2, PV3
+#define PIN_MPPT_XSHUT_B (P00) // GPIO - PV0, PV1, PV2, PV3
 
-#define PIN_ADC_TEMP_MPPT_A ()       //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_TEMP_MPPT_B ()       //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_TEMP_BACK ()         //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_TEMP_FRONT_TOP ()    //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_TEMP_FRONT_BOTTOM () //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PV_AVREF ()          //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVIN_I_A (DIFF_3)  // ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVIN_I_B (DIFF_4)  // ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVOUT_I_A (DIFF_1) // ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVOUT_I_B (DIFF_9) // ADC - PV0, PV1, PV2, PV3
+
+#define PIN_ADC_PVIN_A (SINGLE_3)             //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVIN_B (SINGLE_4)             //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVOUT_A (SINGLE_1)            //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVOUT_B (SINGLE_9)            //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_MPPT_A (SINGLE_12)       //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_MPPT_B (SINGLE_13)       //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_BACK (SINGLE_6)          //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_FRONT_TOP (SINGLE_15)    //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_FRONT_BOTTOM (SINGLE_14) //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PV_AVREF (SINGLE_7)           //ADC - PV0, PV1, PV2, PV3
 
 /******************************* Miscellaneous ********************************/
 #define PIN_LED (PD_2)
 
-#endif /* _SRC_PMICPINS_H_ */
+#endif /* _SRC_PMIC_PINS_H_ */

@@ -21,7 +21,7 @@
 
 /**
  * @brief Construct a new Power Node::Power Node object
- * 
+ *
  * @param adc connected to the shunt
  * @param channel connected to the shunt
  * @param shunt resistance
@@ -36,7 +36,7 @@ PowerNode::PowerNode(LTC2499 &adc, LTC2499Channel_t channel, double shunt)
 
 /**
  * @brief Gets the current state of the node's path switched
- * 
+ *
  * @param pathA is connected if true
  * @param pathB is connected if true
  */
@@ -47,11 +47,24 @@ void PowerNode::getSwitch(bool *pathA, bool *pathB) {
 
 /**
  * @brief Gets the current flowing through the node
- * 
+ *
  * @param current to read into
  * @return uint8_t error code
  */
 uint8_t PowerNode::getCurrent(double *current) {
   // Read ADC to get voltage
   // current = voltage / shunt
+  return ERROR_NOT_SUPPORTED;
+}
+
+/**
+ * @brief Sets the switches of the node (not supported)
+ *
+ * @param pathA is connected if true
+ * @param pathB is connected if true
+ * @return uint8_t error code
+ */
+uint8_t PowerNode::setSwitch(bool pathA, bool pathB) {
+  DEBUG("PowerNode", "Set switch improperly called on the base class");
+  return ERROR_NOT_SUPPORTED;
 }

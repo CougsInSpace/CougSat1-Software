@@ -17,16 +17,20 @@
 #ifndef _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_
 #define _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_
 
+#include "drivers/LTC2499.h"
 #include "mbed.h"
 
 class Thermistor {
 public:
-  Thermistor(double voltageFraction270K, double voltageFraction350K);
-  uint8_t getTemperature(double* data);
+  Thermistor(LTC2499 &adc, LTC2499Channel_t channel, double voltageFraction270K,
+             double voltageFraction350K);
+  uint8_t getTemperature(double *data);
 
 private:
-    double resistance270K;
-    double beta;
+  LTC2499 &adc;
+  LTC2499Channel_t channel;
+  double resistance270K;
+  double beta;
 };
 
 #endif /* _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_ */

@@ -14,39 +14,46 @@
  *
  * Initializes PMIC object and starts the execution
  */
-
-#include "PMIC.h"
 #include "mbed.h"
+#include "PMICObjects.h"
 #include "tools/CISConsole.h"
 #include "tools/CISError.h"
-#include "drivers/LTC2499.h"
-#include "PMICPins.h"
 
-PMIC pmic;
+/**
+ * @brief Initializes the all of the subclasses of the PMIC
+ *
+ * @return uint8_t error code
+ */
+uint8_t initialize()
+{
+  DEBUG("PMIC", "Initialization starting");
+  DEBUG("PMIC", "Initialization complete");
+  return ERROR_NOT_SUPPORTED;
+}
 
-I2C i2cLocal(PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL);
-I2C i2cBus(PIN_I2C_LOCAL_SDA, PIN_I2C_LOCAL_SCL);
+/**
+ * @brief Exectutes the main loop of the PMIC
+ *
+ * @return uint8_t error code
+ */
+uint8_t run() { return ERROR_NOT_SUPPORTED; }
 
-LTC2499 adcEPS0(i2cBus, I2C_ADDR_ADC_EPS0);
 /**
  * Program start routine
  * @return error code
  */
-int main(void) {
-  uint8_t result = pmic.initialize();
-  if (result != ERROR_SUCCESS) {
+int main(void)
+{
+  uint8_t result = initialize();
+  if (result != ERROR_SUCCESS)
+  {
     DEBUG("PMIC", "Failed to initialize PMIC: %02X", result);
   }
 
-  result = pmic.run();
-  if (result != ERROR_SUCCESS) {
+  result = run();
+  if (result != ERROR_SUCCESS)
+  {
     DEBUG("PMIC", "Failed to run main loop: %02X", result);
   }
-
-  result = pmic.stop();
-  if (result != ERROR_SUCCESS) {
-    DEBUG("PMIC", "Failed to stop PMIC: %02X", result);
-  }
-
   return result;
 }

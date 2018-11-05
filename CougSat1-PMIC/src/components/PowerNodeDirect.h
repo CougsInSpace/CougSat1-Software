@@ -19,6 +19,7 @@
 #define _SRC_COMPONENTS_POWER_NODE_DIRECT_H_
 
 #include "components/PowerNode.h"
+#include "drivers/LTC2499.h"
 #include "mbed.h"
 
 class PowerNodeDirect : public PowerNode {

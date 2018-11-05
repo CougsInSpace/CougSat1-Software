@@ -14,8 +14,8 @@
  *
  */
 #include "LTC2499.h"
-#include "tools/CISError.h"
 #include "tools/CISConsole.h"
+#include "tools/CISError.h"
 
 /**
  * @brief Construct a new LTC2499::LTC2499 object
@@ -37,7 +37,8 @@ LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) {
  * @param addr of the LTC2499
  * @param refVoltage at the REF+ pin
  */
-LTC2499::LTC2499(I2C &i2c, uint8_t addr, double refVoltage, double gain) : i2c(i2c) {
+LTC2499::LTC2499(I2C &i2c, uint8_t addr, double refVoltage, double gain)
+    : i2c(i2c) {
   this->addr = addr;
   this->vRefVoltage = refVoltage / 2.0;
   setVRef(refVoltage, gain);
@@ -80,9 +81,27 @@ uint8_t LTC2499::readVoltage(LTC2499Channel_t channel, double *data) {
 }
 
 /**
+ * @brief Reads the current channel and selects the next channel
+ * The ADC will send the previous channel's conversion result and perform a
+ * conversion on the newly selected channel
+ *
+ * @param data to read into
+ * @param nextChannel to select
+ * @param blocking or not
+ * @return uint8_t
+ */
+uint8_t LTC2499::readVoltageSelectNext(double *data,
+                                       LTC2499Channel_t nextChannel,
+                                       bool blocking) {
+  // Write the new channel and read the previous result in one transaction
+  // Datasheet page 22: Continuous read/write
+  return ERROR_NOT_SUPPORTED;
+}
+
+/**
  * @brief Reads the internal temperature sensor
  *
- * @param data to store the temperature (celsius)
+ * @param data to store the temperature
  * @return error code
  */
 uint8_t LTC2499::readInternalTemperaure(double *data) {
@@ -97,7 +116,7 @@ uint8_t LTC2499::readInternalTemperaure(double *data) {
     DEBUG("LTC2499", "Error reading temperature channel");
     return result;
   }
-  (*data) = (double)buf * vRefVoltage / 2.0 / LTC2499_TEMP_SLOPE + LTC2499_ZERO_KELVIN;
+  (*data) = (double)buf * vRefVoltage / 2.0 / LTC2499_TEMP_SLOPE;
   return result;
 }
 
@@ -117,7 +136,7 @@ uint8_t LTC2499::selectChannel(LTC2499Channel_t channel, bool blocking) {
   // LTC2499 returns NACK during conversion process
   // Wait 5ms at a time up to 200ms
   do {
-    result = configureChannel(channel, LTC2499_CONFIG_EXT_50_60_1x);
+    result = configureChannel(channel, LTC2499_CONFIG_EXT_60_1x);
     if (result != ERROR_SUCCESS) {
       if (conversionTimeout <= 0) {
         DEBUG("LTC2499", "Error selecting channel %d", configuredChannel);
@@ -129,7 +148,7 @@ uint8_t LTC2499::selectChannel(LTC2499Channel_t channel, bool blocking) {
     } else {
       blocking = false;
     }
-  } while(blocking);
+  } while (blocking);
   return result;
 }
 
@@ -171,7 +190,8 @@ void LTC2499::setVRef(double refVoltage, double gain) {
  * @param channel to calibrate to
  * @return error code
  */
-uint8_t LTC2499::setVRef(double refVoltage, double gain, LTC2499Channel_t channel) {
+uint8_t LTC2499::setVRef(double refVoltage, double gain,
+                         LTC2499Channel_t channel) {
   int32_t rawVRef;
   uint8_t result = selectChannel(channel);
   if (result != ERROR_SUCCESS) {
@@ -190,12 +210,10 @@ uint8_t LTC2499::setVRef(double refVoltage, double gain, LTC2499Channel_t channe
 
 /**
  * @brief Returns the voltage at the Ref pin
- * 
+ *
  * @return double voltage
  */
-double LTC2499::getRefPin(){
-  return (vRefVoltage * 2.0);
-}
+double LTC2499::getRefPin() { return (vRefVoltage * 2.0); }
 
 /**
  * @brief Reads the LTC2499 value of last configured channel
@@ -225,7 +243,7 @@ uint8_t LTC2499::readRaw(int32_t *data, bool blocking) {
     } else {
       blocking = false;
     }
-  } while(blocking);
+  } while (blocking);
 
   DEBUG("LTC2499", "Raw 0x%02X%02X%02X%02X", buf[0], buf[1], buf[2], buf[3]);
 
