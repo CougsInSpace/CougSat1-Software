@@ -9,47 +9,44 @@
 /**
  * @file main.cpp
  * @author Bradley Davis
- * @date 6 Mar 2018
- * @brief Starts the IHU software
+ * @date 4 Nov 2018
+ * @brief Starts the PMIC software
  *
- * Initializes IHU object and starts the eventQueue
+ * Initializes PMIC object and starts the execution
  */
 
-#include <mbed.h>
-#include <rtos.h>
-#include "tools/CISError.h"
+#include "PMIC.h"
+#include "mbed.h"
 #include "tools/CISConsole.h"
-#include "PMICPins.h"
+#include "tools/CISError.h"
 #include "drivers/LTC2499.h"
+#include "PMICPins.h"
 
-I2C i2cLocal(I2C_LOCAL_SDA, I2C_LOCAL_SCL);
-LTC2499 adcB(i2cLocal, 0x2A, 1.024, 1.0);
+PMIC pmic;
 
+I2C i2cLocal(PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL);
+I2C i2cBus(PIN_I2C_LOCAL_SDA, PIN_I2C_LOCAL_SCL);
+
+LTC2499 adcEPS0(i2cBus, I2C_ADDR_ADC_EPS0);
 /**
  * Program start routine
  * @return error code
  */
 int main(void) {
-  DEBUG("PMIC", "Initialization starting");
-  DEBUG("PMIC", "Initialization complete");
-  uint8_t result = 0;
-  double buf;
-  result = adcB.readInternalTemperaure(&buf);
+  uint8_t result = pmic.initialize();
   if (result != ERROR_SUCCESS) {
-    DEBUG("ADC-B", "Failed to read internal temperature: 0x%02X", result);
+    DEBUG("PMIC", "Failed to initialize PMIC: %02X", result);
   }
-  DEBUG("ADC-B", "Internal temperature: %4.1fC", buf);
-  result = adcB.selectChannel(DIFF_4);
+
+  result = pmic.run();
   if (result != ERROR_SUCCESS) {
-    DEBUG("ADC-B", "Failed to select channel single_4: 0x%02X", result);
-    while(1);
+    DEBUG("PMIC", "Failed to run main loop: %02X", result);
   }
-  while (true) {
-    result = adcB.readVoltage(&buf);
-    if (result != ERROR_SUCCESS) {
-      DEBUG("ADC-B", "Failed to read channel single_4: 0x%02X", result);
-    }
-    DEBUG("ADC-B", "Channel 0 (Single): %9.6fV", buf);
+
+  result = pmic.stop();
+  if (result != ERROR_SUCCESS) {
+    DEBUG("PMIC", "Failed to stop PMIC: %02X", result);
   }
-  return ERROR_SUCCESS;
+
+  return result;
 }
