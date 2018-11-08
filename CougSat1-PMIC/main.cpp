@@ -14,18 +14,20 @@
  *
  * Initializes PMIC object and starts the execution
  */
-#include "mbed.h"
 #include "PMICObjects.h"
+#include "mbed.h"
+#include "events/Events.h"
 #include "tools/CISConsole.h"
 #include "tools/CISError.h"
+
+volatile bool busMessage = false;
 
 /**
  * @brief Initializes the all of the subclasses of the PMIC
  *
  * @return uint8_t error code
  */
-uint8_t initialize()
-{
+uint8_t initialize() {
   DEBUG("PMIC", "Initialization starting");
   DEBUG("PMIC", "Initialization complete");
   return ERROR_NOT_SUPPORTED;
@@ -36,23 +38,48 @@ uint8_t initialize()
  *
  * @return uint8_t error code
  */
-uint8_t run() { return ERROR_NOT_SUPPORTED; }
+uint8_t run() {
+  uint32_t nextADCEvent = HAL_GetTick() + PERIOD_MS_ADC_UPDATE;
+  uint32_t nextPeriodicEvent = HAL_GetTick() + PERIOD_MS_PERIODIC;
+  uint8_t result = 0;
+  while (true) {
+    if (busMessage) {
+      result = cdh.processMessage();
+      if (result != ERROR_SUCCESS) {
+        DEBUG("PMIC", "Failed to process message from the bus: %02X", result);
+      }
+    }
+    if ((HAL_GetTick() - nextADCEvent) > 0) {
+      result = eventADC();
+      if (result != ERROR_SUCCESS) {
+        DEBUG("PMIC", "Failed to perform ADC event: %02X", result);
+      }
+      nextADCEvent = HAL_GetTick() + PERIOD_MS_ADC_UPDATE;
+    }
+    if ((HAL_GetTick() - nextPeriodicEvent) > 0) {
+      result = eventPeriodic();
+      if (result != ERROR_SUCCESS) {
+        DEBUG("PMIC", "Failed to perform periodic event: %02X", result);
+      }
+      nextPeriodicEvent = HAL_GetTick() + PERIOD_MS_PERIODIC;
+    }
+    wait_ms(PERIOD_MS_IDLE_SLEEP);
+  }
+  return result;
+}
 
 /**
  * Program start routine
  * @return error code
  */
-int main(void)
-{
+int main(void) {
   uint8_t result = initialize();
-  if (result != ERROR_SUCCESS)
-  {
+  if (result != ERROR_SUCCESS) {
     DEBUG("PMIC", "Failed to initialize PMIC: %02X", result);
   }
 
   result = run();
-  if (result != ERROR_SUCCESS)
-  {
+  if (result != ERROR_SUCCESS) {
     DEBUG("PMIC", "Failed to run main loop: %02X", result);
   }
   return result;

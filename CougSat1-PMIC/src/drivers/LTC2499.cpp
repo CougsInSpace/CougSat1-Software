@@ -16,6 +16,7 @@
 #include "LTC2499.h"
 #include "tools/CISConsole.h"
 #include "tools/CISError.h"
+#include <math.h>
 
 /**
  * @brief Construct a new LTC2499::LTC2499 object
@@ -28,6 +29,10 @@ LTC2499::LTC2499(I2C &i2c, uint8_t addr) : i2c(i2c) {
   conversionFactor = 0.0;
   vRefVoltage = 0.0;
   configuredChannel = DIFF_0;
+  activeChannels = 0;
+  for (int i = 0; i < 24; i++) {
+    voltages[i] = NAN;
+  }
 }
 
 /**
@@ -88,13 +93,49 @@ uint8_t LTC2499::readVoltage(LTC2499Channel_t channel, double *data) {
  * @param data to read into
  * @param nextChannel to select
  * @param blocking or not
- * @return uint8_t
+ * @return uint8_t error code
  */
 uint8_t LTC2499::readVoltageSelectNext(double *data,
                                        LTC2499Channel_t nextChannel,
                                        bool blocking) {
   // Write the new channel and read the previous result in one transaction
   // Datasheet page 22: Continuous read/write
+  return ERROR_NOT_SUPPORTED;
+}
+
+/**
+ * @brief Reads the next channel in the active channel queue
+ *
+ * @param blocking or not
+ * @return uint8_t error code
+ */
+uint8_t LTC2499::readNextActiveChannel(bool blocking) {
+  // Gets the value for the configuredChannel
+  // Changes channel to the next in the queue
+  return ERROR_NOT_SUPPORTED;
+}
+
+/**
+ * @brief Adds the channel to the active channel queue
+ *
+ * @param channel to add
+ * @return uint8_t error code
+ */
+uint8_t LTC2499::addActiveChannel(LTC2499Channel_t channel) {
+  // set the appropriate bit in activeChannels
+  // activeChannels[7:0] = Differential 14 : 0
+  // activeChannels[23:8] = Single ended 15 : 0
+  return ERROR_NOT_SUPPORTED;
+}
+
+/**
+ * @brief Gets the last read voltage for the channel
+ *
+ * @param channel to get
+ * @return double voltage
+ */
+double LTC2499::getVoltage(LTC2499Channel_t channel) {
+  // return voltages[channel & 0x1F]
   return ERROR_NOT_SUPPORTED;
 }
 

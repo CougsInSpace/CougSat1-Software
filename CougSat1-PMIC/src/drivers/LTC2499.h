@@ -85,11 +85,14 @@ public:
   uint8_t readVoltage(LTC2499Channel_t channel, double *data);
   uint8_t readVoltageSelectNext(double *data, LTC2499Channel_t nextChannel,
                                 bool blocking = true);
+  uint8_t readNextActiveChannel(bool blocking = true);
+  uint8_t addActiveChannel(LTC2499Channel_t channel);
   uint8_t readInternalTemperaure(double *data);
   uint8_t selectChannel(LTC2499Channel_t channel, bool blocking = true);
   void setVRef(double refVoltage, double gain);
   uint8_t setVRef(double refVoltage, double gain, LTC2499Channel_t channel);
   double getRefPin();
+  double getVoltage(LTC2499Channel_t channel);
 
 private:
   uint8_t readRaw(int32_t *data, bool blocking = true);
@@ -100,6 +103,9 @@ private:
   double conversionFactor;
   double vRefVoltage;
   LTC2499Channel_t configuredChannel;
+
+  uint32_t activeChannels;
+  double voltages[24];
 };
 
 #endif /* _SRC_DRIVERS_LTC2499_H_ */

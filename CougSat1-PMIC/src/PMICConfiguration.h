@@ -18,6 +18,11 @@
 #ifndef _SRC_PMIC_CONFIGURATION_H_
 #define _SRC_PMIC_CONFIGURATION_H_
 
+/*********************************** Timing ***********************************/
+#define PERIOD_MS_IDLE_SLEEP (10)  // Sleep time during idle
+#define PERIOD_MS_ADC_UPDATE (150) // Read next active channels on ADCs
+#define PERIOD_MS_PERIODIC (5000)  // The periodic event
+
 /******************************** Solar Panel *********************************/
 #define SHUNT_PVIN_0A (0.05)
 #define SHUNT_PVIN_0B (0.05)

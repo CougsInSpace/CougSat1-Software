@@ -17,6 +17,7 @@
 #ifndef _SRC_PMIC_OBJECTS_H_
 #define _SRC_PMIC_OBJECTS_H_
 
+#include "CDH.h"
 #include "PMICConfiguration.h"
 #include "PMICPins.h"
 #include "components/PowerNode.h"
@@ -30,6 +31,8 @@
 /*************************** Interfaces and Drivers ***************************/
 I2C i2cLocal(PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL);
 I2C i2cBus(PIN_I2C_LOCAL_SDA, PIN_I2C_LOCAL_SCL);
+
+CDH cdh(i2cBus);
 
 LTC2499 adcEPS0(i2cBus, I2C_ADDR_ADC_EPS0);
 LTC2499 adcEPS1(i2cBus, I2C_ADDR_ADC_EPS1);
