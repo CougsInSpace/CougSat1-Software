@@ -17,9 +17,9 @@
 #ifndef _SRC_PMIC_OBJECTS_H_
 #define _SRC_PMIC_OBJECTS_H_
 
-#include "CDH.h"
 #include "PMICConfiguration.h"
 #include "PMICPins.h"
+#include "components/CDH.h"
 #include "components/PowerNode.h"
 #include "components/PowerNodeDirect.h"
 #include "components/PowerNodeTCA9535.h"

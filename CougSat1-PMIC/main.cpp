@@ -15,8 +15,8 @@
  * Initializes PMIC object and starts the execution
  */
 #include "PMICObjects.h"
-#include "mbed.h"
 #include "events/Events.h"
+#include "mbed.h"
 #include "tools/CISConsole.h"
 #include "tools/CISError.h"
 
@@ -41,6 +41,7 @@ uint8_t initialize() {
 uint8_t run() {
   uint32_t nextADCEvent = HAL_GetTick() + PERIOD_MS_ADC_UPDATE;
   uint32_t nextPeriodicEvent = HAL_GetTick() + PERIOD_MS_PERIODIC;
+  uint32_t now = HAL_GetTick();
   uint8_t result = 0;
   while (true) {
     if (busMessage) {
@@ -49,14 +50,18 @@ uint8_t run() {
         DEBUG("PMIC", "Failed to process message from the bus: %02X", result);
       }
     }
-    if ((HAL_GetTick() - nextADCEvent) > 0) {
+    now = HAL_GetTick();
+    if (now >= nextADCEvent &&
+        (nextADCEvent >= PERIOD_MS_ADC_UPDATE || now <= PERIOD_MS_ADC_UPDATE)) {
       result = eventADC();
       if (result != ERROR_SUCCESS) {
         DEBUG("PMIC", "Failed to perform ADC event: %02X", result);
       }
       nextADCEvent = HAL_GetTick() + PERIOD_MS_ADC_UPDATE;
     }
-    if ((HAL_GetTick() - nextPeriodicEvent) > 0) {
+    now = HAL_GetTick();
+    if (now >= nextPeriodicEvent && (nextPeriodicEvent >= PERIOD_MS_PERIODIC ||
+                                     now <= PERIOD_MS_PERIODIC)) {
       result = eventPeriodic();
       if (result != ERROR_SUCCESS) {
         DEBUG("PMIC", "Failed to perform periodic event: %02X", result);
