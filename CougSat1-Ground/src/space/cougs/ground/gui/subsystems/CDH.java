@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import space.cougs.ground.satellites.CougSat;
 
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -12,6 +11,7 @@ import javax.swing.JTextArea;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.general.DefaultPieDataset;
 
 import space.cougs.ground.gui.UIScaling;
@@ -19,30 +19,36 @@ import space.cougs.ground.gui.subsystems.modules.TitleLabel;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;
+import space.cougs.ground.satellites.CougSat;
 
 public class CDH extends JPanel implements UIScaling, SatelliteInfo {
 
 	private static final long serialVersionUID = 1L;
-	DefaultPieDataset sdUsageData = new DefaultPieDataset( );
-	JFreeChart chart = ChartFactory.createPieChart("Disk Usage", sdUsageData, true, true, false);
-	DefaultPieDataset dataset = new DefaultPieDataset();
-
+	private static final DefaultPieDataset sdUsageData = new DefaultPieDataset();
+	private static final JFreeChart chart = ChartFactory.createPieChart("Disk Usage", sdUsageData, true, true, false);
+	private static final ChartPanel chartWrapper = new ChartPanel(chart);
+	
 	public CDH() {
 		super();
-
+		
 		sdUsageData.setValue( "SD Used", 1);
 		sdUsageData.setValue( "SD Free", 1);
-		
 		
 		GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
 		gbc.setFill(GridBagConstraintsWrapper.BOTH);
 
 		this.setLayout(new GridBagLayout());
-		
-		this.add(new ChartPanel( chart ));
+		chart.getPlot().setOutlineVisible(false);
+		BarRenderer renderer = new BarRenderer(); 
+		renderer.setShadowVisible(false);
+		chart.setBackgroundPaint(CustomColors.BACKGROUND1);
+	
+		chart.setBorderVisible(true);
+		chart.setBorderPaint(CustomColors.BACKGROUND1);
+		chart.getPlot().setBackgroundPaint(CustomColors.BACKGROUND2 );
+		this.add(chartWrapper, gbc.setLocation(0, 0).setSize(1, 1).setWeight(1.0, 1.0));
 
 		this.add(new TitleLabel("Computer"), gbc.setLocation(0, 0).setSize(3, 1).setWeight(0.0, 0.0));
-
 		this.setBackground(CustomColors.BACKGROUND2);
 	}
 
@@ -89,6 +95,6 @@ public class CDH extends JPanel implements UIScaling, SatelliteInfo {
 
 	@Override
 	public void updateSatellite(CougSat satellite) {
-		
+
 	}
 }
