@@ -24,7 +24,9 @@ typedef enum CDHCommand {
   TURN_ON = 0x01,
   VOLTAGE_REQ = 0x02,
   CURRENT_REQ = 0x03,
-  TEMP_REQ = 0x04
+  TEMP_REQ = 0x04,
+  POWER_CHAN_STAT = 0x05,
+  PV_CHAN_STAT = 0x06
 } CDHCommand_t;
 
 #define CDH_ADDR_PV ((uint8_t)0x00)      // 0x00 to 0x07

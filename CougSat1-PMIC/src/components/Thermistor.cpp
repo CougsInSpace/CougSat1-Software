@@ -31,7 +31,7 @@ Thermistor::Thermistor(LTC2499 &adc, LTC2499Channel_t channel,
     : adc(adc) {
   this->channel = channel;
   // resistance = 1/fraction - 1
-  // beta = ln(R25/R85)/(1/(270)-1/(350K))
+  // beta = ln(R270K/R350K)/(1/(270K)-1/(350K))
 }
 
 /**
@@ -42,7 +42,7 @@ Thermistor::Thermistor(LTC2499 &adc, LTC2499Channel_t channel,
  */
 uint8_t Thermistor::getTemperature(double *data) {
   // Read voltage fraction of thermistor (Vtherm/Vsource)
-  // resistance = (1/fraction -1)/resistance270K
-  // temp = 1/(1/(25c in kelvin)+ln(resistance)/beta)
+  // resistance = (1/fraction - 1)/resistance270K
+  // temp = 1/(1/(270K)+ln(resistance)/beta)
   return ERROR_NOT_SUPPORTED;
 }
