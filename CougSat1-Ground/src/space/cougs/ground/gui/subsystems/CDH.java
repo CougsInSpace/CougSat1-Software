@@ -25,19 +25,19 @@ public class CDH extends JPanel implements UIScaling, SatelliteInfo {
 
 	private static final long serialVersionUID = 1L;
 	private static final DefaultPieDataset sdUsageData = new DefaultPieDataset();
-	private static final JFreeChart chart = ChartFactory.createPieChart("Disk Usage", sdUsageData, true, true, false);
+	private static final JFreeChart chart = ChartFactory.createPieChart("Disk Usage", sdUsageData);
 	private static final ChartPanel chartWrapper = new ChartPanel(chart);
 	
 	public CDH() {
 		super();
 		
+		GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
+		gbc.setFill(GridBagConstraintsWrapper.BOTH);
+		this.setLayout(new GridBagLayout());
+		
 		sdUsageData.setValue( "SD Used", 1);
 		sdUsageData.setValue( "SD Free", 1);
 		
-		GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
-		gbc.setFill(GridBagConstraintsWrapper.BOTH);
-
-		this.setLayout(new GridBagLayout());
 		chart.getPlot().setOutlineVisible(false);
 		BarRenderer renderer = new BarRenderer(); 
 		renderer.setShadowVisible(false);

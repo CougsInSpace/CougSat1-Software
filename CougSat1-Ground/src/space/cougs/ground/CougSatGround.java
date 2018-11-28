@@ -1,5 +1,9 @@
 package space.cougs.ground;
 
+import java.awt.Insets;
+
+import javax.swing.UIManager;
+
 import space.cougs.ground.gui.GUI;
 import space.cougs.ground.packetprocessing.PacketHeader;
 import space.cougs.ground.satellites.CougSat;
@@ -12,6 +16,7 @@ public class CougSatGround {
 	private static final String versionNumber = "1.0.3";
 
 	public static void main(String[] args) {
+		
 		packetHeader.addSatellite((CougSat) cougSat1);
 		packetHeader.decodePacketSwitcher("test/rawPackets/TestTelemetry");
 

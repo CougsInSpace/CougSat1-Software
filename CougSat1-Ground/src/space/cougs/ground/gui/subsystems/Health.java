@@ -135,7 +135,6 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 		temperature.add(commsTemp, gbc.setLocation(5, 1).setSize(1, 1).setWeight(1.0, 1.0));
 		temperature.add(batteryATemp, gbc.setLocation(6, 1).setSize(1, 1).setWeight(1.0, 1.0));
 		temperature.add(batteryBTemp, gbc.setLocation(7, 1).setSize(1, 1).setWeight(1.0, 1.0));
-		// gbc.setSize(1, 1).setWeight(1.0, 1.0).setInsets(5, 5, 5, 5);
 
 		for (int i = 0; i < 8; i++) {
 

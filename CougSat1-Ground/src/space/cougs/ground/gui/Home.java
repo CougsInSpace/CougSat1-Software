@@ -200,7 +200,7 @@ public class Home extends JPanel implements UIScaling {
 	public void updateUIScaling(UIScale uiScale) {
 		Font font = Fonts.BODY_24;
 		Font bodyfont = Fonts.BODY_16;
-		int scrollBarSize = 0;
+		int scrollBarSize = 20;
 
 		switch (uiScale) {
 		default:
