@@ -4,7 +4,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 
 import javax.swing.JLabel;
@@ -13,7 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import space.cougs.ground.gui.UIScaling;
-import space.cougs.ground.gui.subsystems.modules.Thumbnail;
+import space.cougs.ground.gui.subsystems.modules.ThumbnailGrid;
 import space.cougs.ground.gui.subsystems.modules.TitleLabel;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
@@ -24,27 +25,53 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final JPanel photoWrapper = new JPanel();
-	private static final JScrollPane photoWrapperScroll = new JScrollPane(photoWrapper);
+	private static final double thumbnailWidthFactor = 0.3;
+
+	private static final ThumbnailGrid thumbnailGrid = new ThumbnailGrid(2);
 	private static final JPanel photoViewer = new JPanel();
+	
+	private int border = 10;
+
+	private final ComponentListener componentListener = new ComponentListener() {
+
+		@Override
+		public void componentHidden(ComponentEvent e) {
+		}
+
+		@Override
+		public void componentMoved(ComponentEvent e) {
+		}
+
+		@Override
+		public void componentResized(ComponentEvent e) {
+			int thumbnailWidth = (int) (getWidth() * thumbnailWidthFactor);
+			thumbnailGrid.setBounds(border, border, thumbnailWidth - border * 2, getHeight() - border * 2);
+			photoViewer.setBounds(thumbnailWidth, border, getWidth() - thumbnailWidth - border, getHeight() - border * 2);
+			repaint();
+		}
+
+		@Override
+		public void componentShown(ComponentEvent e) {
+			this.componentResized(e);
+		}
+
+	};
 
 	public Plant() {
 
 		super();
-		GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
-		gbc.setFill(GridBagConstraintsWrapper.BOTH);
-		this.setLayout(new GridBagLayout());
+		this.setLayout(null);
+		this.addComponentListener(componentListener);
 
 //		File[] files = new File("/").listFiles();
 //	    showFiles(files);
 
-		photoWrapper.setBackground(CustomColors.BACKGROUND2);
-		photoWrapper.setLayout(new GridLayout(0, 2, 5, 5));
+		thumbnailGrid.setBackground(CustomColors.BACKGROUND2);
 
 		photoViewer.setBackground(CustomColors.BACKGROUND2);
 
-		this.add(photoWrapperScroll, gbc.setLocation(0, 0).setSize(2, 3).setWeight(0.4, 1.0).setInsets(10, 10, 10, 5));
-		this.add(photoViewer, gbc.setLocation(3, 0).setSize(4, 3).setWeight(1.0, 1.0).setInsets(10, 5, 10, 10));
+		this.add(thumbnailGrid);
+		this.add(photoViewer);
 
 		this.setBackground(CustomColors.BACKGROUND1);
 	}
@@ -90,9 +117,6 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 		default:
 			break;
 		}
-		UIManager.put("ScrollBar.width", scrollBarSize);
-		photoWrapperScroll.setVerticalScrollBar(photoWrapperScroll.createVerticalScrollBar());
-		photoWrapperScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
 		for (Component component : this.getComponents()) {
 
@@ -120,21 +144,16 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 
 	@Override
 	public void updateSatellite(CougSat satellite) {
-
-		File photo = new File("packets/images/image.png");
-
-
-		for (int i = 0; i < 10; i++)
-		{
-			photoWrapper.add(new Thumbnail(photo, (photoWrapper.getWidth()), (photoWrapper.getWidth())));			
-		}
-
-//		photoWrapper.add(new Thumbnail(photo, (photoWrapper.getWidth()-15) / 2, photoWrapper.getHeight()*3/4));
-		
-//		System.out.print(photoWrapper.getWidth());
-		System.out.print((photoWrapper.getWidth()- 15) / 2);
-		System.out.println("\n");
-		System.out.print((photoWrapper.getWidth()- 15) / 2 * 3/4);
+		File photo = new File("packets/images/image_thumbnail.png");
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
 
 		this.repaint();
 	}
