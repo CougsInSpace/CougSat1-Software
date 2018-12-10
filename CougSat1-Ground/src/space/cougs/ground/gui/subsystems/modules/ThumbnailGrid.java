@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
@@ -26,34 +27,54 @@ public class ThumbnailGrid extends JPanel {
 	private double scrollPosition = 0.0;
 	private int columns = 1;
 	private int barWidth = 20;
-	private int thumbnailLength = 0;
+	private int gridHeight = 0;
 	private int squareLength = 0;
 	private final List<Image> thumbnails = new ArrayList<Image>();
-	
+	private final List<File> thumbnailFile = new ArrayList<File>();
+	private final List<ActionListener> actionListners = new ArrayList<ActionListener>();
+	private File currentThumbnail = null;
+
 	private int lastScrollBarY = 0;
 
 	private Rectangle scrollBar = new Rectangle(0, 0, 0, 0);
 
+	
+	public ThumbnailGrid(int columns) {
+		this.columns = columns;
+		this.addMouseMotionListener(mouseMotionListener);
+		this.addComponentListener(componentListener);
+		this.addMouseListener(mouseListener);
+	}
+	
+	public void addActionListner(ActionListener listner)
+	{
+		actionListners.add(listner);
+	}
+	
 	private MouseListener mouseListener = new MouseListener() {
 
+		
+		
 		@Override
 		public void mouseClicked(MouseEvent e) {
+
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
+
 			if (scrollBar.contains(e.getPoint())) {
 				lastScrollBarY = e.getY();
 			}
@@ -61,12 +82,26 @@ public class ThumbnailGrid extends JPanel {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	};
+			int hiddenHeight = (int) (scrollPosition * (gridHeight - getHeight()));
+			int currentColumn = e.getX() / squareLength;
+			int currentRow = (e.getY() + hiddenHeight) / squareLength;
+			int selectedThumbnail = currentRow * 2 + currentColumn;
+
+
+			if (selectedThumbnail < thumbnailFile.size())
+			{
+				
+				setCurrentThumbnail(thumbnailFile.get(selectedThumbnail));	
+				for (ActionListener listner : actionListners)
+				{
+					listner.actionPerformed(null);
+				}
 	
+			}
+		}
+
+	};
+
 	private final MouseMotionListener mouseMotionListener = new MouseMotionListener() {
 
 		@Override
@@ -100,8 +135,8 @@ public class ThumbnailGrid extends JPanel {
 		@Override
 		public void componentResized(ComponentEvent e) {
 			squareLength = (getWidth() - barWidth) / columns;
-			thumbnailLength = (int) (squareLength * Math.max(1, Math.ceil((double) thumbnails.size() / columns)));
-			scrollBar.setSize(barWidth, getHeight() * getHeight() / thumbnailLength);
+			gridHeight = (int) (squareLength * Math.max(1, Math.ceil((double) thumbnails.size() / columns)));
+			scrollBar.setSize(barWidth, getHeight() * getHeight() / gridHeight);
 			scrollBar.x = squareLength * 2;
 		}
 
@@ -111,18 +146,14 @@ public class ThumbnailGrid extends JPanel {
 		}
 	};
 
-	public ThumbnailGrid(int columns) {
-		this.columns = columns;
-		this.addMouseMotionListener(mouseMotionListener);
-		this.addComponentListener(componentListener);
-		this.addMouseListener(mouseListener);
-	}
+	
 
 	public void addThumbnail(File thumbnail) {
 		try {
+			thumbnailFile.add(thumbnail);
 			Image image = ImageIO.read(thumbnail);
 			thumbnails.add(image);
-			thumbnailLength = (int) (squareLength * Math.ceil((double) thumbnails.size() / columns));
+			gridHeight = (int) (squareLength * Math.ceil((double) thumbnails.size() / columns));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -134,7 +165,7 @@ public class ThumbnailGrid extends JPanel {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(CustomColors.TEXT1);
-		int y = (int) (-squareLength - scrollPosition * Math.max(0, thumbnailLength - this.getHeight()));
+		int y = (int) (-squareLength - scrollPosition * Math.max(0, gridHeight - this.getHeight()));
 		for (int i = 0; i < thumbnails.size(); i++) {
 			if (i % columns == 0) {
 				y += squareLength;
@@ -149,5 +180,13 @@ public class ThumbnailGrid extends JPanel {
 
 		g2d.setColor(CustomColors.BAR_DEFAULT);
 		g2d.fill(scrollBar);
+	}
+
+	public File getCurrentThumbnail() {
+		return currentThumbnail;
+	}
+
+	public void setCurrentThumbnail(File newThumbnail) {
+		this.currentThumbnail = newThumbnail;
 	}
 }

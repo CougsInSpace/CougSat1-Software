@@ -3,22 +3,26 @@ package space.cougs.ground.gui.subsystems;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
+import java.util.Iterator;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
 
 import space.cougs.ground.gui.UIScaling;
+import space.cougs.ground.gui.subsystems.modules.MetaData;
+import space.cougs.ground.gui.subsystems.modules.PhotoViewer;
 import space.cougs.ground.gui.subsystems.modules.ThumbnailGrid;
 import space.cougs.ground.gui.subsystems.modules.TitleLabel;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
-import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;
 import space.cougs.ground.satellites.CougSat;
 
 public class Plant extends JPanel implements UIScaling, SatelliteInfo {
@@ -28,9 +32,13 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 	private static final double thumbnailWidthFactor = 0.3;
 
 	private static final ThumbnailGrid thumbnailGrid = new ThumbnailGrid(2);
-	private static final JPanel photoViewer = new JPanel();
-	
+	private static final PhotoViewer photoViewer = new PhotoViewer();
+	MetaData meta = new MetaData();
 	private int border = 10;
+
+	private static final File photo = new File("packets/images/image_thumbnail.png");
+	private static final File highRes = new File("packets/images/image.png");
+	private static final File test = new File("packets/images/P2090193.JPG");
 
 	private final ComponentListener componentListener = new ComponentListener() {
 
@@ -46,7 +54,8 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 		public void componentResized(ComponentEvent e) {
 			int thumbnailWidth = (int) (getWidth() * thumbnailWidthFactor);
 			thumbnailGrid.setBounds(border, border, thumbnailWidth - border * 2, getHeight() - border * 2);
-			photoViewer.setBounds(thumbnailWidth, border, getWidth() - thumbnailWidth - border, getHeight() - border * 2);
+			photoViewer.setBounds(thumbnailWidth, border, getWidth() - thumbnailWidth - border,
+					getHeight() - border * 2);
 			repaint();
 		}
 
@@ -67,14 +76,37 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 //	    showFiles(files);
 
 		thumbnailGrid.setBackground(CustomColors.BACKGROUND2);
-
 		photoViewer.setBackground(CustomColors.BACKGROUND2);
 
 		this.add(thumbnailGrid);
 		this.add(photoViewer);
 
 		this.setBackground(CustomColors.BACKGROUND1);
+
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(highRes);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(photo);
+		thumbnailGrid.addThumbnail(test);
+		thumbnailGrid.addActionListner(actionListener);
+
 	}
+
+	private ActionListener actionListener = new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			photoViewer.setThumbnail(thumbnailGrid.getCurrentThumbnail());
+			
+			Metadata meta = ImageMetadataReader.readMetadata(thumbnailGrid.getCurrentThumbnail());
+		}
+	};
 
 	public static void showFiles(File[] files) {
 		for (File file : files) {
@@ -144,18 +176,7 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 
 	@Override
 	public void updateSatellite(CougSat satellite) {
-		File photo = new File("packets/images/image_thumbnail.png");
-		thumbnailGrid.addThumbnail(photo);
-		thumbnailGrid.addThumbnail(photo);
-		thumbnailGrid.addThumbnail(photo);
-		thumbnailGrid.addThumbnail(photo);
-		thumbnailGrid.addThumbnail(photo);
-		thumbnailGrid.addThumbnail(photo);
-		thumbnailGrid.addThumbnail(photo);
-		thumbnailGrid.addThumbnail(photo);
-		thumbnailGrid.addThumbnail(photo);
+		// TODO Auto-generated method stub
 
-		this.repaint();
 	}
-
 }
