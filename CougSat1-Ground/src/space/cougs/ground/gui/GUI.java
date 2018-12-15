@@ -4,6 +4,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -16,7 +19,7 @@ import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.satellites.CougSat;
 import space.cougs.ground.satellites.CougSat1;
 
-public class GUI extends JPanel implements UIScaling {
+public class GUI implements UIScaling {
 
 	private static final long serialVersionUID = 1L;
 	private static final int defaultHeight = 650;
@@ -26,45 +29,6 @@ public class GUI extends JPanel implements UIScaling {
 	private final JTabbedPane mainPanel = new JTabbedPane();
 	private final JPanel home = new Home();
 	private final JFrame mainFrame;
-
-
-	private final ComponentListener componentListener = new ComponentListener() {
-
-		@Override
-		public void componentResized(ComponentEvent e) {
-
-			int height = mainFrame.getHeight();
-			int width = mainFrame.getWidth();
-
-			if (height > defaultHeight * 3 && width > defaultWidth * 3) {
-				updateUIScaling(UIScale.SCALE_300);
-			} else if (height > defaultHeight * 2 && width > defaultWidth * 2) {
-				updateUIScaling(UIScale.SCALE_200);
-			} else if (height > defaultHeight * 1.5 && width > defaultWidth * 1.5) {
-				updateUIScaling(UIScale.SCALE_150);
-			} else if (height > defaultHeight && width > defaultWidth) {
-				updateUIScaling(UIScale.SCALE_100);
-			} else {
-				updateUIScaling(UIScale.SCALE_75);
-			}
-		}
-
-		@Override
-		public void componentHidden(ComponentEvent e) { // not needed
-
-		}
-
-		@Override
-		public void componentMoved(ComponentEvent e) { // not needed
-
-		}
-
-		@Override
-		public void componentShown(ComponentEvent e) { // not needed
-
-		}
-
-	};
 
 	public GUI() {
 		super();
@@ -92,6 +56,48 @@ public class GUI extends JPanel implements UIScaling {
 		mainFrame.setVisible(true); // makes GUI visible to user / makes visible
 		mainFrame.addComponentListener(componentListener);
 	}
+	
+	private final ComponentListener componentListener = new ComponentListener() {
+
+		
+		@Override
+		public void componentResized(ComponentEvent e) {
+
+			int height = mainFrame.getHeight();
+			int width = mainFrame.getWidth();
+
+			if (height > defaultHeight * 3 && width > defaultWidth * 3) {
+				updateUIScaling(UIScale.SCALE_300);
+			} else if (height > defaultHeight * 2 && width > defaultWidth * 2) {
+				updateUIScaling(UIScale.SCALE_200);
+			} else if (height > defaultHeight * 1.5 && width > defaultWidth * 1.5) {
+				updateUIScaling(UIScale.SCALE_150);
+			} else if (height > defaultHeight && width > defaultWidth) {
+				updateUIScaling(UIScale.SCALE_100);
+			} else {
+				updateUIScaling(UIScale.SCALE_75);
+			}
+			mainFrame.repaint();
+		}
+
+		@Override
+		public void componentHidden(ComponentEvent e) { // not needed
+
+		}
+
+		@Override
+		public void componentMoved(ComponentEvent e) { // not needed
+
+		}
+
+		@Override
+		public void componentShown(ComponentEvent e) { // not needed
+
+		}
+
+	};
+
+
 
 	@Override
 	public void updateUIScaling(UIScale uiScale) {

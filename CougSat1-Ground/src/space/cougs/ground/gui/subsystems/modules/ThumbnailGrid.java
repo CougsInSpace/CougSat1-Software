@@ -42,7 +42,6 @@ public class ThumbnailGrid extends JPanel {
 	public ThumbnailGrid(int columns) {
 		this.columns = columns;
 		this.addMouseMotionListener(mouseMotionListener);
-		this.addComponentListener(componentListener);
 		this.addMouseListener(mouseListener);
 	}
 	
@@ -122,32 +121,6 @@ public class ThumbnailGrid extends JPanel {
 
 	};
 
-	private final ComponentListener componentListener = new ComponentListener() {
-
-		@Override
-		public void componentHidden(ComponentEvent e) {
-		}
-
-		@Override
-		public void componentMoved(ComponentEvent e) {
-		}
-
-		@Override
-		public void componentResized(ComponentEvent e) {
-			squareLength = (getWidth() - barWidth) / columns;
-			gridHeight = (int) (squareLength * Math.max(1, Math.ceil((double) thumbnails.size() / columns)));
-			scrollBar.setSize(barWidth, getHeight() * getHeight() / gridHeight);
-			scrollBar.x = squareLength * 2;
-		}
-
-		@Override
-		public void componentShown(ComponentEvent e) {
-			this.componentResized(e);
-		}
-	};
-
-	
-
 	public void addThumbnail(File thumbnail) {
 		try {
 			thumbnailFile.add(thumbnail);
@@ -165,6 +138,12 @@ public class ThumbnailGrid extends JPanel {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(CustomColors.TEXT1);
+		
+		squareLength = (getWidth() - barWidth) / columns;
+		gridHeight = (int) (squareLength * Math.max(1, Math.ceil((double) thumbnails.size() / columns)));
+		scrollBar.setSize(barWidth, getHeight() * getHeight() / gridHeight);
+		scrollBar.x = squareLength * 2;
+		
 		int y = (int) (-squareLength - scrollPosition * Math.max(0, gridHeight - this.getHeight()));
 		for (int i = 0; i < thumbnails.size(); i++) {
 			if (i % columns == 0) {
@@ -180,6 +159,7 @@ public class ThumbnailGrid extends JPanel {
 
 		g2d.setColor(CustomColors.BAR_DEFAULT);
 		g2d.fill(scrollBar);
+		this.repaint();
 	}
 
 	public File getCurrentThumbnail() {
@@ -189,4 +169,5 @@ public class ThumbnailGrid extends JPanel {
 	public void setCurrentThumbnail(File newThumbnail) {
 		this.currentThumbnail = newThumbnail;
 	}
+	
 }
