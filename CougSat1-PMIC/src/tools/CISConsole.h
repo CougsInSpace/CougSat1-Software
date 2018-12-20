@@ -22,12 +22,10 @@
 
 #include "mbed.h"
 #include "SWO.h"
-#include "IHU.h"
 
 //#define NDEBUG
 
 extern SWO_Channel swo;
-extern Serial umbilical;
 
 /**
  * Prints to the SWO port as follows:
@@ -40,18 +38,5 @@ extern Serial umbilical;
 #else
 #define DEBUG(o, ...) {}
 #endif
-
-/**
- * Prints to the umbilical USART port as follows:
- * "[time stamp] object name: message"
- * @param o name of the class or function
- * @param args... standard printf arguments
- */
-#define CONSOLE_TX(o, args...) {umbilical.printf("[%7lu] %10s: ", HAL_GetTick(), o); umbilical.printf(args); umbilical.putc('\n');}
-
-/**
- * Clears the console's screen
- */
-#define CONSOLE_CLR {umbilical.putc(27); umbilical.printf("[2J"); umbilical.putc(27); umbilical.printf("[H");}
 
 #endif /* SRC_TOOLS_CISCONSOLE_H_ */
