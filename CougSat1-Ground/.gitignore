@@ -1,2 +1,6 @@
 # Class build output
-/bin/classes
+/bin/*
+!*.jar
+
+# Settings
+.settings
