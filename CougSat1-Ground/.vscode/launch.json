@@ -9,7 +9,6 @@
             "name": "Debug (Launch)-CougSatGround",
             "request": "launch",
             "mainClass": "space.cougs.ground.CougSatGround",
-            "projectName": "utils",
             "vmArgs": "-splash:resources\\images\\Splash.png"
         }
     ]
