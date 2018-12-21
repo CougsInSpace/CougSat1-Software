@@ -1,2 +1,2 @@
 @echo off
-start javaw -jar bin\CougSat1-Ground.jar
+start javaw -splash:resources\images\Splash.png -jar bin\CougSat1-Ground.jar

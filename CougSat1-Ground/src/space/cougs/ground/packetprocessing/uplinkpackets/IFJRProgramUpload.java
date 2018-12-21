@@ -3,7 +3,7 @@ package space.cougs.ground.packetprocessing.uplinkpackets;
 import java.io.File;
 import java.io.IOException;
 
-import com.sun.jmx.snmp.Timestamp;
+// import com.sun.jmx.snmp.Timestamp;
 
 public class IFJRProgramUpload extends UplinkPacket {
 
@@ -25,12 +25,12 @@ public class IFJRProgramUpload extends UplinkPacket {
 		// return null;
 		// }
 		//
-		Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
+		//Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 		// File programFile = new File(programPath);
 		//
 		// long programLength = programFile.length();
 		//
-		String folderPath = "UplinkPackets/" + timeStamp.toString() + "/";
+		String folderPath = "UplinkPackets/";// + timeStamp.toString() + "/";
 		File destination = new File(folderPath);
 		destination.mkdirs();
 		//
