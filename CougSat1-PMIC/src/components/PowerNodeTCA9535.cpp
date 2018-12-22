@@ -29,14 +29,14 @@
  * @param switchA control pin on the GPIO
  * @param switchB control pin on the GPIO
  */
-PowerNodeTCA9535::PowerNodeTCA9535(LTC2499 &adc, LTC2499Channel_t channel,
-                                   double shunt, TCA9535 &gpio,
-                                   GPIOExpanderPin_t switchA,
-                                   GPIOExpanderPin_t switchB)
-    : PowerNode(adc, channel, shunt), gpio(gpio) {
+PowerNodeTCA9535::PowerNodeTCA9535(LTC2499 & adc, LTC2499Channel_t channel,
+    double shunt, TCA9535 & gpio, GPIOExpanderPin_t switchA,
+    GPIOExpanderPin_t switchB) :
+  PowerNode(adc, channel, shunt),
+  gpio(gpio) {
   this->switchA = switchA;
   this->switchB = switchB;
-  // setSwitch(false, false)
+  setSwitch(false, false);
 }
 
 /**

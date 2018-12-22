@@ -10,7 +10,7 @@
  * @file Events.h
  * @author Bradley Davis
  * @date 7 Nov 2018
- * @brief List of events 
+ * @brief List of events
  *
  */
 

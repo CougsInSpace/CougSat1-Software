@@ -23,18 +23,21 @@
 
 class PowerNode {
 public:
-  PowerNode(LTC2499 &adc, LTC2499Channel_t channel, double shunt);
-  void getSwitch(bool *pathA, bool *pathB);
-  uint8_t getCurrent(double *current);
+  PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt);
+
+  uint8_t getCurrent(double * current);
+
+  void    getSwitch(bool * pathA, bool * pathB);
   uint8_t setSwitch(bool pathA, bool pathB);
 
 private:
-  LTC2499 &adc;
+  LTC2499 & adc;
+
   LTC2499Channel_t channel;
 
   double shunt;
-  bool pathA;
-  bool pathB;
+  bool   pathA;
+  bool   pathB;
 };
 
 #endif /* _SRC_COMPONENTS_POWER_NODE_H_ */

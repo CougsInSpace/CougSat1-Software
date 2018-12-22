@@ -25,14 +25,14 @@
 
 class PowerNodeTCA9535 : public PowerNode {
 public:
-  PowerNodeTCA9535(LTC2499 &adc, LTC2499Channel_t channel, double shunt,
-                   TCA9535 &gpio, GPIOExpanderPin_t switchA,
-                   GPIOExpanderPin_t switchB);
+  PowerNodeTCA9535(LTC2499 & adc, LTC2499Channel_t channel, double shunt,
+      TCA9535 & gpio, GPIOExpanderPin_t switchA, GPIOExpanderPin_t switchB);
 
   uint8_t setSwitch(bool pathA, bool pathB);
 
 private:
-  TCA9535 &gpio;
+  TCA9535 & gpio;
+
   GPIOExpanderPin_t switchA;
   GPIOExpanderPin_t switchB;
 };

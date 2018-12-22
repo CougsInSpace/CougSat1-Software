@@ -22,4 +22,6 @@
  *
  * @return uint8_t error code
  */
-uint8_t eventPeriodic() { return ERROR_NOT_SUPPORTED; }
+uint8_t eventPeriodic() {
+  return ERROR_NOT_SUPPORTED;
+}

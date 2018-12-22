@@ -26,12 +26,12 @@
  * @param channel connected to the shunt
  * @param shunt resistance
  */
-PowerNode::PowerNode(LTC2499 &adc, LTC2499Channel_t channel, double shunt)
-    : adc(adc) {
+PowerNode::PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt) :
+  adc(adc) {
   this->channel = channel;
-  this->shunt = shunt;
-  this->pathA = false;
-  this->pathB = false;
+  this->shunt   = shunt;
+  this->pathA   = false;
+  this->pathB   = false;
 }
 
 /**
@@ -40,7 +40,7 @@ PowerNode::PowerNode(LTC2499 &adc, LTC2499Channel_t channel, double shunt)
  * @param pathA is connected if true
  * @param pathB is connected if true
  */
-void PowerNode::getSwitch(bool *pathA, bool *pathB) {
+void PowerNode::getSwitch(bool * pathA, bool * pathB) {
   *(pathA) = this->pathA;
   *(pathB) = this->pathB;
 }
@@ -51,7 +51,7 @@ void PowerNode::getSwitch(bool *pathA, bool *pathB) {
  * @param current to read into
  * @return uint8_t error code
  */
-uint8_t PowerNode::getCurrent(double *current) {
+uint8_t PowerNode::getCurrent(double * current) {
   // Read ADC to get voltage
   // current = voltage / shunt
   return ERROR_NOT_SUPPORTED;

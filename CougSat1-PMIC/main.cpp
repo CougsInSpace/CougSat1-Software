@@ -39,9 +39,10 @@ uint8_t initialize() {
  * @return uint8_t error code
  */
 uint8_t run() {
-  uint32_t nextADCEvent = HAL_GetTick() + PERIOD_MS_ADC_UPDATE;
+  uint32_t nextADCEvent      = HAL_GetTick() + PERIOD_MS_ADC_UPDATE;
   uint32_t nextPeriodicEvent = HAL_GetTick() + PERIOD_MS_PERIODIC;
-  uint32_t now = HAL_GetTick();
+  uint32_t now               = HAL_GetTick();
+
   uint8_t result = 0;
   while (true) {
     if (busMessage) {
@@ -61,7 +62,7 @@ uint8_t run() {
     }
     now = HAL_GetTick();
     if (now >= nextPeriodicEvent && (nextPeriodicEvent >= PERIOD_MS_PERIODIC ||
-                                     now <= PERIOD_MS_PERIODIC)) {
+                                        now <= PERIOD_MS_PERIODIC)) {
       result = eventPeriodic();
       if (result != ERROR_SUCCESS) {
         DEBUG("PMIC", "Failed to perform periodic event: %02X", result);

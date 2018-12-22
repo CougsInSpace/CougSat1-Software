@@ -23,7 +23,9 @@
  * @param i2c connected to the GPIO
  * @param addr of the GPIO
  */
-TCA9535::TCA9535(I2C &i2c, uint8_t addr) : i2c(i2c) { this->addr = addr; }
+TCA9535::TCA9535(I2C & i2c, uint8_t addr) : i2c(i2c) {
+  this->addr = addr;
+}
 
 /**
  * @brief Configures the direction, polarity, and value (if output)
@@ -34,8 +36,8 @@ TCA9535::TCA9535(I2C &i2c, uint8_t addr) : i2c(i2c) { this->addr = addr; }
  * @param value is high if true
  * @return uint8_t error code
  */
-uint8_t TCA9535::configurePin(GPIOExpanderPin_t pin, bool input,
-                              bool polarityInversion, bool value) {
+uint8_t TCA9535::configurePin(
+    GPIOExpanderPin_t pin, bool input, bool polarityInversion, bool value) {
   return ERROR_NOT_SUPPORTED;
 }
 
@@ -58,7 +60,7 @@ uint8_t TCA9535::write(GPIOExpanderPin_t pin, bool value) {
  * @param value is high if true
  * @return uint8_t error code
  */
-uint8_t TCA9535::read(GPIOExpanderPin_t pin, bool *value) {
+uint8_t TCA9535::read(GPIOExpanderPin_t pin, bool * value) {
   return ERROR_NOT_SUPPORTED;
 }
 
@@ -80,6 +82,6 @@ uint8_t TCA9535::writeRegister(GPIOExpanderRegister_t reg, uint8_t value) {
  * @param value to read into
  * @return uint8_t error code
  */
-uint8_t TCA9535::readRegister(GPIOExpanderRegister_t reg, uint8_t *value) {
+uint8_t TCA9535::readRegister(GPIOExpanderRegister_t reg, uint8_t * value) {
   return ERROR_NOT_SUPPORTED;
 }
