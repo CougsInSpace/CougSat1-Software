@@ -31,9 +31,7 @@
 PowerNodeDirect::PowerNodeDirect(LTC2499 & adc, LTC2499Channel_t channel,
     double shunt, PinName switchA, PinName switchB) :
   PowerNode(adc, channel, shunt),
-  switchA(switchA), switchB(switchB) {
-  setSwitch(false, false);
-}
+  switchA(switchA), switchB(switchB) {}
 
 /**
  * @brief Disables or enables the switch for either current path
@@ -43,6 +41,7 @@ PowerNodeDirect::PowerNodeDirect(LTC2499 & adc, LTC2499Channel_t channel,
  * @return uint8_t error code
  */
 uint8_t PowerNodeDirect::setSwitch(bool pathA, bool pathB) {
-  // change each switch accordingly
-  return ERROR_NOT_SUPPORTED;
+  switchA.write(pathA);
+  switchB.write(pathB);
+  return ERROR_SUCCESS;
 }

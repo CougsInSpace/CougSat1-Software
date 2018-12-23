@@ -27,8 +27,9 @@ public:
 
   uint8_t getCurrent(double * current);
 
-  void    getSwitch(bool * pathA, bool * pathB);
-  uint8_t setSwitch(bool pathA, bool pathB);
+  void getSwitch(bool * pathA, bool * pathB);
+
+  virtual uint8_t setSwitch(bool pathA, bool pathB);
 
 private:
   LTC2499 & adc;

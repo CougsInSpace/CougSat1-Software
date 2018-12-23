@@ -23,6 +23,15 @@
 #define PERIOD_MS_ADC_UPDATE (150) // Read next active channels on ADCs
 #define PERIOD_MS_PERIODIC (5000)  // The periodic event
 
+/******************************** Array Counts ********************************/
+#define COUNT_PV (8)
+#define COUNT_PR_3V3 (13)
+#define COUNT_PR_BATT (7)
+#define COUNT_PV_3V3 (4)
+#define COUNT_BH (2)
+#define COUNT_THERM_MPPT (8)
+#define COUNT_THERM_BOARD (12)
+
 /******************************** Solar Panel *********************************/
 #define SHUNT_PVIN_0A (0.05)
 #define SHUNT_PVIN_0B (0.05)

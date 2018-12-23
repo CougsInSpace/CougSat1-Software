@@ -28,9 +28,56 @@ volatile bool busMessage = false;
  * @return uint8_t error code
  */
 uint8_t initialize() {
-  DEBUG("PMIC", "Initialization starting");
-  DEBUG("PMIC", "Initialization complete");
-  return ERROR_NOT_SUPPORTED;
+  DEBUG("Init", "Initialization starting");
+  uint8_t result = 0;
+
+  bool pathA = true;
+  bool pathB = false;
+  DEBUG("Init", "All power nodes are A: %s, B %s", pathA ? "on" : "off",
+      pathB ? "on" : "off");
+  for (int i = 0; i < COUNT_PV; i++) {
+    result = nodesPVOut[i]->setSwitch(pathA, pathB);
+    if (result != ERROR_SUCCESS) {
+      DEBUG("Init", "Failed to switch nodesPVOut[%d]: 0x%02X", i, result);
+      return result;
+    }
+  }
+  for (int i = 0; i < COUNT_PR_3V3; i++) {
+    result = nodesPR3V3[i]->setSwitch(pathA, pathB);
+    if (result != ERROR_SUCCESS) {
+      DEBUG("Init", "Failed to switch nodesPR3V3[%d]: 0x%02X", i, result);
+      return result;
+    }
+  }
+  for (int i = 0; i < COUNT_PR_BATT; i++) {
+    result = nodesPRBatt[i]->setSwitch(pathA, pathB);
+    if (result != ERROR_SUCCESS) {
+      DEBUG("Init", "Failed to switch nodesPRBatt[%d]: 0x%02X", i, result);
+      return result;
+    }
+  }
+  for (int i = 0; i < COUNT_PV_3V3; i++) {
+    result = nodesPV3V3[i]->setSwitch(pathA, pathB);
+    if (result != ERROR_SUCCESS) {
+      DEBUG("Init", "Failed to switch nodesPV3V3[%d]: 0x%02X", i, result);
+      return result;
+    }
+  }
+  for (int i = 0; i < COUNT_BH; i++) {
+    result = nodesBH[i]->setSwitch(pathA, pathB);
+    if (result != ERROR_SUCCESS) {
+      DEBUG("Init", "Failed to switch nodesBH[%d]: 0x%02X ", i, result);
+      return result;
+    }
+  }
+  result = nodeDeployables.setSwitch(pathA, pathB);
+  if (result != ERROR_SUCCESS) {
+    DEBUG("Init", "Failed to switch nodeDeployable: 0x%02X", result);
+    return result;
+  }
+
+  DEBUG("Init", "Initialization complete");
+  return ERROR_SUCCESS;
 }
 
 /**
@@ -48,7 +95,7 @@ uint8_t run() {
     if (busMessage) {
       result = cdh.processMessage();
       if (result != ERROR_SUCCESS) {
-        DEBUG("PMIC", "Failed to process message from the bus: %02X", result);
+        DEBUG("Run", "Failed to process message from the bus: 0x%02X", result);
       }
     }
     now = HAL_GetTick();
@@ -56,7 +103,7 @@ uint8_t run() {
         (nextADCEvent >= PERIOD_MS_ADC_UPDATE || now <= PERIOD_MS_ADC_UPDATE)) {
       result = eventADC();
       if (result != ERROR_SUCCESS) {
-        DEBUG("PMIC", "Failed to perform ADC event: %02X", result);
+        DEBUG("Run", "Failed to perform ADC event: 0x%02X", result);
       }
       nextADCEvent = HAL_GetTick() + PERIOD_MS_ADC_UPDATE;
     }
@@ -65,7 +112,7 @@ uint8_t run() {
                                         now <= PERIOD_MS_PERIODIC)) {
       result = eventPeriodic();
       if (result != ERROR_SUCCESS) {
-        DEBUG("PMIC", "Failed to perform periodic event: %02X", result);
+        DEBUG("Run", "Failed to perform periodic event: 0x%02X", result);
       }
       nextPeriodicEvent = HAL_GetTick() + PERIOD_MS_PERIODIC;
     }
@@ -81,12 +128,14 @@ uint8_t run() {
 int main(void) {
   uint8_t result = initialize();
   if (result != ERROR_SUCCESS) {
-    DEBUG("PMIC", "Failed to initialize PMIC: %02X", result);
+    DEBUG("PMIC", "Failed to initialize PMIC: 0x%02X", result);
+    return result;
   }
 
   result = run();
   if (result != ERROR_SUCCESS) {
-    DEBUG("PMIC", "Failed to run main loop: %02X", result);
+    DEBUG("PMIC", "Failed to run main loop: 0x%02X", result);
+    return result;
   }
   return result;
 }

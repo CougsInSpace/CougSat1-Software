@@ -36,7 +36,6 @@ PowerNodeTCA9535::PowerNodeTCA9535(LTC2499 & adc, LTC2499Channel_t channel,
   gpio(gpio) {
   this->switchA = switchA;
   this->switchB = switchB;
-  setSwitch(false, false);
 }
 
 /**
@@ -47,6 +46,13 @@ PowerNodeTCA9535::PowerNodeTCA9535(LTC2499 & adc, LTC2499Channel_t channel,
  * @return uint8_t error code
  */
 uint8_t PowerNodeTCA9535::setSwitch(bool pathA, bool pathB) {
-  // change each switch accordingly
-  return ERROR_NOT_SUPPORTED;
+  uint8_t result = gpio.write(switchA, pathA);
+  if (result != ERROR_SUCCESS) {
+    return result;
+  }
+  result = gpio.write(switchB, pathB);
+  if (result != ERROR_SUCCESS) {
+    return result;
+  }
+  return ERROR_SUCCESS;
 }

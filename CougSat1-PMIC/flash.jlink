@@ -1,0 +1,2 @@
+loadfile BUILD/NUCLEO_L476RG/GCC_ARM/CougSat1-PMIC.bin  
+exit

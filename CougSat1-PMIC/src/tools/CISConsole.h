@@ -20,8 +20,8 @@
 #ifndef SRC_TOOLS_CISCONSOLE_H_
 #define SRC_TOOLS_CISCONSOLE_H_
 
-#include "mbed.h"
 #include "SWO.h"
+#include "mbed.h"
 
 //#define NDEBUG
 
@@ -34,9 +34,15 @@ extern SWO_Channel swo;
  * @param args... standard printf arguments
  */
 #ifndef NDEBUG
-#define DEBUG(o, args...) {swo.printf("[%07lu] %10s: ", HAL_GetTick(), o); swo.printf(args); swo.putc('\n');}
+#define DEBUG(o, args...)                                                      \
+  {                                                                            \
+    swo.printf("[%07lu] %-10s: ", HAL_GetTick(), o);                           \
+    swo.printf(args);                                                          \
+    swo.putc('\n');                                                            \
+  }
 #else
-#define DEBUG(o, ...) {}
+#define DEBUG(o, ...)                                                          \
+  {}
 #endif
 
 #endif /* SRC_TOOLS_CISCONSOLE_H_ */
