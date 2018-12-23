@@ -199,8 +199,8 @@ public class EPS extends JPanel implements UIScaling, SatelliteInfo {
 		int i = 0;
 		for (SolarPanel solarPanel : solarPanels) {
 
-			solarPanel.setVoltage(satellite.getPVVoltage(i));
-			solarPanel.setCurrent(satellite.getPVCurrent(i));
+			solarPanel.setVoltage(satellite.getEPS().getPVVoltage(i));
+			solarPanel.setCurrent(satellite.getEPS().getPVCurrent(i));
 			i++;
 		}
 	}

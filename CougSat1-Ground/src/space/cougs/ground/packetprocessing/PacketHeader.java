@@ -16,72 +16,71 @@ import space.cougs.ground.satellites.CougSat;
 import space.cougs.ground.utils.CISErrors;
 
 public class PacketHeader {
+  private static final int MASK_COMMAND_ID = 0x1F;
+  private static final int MASK_SENDER_ID  = 0xE0;
 
-	private final List<CougSat> satellites = new ArrayList<CougSat>();
-	private DownlinkPacket currentPacket;
-	private static int firstByte = -1;
-	private static final int MASK_COMMAND_ID = 0x1F;
-	private static final int MASK_SENDER_ID = 0xE0;//
+  private final List<CougSat> satellites = new ArrayList<CougSat>();
 
-	public PacketHeader() {
+  private DownlinkPacket currentPacket;
 
-	}
+  public PacketHeader() {}
 
-	public boolean decodePacketSwitcher(String filePath) {
+  public CISErrors decodePacket(String filePath) {
+    File file = new File(filePath);
+    if (!file.exists()) {
+      System.out.printf("Decoding packet file not found: %s\n", filePath);
+      return CISErrors.FILE_NOT_FOUND;
+    }
 
-		File file = new File(filePath);
+    int buf = 0;
 
-		try {
+    try {
+      FileInputStream inFile = new FileInputStream(file);
 
-			FileInputStream inFile = new FileInputStream(file);
+      buf = inFile.read();
 
-			firstByte = inFile.read();
+      inFile.close();
 
-			inFile.close();
+    } catch (IOException e) {
+      System.out.printf("Failed to read file for packet decoding: %s\n",
+          file.getAbsolutePath());
+      e.printStackTrace();
+    }
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (firstByte == -1) {
-			System.out.printf("Error %d - %s %s", CISErrors.FILE_NOT_FOUND, CISErrors.FILE_NOT_FOUND.toString(),
-					filePath);
-			return false;
-		}
+    switch (buf & MASK_COMMAND_ID) {
+      case Telemetry.ID:
+        currentPacket = new Telemetry();
+        break;
+      case RadioConfiguration.ID:
+        currentPacket = new RadioConfiguration();
+        break;
+      case Payload1Configuration.ID:
+        currentPacket = new Payload1Configuration();
+        break;
+      case Payload2Configuration.ID:
+        currentPacket = new Payload2Configuration();
+        break;
+      case Payload3Configuration.ID:
+        currentPacket = new Payload3Configuration();
+        break;
+    }
 
-		switch (firstByte & MASK_COMMAND_ID) {
+    for (CougSat satellite : satellites) {
+      if (satellite.getID() == (buf & MASK_SENDER_ID)) {
+        try {
+          return currentPacket.decodePacket(file, satellite);
+        } catch (IOException e) {
+          System.out.printf("%s failed to decode %s packet from %s\n",
+              satellite.toString(), currentPacket.toString(),
+              file.getAbsolutePath());
+          e.printStackTrace();
+        }
+      }
+    }
+    return CISErrors.SUCCESS;
+  }
 
-		case Telemetry.ID:
-			currentPacket = new Telemetry();
-			break;
-		case RadioConfiguration.ID:
-			break;
-		case Payload1Configuration.ID:
-			break;
-		case Payload2Configuration.ID:
-			break;
-		case Payload3Configuration.ID:
-			break;
-		}
-
-		for (CougSat satellite : satellites) {
-			if (satellite.getID() == (firstByte & MASK_SENDER_ID)) {
-
-				try {
-					return currentPacket.decodePacket(file, satellite);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		return false;
-	}
-
-	public void addSatellite(CougSat satellite) {
-
-		satellites.add(satellite);
-
-	}
-
+  public void addSatellite(CougSat satellite) {
+    satellites.add(satellite);
+  }
 }

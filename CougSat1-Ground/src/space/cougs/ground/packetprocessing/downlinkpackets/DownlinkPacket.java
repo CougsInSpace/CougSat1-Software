@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import space.cougs.ground.satellites.CougSat;
+import space.cougs.ground.utils.CISErrors;
 
 public abstract class DownlinkPacket {
-
-	public abstract boolean decodePacket(File file, CougSat satellite) throws IOException;
-
+  public abstract CISErrors decodePacket(File file, CougSat satellite)
+      throws IOException;
 }

@@ -79,12 +79,12 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 		earthPanel.add(new JLabel("Latitude"),
 				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
 		earthPanel.add(lattCoordinates, gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
-		earthPanel.add(new JLabel("°N"), gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
+		earthPanel.add(new JLabel("ï¿½N"), gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
 
 		earthPanel.add(new JLabel("Longitude"),
 				gbc.setLocation(0, 1).setSize(1, 1).setWeight(0.0, 0.0));
 		earthPanel.add(longCoordinates, gbc.setLocation(1, 1).setSize(1, 1));
-		earthPanel.add(new JLabel("°E"), gbc.setLocation(2, 1).setSize(1, 1));
+		earthPanel.add(new JLabel("ï¿½E"), gbc.setLocation(2, 1).setSize(1, 1));
 
 		earthPanel.add(new JButton("Transmit"),
 				gbc.setLocation(0, 2).setSize(3, 1).setWeight(1.0, 0.0));
@@ -96,14 +96,14 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0));
 		celestialPanel.add(rightAscensionCoordinates,
 				gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
-		celestialPanel.add(new JLabel("°"),
+		celestialPanel.add(new JLabel("ï¿½"),
 				gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
 
 		celestialPanel.add(new JLabel("Left Ascension"),
 				gbc.setLocation(0, 1).setSize(1, 1).setWeight(0.0, 0.0));
 		celestialPanel.add(leftAscensionCoordinates,
 				gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 0.0));
-		celestialPanel.add(new JLabel("°"),
+		celestialPanel.add(new JLabel("ï¿½"),
 				gbc.setLocation(2, 1).setSize(1, 1).setWeight(0.0, 0.0));
 
 		celestialPanel.add(new JButton("Transmit"),
@@ -116,21 +116,21 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0));
 		attitudePanel.add(rollCoordinates,
 				gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
-		attitudePanel.add(new JLabel("°"),
+		attitudePanel.add(new JLabel("ï¿½"),
 				gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
 
 		attitudePanel.add(new JLabel("Pitch"),
 				gbc.setLocation(0, 1).setSize(1, 1).setWeight(0.0, 0.0));
 		attitudePanel.add(pitchCoordinates,
 				gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 0.0));
-		attitudePanel.add(new JLabel("°"),
+		attitudePanel.add(new JLabel("ï¿½"),
 				gbc.setLocation(2, 1).setSize(1, 1).setWeight(0.0, 0.0));
 
 		attitudePanel.add(new JLabel("Yaw"),
 				gbc.setLocation(0, 2).setSize(1, 1).setWeight(0.0, 0.0));
 		attitudePanel.add(yawCoordinates,
 				gbc.setLocation(1, 2).setSize(1, 1).setWeight(1.0, 0.0));
-		attitudePanel.add(new JLabel("°"),
+		attitudePanel.add(new JLabel("ï¿½"),
 				gbc.setLocation(2, 2).setSize(1, 1).setWeight(0.0, 0.0));
 		attitudePanel.add(new JButton("Transmit"),
 				gbc.setLocation(0, 3).setSize(3, 1).setWeight(1.0, 0.0));
@@ -265,18 +265,18 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 
 	@Override
 	public void updateSatellite(CougSat satellite) {
-		map.setValue(satellite.getLattitude(), satellite.getLongitude());
+		map.setValue(satellite.getADCS().getLatitude(), satellite.getADCS().getLongitude());
 
-		adcsTemp.setValue(String.format(" %d°C", satellite.getADCSTemp()));
-		roll.setValue(String.format(" %6.2f°", satellite.getRoll()));
-		pitch.setValue(String.format(" %6.2f°", satellite.getPitch()));
-		yaw.setValue(String.format(" %6.2f°", satellite.getYaw()));
-		xPWMOut.setValue(String.format(" %d", satellite.getXPWMOut()));
-		yPWMOut.setValue(String.format(" %d", satellite.getYPWMOut()));
-		zPWMOut.setValue(String.format(" %d", satellite.getZPWMOut()));
-		xCurrent.setValue(String.format(" %fA", satellite.getXCurrent()));
-		yCurrent.setValue(String.format(" %fA", satellite.getYCurrent()));
-		zCurrent.setValue(String.format(" %fA", satellite.getZCurrent()));
+		adcsTemp.setValue(String.format(" %dï¿½C", satellite.getECS().getADCSTemp()));
+		roll.setValue(String.format(" %6.2fï¿½", satellite.getADCS().getRoll()));
+		pitch.setValue(String.format(" %6.2fï¿½", satellite.getADCS().getPitch()));
+		yaw.setValue(String.format(" %6.2fï¿½", satellite.getADCS().getYaw()));
+		xPWMOut.setValue(String.format(" %d", satellite.getADCS().getXPWMOut()));
+		yPWMOut.setValue(String.format(" %d", satellite.getADCS().getYPWMOut()));
+		zPWMOut.setValue(String.format(" %d", satellite.getADCS().getZPWMOut()));
+		xCurrent.setValue(String.format(" %fA", satellite.getADCS().getXCurrent()));
+		yCurrent.setValue(String.format(" %fA", satellite.getADCS().getYCurrent()));
+		zCurrent.setValue(String.format(" %fA", satellite.getADCS().getZCurrent()));
 
 	}
 

@@ -5,8 +5,10 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -62,13 +64,13 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 
 	private final List<SingleVerticalBarGraph> pvTemps = new ArrayList<SingleVerticalBarGraph>();
 
-	private final SingleVerticalBarGraph avgPVVoltageIn = new SingleVerticalBarGraph(" PV V ", 0, 3, 10, 0.5, false,
+	private final SingleVerticalBarGraph avgPVVoltage = new SingleVerticalBarGraph(" PV V ", 0, 3, 10, 0.5, false,
 			0.7, 0.3, 0.9, 0.1);
 	private final SingleVerticalBarGraph sumPVCurrent = new SingleVerticalBarGraph(" PV I ", 0, 2, 20, 0.5, false, 0.7,
 			0.0, 0.9, 0.0);
 	private final SingleVerticalBarGraph sumPR3V3Current = new SingleVerticalBarGraph("PR-3 I", 0, 8, 10, 0.5, false,
 			0.7, 0.0, 0.9, 0.0);
-	private final SingleVerticalBarGraph sumBatteryPR = new SingleVerticalBarGraph("PR-B I", 0, 8, 10, 0.5, false, 0.7,
+	private final SingleVerticalBarGraph sumPRBattCurrent = new SingleVerticalBarGraph("PR-B I", 0, 8, 10, 0.5, false, 0.7,
 			0.0, 0.9, 0.0);
 	private final SingleVerticalBarGraph sumPV3V3Current = new SingleVerticalBarGraph("PV-3 I", 0, 2, 10, 0.5, false,
 			0.7, 0.0, 0.9, 0.0);
@@ -126,7 +128,7 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 
 		temperature.setLayout(new GridBagLayout());
 
-		temperature.add(new TitleLabel("Temperature (°C)", SwingConstants.CENTER),
+		temperature.add(new TitleLabel("Temperature (ï¿½C)", SwingConstants.CENTER),
 				gbc.setLocation(0, 0).setSize(14, 1).setWeight(0.0, 0.0));
 		temperature.add(ihuTemp, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0));
 		temperature.add(adcsTemp, gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 1.0));
@@ -146,10 +148,10 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 
 		power.add(new TitleLabel("Power", SwingConstants.CENTER),
 				gbc.setLocation(0, 0).setSize(14, 1).setWeight(0.0, 0.0));
-		power.add(avgPVVoltageIn, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(avgPVVoltage, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 1.0));
 		power.add(sumPVCurrent, gbc.setLocation(2, 1).setSize(1, 1).setWeight(1.0, 1.0));
 		power.add(sumPR3V3Current, gbc.setLocation(3, 1).setSize(1, 1).setWeight(1.0, 1.0));
-		power.add(sumBatteryPR, gbc.setLocation(4, 1).setSize(1, 1).setWeight(1.0, 1.0));
+		power.add(sumPRBattCurrent, gbc.setLocation(4, 1).setSize(1, 1).setWeight(1.0, 1.0));
 		power.add(sumPV3V3Current, gbc.setLocation(5, 1).setSize(1, 1).setWeight(1.0, 1.0));
 		power.add(battHeaterA, gbc.setLocation(6, 1).setSize(1, 1).setWeight(1.0, 1.0));
 		power.add(battHeaterB, gbc.setLocation(7, 1).setSize(1, 1).setWeight(1.0, 1.0));
@@ -173,10 +175,10 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 		power.add(new JLabel("Regulator B", SwingConstants.CENTER),
 				gbc.setLocation(7, 4).setSize(2, 1).setWeight(0.0, 0.0));
 
-		avgPVVoltageIn.setToolTipText("Solar Panel Average Voltage In");
+		avgPVVoltage.setToolTipText("Solar Panel Average Voltage In");
 		sumPVCurrent.setToolTipText("Sum of Solar Panel Current");
 		sumPR3V3Current.setToolTipText("Sum of 3.3V Power Rail Currents, Deployables, and Batteries");
-		sumBatteryPR.setToolTipText("Sum of Unregulated Battery Power Rail Currents");
+		sumPRBattCurrent.setToolTipText("Sum of Unregulated Battery Power Rail Currents");
 		sumPV3V3Current.setToolTipText("Sum of Solar Panel 3.3V Current");
 		battHeaterA.setToolTipText("Battery Heater A Current");
 		battHeaterB.setToolTipText("Battery Heater B Current");
@@ -275,46 +277,48 @@ public class Health extends JPanel implements UIScaling, SatelliteInfo {
 	@Override
 	public void updateSatellite(CougSat satellite) {
 
-		mode.setValue(satellite.getMode());
-		time.setValue(satellite.getTime());
-		SD.setValue(String.valueOf(satellite.getSDCard()));
-		reset.setValue(String.valueOf(satellite.getResetCount()));
-		status.setValue(satellite.getErrorStatus().toString());
+		mode.setValue(satellite.getCDH().getMode().name());
+		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		time.setValue(format.format(satellite.getCDH().getTime()));
+		SD.setValue(String.valueOf(satellite.getCDH().getSDCard()));
+		reset.setValue(String.valueOf(satellite.getCDH().getResetCount()));
+		status.setValue(satellite.getCDH().getErrorStatus().toString());
 
-		rx.setValue(satellite.getRXPower() * 1000, CustomColors.BAR_DEFAULT);
-		tx.setValue(satellite.getTXPower() * 1000, CustomColors.BAR_DEFAULT);
-		snr.setValue(satellite.getRXSNR(), CustomColors.BAR_DEFAULT);
+		rx.setValue(satellite.getComms().getRXPower() * 1000, CustomColors.BAR_DEFAULT);
+		tx.setValue(satellite.getComms().getTX700Power() * 1000, CustomColors.BAR_DEFAULT);
+		snr.setValue(satellite.getComms().getRXSNR(), CustomColors.BAR_DEFAULT);
 
-		ihuTemp.setValue(satellite.getIHUTemp());
-		adcsTemp.setValue(satellite.getADCSTemp());
-		ifjrTemp.setValue(satellite.getIFJRTemp());
-		pmicTemp.setValue(satellite.getPMICTemp());
-		commsTemp.setValue(satellite.getCommsTemp());
-		batteryATemp.setValue(satellite.getBatteryATemp());
-		batteryBTemp.setValue(satellite.getBatteryBTemp());
+		ihuTemp.setValue(satellite.getECS().getIHUTemp());
+		adcsTemp.setValue(satellite.getECS().getADCSTemp());
+		ifjrTemp.setValue(satellite.getECS().getIFJRTemp());
+		pmicTemp.setValue(satellite.getECS().getPMICTemp());
+		commsTemp.setValue(satellite.getECS().getCommsTemp());
+		batteryATemp.setValue(satellite.getECS().getBatteryTemp(0));
+		batteryBTemp.setValue(satellite.getECS().getBatteryTemp(1));
 
 		for (int i = 0; i < 8; i++) {
-			pvTemps.get(i).setValue(satellite.getPVTemp(i));
+			pvTemps.get(i).setValue(satellite.getECS().getPVTemp(i));
 		}
 
-		avgPVVoltageIn.setValue(satellite.getPVVoltageIn());
-		sumPVCurrent.setValue(satellite.getPVCurrent());
-		sumPR3V3Current.setValue(satellite.getPR3V3Current());
-		sumBatteryPR.setValue(satellite.getBatteryPR());
-		sumPV3V3Current.setValue(satellite.getPV3V3Current());
+		avgPVVoltage.setValue(satellite.getEPS().getPVVoltageAvg());
+		sumPVCurrent.setValue(satellite.getEPS().getPVCurrentSum());
+		sumPR3V3Current.setValue(satellite.getEPS().getPR3V3CurrentSum());
+		sumPRBattCurrent.setValue(satellite.getEPS().getPRBattCurrentSum());
+		sumPV3V3Current.setValue(satellite.getEPS().getPV3V3CurrentSum());
 
-		battHeaterA.setValue(satellite.getPRBatteryHeaterACurrent());
-		battHeaterB.setValue(satellite.getPRBatteryHeaterBCurrent());
-		prDeployCurrent.setValue(satellite.getPRDeployablesCurrent());
-		battACurrent.setValue(satellite.getBatteryACurrent());
-		battAVoltage.setValue(satellite.getBatteryAVoltage());
-		battBCurrent.setValue(satellite.getBatteryBCurrent());
-		battBVoltage.setValue(satellite.getBatteryBVoltage());
-		regulator3V3AVoltage.setValue(satellite.getReg3V3AVoltage());
-		regulator3V3ACurrent.setValue(satellite.getReg3V3ACurrent());
-		regulator3V3BVoltage.setValue(satellite.getReg3V3BVoltage());
-		regulator3V3BCurrent.setValue(satellite.getReg3V3BCurrent());
+		battHeaterA.setValue(satellite.getEPS().getPRBHCurrent(0));
+		battHeaterB.setValue(satellite.getEPS().getPRBHCurrent(1));
+		prDeployCurrent.setValue(satellite.getEPS().getPRDeployablesCurrent());
+		battACurrent.setValue(satellite.getEPS().getBatteryCurrent(0));
+		battAVoltage.setValue(satellite.getEPS().getBatteryVoltage(0));
+		battBCurrent.setValue(satellite.getEPS().getBatteryCurrent(1));
+		battBVoltage.setValue(satellite.getEPS().getBatteryVoltage(1));
+		regulator3V3AVoltage.setValue(satellite.getEPS().getReg3V3Voltage(0));
+		regulator3V3ACurrent.setValue(satellite.getEPS().getReg3V3Current(0));
+		regulator3V3BVoltage.setValue(satellite.getEPS().getReg3V3Voltage(1));
+		regulator3V3BCurrent.setValue(satellite.getEPS().getReg3V3Current(1));
 
-		map.setValue(satellite.getLattitude(), satellite.getLongitude());
+		map.setValue(satellite.getADCS().getLatitude(), satellite.getADCS().getLongitude());
 	}
 }

@@ -8,6 +8,7 @@ public class CRC32 {
   // polynomial - x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8
   // + x^7 + x^5 + -x^4 + x^2 + x + 1
   private int checkSum = 0xFFFFFFFF;
+
   private static final int[] TABLE = {
 
       0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
@@ -60,18 +61,18 @@ public class CRC32 {
     return checkSum ^ 0xFFFFFFFF;
   }
 
-  public void update(int b) {
-    b = ((checkSum ^ b) & 0xFF);
-    checkSum = (checkSum >>> 8) ^ TABLE[b];
+  public void update(int buf) {
+    buf      = ((checkSum ^ buf) & 0xFF);
+    checkSum = (checkSum >>> 8) ^ TABLE[buf];
   }
 
   public void update(File file) throws IOException {
     FileInputStream inStream = new FileInputStream(file);
 
-    int b;
+    int buf;
 
-    while ((b = inStream.read()) != -1) {
-      update(b);
+    while ((buf = inStream.read()) != -1) {
+      update(buf);
     }
     inStream.close();
   }

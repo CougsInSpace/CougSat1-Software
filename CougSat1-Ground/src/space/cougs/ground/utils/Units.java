@@ -25,18 +25,17 @@ public final class Units {
   }
 
   public static Calendar rawToTime(long raw) {
-    Calendar buff = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    buff.setTimeInMillis(raw * 1000);
-
-    return buff;
+    Calendar buf = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    buf.setTimeInMillis(raw * 1000);
+    return buf;
   }
 
-  public static int rawToTemp(long raw) {
+  public static int rawToTemperature(long raw) {
     return (byte)raw;
   }
 
-  public static double rawToAngle(long raw) {
-    return raw * 360.0 / (1 << 16); // 2^16 = 2Pi
+  public static double rawToEulerAngle(long raw) {
+    return raw * 360.0 / (1 << 16); // 2^16 = 2π
   }
 
   public static double rawToDecibels(long raw) {

@@ -1,7 +1,6 @@
 package space.cougs.ground.utils;
 
 public enum CISErrors {
-
   SUCCESS,
   INVALID_ARGS,
   OUT_OF_MEMORY,
@@ -26,5 +25,5 @@ public enum CISErrors {
   POWER_LIMITED,
   POWER_EMERGENCY,
   COMMS_INTERRUPTED,
-  UNKNOWN_COMMAND;
+  UNKNOWN_COMMAND
 }
