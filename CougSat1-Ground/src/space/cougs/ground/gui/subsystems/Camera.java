@@ -38,10 +38,10 @@ public class Camera extends JPanel implements UIScaling, SatelliteInfo {
 
     itr.listFilesForFolder(imageFile, cameraFolder);
 
-    thumbnailGrid.setBackground(CustomColors.BACKGROUND2);
+    thumbnailGrid.setBackground(CustomColors.BACKGROUND22);
     thumbnailGrid.addActionListner(actionListener);
 
-    photoViewer.setBackground(CustomColors.BACKGROUND2);
+    photoViewer.setBackground(CustomColors.BACKGROUND22);
 
     for (File file : cameraFolder) {
       thumbnailGrid.addThumbnail(file);
@@ -51,7 +51,7 @@ public class Camera extends JPanel implements UIScaling, SatelliteInfo {
     this.add(photoViewer);
 
     this.repaint();
-    this.setBackground(CustomColors.BACKGROUND1);
+    this.setBackground(CustomColors.BACKGROUND12);
   }
 
   private final ComponentListener componentListener = new ComponentListener() {

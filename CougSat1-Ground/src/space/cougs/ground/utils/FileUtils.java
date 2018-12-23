@@ -1,7 +1,11 @@
 package space.cougs.ground.utils;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 public final class FileUtils {
   public static long readNextBytes(FileInputStream file, int numberOfBytes)
@@ -56,5 +60,26 @@ public final class FileUtils {
   public static int readNextTemperature(FileInputStream file)
       throws IOException {
     return Units.rawToTemperature(readNextBytes(file, 1));
+  }
+
+  public static BufferedImage getImage(int size, String name) {
+    return getImage(String.valueOf(size) + "\\" + name);
+  }
+
+  public static BufferedImage getImage(String name) {
+    File file = new File("resources\\images\\" + name);
+    if (!file.exists()) {
+      System.out.printf("Image cannot be found: %s\n", file.getAbsolutePath());
+      return null;
+    }
+    BufferedImage image = null;
+    try {
+      image = ImageIO.read(file);
+    } catch (IOException e) {
+      System.out.printf(
+          "Failed to get image from: %s\n", file.getAbsolutePath());
+      e.printStackTrace();
+    }
+    return image;
   }
 }

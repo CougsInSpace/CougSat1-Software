@@ -81,17 +81,17 @@ public class EPS extends JPanel implements UIScaling, SatelliteInfo {
 
 		powerDistribution.addComponentListener(distributionListener);
 
-		mainPowerPanel.setBackground(CustomColors.BACKGROUND1);
+		mainPowerPanel.setBackground(CustomColors.BACKGROUND12);
 		mainPowerPanel.addTab("   Power Gen    ", powerGeneration);
 		mainPowerPanel.addTab("   Power Dist   ", powerDistribution);
 		mainPowerPanel.setSelectedComponent(powerGeneration);
 
-		powerGeneration.setBackground(CustomColors.BACKGROUND2);
-		powerDistribution.setBackground(CustomColors.BACKGROUND2);
+		powerGeneration.setBackground(CustomColors.BACKGROUND22);
+		powerDistribution.setBackground(CustomColors.BACKGROUND22);
 
-		this.add(mainPowerPanel, gbc.setLocation(0, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(10, 10, 10, 10));
+		this.add(mainPowerPanel, gbc.setXY(0, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(10, 10, 10, 10));
 
-		this.setBackground(CustomColors.BACKGROUND1);
+		this.setBackground(CustomColors.BACKGROUND12);
 	}
 
 	private final ComponentListener generationListener = new ComponentListener() {
@@ -112,7 +112,7 @@ public class EPS extends JPanel implements UIScaling, SatelliteInfo {
 			FontMetrics fontMetrics = powerGeneration.getFontMetrics(powerGeneration.getFont());
 
 			for (int i = 0; i < 8; i++) {
-				solarPanels.get(i).setBackground(CustomColors.BACKGROUND1);
+				solarPanels.get(i).setBackground(CustomColors.BACKGROUND12);
 				solarPanels.get(i).setBounds(solarPanels.get(Math.max(0, i-1)).getX() + 10, 10,
 						2 + fontMetrics.stringWidth(
 								solarPanels.get(i).getVoltage() + "V " + solarPanels.get(i).getCurrent() + "I"),

@@ -67,14 +67,7 @@ public class PacketHeader {
 
     for (CougSat satellite : satellites) {
       if (satellite.getID() == (buf & MASK_SENDER_ID)) {
-        try {
-          return currentPacket.decodePacket(file, satellite);
-        } catch (IOException e) {
-          System.out.printf("%s failed to decode %s packet from %s\n",
-              satellite.toString(), currentPacket.toString(),
-              file.getAbsolutePath());
-          e.printStackTrace();
-        }
+        return currentPacket.decodePacket(file, satellite);
       }
     }
     return CISErrors.SUCCESS;

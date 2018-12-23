@@ -38,10 +38,10 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 			grid.addThumbnail(file);
 		}
 
-		grid.setBackground(CustomColors.BACKGROUND2);
+		grid.setBackground(CustomColors.BACKGROUND22);
 		
 		this.add(grid);
-		this.setBackground(CustomColors.BACKGROUND1);
+		this.setBackground(CustomColors.BACKGROUND12);
 	}
 
 	private final ComponentListener componentListener = new ComponentListener() {

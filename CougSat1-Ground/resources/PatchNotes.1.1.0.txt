@@ -1,0 +1,11 @@
+Version 1.1.0:
+Changes:
+~ Minor overhaul of packet processing
+~ Changed telemetry packet format
+~ Improved backend performance
+~ Reduced GUI system burden
+
+Version 1.0.0:
+Added:
++ Created GUI
++ Added packet processing for telemetry

@@ -62,8 +62,8 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 	public ADCS() {
 
 		super();
-		this.setBackground(CustomColors.BACKGROUND2);
-		this.setBorder(BorderFactory.createLineBorder(CustomColors.BACKGROUND1, 10));
+		this.setBackground(CustomColors.BACKGROUND22);
+		this.setBorder(BorderFactory.createLineBorder(CustomColors.BACKGROUND12, 10));
 		
 		GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
 		gbc.setFill(GridBagConstraintsWrapper.BOTH);
@@ -73,92 +73,92 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 		coordinatePanel.setLayout(new BorderLayout());
 
 		panelWrapper.setOpaque(false);
-		panelWrapper.setBackground(CustomColors.BACKGROUND1);
+		panelWrapper.setBackground(CustomColors.BACKGROUND12);
 
 		earthPanel.setLayout(new GridBagLayout());
 		earthPanel.add(new JLabel("Latitude"),
-				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
-		earthPanel.add(lattCoordinates, gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
-		earthPanel.add(new JLabel("�N"), gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(0, 0).setSize(1, 1).setWeight(0.0, 0.0).setInsets(5, 5, 5, 5));
+		earthPanel.add(lattCoordinates, gbc.setXY(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
+		earthPanel.add(new JLabel("�N"), gbc.setXY(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
 
 		earthPanel.add(new JLabel("Longitude"),
-				gbc.setLocation(0, 1).setSize(1, 1).setWeight(0.0, 0.0));
-		earthPanel.add(longCoordinates, gbc.setLocation(1, 1).setSize(1, 1));
-		earthPanel.add(new JLabel("�E"), gbc.setLocation(2, 1).setSize(1, 1));
+				gbc.setXY(0, 1).setSize(1, 1).setWeight(0.0, 0.0));
+		earthPanel.add(longCoordinates, gbc.setXY(1, 1).setSize(1, 1));
+		earthPanel.add(new JLabel("�E"), gbc.setXY(2, 1).setSize(1, 1));
 
 		earthPanel.add(new JButton("Transmit"),
-				gbc.setLocation(0, 2).setSize(3, 1).setWeight(1.0, 0.0));
-		earthPanel.setBackground(CustomColors.BACKGROUND1);
+				gbc.setXY(0, 2).setSize(3, 1).setWeight(1.0, 0.0));
+		earthPanel.setBackground(CustomColors.BACKGROUND12);
 		panelWrapper.add(earthPanel, "Earth");
 
 		celestialPanel.setLayout(new GridBagLayout());
 		celestialPanel.add(new JLabel("Right Ascension"),
-				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(0, 0).setSize(1, 1).setWeight(0.0, 0.0));
 		celestialPanel.add(rightAscensionCoordinates,
-				gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
+				gbc.setXY(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
 		celestialPanel.add(new JLabel("�"),
-				gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
 
 		celestialPanel.add(new JLabel("Left Ascension"),
-				gbc.setLocation(0, 1).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(0, 1).setSize(1, 1).setWeight(0.0, 0.0));
 		celestialPanel.add(leftAscensionCoordinates,
-				gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 0.0));
+				gbc.setXY(1, 1).setSize(1, 1).setWeight(1.0, 0.0));
 		celestialPanel.add(new JLabel("�"),
-				gbc.setLocation(2, 1).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(2, 1).setSize(1, 1).setWeight(0.0, 0.0));
 
 		celestialPanel.add(new JButton("Transmit"),
-				gbc.setLocation(0, 2).setSize(3, 1).setWeight(1.0, 0.0));
-		celestialPanel.setBackground(CustomColors.BACKGROUND1);
+				gbc.setXY(0, 2).setSize(3, 1).setWeight(1.0, 0.0));
+		celestialPanel.setBackground(CustomColors.BACKGROUND12);
 		panelWrapper.add(celestialPanel, "Celestial");
 
 		attitudePanel.setLayout(new GridBagLayout());
 		attitudePanel.add(new JLabel("Roll"),
-				gbc.setLocation(0, 0).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(0, 0).setSize(1, 1).setWeight(0.0, 0.0));
 		attitudePanel.add(rollCoordinates,
-				gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
+				gbc.setXY(1, 0).setSize(1, 1).setWeight(1.0, 0.0));
 		attitudePanel.add(new JLabel("�"),
-				gbc.setLocation(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(2, 0).setSize(1, 1).setWeight(0.0, 0.0));
 
 		attitudePanel.add(new JLabel("Pitch"),
-				gbc.setLocation(0, 1).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(0, 1).setSize(1, 1).setWeight(0.0, 0.0));
 		attitudePanel.add(pitchCoordinates,
-				gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 0.0));
+				gbc.setXY(1, 1).setSize(1, 1).setWeight(1.0, 0.0));
 		attitudePanel.add(new JLabel("�"),
-				gbc.setLocation(2, 1).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(2, 1).setSize(1, 1).setWeight(0.0, 0.0));
 
 		attitudePanel.add(new JLabel("Yaw"),
-				gbc.setLocation(0, 2).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(0, 2).setSize(1, 1).setWeight(0.0, 0.0));
 		attitudePanel.add(yawCoordinates,
-				gbc.setLocation(1, 2).setSize(1, 1).setWeight(1.0, 0.0));
+				gbc.setXY(1, 2).setSize(1, 1).setWeight(1.0, 0.0));
 		attitudePanel.add(new JLabel("�"),
-				gbc.setLocation(2, 2).setSize(1, 1).setWeight(0.0, 0.0));
+				gbc.setXY(2, 2).setSize(1, 1).setWeight(0.0, 0.0));
 		attitudePanel.add(new JButton("Transmit"),
-				gbc.setLocation(0, 3).setSize(3, 1).setWeight(1.0, 0.0));
-		attitudePanel.setBackground(CustomColors.BACKGROUND1);
+				gbc.setXY(0, 3).setSize(3, 1).setWeight(1.0, 0.0));
+		attitudePanel.setBackground(CustomColors.BACKGROUND12);
 		panelWrapper.add(attitudePanel, "Attitude");
 
 		coordinatePanel.add(panelWrapper, BorderLayout.CENTER);
 		coordinatePanel.add(cardSwitcher, BorderLayout.PAGE_START);
-		coordinatePanel.setBackground(CustomColors.BACKGROUND2);
-		this.add(coordinatePanel, gbc.setLocation(2, 2).setSize(1, 1).setWeight(1.0, 0.0));
+		coordinatePanel.setBackground(CustomColors.BACKGROUND22);
+		this.add(coordinatePanel, gbc.setXY(2, 2).setSize(1, 1).setWeight(1.0, 0.0));
 
 		telemetryPanel.setLayout(new GridBagLayout());
-		telemetryPanel.add(adcsTemp, gbc.setLocation(0, 1).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.add(roll, gbc.setLocation(0, 2).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.add(pitch, gbc.setLocation(0, 3).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.add(yaw, gbc.setLocation(0, 4).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.add(xPWMOut, gbc.setLocation(0, 5).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.add(yPWMOut, gbc.setLocation(1, 1).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.add(zPWMOut, gbc.setLocation(1, 2).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.add(xCurrent, gbc.setLocation(1, 3).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.add(yCurrent, gbc.setLocation(1, 4).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.add(zCurrent, gbc.setLocation(1, 5).setSize(1, 1).setWeight(1.0, 0.0));
-		telemetryPanel.setBackground(CustomColors.BACKGROUND1);
-		attitudeIndicator.setBackground(CustomColors.BACKGROUND1);
+		telemetryPanel.add(adcsTemp, gbc.setXY(0, 1).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.add(roll, gbc.setXY(0, 2).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.add(pitch, gbc.setXY(0, 3).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.add(yaw, gbc.setXY(0, 4).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.add(xPWMOut, gbc.setXY(0, 5).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.add(yPWMOut, gbc.setXY(1, 1).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.add(zPWMOut, gbc.setXY(1, 2).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.add(xCurrent, gbc.setXY(1, 3).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.add(yCurrent, gbc.setXY(1, 4).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.add(zCurrent, gbc.setXY(1, 5).setSize(1, 1).setWeight(1.0, 0.0));
+		telemetryPanel.setBackground(CustomColors.BACKGROUND12);
+		attitudeIndicator.setBackground(CustomColors.BACKGROUND12);
 
-		this.add(telemetryPanel, gbc.setLocation(1, 2).setSize(1, 1).setWeight(0.0, 0.0));
-		this.add(map, gbc.setLocation(0, 0).setSize(3, 2).setWeight(1.0, 1.0));
-		this.add(attitudeIndicator, gbc.setLocation(0, 2).setSize(1, 1).setWeight(1.0, 0.0));
+		this.add(telemetryPanel, gbc.setXY(1, 2).setSize(1, 1).setWeight(0.0, 0.0));
+		this.add(map, gbc.setXY(0, 0).setSize(3, 2).setWeight(1.0, 1.0));
+		this.add(attitudeIndicator, gbc.setXY(0, 2).setSize(1, 1).setWeight(1.0, 0.0));
 
 		for (Component component : this.getComponents()) {
 
@@ -195,9 +195,9 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 			attitudeButton.setHorizontalAlignment(SwingConstants.CENTER);
 			celestialButton.setHorizontalAlignment(SwingConstants.CENTER);
 
-			this.add(earthButton, gbc.setLocation(1, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 0, 10, 5));
-			this.add(attitudeButton, gbc.setLocation(2, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 5, 10, 5));
-			this.add(celestialButton, gbc.setLocation(3, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 5, 10, 0));
+			this.add(earthButton, gbc.setXY(1, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 0, 10, 5));
+			this.add(attitudeButton, gbc.setXY(2, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 5, 10, 5));
+			this.add(celestialButton, gbc.setXY(3, 0).setSize(1, 1).setWeight(1.0, 1.0).setInsets(0, 5, 10, 0));
 
 			for (Component component : this.getComponents()) {
 				if (component instanceof JButton) {
@@ -330,7 +330,7 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 					subComponent.setFont(font);
 					
 					if (subComponent instanceof JButton) {
-						subComponent.setBackground(CustomColors.BACKGROUND2);
+						subComponent.setBackground(CustomColors.BACKGROUND22);
 					}
 				}
 			}

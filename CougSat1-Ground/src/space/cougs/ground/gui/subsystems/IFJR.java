@@ -11,6 +11,6 @@ public class IFJR extends JPanel {
 	public IFJR() {
 		// TODO
 		super();
-		this.setBackground(CustomColors.BACKGROUND2);
+		this.setBackground(CustomColors.BACKGROUND22);
 	}
 }

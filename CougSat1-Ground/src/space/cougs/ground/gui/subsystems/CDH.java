@@ -41,15 +41,15 @@ public class CDH extends JPanel implements UIScaling, SatelliteInfo {
 		chart.getPlot().setOutlineVisible(false);
 		BarRenderer renderer = new BarRenderer(); 
 		renderer.setShadowVisible(false);
-		chart.setBackgroundPaint(CustomColors.BACKGROUND1);
+		chart.setBackgroundPaint(CustomColors.BACKGROUND12);
 	
 		chart.setBorderVisible(true);
-		chart.setBorderPaint(CustomColors.BACKGROUND1);
-		chart.getPlot().setBackgroundPaint(CustomColors.BACKGROUND2 );
-		this.add(chartWrapper, gbc.setLocation(0, 0).setSize(1, 1).setWeight(1.0, 1.0));
+		chart.setBorderPaint(CustomColors.BACKGROUND12);
+		chart.getPlot().setBackgroundPaint(CustomColors.BACKGROUND22 );
+		this.add(chartWrapper, gbc.setXY(0, 0).setSize(1, 1).setWeight(1.0, 1.0));
 
-		this.add(new TitleLabel("Computer"), gbc.setLocation(0, 0).setSize(3, 1).setWeight(0.0, 0.0));
-		this.setBackground(CustomColors.BACKGROUND2);
+		this.add(new TitleLabel("Computer"), gbc.setXY(0, 0).setSize(3, 1).setWeight(0.0, 0.0));
+		this.setBackground(CustomColors.BACKGROUND22);
 	}
 
 	@Override
@@ -83,12 +83,12 @@ public class CDH extends JPanel implements UIScaling, SatelliteInfo {
 		for (Component component : this.getComponents()) {
 			if (component instanceof TitleLabel) {
 				component.setFont(font);
-				component.setBackground(CustomColors.BACKGROUND1);
+				component.setBackground(CustomColors.BACKGROUND12);
 				component.setForeground(Color.white);
 
 			} else if (component instanceof JTextArea) {
 				component.setFont(bodyfont);
-				component.setBackground(CustomColors.BACKGROUND1);
+				component.setBackground(CustomColors.BACKGROUND12);
 			}
 		}
 	}

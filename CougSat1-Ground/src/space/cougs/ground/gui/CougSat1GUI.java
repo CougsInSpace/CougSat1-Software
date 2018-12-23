@@ -64,7 +64,7 @@ class CougSat1GUI extends JPanel implements UIScaling, SatelliteInfo {
 		this.add(subSystemWrapper, BorderLayout.CENTER);
 		this.add(cardSwitcher, BorderLayout.LINE_START);
 
-		this.setBackground(CustomColors.BACKGROUND1);
+		this.setBackground(CustomColors.BACKGROUND12);
 
 	}
 

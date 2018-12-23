@@ -2,5 +2,8 @@
 /bin/*
 !*.jar
 
+# Backup files
+*.bak
+
 # Settings
 .settings
