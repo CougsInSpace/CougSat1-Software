@@ -12,9 +12,8 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import space.cougs.ground.gui.UIScaling;
-import space.cougs.ground.gui.subsystems.modules.ListFiles;
-import space.cougs.ground.gui.subsystems.modules.PhotoViewer;
-import space.cougs.ground.gui.subsystems.modules.ThumbnailGrid;
+import space.cougs.ground.gui.modules.PhotoViewer;
+import space.cougs.ground.gui.modules.ThumbnailGrid;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.satellites.CougSat;
 
@@ -28,7 +27,7 @@ public class Camera extends JPanel implements UIScaling, SatelliteInfo {
   private int                      border = 10;
 
   private List<File>   cameraFolder = new ArrayList<File>();
-  private ListFiles    itr = new ListFiles();
+  // private ListFiles    itr = new ListFiles();
   private static final File imageFile = new File("packets/images");
 
   public Camera() {
@@ -36,7 +35,7 @@ public class Camera extends JPanel implements UIScaling, SatelliteInfo {
     this.setLayout(null);
     this.addComponentListener(componentListener);
 
-    itr.listFilesForFolder(imageFile, cameraFolder);
+    // itr.listFilesForFolder(imageFile, cameraFolder);
 
     thumbnailGrid.setBackground(CustomColors.BACKGROUND22);
     thumbnailGrid.addActionListner(actionListener);

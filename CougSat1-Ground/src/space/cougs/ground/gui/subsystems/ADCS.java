@@ -18,8 +18,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import space.cougs.ground.gui.UIScaling;
-import space.cougs.ground.gui.subsystems.modules.HorizontalText;
-import space.cougs.ground.gui.subsystems.modules.Map;
+import space.cougs.ground.gui.modules.HorizontalValue;
+import space.cougs.ground.gui.modules.Map;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;
@@ -48,16 +48,16 @@ public class ADCS extends JPanel implements UIScaling, SatelliteInfo {
 	private final JTextField yawCoordinates = new JTextField();
 	private final JTextField pitchCoordinates = new JTextField();
 
-	private final HorizontalText adcsTemp = new HorizontalText("Temp:", "        ", 0.5);
-	private final HorizontalText roll = new HorizontalText("Roll:", "        ", 0.5);
-	private final HorizontalText pitch = new HorizontalText("Pitch:", "        ", 0.5);
-	private final HorizontalText yaw = new HorizontalText("Yaw:", "        ", 0.5);
-	private final HorizontalText xPWMOut = new HorizontalText("X PWM Out:", "        ", 0.5);
-	private final HorizontalText yPWMOut = new HorizontalText("Y PWM Out:", "        ", 0.5);
-	private final HorizontalText zPWMOut = new HorizontalText("Z PWM Out:", "        ", 0.5);
-	private final HorizontalText xCurrent = new HorizontalText("X Current:", "        ", 0.5);
-	private final HorizontalText yCurrent = new HorizontalText("Y Current:", "        ", 0.5);
-	private final HorizontalText zCurrent = new HorizontalText("Z Current:", "        ", 0.5);
+	private final HorizontalValue adcsTemp = new HorizontalValue("Temp:", "        ", 0.5);
+	private final HorizontalValue roll = new HorizontalValue("Roll:", "        ", 0.5);
+	private final HorizontalValue pitch = new HorizontalValue("Pitch:", "        ", 0.5);
+	private final HorizontalValue yaw = new HorizontalValue("Yaw:", "        ", 0.5);
+	private final HorizontalValue xPWMOut = new HorizontalValue("X PWM Out:", "        ", 0.5);
+	private final HorizontalValue yPWMOut = new HorizontalValue("Y PWM Out:", "        ", 0.5);
+	private final HorizontalValue zPWMOut = new HorizontalValue("Z PWM Out:", "        ", 0.5);
+	private final HorizontalValue xCurrent = new HorizontalValue("X Current:", "        ", 0.5);
+	private final HorizontalValue yCurrent = new HorizontalValue("Y Current:", "        ", 0.5);
+	private final HorizontalValue zCurrent = new HorizontalValue("Z Current:", "        ", 0.5);
 
 	public ADCS() {
 

@@ -1,7 +1,8 @@
-package space.cougs.ground.gui.subsystems.modules;
+package space.cougs.ground.gui.modules;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import space.cougs.ground.gui.UIScaling;
 import space.cougs.ground.gui.utils.CustomColors;
@@ -12,36 +13,35 @@ public class TitleLabel extends JLabel implements UIScaling {
 
   public TitleLabel() {
     super();
-    this.setFont(Fonts.TITLE_16);
-    this.setForeground(CustomColors.PRIMARY_TEXT);
+    setDefaults();
   }
 
   public TitleLabel(String text) {
-    super(text);
-    this.setFont(Fonts.TITLE_16);
-    this.setForeground(CustomColors.PRIMARY_TEXT);
+    super(text, SwingConstants.CENTER);
+    setDefaults();
   }
 
   public TitleLabel(Icon image) {
     super(image);
-    this.setFont(Fonts.TITLE_16);
-    this.setForeground(CustomColors.PRIMARY_TEXT);
+    setDefaults();
   }
 
   public TitleLabel(String text, int horizontalAlignment) {
     super(text, horizontalAlignment);
-    this.setFont(Fonts.TITLE_16);
-    this.setForeground(CustomColors.PRIMARY_TEXT);
+    setDefaults();
   }
 
   public TitleLabel(Icon image, int horizontalAlignment) {
     super(image, horizontalAlignment);
-    this.setFont(Fonts.TITLE_16);
-    this.setForeground(CustomColors.PRIMARY_TEXT);
+    setDefaults();
   }
 
   public TitleLabel(String text, Icon icon, int horizontalAlignment) {
     super(text, icon, horizontalAlignment);
+    setDefaults();
+  }
+
+  private void setDefaults(){
     this.setFont(Fonts.TITLE_16);
     this.setForeground(CustomColors.PRIMARY_TEXT);
   }

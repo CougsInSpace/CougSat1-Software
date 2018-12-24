@@ -15,7 +15,7 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.general.DefaultPieDataset;
 
 import space.cougs.ground.gui.UIScaling;
-import space.cougs.ground.gui.subsystems.modules.TitleLabel;
+import space.cougs.ground.gui.modules.TitleLabel;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;

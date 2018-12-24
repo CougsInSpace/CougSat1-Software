@@ -1,15 +1,13 @@
 package space.cougs.ground.gui;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
 
 import space.cougs.ground.CougSatGround;
-import space.cougs.ground.gui.utils.CustomColors;
+import space.cougs.ground.gui.modules.CISTabbedPane;
 import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.satellites.CougSat;
 import space.cougs.ground.satellites.CougSat1;
@@ -19,24 +17,28 @@ public class GUI implements UIScaling {
   private static final int defaultHeight = 650;
   private static final int defaultWidth  = 1200;
 
-  private final JFrame mainFrame      = new JFrame();
-  private final JTabbedPane mainPanel = new JTabbedPane();
+  private final JFrame mainFrame;
+  private final CISTabbedPane mainPanel;
 
-  private final Home home = new Home();
-  //   private final CougSat1GUI cougSat1GUI = new CougSat1GUI();
+  private final Home home;
+  private final CougSat1GUI cougSat1GUI;
 
   private UIScale currentUIScale = null;
 
   public GUI() {
     Fonts.loadFonts();
 
+    mainFrame   = new JFrame();
+    mainPanel   = new CISTabbedPane();
+    home        = new Home();
+    cougSat1GUI = new CougSat1GUI();
+
     mainPanel.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
     mainPanel.setMinimumSize(new Dimension(defaultWidth, defaultHeight));
-    mainPanel.setBackground(CustomColors.PRIMARY);
 
     mainPanel.addTab("     Home      ", home);
-    // mainPanel.addTab("   CougSat-1   ", cougSat1GUI);
-    // mainPanel.setSelectedComponent(cougSat1GUI);
+    mainPanel.addTab("   CougSat-1   ", cougSat1GUI);
+    mainPanel.setSelectedComponent(cougSat1GUI);
 
     mainFrame.add(mainPanel);
 
@@ -86,37 +88,13 @@ public class GUI implements UIScaling {
       return;
     }
     currentUIScale = uiScale;
-    for (Component component : mainPanel.getComponents()) {
-      if (component instanceof UIScaling) {
-        ((UIScaling)component).updateUIScaling(uiScale);
-      }
-    }
-
-    switch (uiScale) {
-      case SCALE_100:
-        mainPanel.setFont(Fonts.TITLE_16);
-        break;
-      case SCALE_150:
-        mainPanel.setFont(Fonts.TITLE_24);
-        break;
-      case SCALE_200:
-        mainPanel.setFont(Fonts.TITLE_32);
-        break;
-      case SCALE_300:
-        mainPanel.setFont(Fonts.TITLE_48);
-        break;
-      case SCALE_75:
-        mainPanel.setFont(Fonts.TITLE_12);
-        break;
-      default:
-        System.out.println("GUI unknown UIscale: " + uiScale);
-        break;
-    }
+    mainPanel.updateUIScaling(uiScale);
+    mainFrame.repaint();
   }
 
   public void updateSatellite(CougSat satellite) {
     if (satellite instanceof CougSat1) {
-      //   cougSat1GUI.updateSatellite(satellite);
+      cougSat1GUI.updateSatellite(satellite);
     }
   }
 }

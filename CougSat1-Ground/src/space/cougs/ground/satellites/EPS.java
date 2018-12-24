@@ -28,6 +28,7 @@ public class EPS {
    * Switch consisting of two independent switches and current
    */
   private class SwitchNode {
+    // TODO add get power that uses the properly connected source voltage
     boolean pathA   = false;
     boolean pathB   = false;
     double  current = 0.0;
@@ -203,6 +204,15 @@ public class EPS {
   }
 
   /**
+   * @return sum of power on the 3.3V rails
+   */
+  public double getPR3V3PowerSum() {
+    // TODO multiply the current by the voltage of the connected regulator
+    double voltage = (reg3V3Voltages[0] + reg3V3Voltages[1]) / 2.0;
+    return voltage * getPR3V3CurrentSum();
+  }
+
+  /**
    * @param i       index of channel
    * @param current the current to set
    */
@@ -227,6 +237,15 @@ public class EPS {
       sum += node.current;
     }
     return sum;
+  }
+
+  /**
+   * @return sum of power on the Batt rails
+   */
+  public double getPRBattPowerSum() {
+    // TODO multiply the current by the voltage of the connected battery
+    double voltage = (batteryVoltages[0] + batteryVoltages[1]) / 2.0;
+    return voltage * getPRBattCurrentSum();
   }
 
   /**
@@ -257,6 +276,15 @@ public class EPS {
   }
 
   /**
+   * @return sum of power on the PV3.3V rails
+   */
+  public double getPV3V3PowerSum() {
+    // TODO multiply the current by the voltage of the connected regulator
+    double voltage = (reg3V3Voltages[0] + reg3V3Voltages[1]) / 2.0;
+    return voltage * getPV3V3CurrentSum();
+  }
+
+  /**
    * @param i       index of channel
    * @param current the current to set
    */
@@ -270,6 +298,26 @@ public class EPS {
    */
   public double getPRBHCurrent(int i) {
     return nodesBatteryHeater[i].current;
+  }
+
+  /**
+   * @return the current
+   */
+  public double getPRBHCurrentSum() {
+    double sum = 0.0;
+    for (SwitchNode node : nodesBatteryHeater) {
+      sum += node.current;
+    }
+    return sum;
+  }
+
+  /**
+   * @return sum of power on the heater rails
+   */
+  public double getHeaterPowerSum() {
+    // TODO multiply the current by the voltage of the connected battery
+    double voltage = (batteryVoltages[0] + batteryVoltages[1]) / 2.0;
+    return voltage * getPRBHCurrentSum();
   }
 
   /**
@@ -405,7 +453,7 @@ public class EPS {
     this.nodesBatteryHeater[i].pathB = pathB;
   }
 
-  /**=
+  /**
    * @param isPathA returns path A if true
    * @return the switch state
    */
@@ -437,5 +485,38 @@ public class EPS {
    */
   public void setEnergyLevel(int energyLevel) {
     this.energyLevel = energyLevel;
+  }
+
+  /**
+   * @return sum of power on the Comms rails
+   */
+  public double getCommsPowerSum() {
+    // TODO multiply the current by the voltage of the connected battery
+    double voltageBatt = (batteryVoltages[0] + batteryVoltages[1]) / 2.0;
+    double voltage3V3  = (reg3V3Voltages[0] + reg3V3Voltages[1]) / 2.0;
+    return voltageBatt * nodesPRBatt[1].current +
+        voltage3V3 * nodesPR3V3[6].current;
+  }
+
+  /**
+   * @return sum of power into the EPS
+   */
+  public double getInPowerSum() {
+    double power = 0.0;
+    for (int i = 0; i < pvCurrents.length; i++){
+      power += pvCurrents[i] + pvVoltages[i];
+    }
+    return power;
+  }
+
+  /**
+   * @return sum of power out of the EPS
+   */
+  public double getOutPowerSum() {
+    double power = getPR3V3PowerSum();
+    power += getPRBattPowerSum();
+    power += getHeaterPowerSum();
+    power += getPV3V3PowerSum();
+    return power;
   }
 }

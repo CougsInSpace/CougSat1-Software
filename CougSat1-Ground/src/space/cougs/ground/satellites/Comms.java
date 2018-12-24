@@ -45,6 +45,13 @@ public class Comms {
   }
 
   /**
+   * @return the total TX power
+   */
+  public double getTXPower() {
+    return tx230Power + tx700Power;
+  }
+
+  /**
    * @return the tx230Power
    */
   public double getTX230Power() {

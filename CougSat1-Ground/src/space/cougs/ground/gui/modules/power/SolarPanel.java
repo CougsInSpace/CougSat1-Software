@@ -1,4 +1,4 @@
-package space.cougs.ground.gui.subsystems.modules.power;
+package space.cougs.ground.gui.modules.power;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;

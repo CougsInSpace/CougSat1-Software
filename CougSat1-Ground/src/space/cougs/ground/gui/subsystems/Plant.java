@@ -9,8 +9,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import space.cougs.ground.gui.UIScaling;
-import space.cougs.ground.gui.subsystems.modules.ListFiles;
-import space.cougs.ground.gui.subsystems.modules.PlantGrid;
+import space.cougs.ground.gui.modules.PlantGrid;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.satellites.CougSat;
 
@@ -19,7 +18,7 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 	private static final long serialVersionUID = 1L;
 
 	private PlantGrid grid = new PlantGrid();
-	private ListFiles itr = new ListFiles();
+	// private ListFiles itr = new ListFiles();
 	private List<File> plantFolder = new ArrayList<File>();
 	private static final File plantFile = new File("packets/plant");
 	
@@ -32,7 +31,7 @@ public class Plant extends JPanel implements UIScaling, SatelliteInfo {
 		this.setLayout(null);
 		this.addComponentListener(componentListener);
 
-		itr.listFilesForFolder(plantFile, plantFolder);
+		// itr.listFilesForFolder(plantFile, plantFolder);
 
 		for (File file : plantFolder) {
 			grid.addThumbnail(file);

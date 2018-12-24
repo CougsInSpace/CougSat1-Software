@@ -49,4 +49,16 @@ public final class Units {
   public static double rawToDataRate(long raw) {
     return Math.pow(raw, 2); // 1 sqrt(bps)/LSB
   }
+
+  public static String toBytes(long bytes) {
+    if (bytes > 1000000000) {
+      return String.format("%6.2fGB", bytes / 1000000000.0);
+    } else if (bytes > 1000000) {
+      return String.format("%6.2fMB", bytes / 1000000.0);
+    } else if (bytes > 1000000) {
+      return String.format("%6.2fkB", bytes / 1000.0);
+    } else {
+      return String.format("%6.2f B", bytes / 1.0);
+    }
+  }
 }

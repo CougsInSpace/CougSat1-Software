@@ -43,6 +43,13 @@ public class ECS {
   }
 
   /**
+   * @return the cdhTemp
+   */
+  public int getCDHTemp() {
+    return getIHUTemp();
+  }
+
+  /**
    * @return the ihuTemp
    */
   public int getIHUTemp() {
@@ -152,6 +159,13 @@ public class ECS {
    */
   public void setReg9V0Temp(int reg9V0Temp) {
     this.reg9V0Temp = reg9V0Temp;
+  }
+
+  /**
+   * @return the epsTemp
+   */
+  public int getEPSTemp() {
+    return (reg3V3Temps[0] + reg3V3Temps[1]) / 2;
   }
 
   /**

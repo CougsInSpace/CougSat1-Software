@@ -10,7 +10,7 @@ import space.cougs.ground.utils.CISErrors;
 
 public class CougSatGround {
   private static final String versionNumber = "1.1.0";
-  private static final long start = System.currentTimeMillis();
+  private static final long   start         = System.currentTimeMillis();
 
   private static File home = new File("");
 
@@ -18,10 +18,10 @@ public class CougSatGround {
 
   private static final CougSat1 cougSat1         = new CougSat1();
   private static final PacketHeader packetHeader = new PacketHeader();
-  
 
   public static void main(String[] args) {
-    System.out.printf("GUI boot took: %dms\n", System.currentTimeMillis() - start);
+    System.out.printf(
+        "GUI boot took: %dms\n", System.currentTimeMillis() - start);
 
     packetHeader.addSatellite((CougSat)cougSat1);
 

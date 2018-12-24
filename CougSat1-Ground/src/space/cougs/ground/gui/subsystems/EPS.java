@@ -15,8 +15,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.Timer;
 
 import space.cougs.ground.gui.UIScaling;
-import space.cougs.ground.gui.subsystems.modules.power.SolarPanel;
-import space.cougs.ground.gui.subsystems.modules.power.Wire;
+import space.cougs.ground.gui.modules.power.SolarPanel;
+import space.cougs.ground.gui.modules.power.Wire;
 import space.cougs.ground.gui.utils.AnimationComponent;
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
