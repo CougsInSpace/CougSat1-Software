@@ -25,9 +25,8 @@ public class Telemetry extends DownlinkPacket {
   }
 
   public CISErrors decodePacket(File file, CougSat satellite) {
-    FileInputStream inFile        = null;
-    CISErrors       result        = CISErrors.SUCCESS;
-    CougSat         tempSatellite = satellite;
+    FileInputStream inFile = null;
+    CISErrors       result = CISErrors.SUCCESS;
     try {
       inFile = new FileInputStream(file);
 
@@ -41,14 +40,19 @@ public class Telemetry extends DownlinkPacket {
         return CISErrors.INVALID_ARGS;
       }
 
-      decodePacketADCS(inFile, tempSatellite);
-      decodePacketCDH(inFile, tempSatellite);
-      decodePacketComms(inFile, tempSatellite);
-      decodePacketECS(inFile, tempSatellite);
-      decodePacketEPS(inFile, tempSatellite);
+      decodePacketADCS(inFile, satellite);
+      decodePacketCDH(inFile, satellite);
+      decodePacketComms(inFile, satellite);
+      decodePacketECS(inFile, satellite);
+      decodePacketEPS(inFile, satellite);
 
-      inFile.read(); // Padding
-      inFile.read(); // Padding
+      // for (int i = 0; i < 0; i++) {
+      //   if (inFile.read() != 0) {
+      //     System.out.println(
+      //         "There is non-zero values where padding should be");
+      //     result = CISErrors.INVALID_ARGS;
+      //   }
+      // }
 
       if (inFile.available() != 0) {
         result = CISErrors.EOF;
@@ -61,10 +65,6 @@ public class Telemetry extends DownlinkPacket {
       System.out.printf(
           "Failed to decode telemetry from %s\n", file.getAbsolutePath());
       e.printStackTrace();
-    }
-    if (result == CISErrors.SUCCESS) {
-      satellite = tempSatellite;
-      System.out.printf("%s updated with telemetry packet\n", satellite.toString());
     }
     return result;
   }
@@ -90,7 +90,7 @@ public class Telemetry extends DownlinkPacket {
     CDH cdh = satellite.getCDH();
     cdh.setMode((int)FileUtils.readNextBytes(file, 1));
     cdh.setTime(FileUtils.readNextBytes(file, 4));
-    cdh.setSDCard(FileUtils.readNextBytes(file, 5));
+    cdh.setSDCardUsed(FileUtils.readNextBytes(file, 5));
     cdh.setResetCount((int)FileUtils.readNextBytes(file, 1));
     cdh.setErrorStatus((int)FileUtils.readNextBytes(file, 1));
   }
@@ -161,6 +161,8 @@ public class Telemetry extends DownlinkPacket {
     eps.setBatteryVoltage(1, FileUtils.readNextVoltage(file));
     eps.setBatteryCurrent(0, FileUtils.readNextCurrent(file));
     eps.setBatteryCurrent(1, FileUtils.readNextCurrent(file));
+    eps.setBatteryEnergy(0, FileUtils.readNextEnergy(file));
+    eps.setBatteryEnergy(1, FileUtils.readNextEnergy(file));
     eps.setReg3V3Voltage(0, FileUtils.readNextVoltage(file));
     eps.setReg3V3Voltage(1, FileUtils.readNextVoltage(file));
     eps.setReg3V3Current(0, FileUtils.readNextCurrent(file));

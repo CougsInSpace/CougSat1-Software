@@ -23,15 +23,5 @@ public class CustomColors {
   public static Color STATUS_GOOD = GREEN;
   public static Color STATUS_WARN = YELLOW;
   public static Color STATUS_BAD  = RED;
-
-  public static final Color ACCENT12        = GREY;
-  public static final Color BACKGROUND12    = GREY;
-  public static final Color BACKGROUND22    = NAVY;
-  public static final Color BACKGROUND3     = CRIMSON;
-  public static final Color BACKGROUND4     = WHITE;
-  public static final Color BAR_BACKGROUND  = GREY;
-  public static final Color BAR_DEFAULT     = CRIMSON;
-  public static final Color BUTTON_INACTIVE = CRIMSON;
-  public static final Color BUTTON_ACTIVE   = RED;
-  public static final Color TEXT1           = WHITE;
+  
 }

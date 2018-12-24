@@ -45,7 +45,7 @@ public class CISCheckBox extends JCheckBox implements UIScaling {
         break;
       default:
         System.out.println("Body label \"" + this.getText() +
-                           "\" unkown UI Scale: " + uiScale);
+                           "\" unknown UI Scale: " + uiScale);
         break;
     }
   }

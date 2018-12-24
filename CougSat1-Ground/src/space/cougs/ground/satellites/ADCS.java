@@ -1,10 +1,14 @@
 package space.cougs.ground.satellites;
 
+import java.io.Serializable;
+
 /**
  * Telemetry for ADCS
  */
-public class ADCS {
-  private double latitude  = 0.0;
+public class ADCS implements Serializable{
+  private static final long serialVersionUID = 1L;
+  
+  private double latitude = 0.0;
   private double longitude = 0.0;
 
   private double roll  = 0.0;

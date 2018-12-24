@@ -1,9 +1,17 @@
 package space.cougs.ground.satellites;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 /**
  * Telemetry for a CougSat
  */
-public abstract class CougSat {
+public abstract class CougSat implements Serializable{
+  private static final long serialVersionUID = 1L;
 
   /**
    * @return the ID of the satellite for packet routing
@@ -20,6 +28,24 @@ public abstract class CougSat {
    * Constructs a new CougSat
    */
   public CougSat() {}
+  
+  /**
+   * @return a deep copy of the satellite
+   */
+  public CougSat deepCopy() {
+    try {
+      ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
+      ObjectOutputStream out = new ObjectOutputStream(outBytes);
+      out.writeObject(this);
+
+      ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(outBytes.toByteArray()));
+      return (CougSat) in.readObject();
+    } catch (IOException | ClassNotFoundException e) {
+      System.out.println("Failed to deep copy CougSat");
+      e.printStackTrace();
+    }
+    return null;
+	}
 
   /**
    * @return the ADCS

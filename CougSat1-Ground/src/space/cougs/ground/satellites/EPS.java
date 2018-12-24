@@ -1,16 +1,20 @@
 package space.cougs.ground.satellites;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * Telemetry for EPS
  */
-public class EPS {
+public class EPS implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   private double pvVoltages[] = new double[8];
   private double pvCurrents[] = new double[8];
 
   private double batteryVoltages[] = new double[2];
   private double batteryCurrents[] = new double[2];
+  private int    batteryEnergy[]   = new int[2];
 
   private double reg3V3Voltages[] = new double[2];
   private double reg3V3Currents[] = new double[2];
@@ -22,12 +26,12 @@ public class EPS {
   private SwitchNode nodesBatteryHeater[] = new SwitchNode[2];
   private SwitchNode nodePRDeployables    = new SwitchNode();
 
-  private int energyLevel = 0;
-
   /**
    * Switch consisting of two independent switches and current
    */
-  private class SwitchNode {
+  private class SwitchNode implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     // TODO add get power that uses the properly connected source voltage
     boolean pathA   = false;
     boolean pathB   = false;
@@ -150,6 +154,22 @@ public class EPS {
    */
   public void setBatteryCurrent(int i, double current) {
     this.batteryCurrents[i] = current;
+  }
+
+  /**
+   * @param i index of battery
+   * @return the energy
+   */
+  public int getBatteryEnergy(int i) {
+    return batteryEnergy[i];
+  }
+
+  /**
+   * @param i       index of battery
+   * @param energy the energy to set
+   */
+  public void setBatteryEnergy(int i, int energy) {
+    this.batteryEnergy[i] = energy;
   }
 
   /**
@@ -474,20 +494,6 @@ public class EPS {
   }
 
   /**
-   * @return the energyLevel
-   */
-  public int getEnergyLevel() {
-    return energyLevel;
-  }
-
-  /**
-   * @param energyLevel the energyLevel to set
-   */
-  public void setEnergyLevel(int energyLevel) {
-    this.energyLevel = energyLevel;
-  }
-
-  /**
    * @return sum of power on the Comms rails
    */
   public double getCommsPowerSum() {
@@ -503,7 +509,7 @@ public class EPS {
    */
   public double getInPowerSum() {
     double power = 0.0;
-    for (int i = 0; i < pvCurrents.length; i++){
+    for (int i = 0; i < pvCurrents.length; i++) {
       power += pvCurrents[i] + pvVoltages[i];
     }
     return power;

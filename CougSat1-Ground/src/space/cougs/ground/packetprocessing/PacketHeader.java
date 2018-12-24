@@ -65,15 +65,31 @@ public class PacketHeader {
         break;
     }
 
+    CougSat reciepient = null;
     for (CougSat satellite : satellites) {
       if (satellite.getID() == (buf & MASK_SENDER_ID)) {
-        return currentPacket.decodePacket(file, satellite);
+        reciepient = satellite;
       }
     }
-    return CISErrors.SUCCESS;
+    if (reciepient == null) {
+      return CISErrors.INVALID_ADDRESS;
+    }
+
+    CougSat   temp   = reciepient.deepCopy();
+    CISErrors result = currentPacket.decodePacket(file, temp);
+    if (result == CISErrors.SUCCESS) {
+      // Make the changes iff the decode was successful
+      satellites.remove(reciepient);
+      satellites.add(temp);
+    }
+    return result;
   }
 
   public void addSatellite(CougSat satellite) {
     satellites.add(satellite);
+  }
+
+  public List<CougSat> getSatellites(){
+    return satellites;
   }
 }

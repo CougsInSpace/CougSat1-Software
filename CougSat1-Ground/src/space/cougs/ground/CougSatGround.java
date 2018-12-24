@@ -16,14 +16,13 @@ public class CougSatGround {
 
   private static final GUI gui = new GUI();
 
-  private static final CougSat1 cougSat1         = new CougSat1();
   private static final PacketHeader packetHeader = new PacketHeader();
 
   public static void main(String[] args) {
     System.out.printf(
         "GUI boot took: %dms\n", System.currentTimeMillis() - start);
 
-    packetHeader.addSatellite((CougSat)cougSat1);
+    packetHeader.addSatellite((CougSat)new CougSat1());
 
     CISErrors result =
         packetHeader.decodePacket("test/rawPackets/TestTelemetry.cspkt");
@@ -32,7 +31,9 @@ public class CougSatGround {
           result.ordinal(), result.toString());
     }
 
-    gui.updateSatellite(cougSat1);
+    for(CougSat cougSat : packetHeader.getSatellites()){
+      gui.updateSatellite(cougSat);
+    }
   }
 
   public static String getVersionnumber() {

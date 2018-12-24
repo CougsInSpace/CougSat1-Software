@@ -1,11 +1,15 @@
 package space.cougs.ground.satellites;
 
+import java.io.Serializable;
+
 import space.cougs.ground.utils.CISErrors;
 
 /**
  * Telemetry for C&DH
  */
-public class CDH {
+public class CDH implements Serializable{
+  private static final long serialVersionUID = 1L;
+
   private ModeEnum mode = ModeEnum.NO_CONNECTION;
 
   private long      time        = 0;
@@ -92,14 +96,21 @@ public class CDH {
   /**
    * @return the sdCard used bytes
    */
-  public long getSDCard() {
+  public long getSDCardUsed() {
     return sdCard;
+  }
+
+  /**
+   * @return the sdCard free bytes
+   */
+  public long getSDCardFree() {
+    return (32L * (1L << 30L)) - sdCard; // 32 GiB total
   }
 
   /**
    * @param sdCard used bytes to set
    */
-  public void setSDCard(long sdCard) {
+  public void setSDCardUsed(long sdCard) {
     this.sdCard = sdCard;
   }
 

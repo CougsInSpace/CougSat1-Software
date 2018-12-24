@@ -1,9 +1,13 @@
 package space.cougs.ground.satellites;
 
+import java.io.Serializable;
+
 /**
  * Telemetry for ECS
  */
-public class ECS {
+public class ECS implements Serializable{
+  private static final long serialVersionUID = 1L;
+
   private int adcsTemp = 0;
 
   private int ihuTemp = 0;

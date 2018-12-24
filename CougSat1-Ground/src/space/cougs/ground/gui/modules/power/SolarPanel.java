@@ -12,18 +12,15 @@ import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.Fonts;
 
 public class SolarPanel extends JComponent implements AnimationComponent, UIScaling {
-
 	private static final long serialVersionUID = 1L;
 	private double current = 0.0;
 	private double voltage = 0.0;
 
 	public SolarPanel(double current, double voltage) {
-
 		this.setCurrent(current);
 		this.setVoltage(voltage);
 
-		this.setForeground(CustomColors.TEXT1);
-
+		this.setForeground(CustomColors.PRIMARY_TEXT);
 	}
 
 	@Override
@@ -31,14 +28,13 @@ public class SolarPanel extends JComponent implements AnimationComponent, UIScal
 		repaint();
 	}
 
-	public void paintComponent(Graphics g) {
+	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		g2d.drawString(this.getName() + "", this.getHeight() / 2, this.getWidth() / 2);
 		g2d.drawString(voltage + "V " + current + "I", this.getHeight() / 2, this.getWidth() / 2);
-
 	}
 
 	public double getVoltage() {
@@ -80,7 +76,5 @@ public class SolarPanel extends JComponent implements AnimationComponent, UIScal
 		default:
 			break;
 		}
-
 	}
-
 }

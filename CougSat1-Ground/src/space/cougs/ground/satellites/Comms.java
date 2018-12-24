@@ -1,10 +1,14 @@
 package space.cougs.ground.satellites;
 
+import java.io.Serializable;
+
 /**
  * Telemetry for Comms
  */
-public class Comms {
-  private double rxPower    = 0.0;
+public class Comms implements Serializable{
+  private static final long serialVersionUID = 1L;
+  
+  private double rxPower = 0.0;
   private double tx230Power = 0.0;
   private double tx700Power = 0.0;
 

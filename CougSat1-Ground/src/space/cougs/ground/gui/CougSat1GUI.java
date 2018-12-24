@@ -36,13 +36,13 @@ class CougSat1GUI extends CISPanel implements SatelliteInfo {
   private static final long serialVersionUID = 1L;
 
   private final Health health = new Health();
-  // private final ADCS adcs = new ADCS();
-  // private final IFJR ifjr = new IFJR();
-  // private final CDH cdh = new CDH();
-  // private final Comms comms = new Comms();
-  // private final Camera camera = new Camera();
-  // private final Plant plant = new Plant();
-  // private final EPS eps = new EPS();
+  private final ADCS adcs = new ADCS();
+  private final IFJR ifjr = new IFJR();
+  private final CDH cdh = new CDH();
+  private final Comms comms = new Comms();
+  private final Camera camera = new Camera();
+  private final Plant plant = new Plant();
+  private final EPS eps = new EPS();
 
   private final CardLayout subSystemLayout = new CardLayout();
   private final CISPanel subSystemWrapper    = new CISPanel(subSystemLayout);
@@ -53,13 +53,13 @@ class CougSat1GUI extends CISPanel implements SatelliteInfo {
     super();
 
     subSystemWrapper.add(health, "Health");
-    // subSystemWrapper.add(adcs, "Attitude");
-    // subSystemWrapper.add(ifjr, "IFJR");
-    // subSystemWrapper.add(cdh, "Computer");
-    // subSystemWrapper.add(comms, "Radio");
-    // subSystemWrapper.add(camera, "Camera");
-    // subSystemWrapper.add(plant, "Plant");
-    // subSystemWrapper.add(eps, "Power");
+    subSystemWrapper.add(adcs, "Attitude");
+    subSystemWrapper.add(ifjr, "IFJR");
+    subSystemWrapper.add(cdh, "Computer");
+    subSystemWrapper.add(comms, "Radio");
+    subSystemWrapper.add(camera, "Camera");
+    subSystemWrapper.add(plant, "Plant");
+    subSystemWrapper.add(eps, "Power");
     subSystemWrapper.setOpaque(false);
 
     this.setLayout(new BorderLayout());
@@ -101,7 +101,6 @@ class CougSat1GUI extends CISPanel implements SatelliteInfo {
       for (JButton button : buttons) {
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.addActionListener(this);
-        button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         button.setForeground(CustomColors.PRIMARY_TEXT);
         button.setIconTextGap(15);
         button.setFocusable(false);

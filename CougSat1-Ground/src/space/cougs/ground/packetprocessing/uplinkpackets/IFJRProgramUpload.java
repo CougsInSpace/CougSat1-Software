@@ -1,7 +1,6 @@
 package space.cougs.ground.packetprocessing.uplinkpackets;
 
 import java.io.File;
-import java.io.IOException;
 
 // import com.sun.jmx.snmp.Timestamp;
 

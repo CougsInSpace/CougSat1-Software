@@ -218,7 +218,7 @@ public class Health extends CISPanel implements SatelliteInfo {
   @Override
   public void updateSatellite(CougSat satellite) {
     mode.setValue(satellite.getCDH().getMode().name());
-    SD.setValue(Units.toBytes(satellite.getCDH().getSDCard()));
+    SD.setValue(Units.toBytes(satellite.getCDH().getSDCardUsed()));
     reset.setValue(String.valueOf(satellite.getCDH().getResetCount()));
     status.setValue(satellite.getCDH().getErrorStatus().toString());
 

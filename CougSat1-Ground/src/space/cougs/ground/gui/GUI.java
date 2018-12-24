@@ -8,12 +8,13 @@ import javax.swing.JFrame;
 
 import space.cougs.ground.CougSatGround;
 import space.cougs.ground.gui.modules.CISTabbedPane;
+import space.cougs.ground.gui.subsystems.SatelliteInfo;
 import space.cougs.ground.gui.utils.Fonts;
 import space.cougs.ground.satellites.CougSat;
 import space.cougs.ground.satellites.CougSat1;
 import space.cougs.ground.utils.FileUtils;
 
-public class GUI implements UIScaling {
+public class GUI implements UIScaling, SatelliteInfo {
   private static final int defaultHeight = 650;
   private static final int defaultWidth  = 1200;
 
@@ -92,6 +93,7 @@ public class GUI implements UIScaling {
     mainFrame.repaint();
   }
 
+  @Override
   public void updateSatellite(CougSat satellite) {
     if (satellite instanceof CougSat1) {
       cougSat1GUI.updateSatellite(satellite);

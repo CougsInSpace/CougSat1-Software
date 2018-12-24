@@ -117,7 +117,7 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
   }
 
   @Override
-  public void paintComponent(Graphics g) {
+  protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D)g;
     g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,

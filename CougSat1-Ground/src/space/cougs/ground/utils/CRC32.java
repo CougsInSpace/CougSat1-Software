@@ -66,14 +66,19 @@ public class CRC32 {
     checkSum = (checkSum >>> 8) ^ TABLE[buf];
   }
 
-  public void update(File file) throws IOException {
-    FileInputStream inStream = new FileInputStream(file);
+  public void update(File file) {
+    try {
+      FileInputStream inStream = new FileInputStream(file);
 
-    int buf;
+      int buf;
 
-    while ((buf = inStream.read()) != -1) {
-      update(buf);
+      while ((buf = inStream.read()) != -1) {
+        update(buf);
+      }
+      inStream.close();
+    } catch (IOException e) {
+      System.out.println(
+          "Failed to update CRC from: " + file.getAbsolutePath());
     }
-    inStream.close();
   }
 }

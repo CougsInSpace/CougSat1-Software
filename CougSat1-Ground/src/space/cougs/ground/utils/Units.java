@@ -51,12 +51,12 @@ public final class Units {
   }
 
   public static String toBytes(long bytes) {
-    if (bytes > 1000000000) {
-      return String.format("%6.2fGB", bytes / 1000000000.0);
-    } else if (bytes > 1000000) {
-      return String.format("%6.2fMB", bytes / 1000000.0);
-    } else if (bytes > 1000000) {
-      return String.format("%6.2fkB", bytes / 1000.0);
+    if (bytes > (1L << 30L)) {
+      return String.format("%6.2fGiB", bytes / (double)(1L << 30L));
+    } else if (bytes > (1L << 20L)) {
+      return String.format("%6.2fMiB", bytes / (double)(1L << 20L));
+    } else if (bytes > (1L << 10L)) {
+      return String.format("%6.2fkiB", bytes / (double)(1L << 10L));
     } else {
       return String.format("%6.2f B", bytes / 1.0);
     }

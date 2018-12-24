@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import javax.swing.SwingConstants;
-
 import space.cougs.ground.CougSatGround;
 import space.cougs.ground.gui.modules.ImageModule;
 import space.cougs.ground.gui.modules.BodyLabel;

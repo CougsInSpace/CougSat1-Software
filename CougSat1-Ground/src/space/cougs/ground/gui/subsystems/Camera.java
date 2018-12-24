@@ -1,56 +1,55 @@
 
 package space.cougs.ground.gui.subsystems;
 
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.JPanel;
-
-import space.cougs.ground.gui.UIScaling;
-import space.cougs.ground.gui.modules.PhotoViewer;
+import space.cougs.ground.CougSatGround;
+import space.cougs.ground.gui.modules.CISPanel;
+import space.cougs.ground.gui.modules.ImageModule;
 import space.cougs.ground.gui.modules.ThumbnailGrid;
+import space.cougs.ground.gui.modules.TitleLabel;
 import space.cougs.ground.gui.utils.CustomColors;
+import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;
 import space.cougs.ground.satellites.CougSat;
+import space.cougs.ground.utils.FileUtils;
 
-public class Camera extends JPanel implements UIScaling, SatelliteInfo {
+public class Camera extends CISPanel implements SatelliteInfo {
   private static final long serialVersionUID = 1L;
 
-  private static final double thumbnailWidthFactor = 0.3;
+  private final int    border               = 10;
+  private final double thumbnailWidthFactor = 0.3;
 
-  private static final ThumbnailGrid thumbnailGrid = new ThumbnailGrid(2);
-  private static final PhotoViewer photoViewer = new PhotoViewer();
-  private int                      border = 10;
+  private final ThumbnailGrid thumbnailGrid = new ThumbnailGrid(2);
 
-  private List<File>   cameraFolder = new ArrayList<File>();
-  // private ListFiles    itr = new ListFiles();
-  private static final File imageFile = new File("packets/images");
+  private final CISPanel photoViewer = new CISPanel();
+  private final ImageModule image    = new ImageModule();
 
   public Camera() {
     super();
-    this.setLayout(null);
-    this.addComponentListener(componentListener);
 
-    // itr.listFilesForFolder(imageFile, cameraFolder);
-
-    thumbnailGrid.setBackground(CustomColors.BACKGROUND22);
     thumbnailGrid.addActionListner(actionListener);
 
-    photoViewer.setBackground(CustomColors.BACKGROUND22);
+    GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
+    gbc.setInsets(5, 5, 5, 5);
 
-    for (File file : cameraFolder) {
-      thumbnailGrid.addThumbnail(file);
-    }
+    photoViewer.setBackground(CustomColors.SECONDARY);
+    photoViewer.setLayout(new GridBagLayout());
+    photoViewer.add(
+        new TitleLabel("Current Image"), gbc.setCommon(0, 0, 1, 1, 1.0, 0.0));
+    photoViewer.add(image, gbc.setCommon(0, 1, 1, 1, 1.0, 1.0));
 
+    this.setLayout(null);
+    this.addComponentListener(componentListener);
+    this.setOpaque(false);
     this.add(thumbnailGrid);
     this.add(photoViewer);
 
-    this.repaint();
-    this.setBackground(CustomColors.BACKGROUND12);
+    addThumbnailsToGrid();
   }
 
   private final ComponentListener componentListener = new ComponentListener() {
@@ -66,8 +65,7 @@ public class Camera extends JPanel implements UIScaling, SatelliteInfo {
       thumbnailGrid.setBounds(border, border, thumbnailWidth - border * 2,
           getHeight() - border * 2);
       photoViewer.setBounds(thumbnailWidth, border,
-          getWidth() - thumbnailWidth - border, getHeight() - border * 2);
-      repaint();
+          getWidth() - thumbnailWidth - border * 2, getHeight() - border * 2);
     }
 
     @Override
@@ -79,37 +77,23 @@ public class Camera extends JPanel implements UIScaling, SatelliteInfo {
   private ActionListener actionListener = new ActionListener() {
     @Override
     public void actionPerformed(ActionEvent e) {
-      photoViewer.setThumbnail(thumbnailGrid.getCurrentThumbnail());
+      image.setImage(FileUtils.getImage(new File(e.getActionCommand())));
     }
   };
 
-  @Override
-  public void updateUIScaling(UIScale uiScale) {
-    // Font titleFont = Fonts.BODY_16;
-
-    // switch (uiScale) {
-    // case SCALE_100:
-    // titleFont = Fonts.BODY_16;
-    // break;
-    // case SCALE_150:
-    // titleFont = Fonts.BODY_24;
-    // break;
-    // case SCALE_200:
-    // titleFont = Fonts.BODY_32;
-    // break;
-    // case SCALE_300:
-    // titleFont = Fonts.BODY_48;
-    // break;
-    // case SCALE_75:
-    // titleFont = Fonts.BODY_12;
-    // break;
-    // default:
-    // break;
-    // }
+  private void addThumbnailsToGrid(){
+    File dir = new File(CougSatGround.getHomeDir().getAbsolutePath() + "\\packets\\images");
+    if(dir.exists()){
+      for(File file : dir.listFiles(FileUtils.imageFilter)){
+        thumbnailGrid.addThumbnail(file);
+      }
+    }else {
+      System.out.println("Image directory does not exist: " + dir.getAbsolutePath());
+    }
   }
 
   @Override
   public void updateSatellite(CougSat satellite) {
-    // TODO Auto-generated method stub
+    addThumbnailsToGrid();
   }
 }

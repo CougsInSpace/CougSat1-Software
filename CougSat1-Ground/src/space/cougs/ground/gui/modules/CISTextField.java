@@ -1,5 +1,7 @@
 package space.cougs.ground.gui.modules;
 
+import java.awt.Color;
+
 import javax.swing.JTextField;
 
 import space.cougs.ground.gui.UIScaling;
@@ -9,11 +11,29 @@ import space.cougs.ground.gui.utils.Fonts;
 public class CISTextField extends JTextField implements UIScaling {
   private static final long serialVersionUID = 1L;
 
+  private Color enabledBackground = null;
+
   public CISTextField() {
-      super();
-      this.setFont(Fonts.BODY_16);
-      this.setForeground(CustomColors.PRIMARY_TEXT);
-      this.setOpaque(false);
+    super();
+    this.setFont(Fonts.BODY_16);
+    this.setForeground(CustomColors.PRIMARY_TEXT);
+    this.setBackground(CustomColors.PRIMARY);
+  }
+
+  @Override
+  public void setBackground(Color bg) {
+    super.setBackground(bg);
+    this.enabledBackground = bg;
+  }
+
+  @Override
+  public void setEnabled(boolean b) {
+    super.setEnabled(b);
+    if (b) {
+      super.setBackground(enabledBackground);
+    } else {
+      super.setBackground(enabledBackground.darker());
+    }
   }
 
   @Override
@@ -36,7 +56,7 @@ public class CISTextField extends JTextField implements UIScaling {
         break;
       default:
         System.out.println("Text field label \"" + this.getText() +
-                           "\" unkown UI Scale: " + uiScale);
+                           "\" unknown UI Scale: " + uiScale);
         break;
     }
   }

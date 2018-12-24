@@ -1,13 +1,25 @@
 package space.cougs.ground.utils;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
 public final class FileUtils {
+  public static FileFilter imageFilter = new FileFilter() {
+    @Override
+    public boolean accept(File pathname) {
+      String name = pathname.getName().toLowerCase();
+      return name.endsWith(".png") || name.endsWith(".jpg") ||
+          name.endsWith(".jpeg") || name.endsWith(".gif") ||
+          name.endsWith(".bmp");
+    }
+  };
+
   public static long readNextBytes(FileInputStream file, int numberOfBytes)
       throws IOException {
     long result = 0;
@@ -39,6 +51,11 @@ public final class FileUtils {
     return Units.rawToCurrent(readNextBytes(file, 2));
   }
 
+  public static int readNextEnergy(FileInputStream file)
+      throws IOException {
+    return Units.rawToEnergy(readNextBytes(file, 1));
+  }
+
   public static double readNextPower(FileInputStream file) throws IOException {
     return Units.rawToPower(readNextBytes(file, 2));
   }
@@ -67,7 +84,10 @@ public final class FileUtils {
   }
 
   public static BufferedImage getImage(String name) {
-    File file = new File("resources\\images\\" + name);
+    return getImage(new File("resources\\images\\" + name));
+  }
+
+  public static BufferedImage getImage(File file) {
     if (!file.exists()) {
       System.out.printf("Image cannot be found: %s\n", file.getAbsolutePath());
       return null;
@@ -81,5 +101,44 @@ public final class FileUtils {
       e.printStackTrace();
     }
     return image;
+  }
+
+  public static BufferedImage getThumbnail(File file) {
+    if (!file.exists()) {
+      System.out.printf("Image cannot be found: %s\n", file.getAbsolutePath());
+      return null;
+    }
+    String thumbnailPath = file.getParentFile().getAbsolutePath();
+    thumbnailPath += "\\thumbnails\\" + file.getName();
+    File thumbnailFile = new File(thumbnailPath);
+    if (thumbnailFile.exists()) {
+      return getImage(thumbnailFile);
+    } else {
+
+      // Get image resize to 150sq px.
+      BufferedImage image = getImage(file);
+      if (image == null) {
+        return null;
+      } else {
+        BufferedImage thumbnail =
+            new BufferedImage(150, 150, BufferedImage.TYPE_INT_RGB);
+
+        Graphics2D g2d = (Graphics2D)thumbnail.getGraphics();
+
+        g2d.drawImage(image, 0, 0, 150, 150, 0, 0, image.getWidth(),
+            image.getHeight(), null);
+
+        try {
+          thumbnailFile.mkdirs();
+          // thumbnailFile.createNewFile();
+          ImageIO.write(thumbnail, "png", thumbnailFile);
+        } catch (IOException e) {
+          System.out.printf("Failed to save thumbnail image at: %s\n",
+              thumbnailFile.getAbsolutePath());
+          e.printStackTrace();
+        }
+        return thumbnail;
+      }
+    }
   }
 }

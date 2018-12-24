@@ -66,7 +66,7 @@ public class TitleLabel extends JLabel implements UIScaling {
         break;
       default:
         System.out.println("Title label \"" + this.getText() +
-                           "\" unkown UI Scale: " + uiScale);
+                           "\" unknown UI Scale: " + uiScale);
         break;
     }
   }
