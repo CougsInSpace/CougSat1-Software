@@ -71,6 +71,7 @@ public class GUI implements UIScaling, SatelliteInfo {
       } else {
         updateUIScaling(UIScale.SCALE_75);
       }
+      mainFrame.repaint();
     }
 
     @Override

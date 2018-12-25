@@ -40,25 +40,22 @@ public class ADCS extends CISPanel implements SatelliteInfo {
   private final CISTextField coordinate3 = new CISTextField();
 
   private final HorizontalValue adcsTemp =
-      new HorizontalValue("Temp: ", "        ", 0.4);
-  private final HorizontalValue roll =
-      new HorizontalValue("Roll: ", "        ", 0.4);
-  private final HorizontalValue pitch =
-      new HorizontalValue("Pitch: ", "        ", 0.4);
-  private final HorizontalValue yaw =
-      new HorizontalValue("Yaw: ", "        ", 0.4);
+      new HorizontalValue("Temp: ", 9, 0.5);
+  private final HorizontalValue roll  = new HorizontalValue("Roll: ", 9, 0.5);
+  private final HorizontalValue pitch = new HorizontalValue("Pitch: ", 9, 0.5);
+  private final HorizontalValue yaw   = new HorizontalValue("Yaw: ", 9, 0.5);
   private final HorizontalValue xPWMOut =
-      new HorizontalValue("X PWM Out: ", "        ", 0.4);
+      new HorizontalValue("X PWM Out: ", 9, 0.5);
   private final HorizontalValue yPWMOut =
-      new HorizontalValue("Y PWM Out: ", "        ", 0.4);
+      new HorizontalValue("Y PWM Out: ", 9, 0.5);
   private final HorizontalValue zPWMOut =
-      new HorizontalValue("Z PWM Out: ", "        ", 0.4);
+      new HorizontalValue("Z PWM Out: ", 9, 0.5);
   private final HorizontalValue xCurrent =
-      new HorizontalValue("X Current: ", "        ", 0.4);
+      new HorizontalValue("X Current: ", 9, 0.5);
   private final HorizontalValue yCurrent =
-      new HorizontalValue("Y Current: ", "        ", 0.4);
+      new HorizontalValue("Y Current: ", 9, 0.5);
   private final HorizontalValue zCurrent =
-      new HorizontalValue("Z Current: ", "        ", 0.4);
+      new HorizontalValue("Z Current: ", 9, 0.5);
 
   private final ActionListener buttonListener = new ActionListener() {
     @Override
@@ -66,31 +63,32 @@ public class ADCS extends CISPanel implements SatelliteInfo {
       if (e.getSource().equals(buttonTransmit)) {
         System.out.println("Transmitting ADCS request");
       } else if (e.getSource().equals(buttonTerrestrial)) {
-		  buttonTerrestrial.setBackground(CustomColors.PRIMARY_BUTTON_ACTIVE);
-		  buttonCelestial.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
-		  buttonEuler.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
-		  coordinateLabel1.setText("Latitude");
-		  coordinateLabel2.setText("Longitude");
-		  coordinateLabel3.setText("");
-		  coordinate3.setEnabled(false);
+        buttonTerrestrial.setBackground(CustomColors.PRIMARY_BUTTON_ACTIVE);
+        buttonCelestial.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
+        buttonEuler.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
+        coordinateLabel1.setText("Latitude");
+        coordinateLabel2.setText("Longitude");
+        coordinateLabel3.setText("");
+        coordinate3.setEnabled(false);
       } else if (e.getSource().equals(buttonCelestial)) {
-		buttonTerrestrial.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
-		buttonCelestial.setBackground(CustomColors.PRIMARY_BUTTON_ACTIVE);
-		buttonEuler.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
-		coordinateLabel1.setText("Right Ascension");
-		coordinateLabel2.setText("Declination");
-		coordinateLabel3.setText("");
-		coordinate3.setEnabled(false);
+        buttonTerrestrial.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
+        buttonCelestial.setBackground(CustomColors.PRIMARY_BUTTON_ACTIVE);
+        buttonEuler.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
+        coordinateLabel1.setText("Right Ascension");
+        coordinateLabel2.setText("Declination");
+        coordinateLabel3.setText("");
+        coordinate3.setEnabled(false);
       } else if (e.getSource().equals(buttonEuler)) {
-		buttonTerrestrial.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
-		buttonCelestial.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
-		buttonEuler.setBackground(CustomColors.PRIMARY_BUTTON_ACTIVE);
-		coordinateLabel1.setText("Roll");
-		coordinateLabel2.setText("Pitch");
-		coordinateLabel3.setText("Yaw");
-		coordinate3.setEnabled(true);
+        buttonTerrestrial.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
+        buttonCelestial.setBackground(CustomColors.PRIMARY_BUTTON_INACTIVE);
+        buttonEuler.setBackground(CustomColors.PRIMARY_BUTTON_ACTIVE);
+        coordinateLabel1.setText("Roll");
+        coordinateLabel2.setText("Pitch");
+        coordinateLabel3.setText("Yaw");
+        coordinate3.setEnabled(true);
       } else {
-        System.out.println("ADCS button not recognized: " + e.getActionCommand());
+        System.out.println(
+            "ADCS button not recognized: " + e.getActionCommand());
       }
     }
   };
@@ -142,12 +140,12 @@ public class ADCS extends CISPanel implements SatelliteInfo {
     telemetryPanel.add(zCurrent, gbc.setXY(1, 5));
 
     this.setLayout(new GridBagLayout());
-    this.setBackground(CustomColors.SECONDARY);
-    this.setBorder(BorderFactory.createLineBorder(CustomColors.PRIMARY, 10));
-    this.add(map, gbc.setCommon(0, 0, 3, 1, 1.0, 1.0));
-    this.add(attitudeIndicator, gbc.setCommon(0, 1, 1, 1, 1.0, 0.0));
-    this.add(telemetryPanel, gbc.setCommon(1, 1, 1, 1, 0.0, 0.0));
-    this.add(coordinatePanel, gbc.setCommon(2, 1, 1, 1, 1.0, 0.0));
+    this.setOpaque(false);
+    this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    this.add(map, gbc.setCommon(0, 0, 3, 1, 1.0, 1.0).setInsets(0, 0, 5,0));
+    this.add(attitudeIndicator, gbc.setCommon(0, 1, 1, 1, 1.0, 0.0).setInsets(5, 0, 0, 5));
+    this.add(telemetryPanel, gbc.setCommon(1, 1, 1, 1, 0.0, 0.0).setInsets(5, 5, 0, 5));
+    this.add(coordinatePanel, gbc.setCommon(2, 1, 1, 1, 1.0, 0.0).setInsets(5, 0, 0, 0));
 
     buttonTerrestrial.addActionListener(buttonListener);
     buttonCelestial.addActionListener(buttonListener);

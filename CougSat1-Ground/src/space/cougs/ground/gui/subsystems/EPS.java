@@ -1,5 +1,6 @@
 package space.cougs.ground.gui.subsystems;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
@@ -10,7 +11,6 @@ import javax.swing.Timer;
 import space.cougs.ground.gui.modules.CISPanel;
 import space.cougs.ground.gui.modules.CISTabbedPane;
 import space.cougs.ground.gui.utils.AnimationComponent;
-import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.satellites.CougSat;
 
 public class EPS extends CISPanel implements SatelliteInfo {
@@ -22,7 +22,7 @@ public class EPS extends CISPanel implements SatelliteInfo {
 
   private final List<AnimationComponent> animationComponents =
       new LinkedList<AnimationComponent>();
-  private final double frameDuration = (1 / 10);
+  private final double frameDuration = 0.1;
 
   private final ActionListener timerListener = new ActionListener() {
     @Override
@@ -43,9 +43,7 @@ public class EPS extends CISPanel implements SatelliteInfo {
     mainPowerPanel.addTab("   Distribution   ", powerDistribution);
     mainPowerPanel.setSelectedComponent(powerGeneration);
 
-    powerGeneration.setBackground(CustomColors.SECONDARY);
-    powerDistribution.setBackground(CustomColors.SECONDARY);
-
+    this.setLayout(new BorderLayout());
     this.add(mainPowerPanel);
     timer.start();
   }

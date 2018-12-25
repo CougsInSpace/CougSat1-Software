@@ -1,10 +1,15 @@
 package space.cougs.ground.gui;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
+import javax.swing.BorderFactory;
 
 import space.cougs.ground.CougSatGround;
 import space.cougs.ground.gui.modules.ImageModule;
@@ -28,8 +33,9 @@ public class Home extends CISPanel {
       new CISScrollPane(patchNotesBody);
 
   private final CISPanel aboutPanel   = new CISPanel();
-  private final CISTextArea aboutBody = new CISTextArea();
+  private final CISTextArea aboutBody = new CISTextArea(8, 30);
 
+  private final CISPanel infoPanel    = new CISPanel();
   private final CISPanel optionsPanel = new CISPanel();
 
   private final CISPanel filesAndDirectories = new CISPanel();
@@ -59,49 +65,55 @@ public class Home extends CISPanel {
   private final CISCheckBox debugAudio  = new CISCheckBox("Debug Missed Audio");
   private final CISCheckBox debugSignal = new CISCheckBox("Debug Find Signal");
 
-  private final ImageModule logoPanel;
+  private final ImageModule logoPanel =
+      new ImageModule(FileUtils.getImage("CISClubLogo-1000.png"));
 
   public Home() {
     super();
 
-    GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
-    gbc.setInsets(5, 5, 5, 5);
-    this.setLayout(new GridBagLayout());
-
-    logoPanel = new ImageModule(FileUtils.getImage("CISClubLogo-1000.png"));
-    logoPanel.setBackground(CustomColors.PRIMARY);
-
-    aboutPanel.setLayout(new GridBagLayout());
-    aboutPanel.setBackground(CustomColors.SECONDARY);
-    aboutPanel.add(
-        new TitleLabel("About"), gbc.setCommon(0, 1, 2, 1, 1.0, 0.0));
-    aboutPanel.add(aboutBody, gbc.setCommon(0, 2, 2, 1, 1.0, 1.0));
-
-    patchNotesPanel.setLayout(new GridBagLayout());
-    patchNotesPanel.setBackground(CustomColors.SECONDARY);
-    patchNotesPanel.add(
-        new TitleLabel("Patch Notes"), gbc.setCommon(0, 3, 2, 1, 1.0, 0.0));
-    patchNotesPanel.add(patchNotesScroll, gbc.setCommon(0, 4, 2, 1, 1.0, 1.0));
-
+    layoutInfoPanel();
     layoutOptionPanel();
 
-    this.add(logoPanel, gbc.setCommon(0, 0, 1, 1, 1.0, 1.0));
-    this.add(aboutPanel, gbc.setCommon(0, 1, 1, 1, 0.0, 0.0));
-    this.add(patchNotesPanel, gbc.setCommon(0, 2, 1, 1, 0.0, 1.0));
-    this.add(optionsPanel, gbc.setCommon(1, 0, 1, 3));
+    this.setLayout(new GridLayout(0, 2, 10, 10));
+    this.add(infoPanel);
+    this.add(optionsPanel);
+    this.setBackground(CustomColors.SECONDARY);
+    this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
     loadText();
+  }
 
-    this.setBackground(CustomColors.SECONDARY);
+  private void layoutInfoPanel() {
+    logoPanel.setLink("http://cougs.space");
+
+    aboutBody.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    patchNotesBody.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+    aboutPanel.setLayout(new BorderLayout());
+    aboutPanel.add(new TitleLabel("About"), BorderLayout.PAGE_START);
+    aboutPanel.add(aboutBody, BorderLayout.CENTER);
+
+    patchNotesPanel.setLayout(new BorderLayout());
+    patchNotesPanel.add(new TitleLabel("Patch Notes"), BorderLayout.PAGE_START);
+    patchNotesPanel.add(patchNotesScroll, BorderLayout.CENTER);
+
+    infoPanel.setLayout(new GridLayout(3, 0, 10, 10));
+    infoPanel.setOpaque(false);
+    infoPanel.add(logoPanel);
+    infoPanel.add(aboutPanel);
+    infoPanel.add(patchNotesPanel);
   }
 
   private void layoutOptionPanel() {
     GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
     gbc.setInsets(5, 5, 5, 5).setWeight(1.0, 1.0);
 
-    filesAndDirectories.setLayout(new GridBagLayout());
-    filesAndDirectories.add(new TitleLabel("Home Directory"), gbc.setXY(0, 0));
-    filesAndDirectories.add(homeDirectory, gbc.setXY(0, 1));
+    filesAndDirectories.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+    filesAndDirectories.setLayout(new BorderLayout());
+    filesAndDirectories.add(
+        new TitleLabel("Home Directory"), BorderLayout.PAGE_START);
+    filesAndDirectories.add(homeDirectory, BorderLayout.CENTER);
 
     groundStationInfo.setLayout(new GridBagLayout());
     groundStationInfo.add(new TitleLabel("Ground Station Info"),
@@ -109,7 +121,7 @@ public class Home extends CISPanel {
     groundStationInfo.add(new BodyLabel("GroundStation Name: "),
         gbc.setCommon(0, 1, 1, 1, 0.0, 1.0));
     groundStationInfo.add(new BodyLabel("Longitude: "), gbc.setXY(0, 2));
-    groundStationInfo.add(new BodyLabel("Latittude: "), gbc.setXY(0, 3));
+    groundStationInfo.add(new BodyLabel("Latitude: "), gbc.setXY(0, 3));
     groundStationInfo.add(new BodyLabel("Grid Locator: "), gbc.setXY(0, 4));
     groundStationInfo.add(new BodyLabel("Altitude (m): "), gbc.setXY(0, 5));
     groundStationInfo.add(
@@ -141,13 +153,16 @@ public class Home extends CISPanel {
     debugPanel.add(debugSignal, gbc.setXY(0, 5));
 
     optionsPanel.setLayout(new GridBagLayout());
-    optionsPanel.setBackground(CustomColors.SECONDARY);
-    optionsPanel.add(
-        new TitleLabel("Options"), gbc.setCommon(0, 0, 2, 1, 1.0, 0.0));
-    optionsPanel.add(filesAndDirectories, gbc.setCommon(0, 1, 2, 1, 1.0, 1.0));
+    optionsPanel.setOpaque(false);
+    optionsPanel.add(new TitleLabel("Options"),
+        gbc.setCommon(0, 0, 2, 1, 1.0, 0.0).setInsets(0, 0, 5, 0));
+    optionsPanel.add(filesAndDirectories,
+        gbc.setCommon(0, 1, 2, 1, 1.0, 1.0).setInsets(5, 0, 5, 0));
     optionsPanel.add(groundStationInfo, gbc.setCommon(0, 2, 2, 1));
-    optionsPanel.add(decoderPanel, gbc.setCommon(0, 3, 1, 1));
-    optionsPanel.add(debugPanel, gbc.setCommon(1, 3, 1, 1));
+    optionsPanel.add(
+        decoderPanel, gbc.setCommon(0, 3, 1, 1).setInsets(5, 0, 0, 5));
+    optionsPanel.add(
+        debugPanel, gbc.setCommon(1, 3, 1, 1).setInsets(5, 5, 0, 0));
   }
 
   private void loadText() {

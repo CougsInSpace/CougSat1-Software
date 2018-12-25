@@ -10,7 +10,11 @@ public class CISTextArea extends JTextArea implements UIScaling {
   private static final long serialVersionUID = 1L;
 
   public CISTextArea() {
-    super();
+    this(0, 0);
+  }
+
+  public CISTextArea(int rows, int columns) {
+    super(rows, columns);
     this.setFont(Fonts.BODY_16);
     this.setEditable(false);
     this.setLineWrap(true);

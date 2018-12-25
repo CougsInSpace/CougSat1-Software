@@ -1,11 +1,13 @@
 
 package space.cougs.ground.gui.subsystems;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.File;
 
 import space.cougs.ground.CougSatGround;
@@ -22,7 +24,7 @@ public class Camera extends CISPanel implements SatelliteInfo {
   private static final long serialVersionUID = 1L;
 
   private final int    border               = 10;
-  private final double thumbnailWidthFactor = 0.3;
+  private final double thumbnailWidthFactor = 0.25;
 
   private final ThumbnailGrid thumbnailGrid = new ThumbnailGrid(2);
 
@@ -32,47 +34,24 @@ public class Camera extends CISPanel implements SatelliteInfo {
   public Camera() {
     super();
 
-    thumbnailGrid.addActionListner(actionListener);
-
     GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
     gbc.setInsets(5, 5, 5, 5);
 
-    photoViewer.setBackground(CustomColors.SECONDARY);
+    thumbnailGrid.addActionListener(actionListener);
+
+    photoViewer.setBackground(CustomColors.PRIMARY);
     photoViewer.setLayout(new GridBagLayout());
     photoViewer.add(
         new TitleLabel("Current Image"), gbc.setCommon(0, 0, 1, 1, 1.0, 0.0));
     photoViewer.add(image, gbc.setCommon(0, 1, 1, 1, 1.0, 1.0));
 
-    this.setLayout(null);
-    this.addComponentListener(componentListener);
+    this.setLayout(layoutManager);
     this.setOpaque(false);
     this.add(thumbnailGrid);
     this.add(photoViewer);
 
     addThumbnailsToGrid();
   }
-
-  private final ComponentListener componentListener = new ComponentListener() {
-    @Override
-    public void componentHidden(ComponentEvent e) {}
-
-    @Override
-    public void componentMoved(ComponentEvent e) {}
-
-    @Override
-    public void componentResized(ComponentEvent e) {
-      int thumbnailWidth = (int)(getWidth() * thumbnailWidthFactor);
-      thumbnailGrid.setBounds(border, border, thumbnailWidth - border * 2,
-          getHeight() - border * 2);
-      photoViewer.setBounds(thumbnailWidth, border,
-          getWidth() - thumbnailWidth - border * 2, getHeight() - border * 2);
-    }
-
-    @Override
-    public void componentShown(ComponentEvent e) {
-      this.componentResized(e);
-    }
-  };
 
   private ActionListener actionListener = new ActionListener() {
     @Override
@@ -81,14 +60,48 @@ public class Camera extends CISPanel implements SatelliteInfo {
     }
   };
 
-  private void addThumbnailsToGrid(){
-    File dir = new File(CougSatGround.getHomeDir().getAbsolutePath() + "\\packets\\images");
-    if(dir.exists()){
-      for(File file : dir.listFiles(FileUtils.imageFilter)){
+  private LayoutManager layoutManager = new LayoutManager() {
+    @Override
+    public void removeLayoutComponent(Component comp) {}
+
+    @Override
+    public Dimension preferredLayoutSize(Container parent) {
+      return null;
+    }
+
+    @Override
+    public Dimension minimumLayoutSize(Container parent) {
+      return null;
+    }
+
+    @Override
+    public void layoutContainer(Container parent) {
+      int x      = border;
+      int y      = border;
+      int width  = (int)(getWidth() * thumbnailWidthFactor);
+      int height = getHeight() - border * 2;
+
+      thumbnailGrid.setBounds(x, y, width, height);
+
+      x += width + border;
+      width = getWidth() - x - border;
+      photoViewer.setBounds(x, y, width, height);
+    }
+
+    @Override
+    public void addLayoutComponent(String name, Component comp) {}
+  };
+
+  private void addThumbnailsToGrid() {
+    File dir = new File(
+        CougSatGround.getHomeDir().getAbsolutePath() + "\\packets\\images");
+    if (dir.exists()) {
+      for (File file : dir.listFiles(FileUtils.imageFilter)) {
         thumbnailGrid.addThumbnail(file);
       }
-    }else {
-      System.out.println("Image directory does not exist: " + dir.getAbsolutePath());
+    } else {
+      System.out.println(
+          "Image directory does not exist: " + dir.getAbsolutePath());
     }
   }
 

@@ -58,7 +58,7 @@ public final class Units {
     } else if (bytes > (1L << 10L)) {
       return String.format("%6.2fkiB", bytes / (double)(1L << 10L));
     } else {
-      return String.format("%6.2f B", bytes / 1.0);
+      return String.format("%6.2f  B", bytes / 1.0);
     }
   }
 }

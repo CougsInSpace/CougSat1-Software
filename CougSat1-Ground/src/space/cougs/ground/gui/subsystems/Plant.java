@@ -1,8 +1,8 @@
 package space.cougs.ground.gui.subsystems;
 
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import javax.swing.BorderFactory;
 
 import space.cougs.ground.CougSatGround;
 import space.cougs.ground.gui.modules.CISPanel;
-import space.cougs.ground.gui.modules.HorizontalScrollBar;
+import space.cougs.ground.gui.modules.CISScrollBar;
 import space.cougs.ground.gui.modules.HorizontalValue;
 import space.cougs.ground.gui.modules.ImageModule;
 import space.cougs.ground.gui.modules.TitleLabel;
@@ -25,15 +25,16 @@ public class Plant extends CISPanel implements SatelliteInfo {
 
   private final ImageModule image = new ImageModule();
   private final HorizontalValue time =
-      new HorizontalValue("Data Timestamp: ", "     ", 0.5);
-  private final HorizontalScrollBar scroll = new HorizontalScrollBar("Day  0");
+      new HorizontalValue("Data Timestamp: ", 9, 0.5);
+  private final CISScrollBar scroll =
+      new CISScrollBar("Day  0", CISScrollBar.HORIZONTAL, 0, 24, 0, 28 * 24);
 
   private final List<File> imageFiles = new ArrayList<File>();
 
-  private final ActionListener actionListener = new ActionListener() {
+  private final AdjustmentListener adjustmentListener = new AdjustmentListener() {
     @Override
-    public void actionPerformed(ActionEvent e) {
-      int day = (int)(Math.floor(28 * scroll.getScrollPosition() + 0.5));
+    public void adjustmentValueChanged(AdjustmentEvent e) {
+      int day = (int)(Math.floor(e.getValue() / 24.0));
       scroll.setLabel(String.format("Day %2d", day));
       if (day < imageFiles.size()) {
         image.setImage(FileUtils.getImage(imageFiles.get(day)));
@@ -49,7 +50,7 @@ public class Plant extends CISPanel implements SatelliteInfo {
     GridBagConstraintsWrapper gbc = new GridBagConstraintsWrapper();
     gbc.setInsets(5, 5, 5, 5);
 
-    scroll.addActionListner(actionListener);
+    scroll.addAdjustmentListener(adjustmentListener);
 
     this.setLayout(new GridBagLayout());
     this.add(new TitleLabel("Germination Exeriment"),
@@ -58,8 +59,7 @@ public class Plant extends CISPanel implements SatelliteInfo {
     this.add(time, gbc.setCommon(1, 1, 1, 1, 0.0, 1.0));
     this.add(scroll, gbc.setCommon(0, 2, 2, 1, 1.0, 0.0));
 
-    this.setBackground(CustomColors.SECONDARY);
-    this.setBorder(BorderFactory.createLineBorder(CustomColors.PRIMARY, 10));
+    this.setBorder(BorderFactory.createLineBorder(CustomColors.SECONDARY, 10));
 
     addImagesToList();
   }

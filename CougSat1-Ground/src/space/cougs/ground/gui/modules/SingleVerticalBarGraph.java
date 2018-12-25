@@ -70,8 +70,8 @@ public class SingleVerticalBarGraph extends JComponent implements UIScaling {
     this.dangerHigh  = dangerHigh;
     this.dangerLow   = dangerLow;
 
-    this.setForeground(CustomColors.PRIMARY_TEXT);
-    this.setBackground(CustomColors.PRIMARY);
+    this.setForeground(CustomColors.SECONDARY_TEXT);
+    this.setBackground(CustomColors.SECONDARY.darker());
 
     this.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
   }

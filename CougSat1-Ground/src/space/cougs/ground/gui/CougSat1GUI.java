@@ -63,6 +63,7 @@ class CougSat1GUI extends CISPanel implements SatelliteInfo {
     subSystemWrapper.setOpaque(false);
 
     this.setLayout(new BorderLayout());
+    this.setBackground(CustomColors.SECONDARY);
     this.add(subSystemWrapper, BorderLayout.CENTER);
     this.add(cardSwitcher, BorderLayout.LINE_START);
   }

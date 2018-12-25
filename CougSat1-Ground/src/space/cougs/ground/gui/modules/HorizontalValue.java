@@ -20,13 +20,21 @@ public class HorizontalValue extends JComponent implements UIScaling {
   private final String label;
   private final double divider;
 
+  private final int valueWidth;
+
   private String value;
 
-  public HorizontalValue(String label, String value, double divider) {
+  public HorizontalValue(String label, int valueWidth, double divider) {
+    this(label, "", valueWidth, divider);
+  }
+
+  public HorizontalValue(
+      String label, String value, int valueWidth, double divider) {
     super();
-    this.label   = label;
-    this.divider = divider;
-    this.value   = value;
+    this.label      = label;
+    this.divider    = divider;
+    this.value      = value;
+    this.valueWidth = valueWidth;
     this.setForeground(CustomColors.PRIMARY_TEXT);
     this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
   }
@@ -43,6 +51,13 @@ public class HorizontalValue extends JComponent implements UIScaling {
     int height     = fontMetrics.getHeight();
     int labelWidth = fontMetrics.stringWidth(label);
     int valueWidth = fontMetrics.stringWidth(value);
+    if(this.valueWidth > value.length()){
+      String string = "";
+      for(int i = 0; i < this.valueWidth; i++){
+        string += " ";
+      }
+      valueWidth = fontMetrics.stringWidth(string);
+    }
 
     Insets insets = this.getInsets();
 
@@ -77,6 +92,7 @@ public class HorizontalValue extends JComponent implements UIScaling {
 
   public void setValue(String value) {
     this.value = value;
+    this.repaint();
   }
 
   @Override

@@ -15,7 +15,6 @@ import space.cougs.ground.gui.modules.Map;
 import space.cougs.ground.gui.modules.SingleVerticalBarGraph;
 import space.cougs.ground.gui.modules.TitleLabel;
 import space.cougs.ground.gui.modules.CISPanel;
-import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.gui.utils.GridBagConstraintsWrapper;
 import space.cougs.ground.satellites.CougSat;
 import space.cougs.ground.utils.Units;
@@ -29,16 +28,11 @@ public class Health extends CISPanel implements SatelliteInfo {
   private final CISPanel power       = new CISPanel();
   private final CISPanel temperature = new CISPanel();
 
-  private final HorizontalValue mode =
-      new HorizontalValue("Mode:", "        ", 0.5);
-  private final HorizontalValue time =
-      new HorizontalValue("Time:", "        ", 0.5);
-  private final HorizontalValue SD =
-      new HorizontalValue("SD:", "        ", 0.5);
-  private final HorizontalValue reset =
-      new HorizontalValue("Reset:", "        ", 0.5);
-  private final HorizontalValue status =
-      new HorizontalValue("Status:", "        ", 0.5);
+  private final HorizontalValue mode   = new HorizontalValue("Mode:", 9, 0.5);
+  private final HorizontalValue time   = new HorizontalValue("Time:", 9, 0.5);
+  private final HorizontalValue SD     = new HorizontalValue("SD:", 9, 0.5);
+  private final HorizontalValue reset  = new HorizontalValue("Reset:", 9, 0.5);
+  private final HorizontalValue status = new HorizontalValue("Status:", 9, 0.5);
 
   private final SingleVerticalBarGraph rx =
       new SingleVerticalBarGraph("RX (mW)", 8, 0, 100);
@@ -105,6 +99,7 @@ public class Health extends CISPanel implements SatelliteInfo {
   public Health() {
     super();
 
+    this.setOpaque(false);
     this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     this.setLayout(new GridBagLayout());
 
@@ -185,7 +180,6 @@ public class Health extends CISPanel implements SatelliteInfo {
     this.add(power, gbc.setCommon(2, 0, 1, 2, 1.0, 1.0).setInsets(0, 5, 5, 0));
 
     setToolTips();
-    configureAppearance();
   }
 
   private void setToolTips() {
@@ -207,14 +201,6 @@ public class Health extends CISPanel implements SatelliteInfo {
     regulator3V3BCurrent.setToolTipText("3.3V Regulator B Current");
   }
 
-  private void configureAppearance() {
-    cdh.setBackground(CustomColors.SECONDARY);
-    temperature.setBackground(CustomColors.SECONDARY);
-    adcs.setBackground(CustomColors.SECONDARY);
-    comms.setBackground(CustomColors.SECONDARY);
-    power.setBackground(CustomColors.SECONDARY);
-  }
-
   @Override
   public void updateSatellite(CougSat satellite) {
     mode.setValue(satellite.getCDH().getMode().name());
@@ -224,7 +210,7 @@ public class Health extends CISPanel implements SatelliteInfo {
 
     SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
     format.setTimeZone(TimeZone.getTimeZone("UTC"));
-    time.setValue(format.format(satellite.getCDH().getTime()));
+    time.setValue(format.format(satellite.getCDH().getTime() * 1000));
 
     rx.setValue(satellite.getComms().getRXPower() * 1000);
     tx.setValue(satellite.getComms().getTXPower() * 1000);

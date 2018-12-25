@@ -1,21 +1,27 @@
 package space.cougs.ground.gui.modules;
 
+import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 
 import space.cougs.ground.gui.utils.CustomColors;
 import space.cougs.ground.utils.FileUtils;
@@ -23,32 +29,31 @@ import space.cougs.ground.utils.FileUtils;
 public class ThumbnailGrid extends JComponent {
   private static final long serialVersionUID = 1L;
 
+  private final CISScrollBar scroll = new CISScrollBar();
+
   private final List<Image> thumbnails    = new ArrayList<Image>();
   private final List<File> thumbnailFiles = new ArrayList<File>();
   private final List<ActionListener> actionListeners =
       new ArrayList<ActionListener>();
 
-  private final Rectangle scrollBar = new Rectangle(0, 0, 0, 0);
-
-  private double  scrollPosition = 0.0;
-  private int     columns        = 1;
-  private int     barWidth       = 20;
-  private int     gridHeight     = 0;
-  private int     squareLength   = 0;
-  private int     lastScrollBarY = 0;
-  private boolean barClicked     = false;
+  private int columns      = 1;
+  private int gridHeight   = 0;
+  private int squareLength = 0;
 
   public ThumbnailGrid(int columns) {
+    scroll.addAdjustmentListener(adjustmentListener);
+
     this.columns = columns;
-    this.addMouseMotionListener(mouseMotionListener);
     this.addMouseListener(mouseListener);
-    this.setBackground(CustomColors.SECONDARY);
+    this.addComponentListener(componentListener);
+    this.addMouseWheelListener(mouseWheelListener);
+    this.setBackground(CustomColors.PRIMARY);
+    this.setLayout(new BorderLayout());
+    this.add(scroll, BorderLayout.EAST);
   }
 
-  public void addActionListner(ActionListener listener) {
-    if (!actionListeners.contains(listener)) {
-      actionListeners.add(listener);
-    }
+  public void addActionListener(ActionListener actionListener) {
+    actionListeners.add(actionListener);
   }
 
   private MouseListener mouseListener = new MouseListener() {
@@ -62,51 +67,77 @@ public class ThumbnailGrid extends JComponent {
     public void mouseExited(MouseEvent e) {}
 
     @Override
-    public void mousePressed(MouseEvent e) {
-      if (scrollBar.contains(e.getPoint())) {
-        lastScrollBarY = e.getY();
-        barClicked     = true;
-      }
-    }
+    public void mousePressed(MouseEvent e) {}
 
     @Override
     public void mouseReleased(MouseEvent e) {
-      if (!barClicked && e.getX() < squareLength * 2) {
-        int hiddenHeight  = (int)(scrollPosition * (gridHeight - getHeight()));
-        int currentColumn = e.getX() / squareLength;
-        int currentRow    = (e.getY() + hiddenHeight) / squareLength;
-        int i             = currentRow * 2 + currentColumn;
+      int hiddenHeight  = scroll.getValue();
+      int currentColumn = e.getX() / squareLength;
+      int currentRow    = (e.getY() + hiddenHeight) / squareLength;
+      int i             = currentRow * 2 + currentColumn;
 
-        if (i < thumbnailFiles.size()) {
-          for (ActionListener listener : actionListeners) {
-            ActionEvent event = new ActionEvent(
-                e.getSource(), 0, thumbnailFiles.get(i).getAbsolutePath());
-            listener.actionPerformed(event);
-          }
+      if (i < thumbnailFiles.size()) {
+        for (ActionListener listener : actionListeners) {
+          ActionEvent event = new ActionEvent(
+              e.getSource(), 0, thumbnailFiles.get(i).getAbsolutePath());
+          listener.actionPerformed(event);
         }
       }
-      barClicked = false;
     }
   };
 
-  private final MouseMotionListener mouseMotionListener =
-      new MouseMotionListener() {
-        @Override
-        public void mouseDragged(MouseEvent e) {
-          if (barClicked) {
-            int y = scrollBar.y + e.getY() - lastScrollBarY;
-            y     = (int)Math.min(y, getHeight() - scrollBar.getHeight());
-            y     = (int)Math.max(0, y);
+  private final ComponentListener componentListener = new ComponentListener() {
+    @Override
+    public void componentShown(ComponentEvent e) {
+      this.componentResized(e);
+    }
 
-            scrollBar.y    = y;
-            scrollPosition = y / (getHeight() - scrollBar.getHeight());
-            lastScrollBarY = e.getY();
-            repaint();
+    @Override
+    public void componentResized(ComponentEvent e) {
+      squareLength = (getWidth() - scroll.getWidth()) / columns;
+
+      int rowCount =
+          (int)Math.max(1, Math.ceil((double)thumbnails.size() / columns));
+      gridHeight = squareLength * rowCount;
+      scroll.setMaximum(gridHeight);
+      scroll.setVisibleAmount(getHeight());
+      scroll.setUnitIncrement(squareLength / 20);
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {}
+
+    @Override
+    public void componentHidden(ComponentEvent e) {}
+  };
+
+  private final AdjustmentListener adjustmentListener =
+      new AdjustmentListener() {
+        @Override
+        public void adjustmentValueChanged(AdjustmentEvent e) {
+          repaint();
+        }
+      };
+
+  private final MouseWheelListener mouseWheelListener =
+      new MouseWheelListener() {
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+          if (e.getWheelRotation() == 0) {
+            return;
+          }
+          int direction = e.getWheelRotation() < 0 ? -1 : 1;
+          if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+            int units = e.getUnitsToScroll();
+            int value = scroll.getValue();
+            value += scroll.getUnitIncrement() * units;
+            scroll.setValue(value);
+          } else if (e.getScrollType() == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
+            int value = scroll.getValue();
+            value += scroll.getBlockIncrement(direction);
+            scroll.setValue(value);
           }
         }
-
-        @Override
-        public void mouseMoved(MouseEvent e) {}
       };
 
   public void addThumbnail(File thumbnail) {
@@ -120,6 +151,7 @@ public class ThumbnailGrid extends JComponent {
       thumbnailFiles.add(thumbnail);
       gridHeight =
           (int)(squareLength * Math.ceil((double)thumbnails.size() / columns));
+      this.repaint();
     }
   }
 
@@ -130,19 +162,15 @@ public class ThumbnailGrid extends JComponent {
     g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
         RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-    squareLength = (getWidth() - barWidth) / columns;
+    int xOffset = this.getWidth() - scroll.getWidth() - squareLength * 2;
 
-    int rowCount =
-        (int)Math.max(1, Math.ceil((double)thumbnails.size() / columns));
-    gridHeight = squareLength * rowCount;
-    scrollBar.setSize(barWidth, getHeight() * getHeight() / gridHeight);
-    scrollBar.x = squareLength * 2;
     g2d.setColor(this.getBackground());
-    g2d.fillRect(0, 0, squareLength * 2 + scrollBar.width, this.getHeight());
+    g2d.fillRect(
+        xOffset, 0, this.getWidth() - scroll.getWidth(), this.getHeight());
 
-    int y = (int)(scrollPosition * Math.min(0, this.getHeight() - gridHeight));
+    int y = -scroll.getValue();
     for (int i = 0; i < thumbnails.size(); i++) {
-      int x = squareLength * (i % columns);
+      int x = squareLength * (i % columns) + xOffset;
       if (y > -squareLength && y < getHeight()) {
         // Only draw visible images
         g2d.drawImage(
@@ -152,8 +180,5 @@ public class ThumbnailGrid extends JComponent {
         y += squareLength;
       }
     }
-
-    g2d.setColor(CustomColors.ACCENT);
-    g2d.fill(scrollBar);
   }
 }

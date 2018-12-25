@@ -37,6 +37,7 @@ public class Map extends JComponent implements UIScaling {
     this.latitude  = latitude;
     this.longitude = longitude;
 
+    this.setBackground(CustomColors.PRIMARY);
     this.setForeground(CustomColors.PRIMARY_TEXT);
     this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -73,9 +74,18 @@ public class Map extends JComponent implements UIScaling {
     Graphics2D g2d = (Graphics2D)g;
     g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
         RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+    g2d.setRenderingHint(
+        RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2d.setRenderingHint(
+        RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
     FontMetrics fontMetrics = this.getFontMetrics(this.getFont());
     Insets      insets      = this.getInsets();
+
+    g2d.setColor(this.getBackground());
+    g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
     int x1 = insets.left;
     int x2 = this.getWidth() - insets.right;
@@ -87,28 +97,26 @@ public class Map extends JComponent implements UIScaling {
 
     x1 = (this.getWidth() / 2) - (newWidth / 2);
     x2 = x1 + newWidth;
-
     g2d.drawImage(
         map, x1, y1, x2, y2, 0, 0, map.getWidth(), map.getHeight(), null);
 
     int x = x1 - insets.left;
     int y = y2 + fontMetrics.getAscent();
-
+    g2d.setColor(this.getForeground());
     g2d.drawString(String.format(latitudeText, latitude), x, y);
 
     x = x2 - fontMetrics.stringWidth(String.format(longitudeText, longitude));
-
     g2d.drawString(String.format(longitudeText, longitude), x, y);
 
     x = (int)((longitude + 180.0) / 360.0 * (x2 - x1) + insets.left);
     y = (int)((-latitude + 90.0) / 180 * (y2 - y1) + insets.top);
-
     g2d.fillOval(x1 + x - diameter / 2, y - diameter / 2, diameter, diameter);
   }
 
   public void setValue(double latitude, double longitude) {
     this.longitude = longitude;
     this.latitude  = latitude;
+    this.repaint();
   }
 
   @Override

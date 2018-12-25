@@ -17,6 +17,7 @@ public class CISTextField extends JTextField implements UIScaling {
     super();
     this.setFont(Fonts.BODY_16);
     this.setForeground(CustomColors.PRIMARY_TEXT);
+    this.setCaretColor(CustomColors.PRIMARY_TEXT);
     this.setBackground(CustomColors.PRIMARY);
   }
 
