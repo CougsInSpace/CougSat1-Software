@@ -78,14 +78,14 @@ uint8_t LTC2499::readVoltage(double * data) {
 uint8_t LTC2499::readVoltage(LTC2499Channel_t channel, double * data) {
   uint8_t result = selectChannel(channel);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error changing to temperature channel");
+    DEBUG("LTC2499", "Error changing to channel %d on 0x%02X", channel, addr);
     return result;
   }
 
   int32_t buf;
   result = readRaw(&buf);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error reading temperature channel");
+    DEBUG("LTC2499", "Error reading channel %d from 0x%02X", channel, addr);
     return result;
   }
 
@@ -155,14 +155,14 @@ double LTC2499::getVoltage(LTC2499Channel_t channel) {
 uint8_t LTC2499::readInternalTemperaure(double * data) {
   uint8_t result = configureChannel(INT_TEMP, LTC2499_CONFIG_TEMP_50_60_1x);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error changing to temperature channel");
+    DEBUG("LTC2499", "Error changing to temperature channel on 0x%02X", addr);
     return result;
   }
-  
+
   int32_t buf;
   result = readRaw(&buf);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error reading temperature channel");
+    DEBUG("LTC2499", "Error reading temperature channel from 0x%02X", addr);
     return result;
   }
 
@@ -190,7 +190,8 @@ uint8_t LTC2499::selectChannel(LTC2499Channel_t channel, bool blocking) {
     result = configureChannel(channel, LTC2499_CONFIG_EXT_60_1x);
     if (result != ERROR_SUCCESS) {
       if (conversionTimeout <= 0) {
-        DEBUG("LTC2499", "Error selecting channel %d", configuredChannel);
+        DEBUG("LTC2499", "Error selecting channel %d on 0x%02X",
+            configuredChannel, addr);
         return ERROR_NACK;
       } else {
         wait_ms(5);
@@ -215,7 +216,7 @@ uint8_t LTC2499::configureChannel(LTC2499Channel_t channel, uint8_t config) {
 
   uint8_t result = i2c.write(addr, buf, 2);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error configuring channel %d", channel);
+    DEBUG("LTC2499", "Error configuring channel %d on 0x%02X", channel, addr);
     return ERROR_NACK;
   }
 
@@ -247,14 +248,16 @@ uint8_t LTC2499::setVRef(
     double refVoltage, double gain, LTC2499Channel_t channel) {
   uint8_t result = selectChannel(channel);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error changing to vRef channel %d", channel);
+    DEBUG("LTC2499", "Error changing to vRef channel %d on 0x%02X", channel,
+        addr);
     return result;
   }
-  
+
   int32_t rawVRef;
   result = readRaw(&rawVRef);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error reading vRef from channel %d", channel);
+    DEBUG("LTC2499", "Error reading vRef from channel %d on 0x%02X", channel,
+        addr);
     return result;
   }
 
@@ -293,7 +296,8 @@ uint8_t LTC2499::readRaw(int32_t * data, bool blocking) {
     result = i2c.read(addr, buf, 4);
     if (result != ERROR_SUCCESS) {
       if (conversionTimeout <= 0) {
-        DEBUG("LTC2499", "Error requesting channel %d", configuredChannel);
+        DEBUG("LTC2499", "Error requesting channel %d from 0x%02X",
+            configuredChannel, addr);
         return ERROR_NACK;
       } else {
         wait_ms(5);
@@ -304,33 +308,36 @@ uint8_t LTC2499::readRaw(int32_t * data, bool blocking) {
     }
   } while (blocking);
 
-  DEBUG("LTC2499", "Raw 0x%02X%02X%02X%02X", buf[0], buf[1], buf[2], buf[3]);
+  DEBUG("LTC2499", "Raw 0x%02X%02X%02X%02X from 0x%02X", buf[0], buf[1], buf[2],
+      buf[3], addr);
 
   uint8_t prefixBits = (buf[0] >> 6) & 0x03;
-  DEBUG("LTC2499", "prefixBits: 0x%02X", prefixBits);
+  DEBUG("LTC2499", "prefixBits: 0x%02X from 0x%02X", prefixBits, addr);
 
-  int32_t rawValue   = (buf[0] << 18);
+  int32_t rawValue = (buf[0] << 18);
   rawValue |= (buf[1] << 10);
   rawValue |= (buf[2] << 2);
   rawValue |= (buf[3] >> 6);
-  
+
   switch (prefixBits) {
     case 0x00:
-      DEBUG("LTC2499", "Channel %d is underrange", configuredChannel);
+      DEBUG("LTC2499", "Channel %d is underrange on 0x%02X", configuredChannel,
+          addr);
       (*data) = LTC2499_UNDERRANGE;
       break;
     case 0x01:
       // Negative value
       (*data) = rawValue | LTC2499_RAW_MASK_NEG;
-      DEBUG("LTC2499", "Read 0x%08X = %d", (*data), (*data));
+      DEBUG("LTC2499", "Read 0x%08X = %d from 0x%02X", (*data), (*data), addr);
       break;
     case 0x02:
       // Positive value
       (*data) = rawValue & LTC2499_RAW_MASK_POS;
-      DEBUG("LTC2499", "Read 0x%08X = %d", (*data), (*data));
+      DEBUG("LTC2499", "Read 0x%08X = %d from 0x%02X", (*data), (*data), addr);
       break;
     case 0x03:
-      DEBUG("LTC2499", "Channel %d is overrange", configuredChannel);
+      DEBUG("LTC2499", "Channel %d is overrange on 0x%02X", configuredChannel,
+          addr);
       (*data) = LTC2499_OVERRANGE;
       break;
   }

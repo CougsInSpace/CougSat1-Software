@@ -40,7 +40,7 @@ typedef enum GPIOExpanderPin {
 
 typedef enum GPIOExpanderRegister {
   INPUT    = 0x00,
-  OUPUT    = 0x02,
+  OUTPUT   = 0x02,
   POLARITY = 0x04,
   CONFIG   = 0x06
 } GPIOExpanderRegister_t;
@@ -51,13 +51,15 @@ public:
 
   uint8_t configurePin(
       GPIOExpanderPin_t pin, bool input, bool polarityInversion, bool value);
-      
+
   uint8_t write(GPIOExpanderPin_t pin, bool value);
   uint8_t read(GPIOExpanderPin_t pin, bool * value);
 
 private:
-  uint8_t writeRegister(GPIOExpanderRegister_t reg, uint8_t value);
-  uint8_t readRegister(GPIOExpanderRegister_t reg, uint8_t * value);
+  uint8_t writeRegister(
+      GPIOExpanderRegister_t reg, GPIOExpanderPin_t pin, uint8_t value);
+  uint8_t readRegister(
+      GPIOExpanderRegister_t reg, GPIOExpanderPin_t pin, uint8_t * value);
 
   I2C &   i2c;
   uint8_t addr;
