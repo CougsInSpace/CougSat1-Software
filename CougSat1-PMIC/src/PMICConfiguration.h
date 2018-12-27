@@ -32,6 +32,9 @@
 #define COUNT_THERM_MPPT (8)
 #define COUNT_THERM_BOARD (12)
 
+/********************************* Thresholds *********************************/
+#define THRES_EJECT_TIMER (2.7) // 1 RC with 4.2V source, 2 RC with 3.0V source
+
 /******************************** Solar Panel *********************************/
 #define SHUNT_PVIN_0A (0.05)
 #define SHUNT_PVIN_0B (0.05)

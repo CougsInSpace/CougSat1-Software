@@ -76,6 +76,23 @@ uint8_t initialize() {
     return result;
   }
 
+  double value = 0.0;
+  result       = adcEPS5.readVoltage(PIN_ADC_EJECT_TIMER, &value);
+  if (result != ERROR_SUCCESS) {
+    DEBUG("Init", "Failed to read eject timer voltage: 0x%02X", result);
+    return result;
+  }
+  if (value < THRES_EJECT_TIMER) {
+    DEBUG("Init", "First boot detected: %5.3fV", value);
+    result = eventFirstBoot();
+    if (result != ERROR_SUCCESS) {
+      DEBUG("Init", "Failed to perform first boot: 0x%02X", result);
+      return result;
+    }
+  } else {
+    DEBUG("Init", "First boot not detected: %5.3fV", value);
+  }
+
   DEBUG("Init", "Initialization complete");
   return ERROR_SUCCESS;
 }
@@ -100,7 +117,7 @@ uint8_t run() {
     }
     now = HAL_GetTick();
     if (now >= nextADCEvent &&
-        (nextADCEvent >= PERIOD_MS_ADC_UPDATE || now <= PERIOD_MS_ADC_UPDATE)) {
+        (nextADCEvent >= PERIOD_MS_ADC_UPDATE || noxw <= PERIOD_MS_ADC_UPDATE)) {
       result = eventADC();
       if (result != ERROR_SUCCESS) {
         DEBUG("Run", "Failed to perform ADC event: 0x%02X", result);
@@ -128,7 +145,7 @@ uint8_t run() {
 int main(void) {
   uint8_t result = initialize();
   if (result != ERROR_SUCCESS) {
-    DEBUG("PMIC", "Failed to initialize PMIC: 0x%02X", result);
+    DEBUG("PMIC", "Failed to initialize: 0x%02X", result);
     return result;
   }
 
@@ -137,5 +154,5 @@ int main(void) {
     DEBUG("PMIC", "Failed to run main loop: 0x%02X", result);
     return result;
   }
-  return result;
+  return ERROR_SUCCESS;
 }

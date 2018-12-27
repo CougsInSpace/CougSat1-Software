@@ -7,20 +7,21 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file Events.h
+ * @file EventFirstBoot.cpp
  * @author Bradley Davis
- * @date 7 Nov 2018
- * @brief List of events
+ * @date 25 Dec 2018
+ * @brief Event to handle the first boot sequence
  *
  */
+#include "Events.h"
+#include "tools/CISConsole.h"
+#include "tools/CISError.h"
 
-#ifndef _SRC_EVENTS_EVENTS_H_
-#define _SRC_EVENTS_EVENTS_H_
-
-#include "mbed.h"
-
-uint8_t eventADC();
-uint8_t eventPeriodic();
-uint8_t eventFirstBoot();
-
-#endif /* _SRC_EVENTS_EVENTS_H_ */
+/**
+ * @brief Initializes hardware and timers into first boot configuration
+ *
+ * @return uint8_t error code
+ */
+uint8_t eventFirstBoot() {
+  return ERROR_NOT_SUPPORTED;
+}
