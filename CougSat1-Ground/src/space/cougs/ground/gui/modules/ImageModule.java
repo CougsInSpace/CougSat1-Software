@@ -28,7 +28,7 @@ public class ImageModule extends JComponent {
   private final MouseListener mouseListener = new MouseListener() {
     @Override
     public void mouseReleased(MouseEvent e) {
-      if (getBounds().contains(e.getPoint()) && !link.isBlank()) {
+      if (getBounds().contains(e.getPoint()) && !link.isEmpty()) {
         try {
           Desktop.getDesktop().browse(new URI(link));
         } catch (IOException | URISyntaxException e1) {
@@ -68,7 +68,7 @@ public class ImageModule extends JComponent {
 
   public void setLink(String link) {
     this.link = link;
-    if (!link.isBlank()) {
+    if (!link.isEmpty()) {
       this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
   }

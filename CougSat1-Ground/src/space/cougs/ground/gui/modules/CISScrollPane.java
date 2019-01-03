@@ -6,7 +6,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.plaf.basic.BasicScrollPaneUI;
 
 import space.cougs.ground.gui.UIScaling;
 import space.cougs.ground.gui.utils.CustomColors;

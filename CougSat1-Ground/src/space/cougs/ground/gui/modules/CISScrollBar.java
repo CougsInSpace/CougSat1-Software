@@ -100,7 +100,7 @@ public class CISScrollBar extends JScrollBar implements UIScaling {
 
   @Override
   public Dimension getMinimumSize() {
-    if (label.isBlank()) {
+    if (label.isEmpty()) {
       if (this.getOrientation() == VERTICAL) {
         return new Dimension(scrollBarSize, 48);
       } else {
