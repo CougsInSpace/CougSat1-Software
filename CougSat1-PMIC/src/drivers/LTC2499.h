@@ -82,26 +82,31 @@ public:
   LTC2499(I2C & i2c, uint8_t addr);
   LTC2499(I2C & i2c, uint8_t addr, double refVoltage, double gain);
 
-  uint8_t readVoltage(double * data);
-  uint8_t readVoltage(LTC2499Channel_t channel, double * data);
+  uint8_t readVoltage(double * data, bool blocking = true);
+  uint8_t readVoltage(
+      LTC2499Channel_t channel, double * data, bool blocking = true);
   uint8_t readVoltageSelectNext(
       double * data, LTC2499Channel_t nextChannel, bool blocking = true);
-  uint8_t readInternalTemperaure(double * data);
+  uint8_t readInternalTemperaure(double * data, bool blocking = true);
 
   uint8_t readNextActiveChannel(bool blocking = true);
-  uint8_t addActiveChannel(LTC2499Channel_t channel);
-  uint8_t selectChannel(LTC2499Channel_t channel, bool blocking = true);
+  void    addActiveChannel(LTC2499Channel_t channel);
+  uint8_t selectChannel(
+      LTC2499Channel_t channel, bool blocking = true, bool repeated = false);
 
   void    setVRef(double refVoltage, double gain);
   uint8_t setVRef(double refVoltage, double gain, LTC2499Channel_t channel);
-  double  getRefPin();
+  double  getVRef();
 
   double getVoltage(LTC2499Channel_t channel);
 
 private:
   uint8_t readRaw(int32_t * data, bool blocking = true);
 
-  uint8_t configureChannel(LTC2499Channel_t channel, uint8_t config);
+  uint8_t configureChannel(
+      LTC2499Channel_t channel, uint8_t config, bool repeated = false);
+
+  void setVoltage(LTC2499Channel_t channel, double voltage);
 
   I2C &   i2c;
   uint8_t addr;
@@ -111,8 +116,11 @@ private:
 
   LTC2499Channel_t configuredChannel;
 
-  uint32_t activeChannels;
-  double   voltages[24];
+  std::vector<LTC2499Channel_t> activeChannels;
+  uint8_t                       currentActiveChannel;
+
+  double voltagesSingle[16];
+  double voltagesDiff[8];
 };
 
 #endif /* _SRC_DRIVERS_LTC2499_H_ */
