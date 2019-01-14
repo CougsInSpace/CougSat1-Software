@@ -18,6 +18,7 @@
 #define _SRC_DRIVERS_LTC2499_H_
 
 #include "mbed.h"
+#include <vector>
 
 typedef enum LTC2499Channel {
   DIFF_0    = 0xA0,
@@ -117,7 +118,8 @@ private:
   LTC2499Channel_t configuredChannel;
 
   std::vector<LTC2499Channel_t> activeChannels;
-  uint8_t                       currentActiveChannel;
+
+  uint8_t currentActiveChannel;
 
   double voltagesSingle[16];
   double voltagesDiff[8];

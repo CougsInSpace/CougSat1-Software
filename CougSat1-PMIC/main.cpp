@@ -14,11 +14,13 @@
  *
  * Initializes PMIC object and starts the execution
  */
+#include "PMICConfiguration.h"
 #include "PMICObjects.h"
 #include "events/Events.h"
 #include "mbed.h"
 #include "tools/CISConsole.h"
 #include "tools/CISError.h"
+
 
 volatile bool busMessage = false;
 
@@ -48,15 +50,16 @@ uint8_t run() {
     if (busMessage) {
       result = cdh.processMessage();
       if (result != ERROR_SUCCESS) {
-        DEBUG("PMIC", "Failed to process message from the bus: %02X", result);
+        DEBUG("PMIC", "Failed to process message from the bus: 0x%02X", result);
       }
     }
     now = HAL_GetTick();
     if (now >= nextADCEvent &&
         (nextADCEvent >= PERIOD_MS_ADC_UPDATE || now <= PERIOD_MS_ADC_UPDATE)) {
       result = eventADC();
+      led    = !led;
       if (result != ERROR_SUCCESS) {
-        DEBUG("PMIC", "Failed to perform ADC event: %02X", result);
+        DEBUG("PMIC", "Failed to perform ADC event: 0x%02X", result);
       }
       nextADCEvent = HAL_GetTick() + PERIOD_MS_ADC_UPDATE;
     }
@@ -65,7 +68,7 @@ uint8_t run() {
                                         now <= PERIOD_MS_PERIODIC)) {
       result = eventPeriodic();
       if (result != ERROR_SUCCESS) {
-        DEBUG("PMIC", "Failed to perform periodic event: %02X", result);
+        DEBUG("PMIC", "Failed to perform periodic event: 0x%02X", result);
       }
       nextPeriodicEvent = HAL_GetTick() + PERIOD_MS_PERIODIC;
     }
@@ -81,12 +84,12 @@ uint8_t run() {
 int main(void) {
   uint8_t result = initialize();
   if (result != ERROR_SUCCESS) {
-    DEBUG("PMIC", "Failed to initialize PMIC: %02X", result);
+    DEBUG("PMIC", "Failed to initialize PMIC: 0x%02X", result);
   }
 
   result = run();
   if (result != ERROR_SUCCESS) {
-    DEBUG("PMIC", "Failed to run main loop: %02X", result);
+    DEBUG("PMIC", "Failed to run main loop: 0x%02X", result);
   }
   return result;
 }

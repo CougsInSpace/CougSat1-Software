@@ -1,0 +1,7 @@
+{
+  "target_overrides": {
+    "NUCLEO_L476RG": {
+      "target.clock_source": "USE_PLL_HSI"
+    }
+  }
+}

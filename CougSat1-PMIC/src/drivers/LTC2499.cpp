@@ -29,7 +29,6 @@ LTC2499::LTC2499(I2C & i2c, uint8_t addr) : i2c(i2c) {
   vRefVoltage          = 0.0;
   currentActiveChannel = 0;
   configuredChannel    = DIFF_0;
-  activeChannels       = 0;
   for (int i = 0; i < 16; i++) {
     voltagesSingle[i] = NAN;
   }
@@ -53,7 +52,6 @@ LTC2499::LTC2499(I2C & i2c, uint8_t addr, double refVoltage, double gain) :
   setVRef(refVoltage, gain);
   currentActiveChannel = 0;
   configuredChannel    = DIFF_0;
-  activeChannels       = 0;
   for (int i = 0; i < 16; i++) {
     voltagesSingle[i] = NAN;
   }
@@ -65,7 +63,7 @@ LTC2499::LTC2499(I2C & i2c, uint8_t addr, double refVoltage, double gain) :
 /**
  * @brief Reads the voltage of last configured channel
  *
- * @param data to store voltage value (nullptr okay)
+ * @param data to store voltage value (NULL okay)
  * @param blocking or not
  * @return error code
  */
@@ -74,7 +72,7 @@ uint8_t LTC2499::readVoltage(double * data, bool blocking) {
   uint8_t result  = readRaw(&buf);
   double  voltage = (double)buf * conversionFactor;
 
-  if (data != nullptr) {
+  if (data != NULL) {
     (*data) = voltage;
   }
   setVoltage(configuredChannel, voltage);
@@ -125,8 +123,8 @@ uint8_t LTC2499::readVoltageSelectNext(
   // Configure channel with repeated start condition
   uint8_t result = selectChannel(nextChannel, blocking, true);
   if (result != ERROR_SUCCESS) {
-    DEBUG(
-        "LTC2499", "Error changing to channel %d with repeated start", channel);
+    DEBUG("LTC2499", "Error changing to channel %d with repeated start",
+        nextChannel);
     return result;
   }
 
@@ -152,7 +150,7 @@ uint8_t LTC2499::readNextActiveChannel(bool blocking) {
   }
   currentActiveChannel = (currentActiveChannel + 1) % activeChannels.size();
   return readVoltageSelectNext(
-      nullptr, activeChannels.at(currentActiveChannel), blocking);
+      NULL, activeChannels.at(currentActiveChannel), blocking);
 }
 
 /**
@@ -185,7 +183,7 @@ double LTC2499::getVoltage(LTC2499Channel_t channel) {
  * @param channel to set
  * @param voltage
  */
-void setVoltage(LTC2499Channel_t channel, double voltage) {
+void LTC2499::setVoltage(LTC2499Channel_t channel, double voltage) {
   if ((channel & 0x10) != 0) {
     voltagesSingle[channel & 0x0F] = voltage;
   } else {
@@ -203,8 +201,8 @@ void setVoltage(LTC2499Channel_t channel, double voltage) {
  * @return error code
  */
 uint8_t LTC2499::readInternalTemperaure(double * data, bool blocking) {
-  if (data == nullptr) {
-    DEBUG("LTC2499", "Temperature data is nullptr");
+  if (data == NULL) {
+    DEBUG("LTC2499", "Temperature data is NULL");
     return ERROR_INVALID_ARGS;
   }
 
@@ -344,8 +342,8 @@ double LTC2499::getVRef() {
  * @return error code
  */
 uint8_t LTC2499::readRaw(int32_t * data, bool blocking) {
-  if (data == nullptr) {
-    DEBUG("LTC2499", "Read raw data is nullptr");
+  if (data == NULL) {
+    DEBUG("LTC2499", "Read raw data is NULL");
     return ERROR_INVALID_ARGS;
   }
 
