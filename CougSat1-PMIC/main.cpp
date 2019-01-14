@@ -14,11 +14,13 @@
  *
  * Initializes PMIC object and starts the execution
  */
+#include "PMICConfiguration.h"
 #include "PMICObjects.h"
 #include "events/Events.h"
 #include "mbed.h"
 #include "tools/CISConsole.h"
 #include "tools/CISError.h"
+
 
 volatile bool busMessage = false;
 
@@ -119,6 +121,7 @@ uint8_t run() {
     if (now >= nextADCEvent &&
         (nextADCEvent >= PERIOD_MS_ADC_UPDATE || noxw <= PERIOD_MS_ADC_UPDATE)) {
       result = eventADC();
+      led    = !led;
       if (result != ERROR_SUCCESS) {
         DEBUG("Run", "Failed to perform ADC event: 0x%02X", result);
       }

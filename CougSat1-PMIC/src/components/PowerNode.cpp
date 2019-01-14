@@ -32,6 +32,7 @@ PowerNode::PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt) :
   this->shunt   = shunt;
   this->pathA   = false;
   this->pathB   = false;
+  adc.addActiveChannel(channel);
 }
 
 /**
