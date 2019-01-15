@@ -35,6 +35,8 @@ private:
 
   GPIOExpanderPin_t switchA;
   GPIOExpanderPin_t switchB;
+
+  bool configured = false;
 };
 
 #endif /* _SRC_COMPONENTS_POWER_NODE_TCA9535_H_ */

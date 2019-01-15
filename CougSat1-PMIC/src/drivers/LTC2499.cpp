@@ -75,6 +75,9 @@ uint8_t LTC2499::readVoltage(double * data, bool blocking) {
   if (data != NULL) {
     (*data) = voltage;
   }
+  DEBUG("LTC2499", "Channel 0x%02X on 0x%02X is %7.4fV", configuredChannel,
+      addr, voltage);
+
   setVoltage(configuredChannel, voltage);
   return result;
 }
@@ -91,18 +94,21 @@ uint8_t LTC2499::readVoltage(
     LTC2499Channel_t channel, double * data, bool blocking) {
   uint8_t result = selectChannel(channel);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error changing to channel %d on 0x%02X", channel, addr);
+    DEBUG(
+        "LTC2499", "Error changing to channel 0x%02X on 0x%02X", channel, addr);
     return result;
   }
 
   int32_t buf;
   result = readRaw(&buf, blocking);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error reading channel %d from 0x%02X", channel, addr);
+    DEBUG("LTC2499", "Error reading channel 0x%02X from 0x%02X", channel, addr);
     return result;
   }
 
   (*data) = (double)buf * conversionFactor;
+  DEBUG(
+      "LTC2499", "Channel 0x%02X on 0x%02X is %7.4fV", channel, addr, (*data));
   return result;
 }
 
@@ -123,7 +129,7 @@ uint8_t LTC2499::readVoltageSelectNext(
   // Configure channel with repeated start condition
   uint8_t result = selectChannel(nextChannel, blocking, true);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error changing to channel %d with repeated start",
+    DEBUG("LTC2499", "Error changing to channel 0x%02X with repeated start",
         nextChannel);
     return result;
   }
@@ -245,7 +251,7 @@ uint8_t LTC2499::selectChannel(
     result = configureChannel(channel, LTC2499_CONFIG_EXT_60_1x, repeated);
     if (result != ERROR_SUCCESS) {
       if (conversionTimeout <= 0) {
-        DEBUG("LTC2499", "Error selecting channel %d on 0x%02X",
+        DEBUG("LTC2499", "Error selecting channel 0x%02X on 0x%02X",
             configuredChannel, addr);
         return ERROR_NACK;
       } else {
@@ -274,7 +280,8 @@ uint8_t LTC2499::configureChannel(
 
   uint8_t result = i2c.write(addr, buf, 2, repeated);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error configuring channel %d on 0x%02X", channel, addr);
+    DEBUG(
+        "LTC2499", "Error configuring channel 0x%02X on 0x%02X", channel, addr);
     i2c.stop();
     return ERROR_NACK;
   }
@@ -309,7 +316,7 @@ uint8_t LTC2499::setVRef(
     double refVoltage, double gain, LTC2499Channel_t channel) {
   uint8_t result = selectChannel(channel);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error changing to vRef channel %d on 0x%02X", channel,
+    DEBUG("LTC2499", "Error changing to vRef channel 0x%02X on 0x%02X", channel,
         addr);
     return result;
   }
@@ -317,8 +324,8 @@ uint8_t LTC2499::setVRef(
   int32_t rawVRef;
   result = readRaw(&rawVRef);
   if (result != ERROR_SUCCESS) {
-    DEBUG("LTC2499", "Error reading vRef from channel %d on 0x%02X", channel,
-        addr);
+    DEBUG("LTC2499", "Error reading vRef from channel 0x%02X on 0x%02X",
+        channel, addr);
     return result;
   }
 
@@ -362,7 +369,7 @@ uint8_t LTC2499::readRaw(int32_t * data, bool blocking) {
     result = i2c.read(addr, buf, 4);
     if (result != ERROR_SUCCESS) {
       if (conversionTimeout <= 0) {
-        DEBUG("LTC2499", "Error requesting channel %d from 0x%02X",
+        DEBUG("LTC2499", "Error requesting channel 0x%02X from 0x%02X",
             configuredChannel, addr);
         return ERROR_NACK;
       } else {
@@ -387,8 +394,8 @@ uint8_t LTC2499::readRaw(int32_t * data, bool blocking) {
 
   switch (prefixBits) {
     case 0x00:
-      DEBUG("LTC2499", "Channel %d is underrange on 0x%02X", configuredChannel,
-          addr);
+      DEBUG("LTC2499", "Channel 0x%02X is underrange on 0x%02X",
+          configuredChannel, addr);
       (*data) = LTC2499_UNDERRANGE;
       break;
     case 0x01:
@@ -402,8 +409,8 @@ uint8_t LTC2499::readRaw(int32_t * data, bool blocking) {
       DEBUG("LTC2499", "Read 0x%08X = %d from 0x%02X", (*data), (*data), addr);
       break;
     case 0x03:
-      DEBUG("LTC2499", "Channel %d is overrange on 0x%02X", configuredChannel,
-          addr);
+      DEBUG("LTC2499", "Channel 0x%02X is overrange on 0x%02X",
+          configuredChannel, addr);
       (*data) = LTC2499_OVERRANGE;
       break;
   }

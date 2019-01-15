@@ -16,6 +16,7 @@
  */
 #include "PMICConfiguration.h"
 #include "PMICObjects.h"
+#include "PMICPins.h"
 #include "events/Events.h"
 #include "mbed.h"
 #include "tools/CISConsole.h"
@@ -33,7 +34,9 @@ uint8_t initialize() {
   DEBUG("Init", "Initialization starting");
   uint8_t result = 0;
 
-  bool pathA = true;
+  led = 1;
+
+  bool pathA = false;
   bool pathB = false;
   DEBUG("Init", "All power nodes are A: %s, B %s", pathA ? "on" : "off",
       pathB ? "on" : "off");
@@ -66,7 +69,7 @@ uint8_t initialize() {
     }
   }
   for (int i = 0; i < COUNT_BH; i++) {
-    result = nodesBH[i]->setSwitch(pathA, pathB);
+    result = nodesBatteryHeaters[i]->setSwitch(pathA, pathB);
     if (result != ERROR_SUCCESS) {
       DEBUG("Init", "Failed to switch nodesBH[%d]: 0x%02X ", i, result);
       return result;
@@ -119,9 +122,9 @@ uint8_t run() {
     }
     now = HAL_GetTick();
     if (now >= nextADCEvent &&
-        (nextADCEvent >= PERIOD_MS_ADC_UPDATE || noxw <= PERIOD_MS_ADC_UPDATE)) {
-      result = eventADC();
+        (nextADCEvent >= PERIOD_MS_ADC_UPDATE || now <= PERIOD_MS_ADC_UPDATE)) {
       led    = !led;
+      result = eventADC();
       if (result != ERROR_SUCCESS) {
         DEBUG("Run", "Failed to perform ADC event: 0x%02X", result);
       }
@@ -149,7 +152,7 @@ int main(void) {
   uint8_t result = initialize();
   if (result != ERROR_SUCCESS) {
     DEBUG("PMIC", "Failed to initialize: 0x%02X", result);
-    return result;
+    // return result;
   }
 
   result = run();

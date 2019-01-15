@@ -17,6 +17,7 @@
 #ifndef _SRC_PMIC_OBJECTS_H_
 #define _SRC_PMIC_OBJECTS_H_
 
+#include "PMICConfiguration.h"
 #include "components/CDH.h"
 #include "components/PowerNode.h"
 #include "components/PowerNodeDirect.h"
@@ -58,12 +59,12 @@ extern InterruptIn interruptCtrlSync;
 extern InterruptIn interruptBusI2CIRQ;
 
 /******************************** Power Nodes *********************************/
-extern PowerNode nodesPVIn[8];
-extern PowerNode nodesPVOut[8];
-extern PowerNode nodesPR3V3[13];
-extern PowerNode nodesPRBatt[7];
-extern PowerNode nodesPV3V3[4];
-extern PowerNode nodesBatteryHeaters[2];
+extern PowerNode * nodesPVIn[COUNT_PV];
+extern PowerNode * nodesPVOut[COUNT_PV];
+extern PowerNode * nodesPR3V3[COUNT_PR_3V3];
+extern PowerNode * nodesPRBatt[COUNT_PR_BATT];
+extern PowerNode * nodesPV3V3[COUNT_PV_3V3];
+extern PowerNode * nodesBatteryHeaters[COUNT_BH];
 
 extern PowerNodeDirect nodeDeployables;
 

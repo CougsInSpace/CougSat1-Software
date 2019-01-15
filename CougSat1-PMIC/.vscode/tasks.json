@@ -37,7 +37,11 @@
       "command": "C:\\Program Files (x86)\\SEGGER\\JLink_V640\\JLinkSWOViewerCL.exe",
       "args": [
         "-device",
-        "STM32L476RG"
+        "STM32L476RG",
+        "-cpufreq",
+        "80000000",
+        "-swofreq",
+        "4000000"
       ],
       "group": "none",
       "problemMatcher": []
@@ -69,7 +73,11 @@
       "command": "C:\\Program Files (x86)\\SEGGER\\JLink_V640\\JLinkSWOViewerCL.exe",
       "args": [
         "-device",
-        "STM32L476RG"
+        "STM32L476RG",
+        "-cpufreq",
+        "80000000",
+        "-swofreq",
+        "4000000"
       ],
       "group": {
         "kind": "build",
