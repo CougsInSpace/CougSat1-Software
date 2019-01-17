@@ -51,6 +51,7 @@ public:
 
   uint8_t configurePin(
       GPIOExpanderPin_t pin, bool input, bool polarityInversion, bool value);
+  uint8_t configureAll(bool input, bool polarityInversion, bool value);
 
   uint8_t write(GPIOExpanderPin_t pin, bool value);
   uint8_t read(GPIOExpanderPin_t pin, bool * value);

@@ -46,28 +46,14 @@ PowerNodeTCA9535::PowerNodeTCA9535(LTC2499 & adc, LTC2499Channel_t channel,
  * @return uint8_t error code
  */
 uint8_t PowerNodeTCA9535::setSwitch(bool pathA, bool pathB) {
-  uint8_t result = ERROR_SUCCESS;
-  if (!configured) {
-    result = gpio.configurePin(switchA, OUTPUT, true, pathA);
-    if (result != ERROR_SUCCESS) {
-      DEBUG("Node TCA", "Failed to configure switch 0x%02X", switchA);
-      return result;
-    }
-    result = gpio.configurePin(switchB, OUTPUT, true, pathB);
-    if (result != ERROR_SUCCESS) {
-      DEBUG("Node TCA", "Failed to configure switch 0x%02X", switchB);
-      return result;
-    }
-    configured = true;
-  } else {
-    result = gpio.write(switchA, pathA);
-    if (result != ERROR_SUCCESS) {
-      return result;
-    }
-    result = gpio.write(switchB, pathB);
-    if (result != ERROR_SUCCESS) {
-      return result;
-    }
+  uint8_t result = gpio.write(switchA, pathA);
+  if (result != ERROR_SUCCESS) {
+    return result;
   }
+  result = gpio.write(switchB, pathB);
+  if (result != ERROR_SUCCESS) {
+    return result;
+  }
+
   return ERROR_SUCCESS;
 }

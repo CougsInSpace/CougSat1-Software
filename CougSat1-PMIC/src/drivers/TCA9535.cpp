@@ -34,21 +34,60 @@ TCA9535::TCA9535(I2C & i2c, uint8_t addr) : i2c(i2c) {
  * @param input configures the pin to an input if true
  * @param polarityInversion inverts the pin if true
  * @param value is high if true
- * @return uint8_t error code
+ * @return error code
  */
 uint8_t TCA9535::configurePin(
     GPIOExpanderPin_t pin, bool input, bool polarityInversion, bool value) {
+  uint8_t regValue = 0;
+  uint8_t result   = 0;
+  if (value) {
+    regValue = 0xFF;
+  } else {
+    regValue = 0x00;
+  }
+  result = writeRegister(OUTPUT, pin, regValue);
+  if (result != ERROR_SUCCESS) {
+    ERROR("TCA9535", "Could not write output register to 0x%02X", addr);
+    return result;
+  }
+
+  if (polarityInversion) {
+    regValue = 0xFF;
+  } else {
+    regValue = 0x00;
+  }
+  result = writeRegister(POLARITY, pin, regValue);
+  if (result != ERROR_SUCCESS) {
+    ERROR("TCA9535", "Could not write polarity register to 0x%02X", addr);
+    return result;
+  }
+
+  if (input) {
+    regValue = 0xFF;
+  } else {
+    regValue = 0x00;
+  }
+  result = writeRegister(CONFIG, pin, regValue);
+  if (result != ERROR_SUCCESS) {
+    ERROR("TCA9535", "Could not write config register to 0x%02X", addr);
+    return result;
+  }
+
+  return ERROR_SUCCESS;
+}
+
+uint8_t TCA9535::configureAll(bool input, bool polarityInversion, bool value) {
   uint8_t mask     = 1 << (pin & 0x0F);
   uint8_t regValue = 0;
   uint8_t result   = write(pin, value);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Could not write pin to 0x%02X", addr);
+    ERROR("TCA9535", "Could not write pin to 0x%02X", addr);
     return result;
   }
 
   result = readRegister(POLARITY, pin, &regValue);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Could not read polarity register from 0x%02X", addr);
+    ERROR("TCA9535", "Could not read polarity register from 0x%02X", addr);
     return result;
   }
   if (polarityInversion) {
@@ -58,13 +97,13 @@ uint8_t TCA9535::configurePin(
   }
   result = writeRegister(POLARITY, pin, regValue);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Could not write polarity register to 0x%02X", addr);
+    ERROR("TCA9535", "Could not write polarity register to 0x%02X", addr);
     return result;
   }
 
   result = readRegister(CONFIG, pin, &regValue);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Could not read config register from 0x%02X", addr);
+    ERROR("TCA9535", "Could not read config register from 0x%02X", addr);
     return result;
   }
   if (input) {
@@ -74,7 +113,7 @@ uint8_t TCA9535::configurePin(
   }
   result = writeRegister(CONFIG, pin, regValue);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Could not write config register to 0x%02X", addr);
+    ERROR("TCA9535", "Could not write config register to 0x%02X", addr);
     return result;
   }
 
@@ -93,7 +132,7 @@ uint8_t TCA9535::write(GPIOExpanderPin_t pin, bool value) {
   uint8_t regValue = 0;
   uint8_t result   = readRegister(OUTPUT, pin, &regValue);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Could not read output register from 0x%02X", addr);
+    ERROR("TCA9535", "Could not read output register from 0x%02X", addr);
     return result;
   }
   if (value) {
@@ -103,7 +142,7 @@ uint8_t TCA9535::write(GPIOExpanderPin_t pin, bool value) {
   }
   result = writeRegister(OUTPUT, pin, regValue);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Could not write output register to 0x%02X", addr);
+    ERROR("TCA9535", "Could not write output register to 0x%02X", addr);
     return result;
   }
 
@@ -111,11 +150,11 @@ uint8_t TCA9535::write(GPIOExpanderPin_t pin, bool value) {
 
   result = read(pin, &actualValue);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Could not read 0x%02X from 0x%02X", pin, addr);
+    ERROR("TCA9535", "Could not read 0x%02X from 0x%02X", pin, addr);
     return result;
   }
   if (value != actualValue) {
-    DEBUG("TCA9535", "Output 0x%02X has not taken affect on 0x%02X", pin, addr);
+    ERROR("TCA9535", "Output 0x%02X has not taken affect on 0x%02X", pin, addr);
     return ERROR_WRITE;
   }
 
@@ -135,7 +174,7 @@ uint8_t TCA9535::read(GPIOExpanderPin_t pin, bool * value) {
   uint8_t regValue = 0;
   uint8_t result   = readRegister(INPUT, pin, &regValue);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Could not read input register from 0x%02X", addr);
+    ERROR("TCA9535", "Could not read input register from 0x%02X", addr);
     return result;
   }
   (*value) = (regValue & mask) != 0;
@@ -157,7 +196,7 @@ uint8_t TCA9535::writeRegister(
 
   uint8_t result = i2c.write(addr, buf, 2);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Failed to write register 0x%02X to 0x%02X", buf[0], addr);
+    ERROR("TCA9535", "Failed to write register 0x%02X to 0x%02X", buf[0], addr);
     return ERROR_NACK;
   }
 
@@ -173,21 +212,24 @@ uint8_t TCA9535::writeRegister(
  */
 uint8_t TCA9535::readRegister(
     GPIOExpanderRegister_t reg, GPIOExpanderPin_t pin, uint8_t * value) {
-  char buf[2] = {(char)(reg | (pin >> 4))};
-  DEBUG("TCA9535", "Writing 0x%02X to 0x%02X", buf[0], addr, true);
+  char buf[1] = {(char)(reg | (pin >> 4))};
+  DEBUG("TCA9535", "Writing 0x%02X to 0x%02X", buf[0], addr);
 
   uint8_t result = i2c.write(addr, buf, 1);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Failed to command register 0x%02X from 0x%02X", buf[0], addr);
+    ERROR("TCA9535", "Failed to command register 0x%02X from 0x%02X", buf[0],
+        addr);
     i2c.stop();
     return ERROR_NACK;
   }
 
   result = i2c.read(addr, buf, 1);
   if (result != ERROR_SUCCESS) {
-    DEBUG("TCA9535", "Failed to read register 0x%02X from 0x%02X", buf[0], addr);
+    ERROR(
+        "TCA9535", "Failed to read register 0x%02X from 0x%02X", buf[0], addr);
     return ERROR_NACK;
   }
+  DEBUG("TCA9535", "Read 0x%02X from 0x%02X", buf[0], addr);
   (*value) = buf[0];
 
   return ERROR_SUCCESS;

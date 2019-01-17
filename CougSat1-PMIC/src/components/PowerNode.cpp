@@ -66,6 +66,6 @@ uint8_t PowerNode::getCurrent(double * current) {
  * @return uint8_t error code
  */
 uint8_t PowerNode::setSwitch(bool pathA, bool pathB) {
-  DEBUG("PowerNode", "Set switch improperly called on the base class");
+  ERROR("PowerNode", "Set switch improperly called on the base class");
   return ERROR_NOT_SUPPORTED;
 }

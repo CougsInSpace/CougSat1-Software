@@ -22,7 +22,6 @@
 #include "tools/CISConsole.h"
 #include "tools/CISError.h"
 
-
 volatile bool busMessage = false;
 
 /**
@@ -31,74 +30,110 @@ volatile bool busMessage = false;
  * @return uint8_t error code
  */
 uint8_t initialize() {
-  DEBUG("Init", "Initialization starting");
+  LOG("Init", "Initialization starting");
   uint8_t result = 0;
 
   led = 1;
 
+  result = gpioEPS0.configureAll(false, true, false);
+  if (result != ERROR_SUCCESS) {
+    ERROR("Init", "Failed to configure gpioEPS0: 0x%02X", result);
+    return result;
+  }
+
+  result = gpioEPS1.configureAll(false, true, false);
+  if (result != ERROR_SUCCESS) {
+    ERROR("Init", "Failed to configure gpioEPS1: 0x%02X", result);
+    return result;
+  }
+
+  result = gpioPV0.configureAll(false, false, true);
+  if (result != ERROR_SUCCESS) {
+    ERROR("Init", "Failed to configure gpioPV0: 0x%02X", result);
+    return result;
+  }
+
+  result = gpioPV1.configureAll(false, false, true);
+  if (result != ERROR_SUCCESS) {
+    ERROR("Init", "Failed to configure gpioPV1: 0x%02X", result);
+    return result;
+  }
+
+  result = gpioPV2.configureAll(false, false, true);
+  if (result != ERROR_SUCCESS) {
+    ERROR("Init", "Failed to configure gpioPV2: 0x%02X", result);
+    return result;
+  }
+
+  result = gpioPV3.configureAll(false, false, true);
+  if (result != ERROR_SUCCESS) {
+    ERROR("Init", "Failed to configure gpioPV3: 0x%02X", result);
+    return result;
+  }
+
   bool pathA = false;
   bool pathB = false;
-  DEBUG("Init", "All power nodes are A: %s, B %s", pathA ? "on" : "off",
+  LOG("Init", "All power nodes are A: %s, B %s", pathA ? "on" : "off",
       pathB ? "on" : "off");
   for (int i = 0; i < COUNT_PV; i++) {
     result = nodesPVOut[i]->setSwitch(pathA, pathB);
     if (result != ERROR_SUCCESS) {
-      DEBUG("Init", "Failed to switch nodesPVOut[%d]: 0x%02X", i, result);
+      ERROR("Init", "Failed to switch nodesPVOut[%d]: 0x%02X", i, result);
       return result;
     }
   }
   for (int i = 0; i < COUNT_PR_3V3; i++) {
     result = nodesPR3V3[i]->setSwitch(pathA, pathB);
     if (result != ERROR_SUCCESS) {
-      DEBUG("Init", "Failed to switch nodesPR3V3[%d]: 0x%02X", i, result);
+      ERROR("Init", "Failed to switch nodesPR3V3[%d]: 0x%02X", i, result);
       return result;
     }
   }
   for (int i = 0; i < COUNT_PR_BATT; i++) {
     result = nodesPRBatt[i]->setSwitch(pathA, pathB);
     if (result != ERROR_SUCCESS) {
-      DEBUG("Init", "Failed to switch nodesPRBatt[%d]: 0x%02X", i, result);
+      ERROR("Init", "Failed to switch nodesPRBatt[%d]: 0x%02X", i, result);
       return result;
     }
   }
   for (int i = 0; i < COUNT_PV_3V3; i++) {
     result = nodesPV3V3[i]->setSwitch(pathA, pathB);
     if (result != ERROR_SUCCESS) {
-      DEBUG("Init", "Failed to switch nodesPV3V3[%d]: 0x%02X", i, result);
+      ERROR("Init", "Failed to switch nodesPV3V3[%d]: 0x%02X", i, result);
       return result;
     }
   }
   for (int i = 0; i < COUNT_BH; i++) {
     result = nodesBatteryHeaters[i]->setSwitch(pathA, pathB);
     if (result != ERROR_SUCCESS) {
-      DEBUG("Init", "Failed to switch nodesBH[%d]: 0x%02X ", i, result);
+      ERROR("Init", "Failed to switch nodesBH[%d]: 0x%02X ", i, result);
       return result;
     }
   }
   result = nodeDeployables.setSwitch(pathA, pathB);
   if (result != ERROR_SUCCESS) {
-    DEBUG("Init", "Failed to switch nodeDeployable: 0x%02X", result);
+    ERROR("Init", "Failed to switch nodeDeployable: 0x%02X", result);
     return result;
   }
 
   double value = 0.0;
   result       = adcEPS5.readVoltage(PIN_ADC_EJECT_TIMER, &value);
   if (result != ERROR_SUCCESS) {
-    DEBUG("Init", "Failed to read eject timer voltage: 0x%02X", result);
+    ERROR("Init", "Failed to read eject timer voltage: 0x%02X", result);
     return result;
   }
   if (value < THRES_EJECT_TIMER) {
-    DEBUG("Init", "First boot detected: %5.3fV", value);
+    LOG("Init", "First boot detected: %5.3fV", value);
     result = eventFirstBoot();
     if (result != ERROR_SUCCESS) {
-      DEBUG("Init", "Failed to perform first boot: 0x%02X", result);
+      ERROR("Init", "Failed to perform first boot: 0x%02X", result);
       return result;
     }
   } else {
-    DEBUG("Init", "First boot not detected: %5.3fV", value);
+    LOG("Init", "First boot not detected: %5.3fV", value);
   }
 
-  DEBUG("Init", "Initialization complete");
+  LOG("Init", "Initialization complete");
   return ERROR_SUCCESS;
 }
 
@@ -117,7 +152,7 @@ uint8_t run() {
     if (busMessage) {
       result = cdh.processMessage();
       if (result != ERROR_SUCCESS) {
-        DEBUG("Run", "Failed to process message from the bus: 0x%02X", result);
+        ERROR("Run", "Failed to process message from the bus: 0x%02X", result);
       }
     }
     now = HAL_GetTick();
@@ -126,7 +161,7 @@ uint8_t run() {
       led    = !led;
       result = eventADC();
       if (result != ERROR_SUCCESS) {
-        DEBUG("Run", "Failed to perform ADC event: 0x%02X", result);
+        ERROR("Run", "Failed to perform ADC event: 0x%02X", result);
       }
       nextADCEvent = HAL_GetTick() + PERIOD_MS_ADC_UPDATE;
     }
@@ -135,7 +170,7 @@ uint8_t run() {
                                         now <= PERIOD_MS_PERIODIC)) {
       result = eventPeriodic();
       if (result != ERROR_SUCCESS) {
-        DEBUG("Run", "Failed to perform periodic event: 0x%02X", result);
+        ERROR("Run", "Failed to perform periodic event: 0x%02X", result);
       }
       nextPeriodicEvent = HAL_GetTick() + PERIOD_MS_PERIODIC;
     }
@@ -151,13 +186,13 @@ uint8_t run() {
 int main(void) {
   uint8_t result = initialize();
   if (result != ERROR_SUCCESS) {
-    DEBUG("PMIC", "Failed to initialize: 0x%02X", result);
-    // return result;
+    ERROR("PMIC", "Failed to initialize: 0x%02X", result);
+    return result;
   }
 
   result = run();
   if (result != ERROR_SUCCESS) {
-    DEBUG("PMIC", "Failed to run main loop: 0x%02X", result);
+    ERROR("PMIC", "Failed to run main loop: 0x%02X", result);
     return result;
   }
   return ERROR_SUCCESS;
