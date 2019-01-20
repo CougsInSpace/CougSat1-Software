@@ -40,3 +40,76 @@ PMIC::~PMIC() {
 uint8_t PMIC::initialize() {
   return ERROR_SUCCESS;
 }
+
+/**
+ * Sends a request to the PMIC to toggle power to a specific subsystem.
+ * @return error code
+ */
+uint8_t PMIC::requestSetSubSystemPower(PMIC::TargetSubsystem target, bool on) {
+  char buffer[2] = {
+    on,
+    target
+  };
+
+  this->i2c.write(I2C_ADDR_PMIC, buffer, 2);
+
+  return ERROR_SUCCESS;
+}
+
+/**
+ * Sends a request to the PMIC to retrieve voltage data for a target
+ * @return error code
+ */
+uint8_t PMIC::requestGetVoltageData(PMIC::TargetReading target) {
+  if (target >= PR_3V3_0) {
+    return ERROR_INVALID_ARGS;
+  }
+
+  char buffer[2] = {
+    0x02,
+    target
+  };
+
+  this->i2c.write(I2C_ADDR_PMIC, buffer, 2);
+
+  return ERROR_SUCCESS;
+}
+
+/**
+ * Sends a request to the PMIC to retrieve current data for a target
+ * @return error code
+ */
+uint8_t PMIC::requestGetCurrentData(PMIC::TargetReading target) {
+  if (target >= PR_DEPLOY) {
+    return ERROR_INVALID_ARGS;
+  }
+
+  char buffer[2] = {
+    0x03,
+    target
+  };
+
+  this->i2c.write(I2C_ADDR_PMIC, buffer, 2);
+
+  return ERROR_SUCCESS;
+}
+
+/**
+ * Sends a request to the PMIC to retrieve current data for a target
+ * @return error code
+ */
+uint8_t PMIC::requestGetTempData(PMIC::TargetReading target) {
+  if (target < TargetPMIC && target > RegulatorB3V3) {
+    return ERROR_INVALID_ARGS;
+  }
+
+  char buffer[2] = {
+    0x04,
+    target
+  };
+
+  this->i2c.write(I2C_ADDR_PMIC, buffer, 2);
+
+  return ERROR_SUCCESS;
+}
+
