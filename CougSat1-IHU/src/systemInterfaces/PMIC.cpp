@@ -95,7 +95,7 @@ uint8_t PMIC::requestGetCurrentData(PMIC::TargetReading target) {
 }
 
 /**
- * Sends a request to the PMIC to retrieve current data for a target
+ * Sends a request to the PMIC to retrieve temperature data for a target
  * @return error code
  */
 uint8_t PMIC::requestGetTempData(PMIC::TargetReading target) {
