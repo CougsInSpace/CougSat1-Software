@@ -8,48 +8,63 @@
  ******************************************************************************/
 /**
  * @file PMIC.h
- * @author Bradley Davis
- * @date 6 Mar 2018
+ * @author Kevin Evans
+ * @date 25 Jan 2019
  * @brief Communicates betwen the IHU and the PMIC
  */
 #ifndef SRC_SYSTEMINTERFACES_PMIC_H
 
 #define SRC_SYSTEMINTERFACES_PMIC_H
 
-#define I2C_ADDR_PMIC 0x0E
+#define I2C_ADDR_PMIC           0x0E
+#define PMIC_VOLTAGE_RESOLUTION 100E-6f
+#define PMIC_CURRENT_RESOLUTION 150E-6f
 
 #include <mbed.h>
 #include <systemInterfaces/Subsystem.h>
 
 class PMIC : public SubSystem {
   public:
-    enum TargetSubsystem {
-      IHU       = 0x00,
-      IFJR      = 0x01,
-      ADCS      = 0x02,
-      ADCSCoils = 0x03,
-      Comms     = 0x04,
-      CommsAmp  = 0x05,
-      Payload0  = 0x06,
-      Payload1  = 0x07,
-      Payload2  = 0x08
-    };
-    enum TargetReading {
-      // voltage/current:
-      SolarPanel0 = 0x00,
-      SolarPanel1,
-      SolarPanel2, 
-      SolarPanel3,
-      SolarPanel4,
-      SolarPanel5,
-      SolarPanel6,
-      SolarPanel7,
-      BatteryA,
-      BatteryB,
-      RegulatorA3V3,
-      RegulatorB3V3,
+    // Command IDs sent over I2C to the PMIC.
+    typedef enum PMICCommand {
+      PMIC_COMMAND_REQ_SUBSYSTEM_OFF,
+      PMIC_COMMAND_REQ_SUBSYSTEM_ON,
+      PMIC_COMMAND_REQ_VOLTAGE_DATA,
+      PMIC_COMMAND_REQ_CURRENT_DATA,
+      PMIC_COMMAND_REQ_TEMPERATURE_DATA,
+      PMIC_COMMAND_REQ_POWER_CHANNEL_STATUS,
+      PMIC_COMMAND_REQ_SOLAR_PANEL_CHANNEL_STATUS
+    } PMICCommand_t;
 
-      // current:
+    typedef enum TargetSubSystem {
+      // Used for toggling power:
+      IHU,
+      IFJR,
+      ADCS,
+      ADCS_COILS,
+      COMMS,
+      COMMS_AMP,
+      PAYLOAD_0,
+      PAYLOAD_1,
+      PAYLOAD_2
+    } TargetSubSystem_t;
+
+    typedef enum TargetReading {
+      // Used for voltage, reading, and temperature:
+      SOLAR_PANEL_0,
+      SOLAR_PANEL_1,
+      SOLAR_PANEL_2, 
+      SOLAR_PANEL_3,
+      SOLAR_PANEL_4,
+      SOLAR_PANEL_5,
+      SOLAR_PANEL_6,
+      SOLAR_PANEL_7,
+      BATTERY_A,
+      BATTERY_B,
+      REGULATOR_A_3V3,
+      REGULATOR_B_3V3,
+
+      // Used for current only:
       PR_3V3_0,
       PR_3V3_1,
       PR_3V3_2,
@@ -78,8 +93,8 @@ class PMIC : public SubSystem {
       PR_BH_1,
       PR_DEPLOY,
 
-      // for temp readings:
-      TargetPMIC,
+      // Used for temperature readings:
+      TARGET_PMIC,
       MPPT_0,
       MPPT_1,
       MPPT_2,
@@ -92,17 +107,19 @@ class PMIC : public SubSystem {
       PCB_NX_PY,
       PCB_PX_NY,
       PCB_PX_PY
-    };
+    } TargetReading_t;
 
     PMIC(I2C &i2c);
     ~PMIC();
 
     uint8_t initialize();
-    uint8_t requestSetSubSystemPower(PMIC::TargetSubsystem target, bool on);
-    uint8_t requestGetVoltageData(PMIC::TargetReading target);
-    uint8_t requestGetCurrentData(PMIC::TargetReading target);
-    uint8_t requestGetTempData(PMIC::TargetReading target);
-
+    uint8_t requestSetSubSystemPower(TargetSubSystem_t target, bool on, uint8_t &result);
+    uint8_t requestGetVoltageData(TargetReading_t target, float &voltage);
+    uint8_t requestGetCurrentData(TargetReading_t target, float &current);
+    uint8_t requestGetTemperatureData(TargetReading_t target, int8_t &temperature);
+    uint8_t requestGetPowerChannelStatus(uint64_t &status);
+    uint8_t requestGetSolarPanelChannelStatus(uint16_t &status);
+    
   private:
     I2C &i2c;
 
