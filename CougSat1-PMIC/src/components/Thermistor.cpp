@@ -26,10 +26,11 @@
  * @param voltageFraction25C proportion of thermistor at 270K
  * @param voltageFraction85C proportion of thermistor at 350K
  */
-Thermistor::Thermistor(LTC2499 & adc, LTC2499Channel_t channel,
+Thermistor::Thermistor(LTC2499 & adc, LTC2499::ADCChannel_t channel,
     double voltageFraction270K, double voltageFraction350K) :
   adc(adc) {
   this->channel = channel;
+  adc.addActiveChannel(channel);
   // resistance = 1/fraction - 1
   // beta = ln(R270K/R350K)/(1/(270K)-1/(350K))
 }

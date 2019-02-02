@@ -91,7 +91,7 @@ uint8_t LTC2499::readVoltage(double * data, bool blocking) {
  * @return error code
  */
 uint8_t LTC2499::readVoltage(
-    LTC2499Channel_t channel, double * data, bool blocking) {
+    LTC2499::ADCChannel_t channel, double * data, bool blocking) {
   uint8_t result = selectChannel(channel);
   if (result != ERROR_SUCCESS) {
     ERROR(
@@ -125,7 +125,7 @@ uint8_t LTC2499::readVoltage(
  * @return uint8_t error code
  */
 uint8_t LTC2499::readVoltageSelectNext(
-    double * data, LTC2499Channel_t nextChannel, bool blocking) {
+    double * data, LTC2499::ADCChannel_t nextChannel, bool blocking) {
   // Configure channel with repeated start condition
   uint8_t result = selectChannel(nextChannel, blocking, true);
   if (result != ERROR_SUCCESS) {
@@ -165,7 +165,7 @@ uint8_t LTC2499::readNextActiveChannel(bool blocking) {
  *
  * @param channel to add
  */
-void LTC2499::addActiveChannel(LTC2499Channel_t channel) {
+void LTC2499::addActiveChannel(LTC2499::ADCChannel_t channel) {
   activeChannels.push_back(channel);
 }
 
@@ -175,7 +175,7 @@ void LTC2499::addActiveChannel(LTC2499Channel_t channel) {
  * @param channel to get
  * @return voltage
  */
-double LTC2499::getVoltage(LTC2499Channel_t channel) {
+double LTC2499::getVoltage(LTC2499::ADCChannel_t channel) {
   if ((channel & 0x10) != 0) {
     return voltagesSingle[channel & 0x0F];
   }
@@ -189,7 +189,7 @@ double LTC2499::getVoltage(LTC2499Channel_t channel) {
  * @param channel to set
  * @param voltage
  */
-void LTC2499::setVoltage(LTC2499Channel_t channel, double voltage) {
+void LTC2499::setVoltage(LTC2499::ADCChannel_t channel, double voltage) {
   if ((channel & 0x10) != 0) {
     voltagesSingle[channel & 0x0F] = voltage;
   } else {
@@ -225,7 +225,7 @@ uint8_t LTC2499::readInternalTemperaure(double * data, bool blocking) {
     return result;
   }
 
-  (*data) = (double)buf * vRefVoltage / 2.0 / LTC2499_TEMP_SLOPE;
+  (*data) = (double)buf * vRefVoltage / LTC2499_TEMP_SLOPE;
   return result;
 }
 
@@ -239,29 +239,13 @@ uint8_t LTC2499::readInternalTemperaure(double * data, bool blocking) {
  * @return error code
  */
 uint8_t LTC2499::selectChannel(
-    LTC2499Channel_t channel, bool blocking, bool repeated) {
-  uint8_t result = 0;
-
-  // Typical 1x conversions will take definitely less than 200ms
-  // LTC2499 cannot be communicated to during conversion process
-  // LTC2499 returns NACK during conversion process
-  // Wait 5ms at a time up to 200ms
-  uint8_t conversionTimeout = LTC2499_CONVERSION_TIMEOUT;
-  do {
-    result = configureChannel(channel, LTC2499_CONFIG_EXT_60_1x, repeated);
-    if (result != ERROR_SUCCESS) {
-      if (conversionTimeout <= 0) {
-        ERROR("LTC2499", "Error selecting channel 0x%02X on 0x%02X",
-            configuredChannel, addr);
-        return ERROR_NACK;
-      } else {
-        wait_ms(5);
-        conversionTimeout -= 5;
-      }
-    } else {
-      blocking = false;
-    }
-  } while (blocking);
+    LTC2499::ADCChannel_t channel, bool blocking, bool repeated) {
+  uint8_t result =
+      configureChannel(channel, LTC2499_CONFIG_EXT_60_1x, blocking, repeated);
+  if (result != ERROR_SUCCESS) {
+    ERROR("LTC2499", "Error selecting channel 0x%02X on 0x%02X", channel, addr);
+    return result;
+  }
   return result;
 }
 
@@ -273,18 +257,38 @@ uint8_t LTC2499::selectChannel(
  * @param repeated start or not
  * @return error code
  */
-uint8_t LTC2499::configureChannel(
-    LTC2499Channel_t channel, uint8_t config, bool repeated) {
+uint8_t LTC2499::configureChannel(LTC2499::ADCChannel_t channel, uint8_t config,
+    bool blocking, bool repeated) {
   char buf[2] = {(char)(channel | LTC2499_CONFIG_CHANNEL), (char)config};
   DEBUG("LTC2499", "Writing 0x%02X%02X to 0x%02X", buf[0], buf[1], addr);
 
-  uint8_t result = i2c.write(addr, buf, 2, repeated);
-  if (result != ERROR_SUCCESS) {
-    ERROR(
-        "LTC2499", "Error configuring channel 0x%02X on 0x%02X", channel, addr);
-    i2c.stop();
-    return ERROR_NACK;
-  }
+  // Typical 1x conversions will take definitely less than 200ms
+  // LTC2499 cannot be communicated to during conversion process
+  // LTC2499 returns NACK during conversion process
+  // Wait 5ms at a time up to 200ms
+  uint8_t conversionTimeout = LTC2499_CONVERSION_TIMEOUT;
+  uint8_t result            = ERROR_SUCCESS;
+  do {
+    result = i2c.write(addr, buf, 2);
+    if (result != ERROR_SUCCESS) {
+      if (conversionTimeout <= 0 || !blocking) {
+        ERROR("LTC2499", "Error configuring channel 0x%02X on 0x%02X", channel,
+            addr);
+        if (repeated) {
+          // i2c.stop();
+        }
+        return ERROR_NACK;
+      } else {
+        if (repeated) {
+          // i2c.stop();
+        }
+        wait_ms(5);
+        conversionTimeout -= 5;
+      }
+    } else {
+      blocking = false;
+    }
+  } while (blocking);
 
   if (!repeated) {
     configuredChannel = channel;
@@ -313,7 +317,7 @@ void LTC2499::setVRef(double refVoltage, double gain) {
  * @return error code
  */
 uint8_t LTC2499::setVRef(
-    double refVoltage, double gain, LTC2499Channel_t channel) {
+    double refVoltage, double gain, LTC2499::ADCChannel_t channel) {
   uint8_t result = selectChannel(channel);
   if (result != ERROR_SUCCESS) {
     ERROR("LTC2499", "Error changing to vRef channel 0x%02X on 0x%02X", channel,
@@ -330,7 +334,7 @@ uint8_t LTC2499::setVRef(
   }
 
   conversionFactor = refVoltage / rawVRef;
-  vRefVoltage      = conversionFactor * (double)LTC2499_FULL_SCALE * 2.0 / gain;
+  vRefVoltage      = conversionFactor * (double)LTC2499_FULL_SCALE * gain;
   return ERROR_SUCCESS;
 }
 

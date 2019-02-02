@@ -23,7 +23,7 @@
 
 class PowerNode {
 public:
-  PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt);
+  PowerNode(LTC2499 & adc, LTC2499::ADCChannel_t channel, double shunt);
 
   uint8_t getCurrent(double * current);
 
@@ -34,7 +34,7 @@ public:
 private:
   LTC2499 & adc;
 
-  LTC2499Channel_t channel;
+  LTC2499::ADCChannel_t channel;
 
   double shunt;
   bool   pathA;

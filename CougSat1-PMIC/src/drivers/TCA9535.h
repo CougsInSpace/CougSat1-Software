@@ -19,48 +19,50 @@
 
 #include "mbed.h"
 
-typedef enum GPIOExpanderPin {
-  P00 = 0x00,
-  P01 = 0x01,
-  P02 = 0x02,
-  P03 = 0x03,
-  P04 = 0x04,
-  P05 = 0x05,
-  P06 = 0x06,
-  P07 = 0x07,
-  P10 = 0x10,
-  P11 = 0x11,
-  P12 = 0x12,
-  P13 = 0x13,
-  P14 = 0x14,
-  P15 = 0x15,
-  P16 = 0x16,
-  P17 = 0x17
-} GPIOExpanderPin_t;
-
-typedef enum GPIOExpanderRegister {
-  INPUT    = 0x00,
-  OUTPUT   = 0x02,
-  POLARITY = 0x04,
-  CONFIG   = 0x06
-} GPIOExpanderRegister_t;
-
 class TCA9535 {
 public:
+  typedef enum Pin {
+    P00 = 0x00,
+    P01 = 0x01,
+    P02 = 0x02,
+    P03 = 0x03,
+    P04 = 0x04,
+    P05 = 0x05,
+    P06 = 0x06,
+    P07 = 0x07,
+    P10 = 0x10,
+    P11 = 0x11,
+    P12 = 0x12,
+    P13 = 0x13,
+    P14 = 0x14,
+    P15 = 0x15,
+    P16 = 0x16,
+    P17 = 0x17
+  } Pin_t;
+
+  typedef enum Register {
+    INPUT    = 0x00,
+    OUTPUT   = 0x02,
+    POLARITY = 0x04,
+    CONFIG   = 0x06
+  } Register_t;
+
   TCA9535(I2C & i2c, uint8_t addr);
 
   uint8_t configurePin(
-      GPIOExpanderPin_t pin, bool input, bool polarityInversion, bool value);
+      TCA9535::Pin_t pin, bool input, bool polarityInversion, bool value);
   uint8_t configureAll(bool input, bool polarityInversion, bool value);
 
-  uint8_t write(GPIOExpanderPin_t pin, bool value);
-  uint8_t read(GPIOExpanderPin_t pin, bool * value);
+  uint8_t dumpRegisters();
+
+  uint8_t write(TCA9535::Pin_t pin, bool value);
+  uint8_t read(TCA9535::Pin_t pin, bool * value);
 
 private:
   uint8_t writeRegister(
-      GPIOExpanderRegister_t reg, GPIOExpanderPin_t pin, uint8_t value);
+      TCA9535::Register_t reg, TCA9535::Pin_t pin, uint8_t value);
   uint8_t readRegister(
-      GPIOExpanderRegister_t reg, GPIOExpanderPin_t pin, uint8_t * value);
+      TCA9535::Register_t reg, TCA9535::Pin_t pin, uint8_t * value);
 
   I2C &   i2c;
   uint8_t addr;

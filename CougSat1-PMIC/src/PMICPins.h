@@ -45,39 +45,39 @@
 #define I2C_ADDR_GPIO_PV3 ((uint8_t)0x4A)  // +Y
 
 /**************************** Power Node Switching ****************************/
-#define PIN_PV_SW_0A (P06) // GPIO - EPS 0
-#define PIN_PV_SW_0B (P07) // GPIO - EPS 0
-#define PIN_PV_SW_1A (P10) // GPIO - EPS 0
-#define PIN_PV_SW_1B (P11) // GPIO - EPS 0
-#define PIN_PV_SW_2A (P15) // GPIO - EPS 0
-#define PIN_PV_SW_2B (P13) // GPIO - EPS 0
-#define PIN_PV_SW_3A (P12) // GPIO - EPS 0
-#define PIN_PV_SW_3B (P14) // GPIO - EPS 0
-#define PIN_PV_SW_4A (P04) // GPIO - EPS 1
-#define PIN_PV_SW_4B (P05) // GPIO - EPS 1
-#define PIN_PV_SW_5A (P06) // GPIO - EPS 1
-#define PIN_PV_SW_5B (P10) // GPIO - EPS 1
-#define PIN_PV_SW_6A (P07) // GPIO - EPS 1
-#define PIN_PV_SW_6B (P12) // GPIO - EPS 1
-#define PIN_PV_SW_7A (P11) // GPIO - EPS 1
-#define PIN_PV_SW_7B (P13) // GPIO - EPS 1
+#define PIN_PV_SW_0A (TCA9535::P06) // GPIO - EPS 0
+#define PIN_PV_SW_0B (TCA9535::P07) // GPIO - EPS 0
+#define PIN_PV_SW_1A (TCA9535::P10) // GPIO - EPS 0
+#define PIN_PV_SW_1B (TCA9535::P11) // GPIO - EPS 0
+#define PIN_PV_SW_2A (TCA9535::P15) // GPIO - EPS 0
+#define PIN_PV_SW_2B (TCA9535::P13) // GPIO - EPS 0
+#define PIN_PV_SW_3A (TCA9535::P12) // GPIO - EPS 0
+#define PIN_PV_SW_3B (TCA9535::P14) // GPIO - EPS 0
+#define PIN_PV_SW_4A (TCA9535::P04) // GPIO - EPS 1
+#define PIN_PV_SW_4B (TCA9535::P05) // GPIO - EPS 1
+#define PIN_PV_SW_5A (TCA9535::P06) // GPIO - EPS 1
+#define PIN_PV_SW_5B (TCA9535::P10) // GPIO - EPS 1
+#define PIN_PV_SW_6A (TCA9535::P07) // GPIO - EPS 1
+#define PIN_PV_SW_6B (TCA9535::P12) // GPIO - EPS 1
+#define PIN_PV_SW_7A (TCA9535::P11) // GPIO - EPS 1
+#define PIN_PV_SW_7B (TCA9535::P13) // GPIO - EPS 1
 
-#define PIN_PVC_3V3_0A (P16) // GPIO - EPS 0
-#define PIN_PVC_3V3_0B (P17) // GPIO - EPS 0
-#define PIN_PVC_3V3_1A (P04) // GPIO - EPS 0
-#define PIN_PVC_3V3_1B (P05) // GPIO - EPS 0
-#define PIN_PVC_3V3_2A (P16) // GPIO - EPS 1
-#define PIN_PVC_3V3_2B (P17) // GPIO - EPS 1
-#define PIN_PVC_3V3_3A (P15) // GPIO - EPS 1
-#define PIN_PVC_3V3_3B (P14) // GPIO - EPS 1
+#define PIN_PVC_3V3_0A (TCA9535::P16) // GPIO - EPS 0
+#define PIN_PVC_3V3_0B (TCA9535::P17) // GPIO - EPS 0
+#define PIN_PVC_3V3_1A (TCA9535::P04) // GPIO - EPS 0
+#define PIN_PVC_3V3_1B (TCA9535::P05) // GPIO - EPS 0
+#define PIN_PVC_3V3_2A (TCA9535::P16) // GPIO - EPS 1
+#define PIN_PVC_3V3_2B (TCA9535::P17) // GPIO - EPS 1
+#define PIN_PVC_3V3_3A (TCA9535::P15) // GPIO - EPS 1
+#define PIN_PVC_3V3_3B (TCA9535::P14) // GPIO - EPS 1
 
 #define PIN_UMB_SW_A (PB_6)
 #define PIN_UMB_SW_B (PB_7)
 
-#define PIN_PC_3V3_0A (P03) // GPIO - EPS 1
-#define PIN_PC_3V3_0B (P02) // GPIO - EPS 1
-#define PIN_PC_3V3_1A (P01) // GPIO - EPS 1
-#define PIN_PC_3V3_1B (P00) // GPIO - EPS 1
+#define PIN_PC_3V3_0A (TCA9535::P03) // GPIO - EPS 1
+#define PIN_PC_3V3_0B (TCA9535::P02) // GPIO - EPS 1
+#define PIN_PC_3V3_1A (TCA9535::P01) // GPIO - EPS 1
+#define PIN_PC_3V3_1B (TCA9535::P00) // GPIO - EPS 1
 #define PIN_PC_3V3_2A (PC_12)
 #define PIN_PC_3V3_2B (PC_11)
 #define PIN_PC_3V3_3A (PC_10)
@@ -119,92 +119,92 @@
 #define PIN_PC_DEPLOY_A (PB_4)
 #define PIN_PC_DEPLOY_B (PB_5)
 
-#define PIN_PC_BH_0A (P02) // GPIO - EPS 0
-#define PIN_PC_BH_0B (P03) // GPIO - EPS 0
-#define PIN_PC_BH_1A (P00) // GPIO - EPS 0
-#define PIN_PC_BH_1B (P01) // GPIO - EPS 0
+#define PIN_PC_BH_0A (TCA9535::P02) // GPIO - EPS 0
+#define PIN_PC_BH_0B (TCA9535::P03) // GPIO - EPS 0
+#define PIN_PC_BH_1A (TCA9535::P00) // GPIO - EPS 0
+#define PIN_PC_BH_1B (TCA9535::P01) // GPIO - EPS 0
 
 /******************************** ADC Channels ********************************/
-#define PIN_ADC_VBATT_I_A (DIFF_4)  // ADC - EPS 4
-#define PIN_ADC_VBATT_I_B (DIFF_11) // ADC - EPS 3
+#define PIN_ADC_VBATT_I_A (LTC2499::LTC2499::DIFF_4)  // ADC - EPS 4
+#define PIN_ADC_VBATT_I_B (LTC2499::DIFF_11) // ADC - EPS 3
 
-#define PIN_ADC_BATT_A (DIFF_13) // ADC - EPS 4
-#define PIN_ADC_BATT_B (DIFF_11) // ADC - EPS 4
+#define PIN_ADC_BATT_A (LTC2499::DIFF_13) // ADC - EPS 4
+#define PIN_ADC_BATT_B (LTC2499::DIFF_11) // ADC - EPS 4
 
-#define PIN_ADC_3V3_IN_A (DIFF_9)  // ADC - EPS 4
-#define PIN_ADC_3V3_IN_B (DIFF_4)  // ADC - EPS 3
-#define PIN_ADC_3V3_OUT_A (DIFF_7) // ADC - EPS 4
-#define PIN_ADC_3V3_OUT_B (DIFF_6) // ADC - EPS 3
+#define PIN_ADC_3V3_IN_A (LTC2499::DIFF_9)  // ADC - EPS 4
+#define PIN_ADC_3V3_IN_B (LTC2499::DIFF_4)  // ADC - EPS 3
+#define PIN_ADC_3V3_OUT_A (LTC2499::DIFF_7) // ADC - EPS 4
+#define PIN_ADC_3V3_OUT_B (LTC2499::DIFF_6) // ADC - EPS 3
 
-#define PIN_ADC_PR_3V3_0 (DIFF_6)   // ADC - EPS 0
-#define PIN_ADC_PR_3V3_1 (DIFF_8)   // ADC - EPS 0
-#define PIN_ADC_PR_3V3_2 (DIFF_5)   // ADC - EPS 0
-#define PIN_ADC_PR_3V3_3 (DIFF_12)  // ADC - EPS 0
-#define PIN_ADC_PR_3V3_4 (DIFF_3)   // ADC - EPS 0
-#define PIN_ADC_PR_3V3_5 (DIFF_14)  // ADC - EPS 0
-#define PIN_ADC_PR_3V3_6 (DIFF_1)   // ADC - EPS 0
-#define PIN_ADC_PR_3V3_7 (DIFF_10)  // ADC - EPS 0
-#define PIN_ADC_PR_3V3_8 (DIFF_9)   // ADC - EPS 2
-#define PIN_ADC_PR_3V3_9 (DIFF_10)  // ADC - EPS 2
-#define PIN_ADC_PR_3V3_10 (DIFF_14) // ADC - EPS 2
-#define PIN_ADC_PR_3V3_11 (DIFF_12) // ADC - EPS 2
-#define PIN_ADC_PR_3V3_12 (DIFF_10) // ADC - EPS 1
+#define PIN_ADC_PR_3V3_0 (LTC2499::DIFF_6)   // ADC - EPS 0
+#define PIN_ADC_PR_3V3_1 (LTC2499::DIFF_8)   // ADC - EPS 0
+#define PIN_ADC_PR_3V3_2 (LTC2499::DIFF_5)   // ADC - EPS 0
+#define PIN_ADC_PR_3V3_3 (LTC2499::DIFF_12)  // ADC - EPS 0
+#define PIN_ADC_PR_3V3_4 (LTC2499::DIFF_3)   // ADC - EPS 0
+#define PIN_ADC_PR_3V3_5 (LTC2499::DIFF_14)  // ADC - EPS 0
+#define PIN_ADC_PR_3V3_6 (LTC2499::DIFF_1)   // ADC - EPS 0
+#define PIN_ADC_PR_3V3_7 (LTC2499::DIFF_10)  // ADC - EPS 0
+#define PIN_ADC_PR_3V3_8 (LTC2499::DIFF_9)   // ADC - EPS 2
+#define PIN_ADC_PR_3V3_9 (LTC2499::DIFF_10)  // ADC - EPS 2
+#define PIN_ADC_PR_3V3_10 (LTC2499::DIFF_14) // ADC - EPS 2
+#define PIN_ADC_PR_3V3_11 (LTC2499::DIFF_12) // ADC - EPS 2
+#define PIN_ADC_PR_3V3_12 (LTC2499::DIFF_10) // ADC - EPS 1
 
-#define PIN_ADC_PR_BATT_0 (DIFF_14) // ADC - EPS 1
-#define PIN_ADC_PR_BATT_1 (DIFF_4)  // ADC - EPS 1
-#define PIN_ADC_PR_BATT_2 (DIFF_0)  // ADC - EPS 1
-#define PIN_ADC_PR_BATT_3 (DIFF_9)  // ADC - EPS 1
-#define PIN_ADC_PR_BATT_4 (DIFF_2)  // ADC - EPS 1
-#define PIN_ADC_PR_BATT_5 (DIFF_7)  // ADC - EPS 1
-#define PIN_ADC_PR_BATT_6 (DIFF_13) // ADC - EPS 1
+#define PIN_ADC_PR_BATT_0 (LTC2499::DIFF_14) // ADC - EPS 1
+#define PIN_ADC_PR_BATT_1 (LTC2499::DIFF_4)  // ADC - EPS 1
+#define PIN_ADC_PR_BATT_2 (LTC2499::DIFF_0)  // ADC - EPS 1
+#define PIN_ADC_PR_BATT_3 (LTC2499::DIFF_9)  // ADC - EPS 1
+#define PIN_ADC_PR_BATT_4 (LTC2499::DIFF_2)  // ADC - EPS 1
+#define PIN_ADC_PR_BATT_5 (LTC2499::DIFF_7)  // ADC - EPS 1
+#define PIN_ADC_PR_BATT_6 (LTC2499::DIFF_13) // ADC - EPS 1
 
-#define PIN_ADC_PV_3V3_0 (DIFF_1)  // ADC - EPS 4
-#define PIN_ADC_PV_3V3_1 (DIFF_15) // ADC - EPS 4
-#define PIN_ADC_PV_3V3_2 (DIFF_1)  // ADC - EPS 2
-#define PIN_ADC_PV_3V3_3 (DIFF_3)  // ADC - EPS 2
+#define PIN_ADC_PV_3V3_0 (LTC2499::DIFF_1)  // ADC - EPS 4
+#define PIN_ADC_PV_3V3_1 (LTC2499::DIFF_15) // ADC - EPS 4
+#define PIN_ADC_PV_3V3_2 (LTC2499::DIFF_1)  // ADC - EPS 2
+#define PIN_ADC_PV_3V3_3 (LTC2499::DIFF_3)  // ADC - EPS 2
 
-#define PIN_ADC_PR_DEPLOY (DIFF_8) // ADC - EPS 3
+#define PIN_ADC_PR_DEPLOY (LTC2499::DIFF_8) // ADC - EPS 3
 
-#define PIN_ADC_PR_BH_0 (DIFF_2)  // ADC - EPS 4
-#define PIN_ADC_PR_BH_1 (DIFF_13) // ADC - EPS 3
+#define PIN_ADC_PR_BH_0 (LTC2499::DIFF_2)  // ADC - EPS 4
+#define PIN_ADC_PR_BH_1 (LTC2499::DIFF_13) // ADC - EPS 3
 
-#define PIN_ADC_TEMP_BATT_A (SINGLE_0) // ADC - EPS 5
-#define PIN_ADC_TEMP_BATT_B (SINGLE_3) // ADC - EPS 5
-#define PIN_ADC_TEMP_PMIC (SINGLE_2)   // ADC - EPS 5
-#define PIN_ADC_TEMP_REG_A (SINGLE_6)  // ADC - EPS 5
-#define PIN_ADC_TEMP_REG_B (SINGLE_14) // ADC - EPS 5
-#define PIN_ADC_TEMP_pXpY (SINGLE_13)  // ADC - EPS 5
-#define PIN_ADC_TEMP_nXpY (SINGLE_5)   // ADC - EPS 5
-#define PIN_ADC_TEMP_pXnY (SINGLE_9)   // ADC - EPS 5
-#define PIN_ADC_TEMP_nXnY (SINGLE_10)  // ADC - EPS 5
-#define PIN_ADC_AVREF (SINGLE_1)       // ADC - EPS 5
-#define PIN_ADC_UMB_IN (SINGLE_4)      // ADC - EPS 5
-#define PIN_ADC_EJECT_TIMER (SINGLE_8) // ADC - EPS 5
-#define PIN_ADC_VBATT_A (SINGLE_7)     // ADC - EPS 5
-#define PIN_ADC_VBATT_B (SINGLE_15)    // ADC - EPS 5
-#define PIN_ADC_3V3_A (SINGLE_11)      // ADC - EPS 5
-#define PIN_ADC_3V3_B (SINGLE_12)      // ADC - EPS 5
+#define PIN_ADC_TEMP_BATT_A (LTC2499::SINGLE_0) // ADC - EPS 5
+#define PIN_ADC_TEMP_BATT_B (LTC2499::SINGLE_3) // ADC - EPS 5
+#define PIN_ADC_TEMP_PMIC (LTC2499::SINGLE_2)   // ADC - EPS 5
+#define PIN_ADC_TEMP_REG_A (LTC2499::SINGLE_6)  // ADC - EPS 5
+#define PIN_ADC_TEMP_REG_B (LTC2499::SINGLE_14) // ADC - EPS 5
+#define PIN_ADC_TEMP_pXpY (LTC2499::SINGLE_13)  // ADC - EPS 5
+#define PIN_ADC_TEMP_nXpY (LTC2499::SINGLE_5)   // ADC - EPS 5
+#define PIN_ADC_TEMP_pXnY (LTC2499::SINGLE_9)   // ADC - EPS 5
+#define PIN_ADC_TEMP_nXnY (LTC2499::SINGLE_10)  // ADC - EPS 5
+#define PIN_ADC_AVREF (LTC2499::SINGLE_1)       // ADC - EPS 5
+#define PIN_ADC_UMB_IN (LTC2499::SINGLE_4)      // ADC - EPS 5
+#define PIN_ADC_EJECT_TIMER (LTC2499::SINGLE_8) // ADC - EPS 5
+#define PIN_ADC_VBATT_A (LTC2499::SINGLE_7)     // ADC - EPS 5
+#define PIN_ADC_VBATT_B (LTC2499::SINGLE_15)    // ADC - EPS 5
+#define PIN_ADC_3V3_A (LTC2499::SINGLE_11)      // ADC - EPS 5
+#define PIN_ADC_3V3_B (LTC2499::SINGLE_12)      // ADC - EPS 5
 
 /******************************** Solar Panel *********************************/
-// Each panel has the same pins but different addresses to the I²C devices
-#define PIN_MPPT_XSHUT_A (P01) // GPIO - PV0, PV1, PV2, PV3
-#define PIN_MPPT_XSHUT_B (P00) // GPIO - PV0, PV1, PV2, PV3
+// Each panel has the same pins but LTC2499::DIFFerent addresses to the I²C devices
+#define PIN_MPPT_XSHUT_A (TCA9535::P01) // GPIO - PV0, PV1, PV2, PV3
+#define PIN_MPPT_XSHUT_B (TCA9535::P00) // GPIO - PV0, PV1, PV2, PV3
 
-#define PIN_ADC_PVIN_I_A (DIFF_3)  // ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVIN_I_B (DIFF_4)  // ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVOUT_I_A (DIFF_1) // ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVOUT_I_B (DIFF_9) // ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVIN_I_A (LTC2499::DIFF_3)  // ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVIN_I_B (LTC2499::DIFF_4)  // ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVOUT_I_A (LTC2499::DIFF_1) // ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVOUT_I_B (LTC2499::DIFF_9) // ADC - PV0, PV1, PV2, PV3
 
-#define PIN_ADC_PVIN_A (SINGLE_3)             //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVIN_B (SINGLE_4)             //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVOUT_A (SINGLE_1)            //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PVOUT_B (SINGLE_9)            //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_TEMP_MPPT_A (SINGLE_12)       //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_TEMP_MPPT_B (SINGLE_13)       //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_TEMP_BACK (SINGLE_6)          //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_TEMP_FRONT_TOP (SINGLE_15)    //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_TEMP_FRONT_BOTTOM (SINGLE_14) //ADC - PV0, PV1, PV2, PV3
-#define PIN_ADC_PV_AVREF (SINGLE_7)           //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVIN_A (LTC2499::SINGLE_3)             //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVIN_B (LTC2499::SINGLE_4)             //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVOUT_A (LTC2499::SINGLE_1)            //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PVOUT_B (LTC2499::SINGLE_9)            //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_MPPT_A (LTC2499::SINGLE_12)       //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_MPPT_B (LTC2499::SINGLE_13)       //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_BACK (LTC2499::SINGLE_6)          //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_FRONT_TOP (LTC2499::SINGLE_15)    //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_TEMP_FRONT_BOTTOM (LTC2499::SINGLE_14) //ADC - PV0, PV1, PV2, PV3
+#define PIN_ADC_PV_AVREF (LTC2499::SINGLE_7)           //ADC - PV0, PV1, PV2, PV3
 
 /******************************* Miscellaneous ********************************/
 #define PIN_LED (PD_2)

@@ -35,106 +35,116 @@ uint8_t initialize() {
 
   led = 1;
 
-  result = gpioEPS0.configureAll(false, true, false);
-  if (result != ERROR_SUCCESS) {
-    ERROR("Init", "Failed to configure gpioEPS0: 0x%02X", result);
-    return result;
-  }
+  // result = gpioEPS0.configureAll(false, true, false);
+  // if (result != ERROR_SUCCESS) {
+  //   ERROR("Init", "Failed to configure gpioEPS0: 0x%02X", result);
+  //   return result;
+  // }
+  // nodesPRBatt[3]->setSwitch(true, true);
+  // nodesPR3V3[7]->setSwitch(true, true);
+  // nodesPR3V3[11]->setSwitch(true, true);
 
-  result = gpioEPS1.configureAll(false, true, false);
+  result = gpioEPS0.configureAll(false, true, false);
   if (result != ERROR_SUCCESS) {
     ERROR("Init", "Failed to configure gpioEPS1: 0x%02X", result);
     return result;
   }
 
-  result = gpioPV0.configureAll(false, false, true);
+  result = gpioEPS0.dumpRegisters();
   if (result != ERROR_SUCCESS) {
-    ERROR("Init", "Failed to configure gpioPV0: 0x%02X", result);
+    ERROR("Init", "Failed to configure gpioEPS1: 0x%02X", result);
     return result;
   }
 
-  result = gpioPV1.configureAll(false, false, true);
-  if (result != ERROR_SUCCESS) {
-    ERROR("Init", "Failed to configure gpioPV1: 0x%02X", result);
-    return result;
-  }
 
-  result = gpioPV2.configureAll(false, false, true);
-  if (result != ERROR_SUCCESS) {
-    ERROR("Init", "Failed to configure gpioPV2: 0x%02X", result);
-    return result;
-  }
+  // result = gpioPV0.configureAll(false, false, true);
+  // if (result != ERROR_SUCCESS) {
+  //   ERROR("Init", "Failed to configure gpioPV0: 0x%02X", result);
+  //   return result;
+  // }
 
-  result = gpioPV3.configureAll(false, false, true);
-  if (result != ERROR_SUCCESS) {
-    ERROR("Init", "Failed to configure gpioPV3: 0x%02X", result);
-    return result;
-  }
+  // result = gpioPV1.configureAll(false, false, true);
+  // if (result != ERROR_SUCCESS) {
+  //   ERROR("Init", "Failed to configure gpioPV1: 0x%02X", result);
+  //   return result;
+  // }
 
-  bool pathA = false;
-  bool pathB = false;
-  LOG("Init", "All power nodes are A: %s, B %s", pathA ? "on" : "off",
-      pathB ? "on" : "off");
-  for (int i = 0; i < COUNT_PV; i++) {
-    result = nodesPVOut[i]->setSwitch(pathA, pathB);
-    if (result != ERROR_SUCCESS) {
-      ERROR("Init", "Failed to switch nodesPVOut[%d]: 0x%02X", i, result);
-      return result;
-    }
-  }
-  for (int i = 0; i < COUNT_PR_3V3; i++) {
-    result = nodesPR3V3[i]->setSwitch(pathA, pathB);
-    if (result != ERROR_SUCCESS) {
-      ERROR("Init", "Failed to switch nodesPR3V3[%d]: 0x%02X", i, result);
-      return result;
-    }
-  }
-  for (int i = 0; i < COUNT_PR_BATT; i++) {
-    result = nodesPRBatt[i]->setSwitch(pathA, pathB);
-    if (result != ERROR_SUCCESS) {
-      ERROR("Init", "Failed to switch nodesPRBatt[%d]: 0x%02X", i, result);
-      return result;
-    }
-  }
-  for (int i = 0; i < COUNT_PV_3V3; i++) {
-    result = nodesPV3V3[i]->setSwitch(pathA, pathB);
-    if (result != ERROR_SUCCESS) {
-      ERROR("Init", "Failed to switch nodesPV3V3[%d]: 0x%02X", i, result);
-      return result;
-    }
-  }
-  for (int i = 0; i < COUNT_BH; i++) {
-    result = nodesBatteryHeaters[i]->setSwitch(pathA, pathB);
-    if (result != ERROR_SUCCESS) {
-      ERROR("Init", "Failed to switch nodesBH[%d]: 0x%02X ", i, result);
-      return result;
-    }
-  }
-  result = nodeDeployables.setSwitch(pathA, pathB);
-  if (result != ERROR_SUCCESS) {
-    ERROR("Init", "Failed to switch nodeDeployable: 0x%02X", result);
-    return result;
-  }
+  // result = gpioPV2.configureAll(false, false, true);
+  // if (result != ERROR_SUCCESS) {
+  //   ERROR("Init", "Failed to configure gpioPV2: 0x%02X", result);
+  //   return result;
+  // }
 
-  double value = 0.0;
-  result       = adcEPS5.readVoltage(PIN_ADC_EJECT_TIMER, &value);
-  if (result != ERROR_SUCCESS) {
-    ERROR("Init", "Failed to read eject timer voltage: 0x%02X", result);
-    return result;
-  }
-  if (value < THRES_EJECT_TIMER) {
-    LOG("Init", "First boot detected: %5.3fV", value);
-    result = eventFirstBoot();
-    if (result != ERROR_SUCCESS) {
-      ERROR("Init", "Failed to perform first boot: 0x%02X", result);
-      return result;
-    }
-  } else {
-    LOG("Init", "First boot not detected: %5.3fV", value);
-  }
+  // result = gpioPV3.configureAll(false, false, true);
+  // if (result != ERROR_SUCCESS) {
+  //   ERROR("Init", "Failed to configure gpioPV3: 0x%02X", result);
+  //   return result;
+  // }
+
+  // bool pathA = false;
+  // bool pathB = false;
+  // LOG("Init", "All power nodes are A: %s, B %s", pathA ? "on" : "off",
+  //     pathB ? "on" : "off");
+  // for (int i = 0; i < COUNT_PV; i++) {
+  //   result = nodesPVOut[i]->setSwitch(pathA, pathB);
+  //   if (result != ERROR_SUCCESS) {
+  //     ERROR("Init", "Failed to switch nodesPVOut[%d]: 0x%02X", i, result);
+  //     return result;
+  //   }
+  // }
+  // for (int i = 0; i < COUNT_PR_3V3; i++) {
+  //   result = nodesPR3V3[i]->setSwitch(pathA, pathB);
+  //   if (result != ERROR_SUCCESS) {
+  //     ERROR("Init", "Failed to switch nodesPR3V3[%d]: 0x%02X", i, result);
+  //     return result;
+  //   }
+  // }
+  // for (int i = 0; i < COUNT_PR_BATT; i++) {
+  //   result = nodesPRBatt[i]->setSwitch(pathA, pathB);
+  //   if (result != ERROR_SUCCESS) {
+  //     ERROR("Init", "Failed to switch nodesPRBatt[%d]: 0x%02X", i, result);
+  //     return result;
+  //   }
+  // }
+  // for (int i = 0; i < COUNT_PV_3V3; i++) {
+  //   result = nodesPV3V3[i]->setSwitch(pathA, pathB);
+  //   if (result != ERROR_SUCCESS) {
+  //     ERROR("Init", "Failed to switch nodesPV3V3[%d]: 0x%02X", i, result);
+  //     return result;
+  //   }
+  // }
+  // for (int i = 0; i < COUNT_BH; i++) {
+  //   result = nodesBatteryHeaters[i]->setSwitch(pathA, pathB);
+  //   if (result != ERROR_SUCCESS) {
+  //     ERROR("Init", "Failed to switch nodesBH[%d]: 0x%02X ", i, result);
+  //     return result;
+  //   }
+  // }
+  // result = nodeDeployables.setSwitch(pathA, pathB);
+  // if (result != ERROR_SUCCESS) {
+  //   ERROR("Init", "Failed to switch nodeDeployable: 0x%02X", result);
+  //   return result;
+  // }
+
+  // double value = 0.0;
+  // result       = adcEPS5.readVoltage(PIN_ADC_EJECT_TIMER, &value);
+  // if (result != ERROR_SUCCESS) {
+  //   ERROR("Init", "Failed to read eject timer voltage: 0x%02X", result);
+  //   return result;
+  // }
+  // if (value < THRES_EJECT_TIMER) {
+  //   LOG("Init", "First boot detected: %5.3fV", value);
+  //   result = eventFirstBoot();
+  //   if (result != ERROR_SUCCESS) {
+  //     ERROR("Init", "Failed to perform first boot: 0x%02X", result);
+  //     return result;
+  //   }
+  // } else {
+  //   LOG("Init", "First boot not detected: %5.3fV", value);
+  // }
 
   LOG("Init", "Initialization complete");
-  return ERROR_SUCCESS;
+  return ERROR_INVALID_DATA;
 }
 
 /**

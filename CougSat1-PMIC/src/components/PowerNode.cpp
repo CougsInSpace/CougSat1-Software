@@ -26,7 +26,7 @@
  * @param channel connected to the shunt
  * @param shunt resistance
  */
-PowerNode::PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt) :
+PowerNode::PowerNode(LTC2499 & adc, LTC2499::ADCChannel_t channel, double shunt) :
   adc(adc) {
   this->channel = channel;
   this->shunt   = shunt;

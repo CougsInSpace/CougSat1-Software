@@ -23,9 +23,9 @@
 #include "SWO.h"
 #include "mbed.h"
 
-//#define NDEBUG
-//#define NLOG
-//#define NERROR
+// #define NDEBUG
+// #define NLOG
+// #define NERROR
 
 extern SWO_Channel swo;
 
@@ -38,7 +38,7 @@ extern SWO_Channel swo;
 #ifndef NDEBUG
 #define DEBUG(o, args...)                                                      \
   {                                                                            \
-    swo.printf("D[%07lu][Debug] %-10s: ", HAL_GetTick(), o);                   \
+    swo.printf("[%07lu][Debug] %-10s: ", HAL_GetTick(), o);                    \
     swo.printf(args);                                                          \
     swo.putc('\n');                                                            \
   }
@@ -56,7 +56,7 @@ extern SWO_Channel swo;
 #ifndef NLOG
 #define LOG(o, args...)                                                        \
   {                                                                            \
-    swo.printf("L[%07lu][ Log ] %-10s: ", HAL_GetTick(), o);                   \
+    swo.printf("[%07lu][ Log ] %-10s: ", HAL_GetTick(), o);                    \
     swo.printf(args);                                                          \
     swo.putc('\n');                                                            \
   }

@@ -61,29 +61,29 @@ uint8_t eventADC() {
     return result;
   }
   
-  result = adcPV0.readNextActiveChannel();
-  if(result != ERROR_SUCCESS){
-    ERROR("Event-ADC", "Failed to read next active channel of PV0: 0x%02X", result);
-    return result;
-  }
+  // result = adcPV0.readNextActiveChannel();
+  // if(result != ERROR_SUCCESS){
+  //   ERROR("Event-ADC", "Failed to read next active channel of PV0: 0x%02X", result);
+  //   return result;
+  // }
   
-  result = adcPV1.readNextActiveChannel();
-  if(result != ERROR_SUCCESS){
-    ERROR("Event-ADC", "Failed to read next active channel of PV1: 0x%02X", result);
-    return result;
-  }
+  // result = adcPV1.readNextActiveChannel();
+  // if(result != ERROR_SUCCESS){
+  //   ERROR("Event-ADC", "Failed to read next active channel of PV1: 0x%02X", result);
+  //   return result;
+  // }
   
-  result = adcPV2.readNextActiveChannel();
-  if(result != ERROR_SUCCESS){
-    ERROR("Event-ADC", "Failed to read next active channel of PV2: 0x%02X", result);
-    return result;
-  }
+  // result = adcPV2.readNextActiveChannel();
+  // if(result != ERROR_SUCCESS){
+  //   ERROR("Event-ADC", "Failed to read next active channel of PV2: 0x%02X", result);
+  //   return result;
+  // }
   
-  result = adcPV3.readNextActiveChannel();
-  if(result != ERROR_SUCCESS){
-    ERROR("Event-ADC", "Failed to read next active channel of PV3: 0x%02X", result);
-    return result;
-  }
+  // result = adcPV3.readNextActiveChannel();
+  // if(result != ERROR_SUCCESS){
+  //   ERROR("Event-ADC", "Failed to read next active channel of PV3: 0x%02X", result);
+  //   return result;
+  // }
 
   return result;
 }

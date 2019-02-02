@@ -22,14 +22,14 @@
 
 class Thermistor {
 public:
-  Thermistor(LTC2499 & adc, LTC2499Channel_t channel,
+  Thermistor(LTC2499 & adc, LTC2499::ADCChannel_t channel,
       double voltageFraction270K, double voltageFraction350K);
   uint8_t getTemperature(double * data);
 
 private:
   LTC2499 & adc;
 
-  LTC2499Channel_t channel;
+  LTC2499::ADCChannel_t channel;
 
   double resistance270K;
   double beta;

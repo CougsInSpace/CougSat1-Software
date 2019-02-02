@@ -23,6 +23,11 @@
 #define PERIOD_MS_ADC_UPDATE (150) // Read next active channels on ADCs
 #define PERIOD_MS_PERIODIC (5000)  // The periodic event
 
+/************************************ ADCs ************************************/
+#define ADC_AVREF (1.7995)
+#define ADC_GAIN_NONE (1.0)
+#define ADC_GAIN_EPS5 (0.231)
+
 /******************************** Array Counts ********************************/
 #define COUNT_PV (8)
 #define COUNT_PR_3V3 (13)
