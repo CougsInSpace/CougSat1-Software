@@ -8,8 +8,8 @@
  ******************************************************************************/
 /**
  * @file PMIC.h
- * @author Kevin Evans
- * @date 25 Jan 2019
+ * @author Bradley Davis, Kevin Evans
+ * @date 3 Feb 2019
  * @brief Communicates betwen the IHU and the PMIC
  */
 #ifndef SRC_SYSTEMINTERFACES_PMIC_H
@@ -17,8 +17,6 @@
 #define SRC_SYSTEMINTERFACES_PMIC_H
 
 #define I2C_ADDR_PMIC           0x0E
-#define PMIC_VOLTAGE_RESOLUTION 100E-6f
-#define PMIC_CURRENT_RESOLUTION 150E-6f
 
 #include <mbed.h>
 #include <systemInterfaces/Subsystem.h>
@@ -27,13 +25,13 @@ class PMIC : public SubSystem {
   public:
     // Command IDs sent over I2C to the PMIC.
     typedef enum PMICCommand {
-      PMIC_COMMAND_REQ_SUBSYSTEM_OFF,
-      PMIC_COMMAND_REQ_SUBSYSTEM_ON,
-      PMIC_COMMAND_REQ_VOLTAGE_DATA,
-      PMIC_COMMAND_REQ_CURRENT_DATA,
-      PMIC_COMMAND_REQ_TEMPERATURE_DATA,
-      PMIC_COMMAND_REQ_POWER_CHANNEL_STATUS,
-      PMIC_COMMAND_REQ_SOLAR_PANEL_CHANNEL_STATUS
+      REQ_SUBSYSTEM_OFF,
+      REQ_SUBSYSTEM_ON,
+      REQ_VOLTAGE_DATA,
+      REQ_CURRENT_DATA,
+      REQ_TEMPERATURE_DATA,
+      REQ_POWER_CHANNEL_STATUS,
+      REQ_SOLAR_PANEL_CHANNEL_STATUS
     } PMICCommand_t;
 
     typedef enum TargetSubSystem {
@@ -113,12 +111,12 @@ class PMIC : public SubSystem {
     ~PMIC();
 
     uint8_t initialize();
-    uint8_t requestSetSubSystemPower(TargetSubSystem_t target, bool on, uint8_t &result);
-    uint8_t requestGetVoltageData(TargetReading_t target, float &voltage);
-    uint8_t requestGetCurrentData(TargetReading_t target, float &current);
-    uint8_t requestGetTemperatureData(TargetReading_t target, int8_t &temperature);
-    uint8_t requestGetPowerChannelStatus(uint64_t &status);
-    uint8_t requestGetSolarPanelChannelStatus(uint16_t &status);
+    uint8_t requestSetSubSystemPower(TargetSubSystem_t target, bool on, uint8_t *result);
+    uint8_t requestGetVoltageData(TargetReading_t target, uint8_t *output);
+    uint8_t requestGetCurrentData(TargetReading_t target, uint8_t *output);
+    uint8_t requestGetTemperatureData(TargetReading_t target, int8_t *temperature);
+    uint8_t requestGetPowerChannelStatus(uint64_t *status);
+    uint8_t requestGetSolarPanelChannelStatus(uint16_t *status);
     
   private:
     I2C &i2c;

@@ -8,13 +8,14 @@
  ******************************************************************************/
 /**
  * @file PMIC.cpp
- * @author Kevin Evans
- * @date 25 Jan 2019
+ * @author Bradley Davis, Kevin Evans
+ * @date 3 Feb 2019
  * @brief Communicates betwen the IHU and the PMIC
  */
 
 #include "PMIC.h"
 #include "tools/CISError.h"
+#include "tools/CISConsole.h"
 
 /**
  * Constructs PMIC object
@@ -50,18 +51,20 @@ uint8_t PMIC::initialize() {
  *         ERROR_INVALID_ARGS if the target is not supported for temperature
  *         ERROR_WRITE on I2C write failure
  */
-uint8_t PMIC::requestSetSubSystemPower(PMIC::TargetSubSystem_t target, bool on, uint8_t &result) {
+uint8_t PMIC::requestSetSubSystemPower(PMIC::TargetSubSystem_t target, bool on, uint8_t *result) {
   char buffer[2] = {
-    on ? PMIC_COMMAND_REQ_SUBSYSTEM_ON : PMIC_COMMAND_REQ_SUBSYSTEM_OFF,
+    on ? REQ_SUBSYSTEM_ON : REQ_SUBSYSTEM_OFF,
     target
   };
 
-  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 2) != 0) {
-    return ERROR_WRITE;
+  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 2) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error setting subsystem power for target %d (on: %d). No NACK after I2C write.", target, on);
+    return ERROR_NACK;
   }
 
-  if (this->i2c.read(I2C_ADDR_PMIC, (char *)&result, 1) != 0) {
-    return ERROR_READ;
+  if (this->i2c.read(I2C_ADDR_PMIC, (char *)result, 1) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error setting subsystem power for target %d (on: %d). No NACK after I2C read.", target, on);
+    return ERROR_NACK;
   }
 
   return ERROR_SUCCESS;
@@ -70,31 +73,30 @@ uint8_t PMIC::requestSetSubSystemPower(PMIC::TargetSubSystem_t target, bool on, 
 /**
  * Sends a request to the PMIC to retrieve voltage data for a target
  * @param target for pulling voltage data
- * @param voltage of the target, in volts
+ * @param output from the PMIC, a 2-byte array
  * @return ERROR_SUCCESS on success,
  *         ERROR_INVALID_ARGS if the target is not supported for temperature
  *         ERROR_WRITE on I2C write failure
  */
-uint8_t PMIC::requestGetVoltageData(PMIC::TargetReading_t target, float &voltage) {
+uint8_t PMIC::requestGetVoltageData(PMIC::TargetReading_t target, uint8_t *output) {
   if (target > REGULATOR_B_3V3) {
     return ERROR_INVALID_ARGS;
   }
 
   char buffer[2] = {
-    PMIC_COMMAND_REQ_VOLTAGE_DATA,
+    REQ_VOLTAGE_DATA,
     target
   };
-  unsigned short response;
 
-  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 2) != 0) {
-    return ERROR_WRITE;
+  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 2) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting voltage data for target %d. No NACK after I2C write.", target);
+    return ERROR_NACK;
   }
 
-  if (this->i2c.read(I2C_ADDR_PMIC, (char *)&response, 2) != 0) {
-    return ERROR_READ;
+  if (this->i2c.read(I2C_ADDR_PMIC, (char *)output, 2) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting voltage data for target %d. No NACK after I2C read.", target);
+    return ERROR_NACK;
   }
-
-  voltage = (float)response * PMIC_VOLTAGE_RESOLUTION;
 
   return ERROR_SUCCESS;
 }
@@ -102,31 +104,30 @@ uint8_t PMIC::requestGetVoltageData(PMIC::TargetReading_t target, float &voltage
 /**
  * Sends a request to the PMIC to retrieve current data for a target
  * @param target for pulling current
- * @param current of target, in amps
+ * @param output from the PMIC, a 2 byte array
  * @return ERROR_SUCCESS on success,
  *         ERROR_INVALID_ARGS if the target is not supported for temperature
  *         ERROR_WRITE on I2C write failure
  */
-uint8_t PMIC::requestGetCurrentData(PMIC::TargetReading_t target, float &current) {
+uint8_t PMIC::requestGetCurrentData(PMIC::TargetReading_t target, uint8_t *output) {
   if (target > MPPT_7) {
     return ERROR_INVALID_ARGS;
   }
 
   char buffer[2] = {
-    PMIC_COMMAND_REQ_CURRENT_DATA,
+    REQ_CURRENT_DATA,
     target
   };
-  unsigned short response;
 
-  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 2) != 0) {
-    return ERROR_WRITE;
+  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 2) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting current data for target %d. No NACK after I2C write.", target);
+    return ERROR_NACK;
   }
 
-  if (this->i2c.read(I2C_ADDR_PMIC, (char *)&response, 2) != 0) {
-    return ERROR_READ;
+  if (this->i2c.read(I2C_ADDR_PMIC, (char *)output, 2) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting voltage data for target %d. No NACK after I2C read.", target);
+    return ERROR_NACK;
   }
-
-  current = (float)response * PMIC_CURRENT_RESOLUTION;
 
   return ERROR_SUCCESS;
 }
@@ -139,22 +140,24 @@ uint8_t PMIC::requestGetCurrentData(PMIC::TargetReading_t target, float &current
  *         ERROR_INVALID_ARGS if the target is not supported for temperature
  *         ERROR_WRITE on I2C write failure
  */
-uint8_t PMIC::requestGetTemperatureData(PMIC::TargetReading_t target, int8_t &temperature) {
+uint8_t PMIC::requestGetTemperatureData(PMIC::TargetReading_t target, int8_t *temperature) {
   if (target < TARGET_PMIC && target > REGULATOR_B_3V3) {
     return ERROR_INVALID_ARGS;
   }
 
   char buffer[2] = {
-    PMIC_COMMAND_REQ_TEMPERATURE_DATA,
+    REQ_TEMPERATURE_DATA,
     target
   };
 
-  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 2) != 0) {
-    return ERROR_WRITE;
+  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 2) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting temperature data for target %d. No NACK after I2C write.", target);
+    return ERROR_NACK;
   }
 
-  if (this->i2c.read(I2C_ADDR_PMIC, (char *)&temperature, 1) != 0) {
-    return ERROR_READ;
+  if (this->i2c.read(I2C_ADDR_PMIC, (char *)temperature, 1) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting voltage data for target %d. No NACK after I2C read.", target);
+    return ERROR_NACK;
   }
 
   return ERROR_SUCCESS;
@@ -166,18 +169,22 @@ uint8_t PMIC::requestGetTemperatureData(PMIC::TargetReading_t target, int8_t &te
  * @return ERROR_SUCCESS on success,
  *         ERROR_WRITE on I2C write failure
  */
-uint8_t PMIC::requestGetPowerChannelStatus(uint64_t &status) {
+uint8_t PMIC::requestGetPowerChannelStatus(uint64_t *status) {
   char buffer[1] = {
-    PMIC_COMMAND_REQ_POWER_CHANNEL_STATUS
+    REQ_POWER_CHANNEL_STATUS
   };
   status = 0;
 
-  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 1) != 0) {
-    return ERROR_WRITE;
+  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 1) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting power channel status. No NACK after I2C write.");
+    return ERROR_NACK;
   }
-  if (this->i2c.read(I2C_ADDR_PMIC, (char *)&status, 7) != 0) {
-    return ERROR_READ;
+
+  if (this->i2c.read(I2C_ADDR_PMIC, (char *)status, 7) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting power channel status. No NACK after I2C read.");
+    return ERROR_NACK;
   }
+
   return ERROR_SUCCESS;
 }
 
@@ -187,17 +194,21 @@ uint8_t PMIC::requestGetPowerChannelStatus(uint64_t &status) {
  * @return ERROR_SUCCESS on success,
  *         ERROR_WRITE on I2C write failure
  */
-uint8_t PMIC::requestGetSolarPanelChannelStatus(uint16_t &status) {
+uint8_t PMIC::requestGetSolarPanelChannelStatus(uint16_t *status) {
   char buffer[1] = {
-    PMIC_COMMAND_REQ_SOLAR_PANEL_CHANNEL_STATUS
+    REQ_SOLAR_PANEL_CHANNEL_STATUS
   };
   status = 0;
 
-  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 1) != 0) {
-    return ERROR_WRITE;
+  if (this->i2c.write(I2C_ADDR_PMIC, buffer, 1) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting solar panel channel status. No NACK after I2C write.");
+    return ERROR_NACK;
   }
-  if (this->i2c.read(I2C_ADDR_PMIC, (char *)&status, 2) != 0) {
-    return ERROR_READ;
+
+  if (this->i2c.read(I2C_ADDR_PMIC, (char *)status, 2) != ERROR_SUCCESS) {
+    DEBUG("IHU<->PMIC", "Error getting solar panel channel status. No NACK after I2C read.");
+    return ERROR_NACK;
   }
+
   return ERROR_SUCCESS;
 }
