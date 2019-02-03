@@ -112,8 +112,8 @@ class PMIC : public SubSystem {
 
     uint8_t initialize();
     uint8_t requestSetSubSystemPower(TargetSubSystem_t target, bool on, uint8_t *result);
-    uint8_t requestGetVoltageData(TargetReading_t target, uint8_t *output);
-    uint8_t requestGetCurrentData(TargetReading_t target, uint8_t *output);
+    uint8_t requestGetVoltageData(TargetReading_t target, uint16_t *output);
+    uint8_t requestGetCurrentData(TargetReading_t target, int16_t *output);
     uint8_t requestGetTemperatureData(TargetReading_t target, int8_t *temperature);
     uint8_t requestGetPowerChannelStatus(uint64_t *status);
     uint8_t requestGetSolarPanelChannelStatus(uint16_t *status);
