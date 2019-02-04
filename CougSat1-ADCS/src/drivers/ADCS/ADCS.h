@@ -21,55 +21,25 @@
 	-Get power info from IHU
 	-Photodiodes?
  */
-
-#ifndef SRC_SYSTEMINTERFACES_ADCS_H_
-#define SRC_SYSTEMINTERFACES_ADCS_H_
+#ifndef ADCS_H
+#define ADCS_H
 
 #include <mbed.h>
 #include <rtos.h>
-#include <filesystem/fat/FATFileSystem.h>
+#include "../../ADCSPins.h"
+#include "drivers/IHU/IHU.h"
 
-#include "systemInterfaces/PMIC.h"
-#include "systemInterfaces/IHU.h"
-#include "systemInterfaces/RCS.h"
-#include "systemInterfaces/Payload.h"
-#include "systemInterfaces/IFJR.h"
-#include "drivers/SDBlockDevice.h"
-#include "GPS.h"
-
-#define ADCS_EVENT_QUEUE_SIZE 20
-
-class ADCS {
-  public:
-    static ADCS* getInstance();
-
-    void addEvent(uint8_t eventIndex, uint8_t *dataBlock, uint16_t dataLength);
-    void addEventPeriodic(int ms, uint8_t eventIndex, uint8_t *dataBlock,
-        uint16_t dataLength);
-    void initialize();
-    void run();
-    void stop();
-
-  private:
-    //Singleton class design
-    ADCS();
-    ~ADCS();
-    ADCS(ADCS const&);
-    void operator=(ADCS const&);
-    static ADCS* instance;
-
-    //System interfaces
-	IHU ihu;
-    PMIC pmic;
-	GPS gps;
-
-    //Hardware drivers
-    EventQueue queue;
-    I2C i2cPrimary;
-    I2C i2cSecondary;
-    SPI spi;
-    SDBlockDevice sd;
-    FATFileSystem fs;
+class ADCS 
+{
+	private:
+		Thread MONITOR;
+		Thread I2CREAD;
+		char message[4];
+		IHUCOM Reader;
+	public:
+		ADCS();
+		void monitor_thread();
+		void i2c_thread();
+		void initialize();
 };
-
-#endif /* !SRC_SYSTEMINTERFACES_ADCS_H_ */
+#endif

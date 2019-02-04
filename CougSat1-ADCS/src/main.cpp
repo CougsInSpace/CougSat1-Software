@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2018 by Cougs in Space - Washington State University         *
+ * Copyright (c) 2019 by Cougs in Space - Washington State University         *
  * Cougs in Space website: cis.vcea.wsu.edu                                   *
  *                                                                            *
  * This file is a part of flight and/or ground software for Cougs in Space's  *
@@ -7,22 +7,19 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file main.cpp
- * @author Bradley Davis
- * @date 6 Mar 2018
- * @brief Starts the IHU software
+ * @file ADCS.cpp
+ * @author Ryal O'Neil
+ * @date 2019-1-27
+ * @brief Starts the ADCS software
  *
- * Initializes IHU object and starts the eventQueue
+ * Initializes ADCS object and starts the eventQueue
  */
 
-#include <mbed.h>
-#include <rtos.h>
-#include "tools/CISError.h"
+#include "drivers/ADCS/ADCS.h"
+#include "ADCSPins.h"
 
-/**
- * Program start routine
- * @return error code
- */
-int main(void) {
-  return ERROR_SUCCESS;
+int main() 
+{
+    ADCS ADCS;
+    ADCS.initialize();
 }
