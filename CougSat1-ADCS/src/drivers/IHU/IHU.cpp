@@ -1,5 +1,5 @@
 #include "IHU.h"
-I2CSlave IHU(D14, D15);
+I2CSlave IHU(PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL);
 
 IHUCOM::IHUCOM()
 {

@@ -17,7 +17,7 @@
 
 #include "ADCS.h"
 
-DigitalIn I2CListen(D7);
+DigitalIn I2CListen(PIN_I2C_LISTENING);
 
 void ADCS::monitor_thread() {
     while (true) {

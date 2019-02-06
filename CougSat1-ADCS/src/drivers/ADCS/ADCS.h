@@ -29,6 +29,9 @@
 #include "../../ADCSPins.h"
 #include "drivers/IHU/IHU.h"
 
+//ADCS PINS
+extern DigitalIn I2CListen;
+
 class ADCS 
 {
 	private:
