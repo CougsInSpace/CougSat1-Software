@@ -56,7 +56,6 @@ uint8_t initialize() {
     return result;
   }
 
-
   // result = gpioPV0.configureAll(false, false, true);
   // if (result != ERROR_SUCCESS) {
   //   ERROR("Init", "Failed to configure gpioPV0: 0x%02X", result);

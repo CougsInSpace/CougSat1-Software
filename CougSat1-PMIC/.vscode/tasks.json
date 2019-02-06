@@ -15,7 +15,7 @@
     {
       "label": "Flash",
       "type": "shell",
-      "command": "C:\\Program Files (x86)\\SEGGER\\JLink_V640\\JLink.exe",
+      "command": "JLink.exe",
       "args": [
         "-device",
         "STM32L476RG",
@@ -34,7 +34,7 @@
     {
       "label": "SWOView",
       "type": "shell",
-      "command": "C:\\Program Files (x86)\\SEGGER\\JLink_V640\\JLinkSWOViewerCL.exe",
+      "command": "JLinkSWOViewerCL.exe",
       "args": [
         "-device",
         "STM32L476RG",
@@ -49,7 +49,7 @@
     {
       "label": "Build, & Flash",
       "type": "shell",
-      "command": "C:\\Program Files (x86)\\SEGGER\\JLink_V640\\JLink.exe",
+      "command": "JLink.exe",
       "args": [
         "-device",
         "STM32L476RG",
@@ -70,7 +70,7 @@
     {
       "label": "Build, Flash, & SWOView",
       "type": "shell",
-      "command": "C:\\Program Files (x86)\\SEGGER\\JLink_V640\\JLinkSWOViewerCL.exe",
+      "command": "JLinkSWOViewerCL.exe",
       "args": [
         "-device",
         "STM32L476RG",
