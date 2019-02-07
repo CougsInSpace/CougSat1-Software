@@ -1,13 +1,13 @@
 #include <mbed.h>
 #include <rtos.h>
-#include "../../ADCSPins.h"
+#include "ADCSPins.h"
 
 //IHU Communication
-extern I2CSlave IHU;
 
 class IHUCOM
 {
     private:
+        I2CSlave IHU;
         char message[4];
     public:
         IHUCOM();

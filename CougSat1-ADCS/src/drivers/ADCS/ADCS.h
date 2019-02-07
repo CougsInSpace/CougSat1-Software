@@ -26,15 +26,16 @@
 
 #include <mbed.h>
 #include <rtos.h>
-#include "../../ADCSPins.h"
-#include "drivers/IHU/IHU.h"
+#include "ADCSPins.h"
+#include "drivers/IHUCOM/IHUCOM.h"
 
 //ADCS PINS
-extern DigitalIn I2CListen;
+
 
 class ADCS 
 {
 	private:
+		DigitalIn I2CListen;
 		Thread MONITOR;
 		Thread I2CREAD;
 		char message[4];

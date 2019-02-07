@@ -1,7 +1,7 @@
-#include "IHU.h"
-I2CSlave IHU(PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL);
+#include "IHUCOM.h"
 
-IHUCOM::IHUCOM()
+
+IHUCOM::IHUCOM(): IHU(PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL)
 {
     IHU.address(0x99);
 }

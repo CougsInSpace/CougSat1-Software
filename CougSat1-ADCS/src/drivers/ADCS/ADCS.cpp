@@ -17,13 +17,11 @@
 
 #include "ADCS.h"
 
-DigitalIn I2CListen(PIN_I2C_LISTENING);
-
 void ADCS::monitor_thread() {
     while (true) {
         Thread::wait(1);
         //printf("Checking for events!\r\n");
-        if(I2CListen) {
+        if(I2CListen == 1) {
             I2CREAD.signal_set(0x1);
             //printf("Turning on I2C\r\n");
         }
@@ -38,7 +36,7 @@ void ADCS::i2c_thread() {
 
 }
 
-ADCS::ADCS()
+ADCS::ADCS(): I2CListen(PIN_I2C_LISTENING)
 {
     MONITOR.set_priority(osPriorityRealtime);
     I2CREAD.set_priority(osPriorityRealtime);
@@ -50,6 +48,6 @@ void ADCS::initialize() {
     printf("Outside Main!\r\n");
     while (true) {
         printf("Process Main!\r\n");
-        //Thread::wait(500);
+        Thread::wait(500);
     }
 }
