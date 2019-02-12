@@ -16,7 +16,7 @@
 
 #include "MAGNETORQUER.h"
 
-MAGNETORQUER::MAGNETORQUER(PinName forPin, PinName revPin,PinName pSleep){
+MAGNETORQUER::MAGNETORQUER(PwmOut &forPin, PwmOut &revPin,Digitalout &pSleep) :forward (forPin),reverse(revPin),sleep(pSleep){
     PwmOut forward(forPin);
     PwmOut reverse(revPin);
     Digitalout sleepPin(pSleep);
@@ -26,15 +26,17 @@ MAGNETORQUER::MAGNETORQUER(PinName forPin, PinName revPin,PinName pSleep){
 MAGNETORQUER::setCoil(float input){
     if(input > 0){
         forward.write(input);
+        reverse.write(0);
     }else{
         reverse.write(input *-1);
+        forward.write(0);
     }
 }
 
 MAGNETORQUER::wake(void){
-    sleepPin(HIGH);
+    sleep(HIGH);
 }
 MAGNETORQUER::sleep(void){
-    sleepPin(LOW);
+    sleep(LOW);
 }
 

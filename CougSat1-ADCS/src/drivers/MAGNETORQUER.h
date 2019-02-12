@@ -40,7 +40,9 @@ class MAGNETORQUER{
     unit8_t wake();
 
     private:
-
+    PwmOut forward(forPin);
+    PwmOut reverse(revPin);
+    Digitalout sleepPin(pSleep);
   
 
 }
