@@ -35,6 +35,8 @@ MAGNETORQUER::setCoil(float input){
 
 MAGNETORQUER::wake(void){
     sleep(HIGH);
+    forward.write(0);
+    reverse.write(0);
 }
 MAGNETORQUER::sleep(void){
     sleep(LOW);

@@ -39,10 +39,13 @@ class MAGNETORQUER{
     //wakes up h-brige (takes 30 micro seconds)
     unit8_t wake();
 
+    //sets both coils to 0 without puting the hbridge to sleep
+    unit8_t stop();
+
     private:
-    PwmOut forward(forPin);
-    PwmOut reverse(revPin);
-    Digitalout sleepPin(pSleep);
+    PwmOut &forPin;
+    PwmOut &revPin;
+    Digitalout &pSleep;
   
 
 }
