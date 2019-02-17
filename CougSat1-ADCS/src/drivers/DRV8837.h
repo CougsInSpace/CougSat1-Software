@@ -7,26 +7,26 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file MAGNETORQUER.h
+ * @file DRV8837.h
  * @author Eric Curtland
  * @date 27 January 2019
- * @brief Provides an interface for output to magnetorquers 
+ * @brief Provides an interface for output to h-bridge for magnetorquers 
  *
 */
 
-#ifndef MAGNETORQUER_H_
-#define MAGNETORWUER_H_
+#ifndef DRV8837_H_
+#define DRV8837_H_
 
 #include <mbed.h>
 #include "ADCSPins.h"
 
 
 
-class MAGNETORQUER{
+class DRV8837{
     public:
 
-    MAGNETORQUER(PinName forPin, PinName revPin,PinName pSleep);
-    ~MAGNETORQUER();
+    DRV8837(PinName forPin, PinName revPin,PinName pSleep);
+    ~DRV8837();
 
     // input should be between +- 100 corespending to persentage power
     // sign indicates direction
@@ -49,8 +49,6 @@ class MAGNETORQUER{
   
 
 }
-
-
 
 
 #endif 
