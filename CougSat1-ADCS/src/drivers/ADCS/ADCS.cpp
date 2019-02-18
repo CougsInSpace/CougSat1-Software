@@ -21,9 +21,9 @@ void ADCS::monitor_thread() {
     while (true) {
         Thread::wait(1);
         // printf("Checking for events!\r\n");
-        if(I2CListen == 1) {
+        if(Reader.checkRead()) {
             I2CREAD.signal_set(0x1);
-            printf("Turning on I2C\r\n");
+            //printf("Turning on I2C\r\n");
         }
     }
 }

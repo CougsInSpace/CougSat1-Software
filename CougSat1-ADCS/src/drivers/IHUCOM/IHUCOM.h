@@ -13,4 +13,5 @@ class IHUCOM
         IHUCOM();
         void readIHU();
         char getMessage();
+        bool checkRead();
 };
