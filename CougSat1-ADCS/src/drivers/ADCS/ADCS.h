@@ -29,8 +29,6 @@
 #include "ADCSPins.h"
 #include "drivers/IHUCOM/IHUCOM.h"
 
-//ADCS PINS
-
 
 class ADCS 
 {
