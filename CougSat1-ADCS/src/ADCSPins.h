@@ -5,5 +5,6 @@
 #define PIN_I2C_BUS_SDA D14
 #define PIN_I2C_BUS_SCL D15
 #define PIN_I2C_LISTENING PB_12
+#define IHU_ADDRESS 0xAD
 
 #endif

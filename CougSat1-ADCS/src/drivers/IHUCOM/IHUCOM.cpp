@@ -3,7 +3,7 @@
 
 IHUCOM::IHUCOM(): IHU(PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL)
 {
-    IHU.address(0x99);
+    IHU.address(IHU_ADDRESS);
 }
 
 bool IHUCOM::checkRead(){
