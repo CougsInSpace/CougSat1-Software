@@ -10,8 +10,7 @@
  * @file DRV8837.h
  * @author Eric Curtland
  * @date 27 January 2019
- * @brief Provides an interface for output to h-bridge for magnetorquers 
- *
+ * @brief Provides an interface for output to h-bridge 
 */
 
 #ifndef DRV8837_H_
@@ -20,35 +19,20 @@
 #include <mbed.h>
 #include "ADCSPins.h"
 
-
-
-class DRV8837{
-    public:
-
-    DRV8837(PinName forPin, PinName revPin,PinName pSleep);
-    ~DRV8837();
-
-    // input should be between +- 100 corespending to persentage power
-    // sign indicates direction
+class DRV8837
+{
+  public:
+    DRV8837(PinName forPin, PinName revPin, PinName pSleep);
     unit8_t setCoil(float input);
-
     unit8_t setCoil(float input, float time);
-
-    //puts h-brige to sleep 
     unit8_t sleep();
-    //wakes up h-brige (takes 30 micro seconds)
     unit8_t wake();
-
-    //sets both coils to 0 without puting the hbridge to sleep
     unit8_t stop();
 
-    private:
-    PwmOut &forPin;
-    PwmOut &revPin;
-    Digitalout &pSleep;
-  
-
+  private:
+    PwmOut forward;
+    PwmOut reverse;
+    Digitalout sleep;
 }
 
-
-#endif 
+#endif
