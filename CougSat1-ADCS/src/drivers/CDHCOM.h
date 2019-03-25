@@ -7,23 +7,28 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file main.cpp
+ * @file CDHCOM.h
  * @author Ryal O'Neil
  * @date 2019-1-27
- * @brief Starts the ADCS software
+ * @brief Communicates between ADCS and CDH
  *
- * Initializes ADCS object and starts the eventQueue
+ * Declares CDHCOM object for communication with CDH
  */
 
-#include "drivers/ADCS.h"
+#include <mbed.h>
+#include <rtos.h>
 
-/**
- * @brief main, initializes ADCS object 
- * 
- * @return int 
- */
-int main()
+//IHU Communication
+
+class CDHCOM
 {
-    ADCS ADCS;
-    ADCS.main();
-}
+  private:
+    I2CSlave CDH;
+    char message[4];
+
+  public:
+    CDHCOM(int addr, PinName sda, PinName scl);
+    void readCDH();
+    char getMessage();
+    bool checkRead();
+};

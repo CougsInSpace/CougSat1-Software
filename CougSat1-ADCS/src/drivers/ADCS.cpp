@@ -16,38 +16,63 @@
  */
 
 #include "ADCS.h"
+#define CDHFLAG 0x1
+#define ONEMILLISECOND 1
+#define ONESECOND 1000
 
-void ADCS::monitor_thread() {
-    while (true) {
-        Thread::wait(1);
-        // printf("Checking for events!\r\n");
-        if(Reader.checkRead()) {
-            I2CREAD.signal_set(0x1);
+/**
+ * @brief Function for the polling thread
+ * 
+ */
+void ADCS::monitor_thread()
+{
+    while (true)
+    {
+        Thread::wait(ONEMILLISECOND);
+        //printf("Checking for events!\r\n");
+        if (CDH.checkRead())
+        {
+            CDHREAD.signal_set(CDHFLAG);
             //printf("Turning on I2C\r\n");
         }
     }
 }
- 
-void ADCS::i2c_thread() {
-    while(true) {
-        Thread::signal_wait(0x1);
-        Reader.readIHU();
-    }
 
+/**
+ * @brief Function for cdh communication thread
+ * 
+ */
+void ADCS::cdh_thread()
+{
+    while (true)
+    {
+        Thread::signal_wait(CDHFLAG);
+        CDH.readCDH();
+    }
 }
 
-ADCS::ADCS(): I2CListen(PIN_I2C_LISTENING)
+/**
+ * @brief Construct a new ADCS::ADCS object
+ * 
+ */
+ADCS::ADCS() : CDH(IHU_ADDRESS, PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL)
 {
     MONITOR.set_priority(osPriorityRealtime);
-    I2CREAD.set_priority(osPriorityRealtime);
-    I2CREAD.start(callback(this, &ADCS::i2c_thread));
+    CDHREAD.set_priority(osPriorityRealtime);
+    CDHREAD.start(callback(this, &ADCS::cdh_thread));
     MONITOR.start(callback(this, &ADCS::monitor_thread));
 }
 
-void ADCS::initialize() {
+/**
+ * @brief main function for ADCS object
+ * 
+ */
+void ADCS::main()
+{
     printf("Outside Main!\r\n");
-    while (true) {
+    while (true)
+    {
         printf("Process Main!\r\n");
-        Thread::wait(500);
+        Thread::wait(ONESECOND);
     }
 }
