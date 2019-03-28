@@ -13,5 +13,8 @@ RemoteSystemsTempFiles
 # Visual Studio Code
 *.code-workspace
 
+# Precompiled headers
+ipch
+
 # Microsoft Office Lock Files
 *~$*

@@ -24,7 +24,9 @@
  * @param addr of the GPIO
  */
 TCA9535::TCA9535(I2C & i2c, uint8_t addr) : i2c(i2c) {
-  this->addr = addr;
+  this->addr        = addr;
+  this->outputBank0 = 0;
+  this->outputBank1 = 0;
 }
 
 /**
@@ -32,7 +34,7 @@ TCA9535::TCA9535(I2C & i2c, uint8_t addr) : i2c(i2c) {
  *
  * @param pin
  * @param input configures the pin to an input if true
- * @param polarityInversion inverts the pin if true
+ * @param polarityInversion inverts the pin if true and an input
  * @param value is high if true
  * @return error code
  */
@@ -81,13 +83,25 @@ uint8_t TCA9535::configurePin(
   return ERROR_SUCCESS;
 }
 
+/**
+ * @brief Configures the direction, polarity, and value (if output) for all pins
+ *
+ * @param input configures the pin to an input if true
+ * @param polarityInversion inverts the pin if true and an input
+ * @param value is high if true
+ * @return error code
+ */
 uint8_t TCA9535::configureAll(bool input, bool polarityInversion, bool value) {
   uint8_t regValue = 0;
   uint8_t result   = 0;
   if (value) {
-    regValue = 0xFF;
+    regValue    = 0xFF;
+    outputBank0 = 0xFF;
+    outputBank1 = 0xFF;
   } else {
-    regValue = 0x00;
+    regValue    = 0x00;
+    outputBank0 = 0x00;
+    outputBank1 = 0x00;
   }
   result = writeRegister(TCA9535::OUTPUT, TCA9535::P00, regValue);
   if (result != ERROR_SUCCESS) {
@@ -135,10 +149,15 @@ uint8_t TCA9535::configureAll(bool input, bool polarityInversion, bool value) {
   return ERROR_SUCCESS;
 }
 
+/**
+ * @brief Logs all of the registers
+ *
+ * @return error code
+ */
 uint8_t TCA9535::dumpRegisters() {
   uint8_t regValue = 0;
   uint8_t result   = 0;
-  result = readRegister(TCA9535::OUTPUT, TCA9535::P00, &regValue);
+  result           = readRegister(TCA9535::OUTPUT, TCA9535::P00, &regValue);
   if (result != ERROR_SUCCESS) {
     ERROR("TCA9535", "Could not write output register to 0x%02X", addr);
     return result;
@@ -188,7 +207,20 @@ uint8_t TCA9535::dumpRegisters() {
  * @return uint8_t error code
  */
 uint8_t TCA9535::write(TCA9535::Pin_t pin, bool value) {
-  uint8_t mask     = 1 << (pin & 0x0F);
+  uint8_t mask         = 1 << (pin & 0x0F);
+  uint8_t currentValue = 0;
+  if (pin & 0x10) {
+    currentValue = outputBank1 & mask;
+  } else {
+    currentValue = outputBank0 & mask;
+  }
+  bool noChange = value ? currentValue != 0 : currentValue == 0;
+  if (noChange) {
+    DEBUG("TCA9535", "Output already set as desired for pin 0x%02X on 0x%02X",
+        pin, addr);
+    return ERROR_SUCCESS;
+  }
+
   uint8_t regValue = 0;
   uint8_t result   = readRegister(TCA9535::OUTPUT, pin, &regValue);
   if (result != ERROR_SUCCESS) {
@@ -205,17 +237,10 @@ uint8_t TCA9535::write(TCA9535::Pin_t pin, bool value) {
     ERROR("TCA9535", "Could not write output register to 0x%02X", addr);
     return result;
   }
-
-  bool actualValue = false;
-
-  result = read(pin, &actualValue);
-  if (result != ERROR_SUCCESS) {
-    ERROR("TCA9535", "Could not read 0x%02X from 0x%02X", pin, addr);
-    return result;
-  }
-  if (value != actualValue) {
-    ERROR("TCA9535", "Output 0x%02X has not taken affect on 0x%02X", pin, addr);
-    return ERROR_WRITE;
+  if (pin & 0x10) {
+    outputBank1 = regValue;
+  } else {
+    outputBank0 = regValue;
   }
 
   return ERROR_SUCCESS;

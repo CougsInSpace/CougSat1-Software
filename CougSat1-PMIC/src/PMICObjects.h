@@ -46,12 +46,8 @@ extern LTC2499 adcPV3;
 
 extern TCA9535 gpioEPS0;
 extern TCA9535 gpioEPS1;
-extern TCA9535 gpioPV0;
-extern TCA9535 gpioPV1;
-extern TCA9535 gpioPV2;
-extern TCA9535 gpioPV3;
 
-extern DigitalOut led;
+extern DigitalOut statusLED;
 extern DigitalOut umbilicalSwitchA;
 extern DigitalOut umbilicalSwitchB;
 

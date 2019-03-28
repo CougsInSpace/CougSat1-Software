@@ -31,14 +31,17 @@ public:
 
   virtual uint8_t setSwitch(bool pathA, bool pathB);
 
+protected:
+  bool pathA;
+  bool pathB;
+  bool inverted;
+
 private:
   LTC2499 & adc;
 
   LTC2499::ADCChannel_t channel;
 
   double shunt;
-  bool   pathA;
-  bool   pathB;
 };
 
 #endif /* _SRC_COMPONENTS_POWER_NODE_H_ */

@@ -37,12 +37,8 @@ LTC2499 adcPV3(i2cBus, I2C_ADDR_ADC_PV3);
 
 TCA9535 gpioEPS0(i2cBus, I2C_ADDR_GPIO_EPS0);
 TCA9535 gpioEPS1(i2cBus, I2C_ADDR_GPIO_EPS1);
-TCA9535 gpioPV0(i2cBus, I2C_ADDR_GPIO_PV0);
-TCA9535 gpioPV1(i2cBus, I2C_ADDR_GPIO_PV1);
-TCA9535 gpioPV2(i2cBus, I2C_ADDR_GPIO_PV2);
-TCA9535 gpioPV3(i2cBus, I2C_ADDR_GPIO_PV3);
 
-DigitalOut led(PIN_LED);
+DigitalOut statusLED(PIN_LED);
 DigitalOut umbilicalSwitchA(PIN_UMB_SW_A);
 DigitalOut umbilicalSwitchB(PIN_UMB_SW_B);
 
@@ -70,13 +66,13 @@ PowerNodeTCA9535 nodePVOut_1A(adcPV0, PIN_ADC_PVOUT_I_A, SHUNT_PVOUT_1A,
 PowerNodeTCA9535 nodePVOut_1B(adcPV0, PIN_ADC_PVOUT_I_A, SHUNT_PVOUT_1B,
     gpioEPS0, PIN_PV_SW_3A, PIN_PV_SW_3B);
 PowerNodeTCA9535 nodePVOut_2A(adcPV0, PIN_ADC_PVOUT_I_A, SHUNT_PVOUT_2A,
-    gpioEPS0, PIN_PV_SW_4A, PIN_PV_SW_4B);
+    gpioEPS1, PIN_PV_SW_4A, PIN_PV_SW_4B);
 PowerNodeTCA9535 nodePVOut_2B(adcPV0, PIN_ADC_PVOUT_I_A, SHUNT_PVOUT_2B,
-    gpioEPS0, PIN_PV_SW_5A, PIN_PV_SW_5B);
+    gpioEPS1, PIN_PV_SW_5A, PIN_PV_SW_5B);
 PowerNodeTCA9535 nodePVOut_3A(adcPV0, PIN_ADC_PVOUT_I_A, SHUNT_PVOUT_3A,
-    gpioEPS0, PIN_PV_SW_6A, PIN_PV_SW_6B);
+    gpioEPS1, PIN_PV_SW_6A, PIN_PV_SW_6B);
 PowerNodeTCA9535 nodePVOut_3B(adcPV0, PIN_ADC_PVOUT_I_A, SHUNT_PVOUT_3B,
-    gpioEPS0, PIN_PV_SW_7A, PIN_PV_SW_7B);
+    gpioEPS1, PIN_PV_SW_7A, PIN_PV_SW_7B);
 
 PowerNode * nodesPVOut[COUNT_PV] = {&nodePVOut_0A, &nodePVOut_0B, &nodePVOut_1A,
     &nodePVOut_1B, &nodePVOut_2A, &nodePVOut_2B, &nodePVOut_3A, &nodePVOut_3B};
@@ -128,8 +124,8 @@ PowerNodeDirect nodePRBatt_5(adcEPS1, PIN_ADC_PR_BATT_5, SHUNT_PR_BATT_5,
 PowerNodeDirect nodePRBatt_6(adcEPS1, PIN_ADC_PR_BATT_6, SHUNT_PR_BATT_6,
     PIN_PC_BATT_6A, PIN_PC_BATT_6B);
 
-PowerNode * nodesPRBatt[COUNT_PR_BATT] = {&nodePRBatt_0, &nodePRBatt_2,
-    &nodePRBatt_3, &nodePRBatt_4, &nodePRBatt_5, &nodePRBatt_6};
+PowerNode * nodesPRBatt[COUNT_PR_BATT] = {&nodePRBatt_0, &nodePRBatt_1,
+    &nodePRBatt_2, &nodePRBatt_3, &nodePRBatt_4, &nodePRBatt_5, &nodePRBatt_6};
 
 PowerNodeTCA9535 nodePV3V3_0(adcEPS4, PIN_ADC_PV_3V3_0, SHUNT_PV_3V3_0,
     gpioEPS0, PIN_PVC_3V3_0A, PIN_PVC_3V3_0B);

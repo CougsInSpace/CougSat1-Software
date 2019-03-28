@@ -66,6 +66,8 @@ private:
 
   I2C &   i2c;
   uint8_t addr;
+  uint8_t outputBank0;
+  uint8_t outputBank1;
 };
 
 #endif /* _SRC_DRIVERS_TCA9535_H_ */
