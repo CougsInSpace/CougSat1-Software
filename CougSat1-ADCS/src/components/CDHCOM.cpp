@@ -26,7 +26,7 @@
  * @param sda 
  * @param scl 
  */
-CDHCOM::CDHCOM(int addr, PinName sda, PinName scl) : i2c(sda, scl)
+CDHCOM::CDHCOM(uint8_t addr, PinName sda, PinName scl) : i2c(sda, scl)
 {
     i2c.address(addr);
 }
@@ -52,7 +52,7 @@ bool CDHCOM::checkRead()
 void CDHCOM::readCDH()
 {
     i2c.read(message, MESSAGELENGTH);
-    for (int i = 0; message[i] != NULL; i++)
+    for (uint8_t i = 0; message[i] != NULL; i++)
     {
         printf("%c\n", message[i]);
     }

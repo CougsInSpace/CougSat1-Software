@@ -27,7 +27,7 @@ class CDHCOM
     char message[4];
 
   public:
-    CDHCOM(int addr, PinName sda, PinName scl);
+    CDHCOM(uint8_t addr, PinName sda, PinName scl);
     void readCDH();
     char getMessage();
     bool checkRead();
