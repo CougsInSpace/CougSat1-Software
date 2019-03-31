@@ -12,10 +12,10 @@
  * @date 2019-1-27
  * @brief Starts the ADCS software
  *
- * Initializes ADCS object and starts the eventQueue
+ * Initializes ADCS object and starts the priority queue
  */
 
-#include "drivers/ADCS.h"
+#include "ADCS.h"
 
 /**
  * @brief main, initializes ADCS object 
@@ -24,6 +24,6 @@
  */
 int main()
 {
-    ADCS ADCS;
-    ADCS.main();
+    ADCS adcs;
+    adcs.mainThread();
 }

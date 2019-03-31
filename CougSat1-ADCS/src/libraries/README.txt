@@ -1,3 +1,3 @@
-External Libraries go here. 
+Calculation Classes and Non Hardware External Libraries go here. 
 
-DO NOT EDIT FILES IN THIS FOLDER.
+DO NOT EDIT LIBRARIES IN THIS FOLDER.

@@ -26,9 +26,9 @@
  * @param sda 
  * @param scl 
  */
-CDHCOM::CDHCOM(int addr, PinName sda, PinName scl) : CDH(sda, scl)
+CDHCOM::CDHCOM(int addr, PinName sda, PinName scl) : i2c(sda, scl)
 {
-    CDH.address(addr);
+    i2c.address(addr);
 }
 
 /**
@@ -39,7 +39,7 @@ CDHCOM::CDHCOM(int addr, PinName sda, PinName scl) : CDH(sda, scl)
  */
 bool CDHCOM::checkRead()
 {
-    if (CDH.receive() == MESSAGEREADY)
+    if (i2c.receive() == MESSAGEREADY)
         return true;
     else
         return false;
@@ -51,7 +51,7 @@ bool CDHCOM::checkRead()
  */
 void CDHCOM::readCDH()
 {
-    CDH.read(message, MESSAGELENGTH);
+    i2c.read(message, MESSAGELENGTH);
     for (int i = 0; message[i] != NULL; i++)
     {
         printf("%c\n", message[i]);

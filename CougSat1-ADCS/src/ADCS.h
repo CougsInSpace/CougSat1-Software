@@ -28,20 +28,20 @@
 #include <mbed.h>
 #include <rtos.h>
 #include "ADCSPins.h"
-#include "drivers/CDHCOM.h"
+#include "components/CDHCOM.h"
 
 class ADCS
 {
   private:
-	Thread MONITOR;
-	Thread CDHREAD;
+	Thread monitor;
+	Thread cdhRead;
 	char message[4];
-	CDHCOM CDH;
+	CDHCOM cdh;
 	
   public:
 	ADCS();
-	void monitor_thread();
-	void cdh_thread();
-	void main();
+	void monitorThread();
+	void cdhThread();
+	void mainThread();
 };
 #endif

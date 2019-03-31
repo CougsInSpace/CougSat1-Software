@@ -23,7 +23,7 @@
 class CDHCOM
 {
   private:
-    I2CSlave CDH;
+    I2CSlave i2c;
     char message[4];
 
   public:

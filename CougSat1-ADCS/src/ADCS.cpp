@@ -16,23 +16,23 @@
  */
 
 #include "ADCS.h"
-#define CDHFLAG 0x1
-#define ONEMILLISECOND 1
-#define ONESECOND 1000
+#define CDH_FLAG_MSG_READY 0x1
+#define PERIOD_MS_POLLING_SLEEP 1
+#define PERIOD_MS_MAIN_SLEEP 1000
 
 /**
  * @brief Function for the polling thread
  * 
  */
-void ADCS::monitor_thread()
+void ADCS::monitorThread()
 {
     while (true)
     {
-        Thread::wait(ONEMILLISECOND);
+        Thread::wait(PERIOD_MS_POLLING_SLEEP);
         //printf("Checking for events!\r\n");
-        if (CDH.checkRead())
+        if (cdh.checkRead())
         {
-            CDHREAD.signal_set(CDHFLAG);
+            cdhRead.signal_set(CDH_FLAG_MSG_READY);
             //printf("Turning on I2C\r\n");
         }
     }
@@ -42,12 +42,12 @@ void ADCS::monitor_thread()
  * @brief Function for cdh communication thread
  * 
  */
-void ADCS::cdh_thread()
+void ADCS::cdhThread()
 {
     while (true)
     {
-        Thread::signal_wait(CDHFLAG);
-        CDH.readCDH();
+        Thread::signal_wait(CDH_FLAG_MSG_READY);
+        cdh.readCDH();
     }
 }
 
@@ -55,24 +55,24 @@ void ADCS::cdh_thread()
  * @brief Construct a new ADCS::ADCS object
  * 
  */
-ADCS::ADCS() : CDH(IHU_ADDRESS, PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL)
+ADCS::ADCS() : cdh(IHU_ADDRESS, PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL)
 {
-    MONITOR.set_priority(osPriorityRealtime);
-    CDHREAD.set_priority(osPriorityRealtime);
-    CDHREAD.start(callback(this, &ADCS::cdh_thread));
-    MONITOR.start(callback(this, &ADCS::monitor_thread));
+    monitor.set_priority(osPriorityRealtime);
+    cdhRead.set_priority(osPriorityRealtime);
+    cdhRead.start(callback(this, &ADCS::cdhThread));
+    monitor.start(callback(this, &ADCS::monitorThread));
 }
 
 /**
  * @brief main function for ADCS object
  * 
  */
-void ADCS::main()
+void ADCS::mainThread()
 {
     printf("Outside Main!\r\n");
     while (true)
     {
         printf("Process Main!\r\n");
-        Thread::wait(ONESECOND);
+        Thread::wait(PERIOD_MS_MAIN_SLEEP);
     }
 }
