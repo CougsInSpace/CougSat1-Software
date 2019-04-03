@@ -35,7 +35,7 @@ DRV8837::DRV8837(PinName forPin, PinName revPin, PinName pSleep) : forward(forPi
  * 
  * @return unit8_t for future debuging
  */
-unit8_t DRV8837::setCoil(float input)
+unit8_t DRV8837::setOutput(float input)
 {
     if (input > 0.0f)
     {
