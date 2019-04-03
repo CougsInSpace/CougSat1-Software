@@ -24,7 +24,6 @@ class DRV8837
   public:
     DRV8837(PinName forPin, PinName revPin, PinName pSleep);
     unit8_t setCoil(float input);
-    unit8_t setCoil(float input, float time);
     unit8_t sleep();
     unit8_t wake();
     unit8_t stop();
