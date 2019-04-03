@@ -7,10 +7,10 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file ADCS.cpp
- * @author Cody Sigvartson
- * @date 7 October 2018
- * @brief Controls all intracommunication on the satellite
+ * @file ADCS.h
+ * @author Ryal O'Neil
+ * @date 2019-03-24
+ * @brief Initializes subsystem objects and controls priority queue
  *
  * ADCS Tasks:
  *	-Initialize subsystems
@@ -18,58 +18,30 @@
  *  -Read 1x GPS
 	-Reach out to hbridge, provide it a PWM duty cycle signal to tell it how much we want it to run and	which direction
 	-Read thermistor of magnetorquer
-	-Get power info from IHU
-	-Photodiodes?
+	-Get power info from CDH
+	-Photodiodes
  */
 
-#ifndef SRC_SYSTEMINTERFACES_ADCS_H_
-#define SRC_SYSTEMINTERFACES_ADCS_H_
+#ifndef ADCS_H
+#define ADCS_H
 
 #include <mbed.h>
 #include <rtos.h>
-#include <filesystem/fat/FATFileSystem.h>
+#include "ADCSPins.h"
+#include "components/CDHCOM.h"
 
-#include "systemInterfaces/PMIC.h"
-#include "systemInterfaces/IHU.h"
-#include "systemInterfaces/RCS.h"
-#include "systemInterfaces/Payload.h"
-#include "systemInterfaces/IFJR.h"
-#include "drivers/SDBlockDevice.h"
-#include "GPS.h"
-
-#define ADCS_EVENT_QUEUE_SIZE 20
-
-class ADCS {
-  public:
-    static ADCS* getInstance();
-
-    void addEvent(uint8_t eventIndex, uint8_t *dataBlock, uint16_t dataLength);
-    void addEventPeriodic(int ms, uint8_t eventIndex, uint8_t *dataBlock,
-        uint16_t dataLength);
-    void initialize();
-    void run();
-    void stop();
-
+class ADCS
+{
   private:
-    //Singleton class design
-    ADCS();
-    ~ADCS();
-    ADCS(ADCS const&);
-    void operator=(ADCS const&);
-    static ADCS* instance;
-
-    //System interfaces
-	IHU ihu;
-    PMIC pmic;
-	GPS gps;
-
-    //Hardware drivers
-    EventQueue queue;
-    I2C i2cPrimary;
-    I2C i2cSecondary;
-    SPI spi;
-    SDBlockDevice sd;
-    FATFileSystem fs;
+	Thread monitor;
+	Thread cdhRead;
+	char message[4];
+	CDHCOM cdh;
+	
+  public:
+	ADCS();
+	void monitorThread();
+	void cdhThread();
+	void mainThread();
 };
-
-#endif /* !SRC_SYSTEMINTERFACES_ADCS_H_ */
+#endif
