@@ -21,16 +21,9 @@
 #define MODE_WRITE 0
 #define MODE_READ 1
 
+#include "tools/CISError"
 #include <mbed.h>
 
-typedef enum
-{
-    noError = 0;
-    badDeviceAddress = 1;
-    badMemoryAddress = 2;
-    errorInWritig = 3;
-
-}
 
 class M24M01
 {
@@ -39,7 +32,9 @@ class M24M01
     M24M01(I2C &i2c, PinName WC, PinName E1, PinName E2, uint8_t address);
 
     uint8_t write(unit32_t address, unit8_t data);
+    uint8_t write(unit32_t address, char* data, unit8_t dataSize);
     uint8_t read(unit32_t address, unit8_t *data);
+    uint8_t read(unit32_t address, char* data, unit8_t dataSize);
 
   private:
     unit8_t devAddr;
