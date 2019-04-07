@@ -38,7 +38,7 @@ class M24M01
 
   private:
     unit8_t devAddr;
-    I2c &_i2c;
+    I2C &_i2c;
     DigitalOut chipEnable1;
     DigitalOut chipEnable2;
     DigitalOut writeControl;
