@@ -33,7 +33,8 @@ PowerNodeTCA9535::PowerNodeTCA9535(LTC2499 & adc, LTC2499Channel_t channel,
     double shunt, TCA9535 & gpio, GPIOExpanderPin_t switchA,
     GPIOExpanderPin_t switchB) :
   PowerNode(adc, channel, shunt),
-  gpio(gpio) {
+  gpio(gpio) 
+  {
   this->switchA = switchA;
   this->switchB = switchB;
   setSwitch(false, false);
@@ -50,3 +51,4 @@ uint8_t PowerNodeTCA9535::setSwitch(bool pathA, bool pathB) {
   // change each switch accordingly
   return ERROR_NOT_SUPPORTED;
 }
+

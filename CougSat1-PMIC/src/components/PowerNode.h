@@ -21,23 +21,32 @@
 #include "drivers/LTC2499.h"
 #include "mbed.h"
 
-class PowerNode {
+class PowerNode 
+{
 public:
-  PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt);
+  PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt, int pNum, double eCurrent);
 
   uint8_t getCurrent(double * current);
 
   void    getSwitch(bool * pathA, bool * pathB);
+
   uint8_t setSwitch(bool pathA, bool pathB);
 
+  uint8_t getVoltage(double * voltage);
+
+  uint8_t getPriority(int priority);
+
+  uint8_t getExpectedCurrent(double current )
+
+  
 private:
   LTC2499 & adc;
-
   LTC2499Channel_t channel;
-
   double shunt;
   bool   pathA;
   bool   pathB;
+  int    priorityN;
+  int    expected_Curr;
 };
 
 #endif /* _SRC_COMPONENTS_POWER_NODE_H_ */

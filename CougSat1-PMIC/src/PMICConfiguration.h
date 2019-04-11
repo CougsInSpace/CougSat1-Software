@@ -149,4 +149,48 @@
 #define THERM_CAL_PV3_FRONT_BOTTOM_270K (0.158)
 #define THERM_CAL_PV3_FRONT_BOTTOM_350K (0.852)
 
+
+// Comparison Constant for Thermistor readings in celcius
+#define TEMP_MIN (0)
+#define TEMP_MAX (50)
+#define REG_TEMP_MAX (85)
+
+// Priority Levels
+#define priority_PR3V3_one      100
+#define priority_PR3V3_two      101
+#define priority_PRBATT_three   102
+#define priority_PR3V3_four     103
+#define priority_PR3V3_five     104
+#define priority_PR3V3_six      105
+#define priority_PR3V3_seven    106
+#define priority_PRBATT_eight   107
+#define priority_PR3V3_nine     108
+#define priority_PRBATT_ten     109
+#define priority_PR3V3_eleven   110
+#define priority_PR3V3_twelve   111
+#define priority_PR3V3_thirteen 112
+#define priority_PR3V3_fourteen 113
+#define priority_PR3V3_fifteen  114
+
+// expected current for payloads
+#define PR3V3_one      0.090
+#define PR3V3_two      0.105
+#define PRBATT_three   0.400
+#define PR3V3_four     0.020
+#define PR3V3_five     0.060
+#define PR3V3_six      0.020
+#define PR3V3_seven    0.105
+#define PRBATT_eight   0.300
+#define PR3V3_nine     0.055
+#define PRBATT_ten     0.250
+#define PR3V3_eleven   0.050
+#define PR3V3_twelve   0.025
+#define PR3V3_thirteen 0.015
+#define PR3V3_fourteen 0.390
+#define PR3V3_fifteen  0.390
+#define UNUSED         0
+
+
 #endif /* _SRC_PMIC_CONFIGURATION_H_ */
+
+

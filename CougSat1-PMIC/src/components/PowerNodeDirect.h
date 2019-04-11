@@ -22,12 +22,14 @@
 #include "drivers/LTC2499.h"
 #include "mbed.h"
 
-class PowerNodeDirect : public PowerNode {
+class PowerNodeDirect : public PowerNode 
+{
 public:
   PowerNodeDirect(LTC2499 & adc, LTC2499Channel_t channel, double shunt,
-      PinName switchA, PinName switchB);
+                  PinName switchA, PinName switchB);
 
   uint8_t setSwitch(bool pathA, bool pathB);
+
 
 private:
   DigitalOut switchA;

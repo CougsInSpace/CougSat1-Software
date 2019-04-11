@@ -29,9 +29,10 @@
  * @param switchB control pin
  */
 PowerNodeDirect::PowerNodeDirect(LTC2499 & adc, LTC2499Channel_t channel,
-    double shunt, PinName switchA, PinName switchB) :
+double shunt, PinName switchA, PinName switchB) :
   PowerNode(adc, channel, shunt),
-  switchA(switchA), switchB(switchB) {
+  switchA(switchA), switchB(switchB) 
+{
   setSwitch(false, false);
 }
 
