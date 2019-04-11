@@ -17,7 +17,7 @@
 
 #include "CDHCOM.h"
 #define MESSAGEREADY 3
-#define MESSAGELENGTH 4
+#define MESSAGELENGTH 8
 
 /**
  * @brief Construct a new CDHCOM::CDHCOM object
@@ -52,8 +52,10 @@ bool CDHCOM::checkRead()
 void CDHCOM::readCDH()
 {
     i2c.read(message, MESSAGELENGTH);
+    i2c.write(message, MESSAGELENGTH);
     for (uint8_t i = 0; message[i] != NULL; i++)
     {
         printf("%c\n", message[i]);
+
     }
 }
