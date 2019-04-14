@@ -7,41 +7,31 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file ADCS.h
- * @author Ryal O'Neil
- * @date 2019-03-24
- * @brief Initializes subsystem objects and controls priority queue
- *
- * ADCS Tasks:
- *	-Initialize subsystems
- *  -Read 4x IMUs
- *  -Read 1x GPS
-	-Reach out to hbridge, provide it a PWM duty cycle signal to tell it how much we want it to run and	which direction
-	-Read thermistor of magnetorquer
-	-Get power info from CDH
-	-Photodiodes
- */
+ * @file DRV8837.h
+ * @author Eric Curtland
+ * @date 27 January 2019
+ * @brief Provides an interface for output to h-bridge 
+*/
 
-#ifndef ADCS_H
-#define ADCS_H
+#ifndef DRV8837_H_
+#define DRV8837_H_
 
 #include <mbed.h>
-#include <rtos.h>
 #include "ADCSPins.h"
-#include "components/CDHCOM.h"
 
-class ADCS
+class DRV8837
 {
-  private:
-	Thread monitor;
-	Thread cdhRead;
-	char message[4];
-	CDHCOM cdh;
-	
   public:
-	ADCS();
-	void monitorThread();
-	void cdhThread();
-	void mainThread();
-};
+    DRV8837(PinName forPin, PinName revPin, PinName pSleep);
+    unit8_t setOutput(float input);
+    unit8_t sleep();
+    unit8_t wake();
+    unit8_t stop();
+
+  private:
+    PwmOut forward;
+    PwmOut reverse;
+    Digitalout sleep;
+}
+
 #endif

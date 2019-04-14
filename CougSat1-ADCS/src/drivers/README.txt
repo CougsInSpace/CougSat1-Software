@@ -1,0 +1,1 @@
+Files used to directly talk to hardware through non built-in mbed methods.
