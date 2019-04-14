@@ -9,7 +9,7 @@
 /**
  * @file M24M01R.cpp
  * @author Eric Curtland
- * @brief 
+ * @brief provides interface to store data on M24M01R eeprom
  * @date 2019-03-24
  * 
  */
@@ -29,28 +29,19 @@ M24M01::M24M01(I2C &i2c, PinName WC, PinName E1, PinName E2, uint8_t address) : 
 
     writeControl.write(1);
 }
+
 uint8_t M24M01::write(unit32_t address, unit8_t data)
 {
     unit8_t deviceSelectCode = (DEVICE_TYPE_ID << 4) | ((address & 0x10000) >> 15) | (devAddr << 2) | MODE_WRITE, error = ERROR_SUCCESS;
 
     writeControl.write(0); // enable writing
 
-    if (!i2c.write(devideSelectCode)) //send device select code to i2c bus
+    if (!i2c.write(devideSelectCode) && !i2c.write((address & 0xFF00) >> 8) && !i2c.write(address & 0xFF)) //send device select code to i2c bus
     {
-        if (!i2c.write((address & 0xFF00) >> 8))//send first half of address
+        if (!i2c.write(data))//write byte to eeprom
         {
-            if (!i2c.write(address & 0xFF))//send second half of address
-            {
-                if (!i2c.write(data))//write byte to eeprom
-                {
-                }else{
-                    error = ERROR_NACK;
-                }
-            }else{
-                error = ERROR_OPEN_FAILED;
-            }
         }else{
-            error = ERROR_OPEN_FAILED;
+            error = ERROR_NACK;
         }
     }else{
         error = ERROR_OPEN_FAILED;
@@ -74,7 +65,7 @@ uint8_t M24M01::write(unit32_t address, char* data, unit8_t dataSize){
 
     writeControl.write(0); // enable writing
 
-    if (!i2c.write(devideSelectCode) && (!i2c.write((address & 0xFF00) >> 8 && (!i2c.write(address & 0xFF)) && //send device select code to i2c bus
+    if ((!i2c.write(devideSelectCode)) && (!i2c.write((address & 0xFF00))) >> 8 && (!i2c.write(address & 0xFF))) //send device select code to i2c bus
     {
         for(unit8_t i = 0; i <dataSize && !error; ++i){
             ++address;
@@ -125,7 +116,7 @@ uint8_t M24M01::read(unit32_t address, unit8_t *data)
 
     unit8_t deviceSelectCode = (DEVICE_TYPE_ID << 4) | ((address & 0x10000) >> 15) | (devAddr << 2) | MODE_WRITE, error = ERROR_SUCCESS;
 
-    if (!i2c.write(devideSelectCode) &&!i2c.write((address & 0xFF00) >> 8) && !i2c.write(address & 0xFF)) //send device select code to i2c bus
+    if (!i2c.write(devideSelectCode) && !i2c.write((address & 0xFF00) >> 8) && !i2c.write(address & 0xFF)) //send device select code to i2c bus
     {
         for(unit8_t i = 0; i < dataSize -1; ++i){
             ++address;
@@ -135,7 +126,6 @@ uint8_t M24M01::read(unit32_t address, unit8_t *data)
                 }
             }
             *(data +i) = i2c.read(1);
-
         }
             *(data + i) = i2c.read(); // read without ack to stop read operation
     }else{

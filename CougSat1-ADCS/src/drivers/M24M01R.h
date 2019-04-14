@@ -9,7 +9,7 @@
 /**
  * @file M24M01R.h
  * @author Eric Curtland
- * @brief 
+ * @brief provides interface to store data on M24M01R eeprom
  * @date 2019-03-24
  * 
  */
@@ -42,6 +42,6 @@ class M24M01
     DigitalOut chipEnable1;
     DigitalOut chipEnable2;
     DigitalOut writeControl;
-}
+};
 
 #endif //!M24M01R_H_

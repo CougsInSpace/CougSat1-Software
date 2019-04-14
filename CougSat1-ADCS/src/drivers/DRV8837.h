@@ -16,22 +16,24 @@
 #ifndef DRV8837_H_
 #define DRV8837_H_
 
-#include <mbed.h>
+#include "mbed.h"
 #include "ADCSPins.h"
+#include "tools/CISError"
+
 
 class DRV8837
 {
   public:
     DRV8837(PinName forPin, PinName revPin, PinName pSleep);
-    unit8_t setOutput(float input);
-    unit8_t sleep();
-    unit8_t wake();
-    unit8_t stop();
+    uint8_t setOutput(float input);
+    uint8_t diable();
+    uint8_t wake();
+    uint8_t stop();
 
   private:
     PwmOut forward;
     PwmOut reverse;
-    Digitalout sleep;
-}
+    DigitalOut sleep;
+};
 
 #endif

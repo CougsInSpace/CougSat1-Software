@@ -10,7 +10,8 @@
  *      Revised: August    23rd, 2017
  */
 
-#include "mbed.h"
+#include <mbed.h>
+#include <rtos.h>
 #include "BNO055.h"
 
 

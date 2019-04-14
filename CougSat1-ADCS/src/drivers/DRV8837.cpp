@@ -24,8 +24,8 @@
  */
 DRV8837::DRV8837(PinName forPin, PinName revPin, PinName pSleep) : forward(forPin), reverse(revPin), sleep(pSleep)
 {
-    forward.frequency(1000);
-    reverse.frequency(1000);
+    forward.period(0.001f);
+    reverse.period(0.001f);
 }
 /**
  * @brief 
@@ -35,7 +35,7 @@ DRV8837::DRV8837(PinName forPin, PinName revPin, PinName pSleep) : forward(forPi
  * 
  * @return unit8_t for future debuging
  */
-unit8_t DRV8837::setOutput(float input)
+uint8_t DRV8837::setOutput(float input)
 {
     if (input > 0.0f)
     {
@@ -47,6 +47,8 @@ unit8_t DRV8837::setOutput(float input)
         reverse.write(input * -1.0f);
         forward.write(0.0f);
     }
+
+    return ERROR_SUCCESS;
 }
 /**
  * @brief wakes up hbridge takes 30 micro seconds
@@ -54,30 +56,36 @@ unit8_t DRV8837::setOutput(float input)
  * 
  * @return unit8_t for future debuging
  */
-unit8_t DRV8837::wake()
+uint8_t DRV8837::wake()
 {
-    sleep(HIGH);
+    sleep.write(1);
     forward.write(0.0f);
     reverse.write(0.0f);
+
+    return ERROR_SUCCESS;
 }
 /**
  * @brief puts hbridge to sleep
  * 
  * @return unit8_t for future debuging
  */
-unit8_t DRV8837::sleep()
+uint8_t DRV8837::diable()
 {
-    sleep(LOW);
+    sleep.write(0);
     forward.write(0.0f);
     reverse.write(0.0f);
+
+    return ERROR_SUCCESS;
 }
 /**
  * @brief sets all hbridge output to zero
  * 
  * @return unit8_t for future debuging
  */
-unit8_t DRV8837::stop()
+uint8_t DRV8837::stop()
 {
     forward.write(0.0f);
     reverse.write(0.0f);
+
+    return ERROR_SUCCESS;
 }
