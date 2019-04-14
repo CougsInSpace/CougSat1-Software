@@ -18,7 +18,7 @@
 
 #include "mbed.h"
 #include "ADCSPins.h"
-#include "tools/CISError"
+#include "../tools/CISError.h"
 
 
 class DRV8837
