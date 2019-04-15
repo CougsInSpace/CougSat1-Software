@@ -18,7 +18,7 @@
 
 #include "mbed.h"
 #include "ADCSPins.h"
-#include "../tools/CISError.h"
+
 
 
 class DRV8837
@@ -26,7 +26,7 @@ class DRV8837
   public:
     DRV8837(PinName forPin, PinName revPin, PinName pSleep);
     uint8_t setOutput(float input);
-    uint8_t diable();
+    uint8_t disable();
     uint8_t wake();
     uint8_t stop();
 

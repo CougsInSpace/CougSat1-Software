@@ -15,6 +15,7 @@
 */
 
 #include "DRV8837.h"
+#include "../tools/CISError.h"
 /**
  * @brief Construct a new DRV8837::DRV8837 object
  * 
@@ -69,7 +70,7 @@ uint8_t DRV8837::wake()
  * 
  * @return unit8_t for future debuging
  */
-uint8_t DRV8837::diable()
+uint8_t DRV8837::disable()
 {
     sleep.write(0);
     forward.write(0.0f);
