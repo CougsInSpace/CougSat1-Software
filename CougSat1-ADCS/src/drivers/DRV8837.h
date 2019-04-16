@@ -10,28 +10,27 @@
  * @file DRV8837.h
  * @author Eric Curtland
  * @date 27 January 2019
- * @brief Provides an interface for output to h-bridge 
-*/
+ * @brief Provides an interface for output to h-bridge
+ */
 
 #ifndef DRV8837_H_
 #define DRV8837_H_
 
-#include <mbed.h>
 #include "ADCSPins.h"
+#include "mbed.h"
 
-class DRV8837
-{
-  public:
-    DRV8837(PinName forPin, PinName revPin, PinName pSleep);
-    unit8_t setOutput(float input);
-    unit8_t sleep();
-    unit8_t wake();
-    unit8_t stop();
+class DRV8837 {
+public:
+  DRV8837(PinName forPin, PinName revPin, PinName pSleep);
+  uint8_t setOutput(float input);
+  uint8_t disable();
+  uint8_t wake();
+  uint8_t stop();
 
-  private:
-    PwmOut forward;
-    PwmOut reverse;
-    Digitalout sleep;
-}
+private:
+  PwmOut     forward;
+  PwmOut     reverse;
+  DigitalOut sleep;
+};
 
 #endif
