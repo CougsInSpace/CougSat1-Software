@@ -25,14 +25,15 @@ M24M01::M24M01(I2C &i2c, PinName WC, PinName E1, PinName E2, uint8_t address) : 
     devAddr |= e2Address;
     chipEnable1.write(e1Address);
     chipEnable2.write(e2Address);
-  //  this->_i2c = i2c;
+
 
     writeControl.write(1);
 }
 
 uint8_t M24M01::write(uint32_t address, uint8_t data)
 {
-    uint8_t deviceSelectCode = (DEVICE_TYPE_ID << 4) | ((address & 0x10000) >> 15) | (devAddr << 2) | MODE_WRITE, error = ERROR_SUCCESS;
+    uint8_t deviceSelectCode = (DEVICE_TYPE_ID << 4) | ((address & 0x10000) >> 15) | (devAddr << 2) | MODE_WRITE;
+    uint8_t error = ERROR_SUCCESS;
 
     writeControl.write(0); // enable writing
 
