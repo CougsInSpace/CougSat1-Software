@@ -27,11 +27,11 @@ GPS::GPS(Serial &serial, DigitalOut &reset, DigitalIn &pulse, bool mode) : seria
 GPS::~GPS(){
 	// free up any dynamic memory allocation
 }
-
-GPS::bool getMode() const{
+/*
+bool GPS::getMode() const{
 	return this->mode;
 }
-
+*/
 uint32_t GPS::getUtcTime() const{
 	return this->utcTime;
 }
@@ -75,7 +75,7 @@ uint8_t GPS::setUpdateRate(uint8_t frequency, Attributes_t attribute)
     messageBody[1] = attribute;
     return sendCommand(0x0E, messageBody, 2);
 }
-}
+
 
 uint8_t GPS::resetReceiver(bool reboot)
 {
@@ -86,7 +86,8 @@ uint8_t GPS::resetReceiver(bool reboot)
     uint8_t code = sendCommand(0x04, messageBody, 1, 10000);
     if (code == ERROR_SUCCESS)
     {
-        delay(500);
+        //delay(500);
+        ThisThread::sleep_for(500);
 		// TODO: restart the gps
     }
 	else{
@@ -207,33 +208,34 @@ uint8_t GPS::sendCommand(uint8_t messageId, uint8_t *messageBody, uint32_t bodyL
     // Send Packet
     printPacket(packet, packetLength);
 
-    uint8_t code = sendPacket(packet, packetLength, timeout / 2);
+    char code = sendPacket(packet, packetLength, timeout / 2);
     DEBUG("GPS","response code ");
-    DEBUG("GPS",code);
+    DEBUG("GPS",&code);
 
     if (code != ERROR_SUCCESS)
     {
         DEBUG("GPS","failed, trying again\n");
         code = sendPacket(packet, packetLength, timeout / 2);
         DEBUG("GPS","response code ");
-        DEBUG("GPS",code);
+        DEBUG("GPS",&code);
     }
     return code;
 }
 
-uint8_t GPS::sendPacket(uint8_t *packet, int32_t size, uint32_t timeout)
+uint8_t GPS::sendPacket(uint8_t *packet, uint32_t size, uint32_t timeout)
 {
     uint8_t c = 0;
     uint8_t last = 0;
     bool response = false;
-    serial.write(packet, size);
+    serial.putc(*packet);
     // TODO: wait for ACK, need to use different API to get current
 	// time in ms
-    for(uint32_t start = millis(); millis() - start < timeout;)
+    Timer t;
+    for(t.start(); t.read_ms() < timeout;)
     {
-        while (serial.available())
+        while (serial.readable())
         {
-            c = serial.read();
+            c = serial.getc();
             if (last == 0xA0 && c == 0xA1 && response == false)
                 response = true;
             if (response && last == 0x83)

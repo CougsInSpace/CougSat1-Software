@@ -18,6 +18,7 @@
 #define SRC_SYSTEMINTERFACES_GPS_H_
 
 #include <mbed.h>
+#include <rtos.h>
 #include <DigitalIn.h>
 #include <DigitalOut.h>
 #include "ADCSPins.h"
@@ -39,7 +40,7 @@ class GPS {
     ~GPS();
  
 	// Accessors
-	bool getMode() const;
+	//bool getMode() const;
 	uint32_t getUtcTime() const;
 	float getLat() const;
 	float getLong() const;
