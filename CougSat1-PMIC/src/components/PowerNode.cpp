@@ -57,7 +57,15 @@ void PowerNode::getSwitch(bool * pathA, bool * pathB) {
 uint8_t PowerNode::getCurrent(double * current) {
   // Read ADC to get voltage
   // current = voltage / shunt
-  return ERROR_NOT_SUPPORTED;
+  double  value  = 0.0;
+  uint8_t result = adc.readVoltage(channel, &value);
+  if (result != ERROR_SUCCESS) {
+    ERROR("PowerNode", "Failed to read shunt resistor: 0x%02X", result);
+    return result;
+  }
+  DEBUG("PowerNode", "Shunt resistor is %8.6fV", value);
+  (*current) = value / shunt;
+  return ERROR_SUCCESS;
 }
 
 /**
