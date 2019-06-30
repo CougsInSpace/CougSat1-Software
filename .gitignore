@@ -11,10 +11,8 @@ RemoteSystemsTempFiles
 *.cproject
 
 # Visual Studio Code
+.vscode
 *.code-workspace
-
-# Precompiled headers
-ipch
 
 # Microsoft Office Lock Files
 *~$*
