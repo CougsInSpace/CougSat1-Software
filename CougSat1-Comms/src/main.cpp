@@ -16,13 +16,19 @@
  */
 
 #include <mbed.h>
-#include <rtos.h>
 #include "tools/CISError.h"
+
+DigitalOut statusLED(PD_2);
 
 /**
  * Program start routine
  * @return error code
  */
 int main(void) {
+  statusLED = 1;
+  while(true){
+    wait_ms(500);
+    statusLED = !statusLED;
+  }
   return ERROR_SUCCESS;
 }
