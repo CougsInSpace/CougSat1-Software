@@ -26,13 +26,14 @@
  * @param channel connected to the shunt
  * @param shunt resistance
  */
-PowerNode::PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt, int pNum ) : adc(adc) 
+PowerNode(LTC2499& adc, LTC2499Channel_t channel double shunt, int priority_level, double expectedCurrent); : adc(adc) 
 {
   this->channel = channel;
   this->shunt   = shunt;
   this->pathA   = false;
   this->pathB   = false;
-  this->priorityN = pNum;
+  this->priority =  priority_level;
+  this->expectedCurrent = expectedCurrent;
 }
 
 
@@ -71,5 +72,28 @@ uint8_t PowerNode::getCurrent(double * current) {
 uint8_t PowerNode::setSwitch(bool pathA, bool pathB) 
 {
   DEBUG("PowerNode", "Set switch improperly called on the base class");
+  return ERROR_NOT_SUPPORTED;
+}
+
+/**
+ * @brief Gets the priority level of the node
+ * @return uint9_t error code
+ * @param value to write to
+ * 
+ */
+
+uint8_t PowerNode::getPriority(int priority_value)
+{
+  *(priority) = this->priority;
+}
+
+/**
+ * @brief Gets expected current for given payload
+ * 
+ * 
+ */
+uint8_t PowerNode::getExpectedCurrent(double *current )
+{
+
   return ERROR_NOT_SUPPORTED;
 }

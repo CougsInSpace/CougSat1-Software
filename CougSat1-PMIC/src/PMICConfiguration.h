@@ -151,9 +151,9 @@
 
 
 // Comparison Constant for Thermistor readings in celcius
-#define TEMP_MIN (0)
-#define TEMP_MAX (50)
-#define REG_TEMP_MAX (85)
+#define THRES_BATT_TEMP_LOW (0)
+#define THRES_BATT_TEMP_HIGH (50)
+#define THRES_REG_TEMP_HIGH (85)
 
 // Priority Levels
 #define priority_PR3V3_one      100

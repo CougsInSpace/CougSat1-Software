@@ -18,13 +18,13 @@
 #ifndef _SRC_COMPONENTS_POWER_NODE_H_
 #define _SRC_COMPONENTS_POWER_NODE_H_
 
-#include "drivers/LTC2499.h"
+#include "LTC2499.h"
 #include "mbed.h"
 
 class PowerNode 
 {
 public:
-  PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt, int pNum, double eCurrent);
+  PowerNode(LTC2499 & adc, LTC2499Channel_t channel, double shunt, int priority_level, double expectedCurrent);
 
   uint8_t getCurrent(double * current);
 
@@ -34,9 +34,9 @@ public:
 
   uint8_t getVoltage(double * voltage);
 
-  uint8_t getPriority(int priority);
+  uint8_t getPriority(int priority_value);
 
-  uint8_t getExpectedCurrent(double current )
+  uint8_t getExpectedCurrent(double current);
 
   
 private:
@@ -45,8 +45,8 @@ private:
   double shunt;
   bool   pathA;
   bool   pathB;
-  int    priorityN;
-  int    expected_Curr;
+  int    priority;
+  int    expectedCurrent;
 };
 
 #endif /* _SRC_COMPONENTS_POWER_NODE_H_ */
