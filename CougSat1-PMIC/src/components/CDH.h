@@ -20,13 +20,13 @@
 #include "mbed.h"
 
 typedef enum CDHCommand {
-  TURN_OFF = 0x00,
-  TURN_ON = 0x01,
-  VOLTAGE_REQ = 0x02,
-  CURRENT_REQ = 0x03,
-  TEMP_REQ = 0x04,
+  TURN_OFF        = 0x00,
+  TURN_ON         = 0x01,
+  VOLTAGE_REQ     = 0x02,
+  CURRENT_REQ     = 0x03,
+  TEMP_REQ        = 0x04,
   POWER_CHAN_STAT = 0x05,
-  PV_CHAN_STAT = 0x06
+  PV_CHAN_STAT    = 0x06
 } CDHCommand_t;
 
 #define CDH_ADDR_PV ((uint8_t)0x00)      // 0x00 to 0x07
@@ -49,18 +49,19 @@ typedef enum CDHCommand {
 
 class CDH {
 public:
-  CDH(I2C &i2c);
+  CDH(I2C & i2c);
+  
   uint8_t processMessage();
 
 private:
-  uint8_t processMsgPowerChange(char* msgBody);
-  uint8_t processMsgVoltageRequest(char* msgBody);
-  uint8_t processMsgCurrentRequest(char* msgBody);
-  uint8_t processMsgTemperatureRequest(char* msgBody);
-  uint8_t processMsgPowerChannelStatus(char* msgBody);
-  uint8_t processMsgSolarChannelStatus(char* msgBody);
+  uint8_t processMsgPowerChange(char * msgBody);
+  uint8_t processMsgVoltageRequest(char * msgBody);
+  uint8_t processMsgCurrentRequest(char * msgBody);
+  uint8_t processMsgTemperatureRequest(char * msgBody);
+  uint8_t processMsgPowerChannelStatus(char * msgBody);
+  uint8_t processMsgSolarChannelStatus(char * msgBody);
 
-  I2C &i2c;
+  I2C & i2c;
 };
 
 #endif /* _SRC_CDH_H_ */

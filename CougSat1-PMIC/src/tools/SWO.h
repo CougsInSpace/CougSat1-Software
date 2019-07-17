@@ -29,6 +29,8 @@
 #ifndef MBED_SWO_H
 #define MBED_SWO_H
 
+#include "mbed.h"
+
 //
 // This is the Class implementation
 //

@@ -10,7 +10,7 @@
  * @file Events.h
  * @author Bradley Davis
  * @date 7 Nov 2018
- * @brief List of events 
+ * @brief List of events
  *
  */
 
@@ -21,5 +21,6 @@
 
 uint8_t eventADC();
 uint8_t eventPeriodic();
+uint8_t eventFirstBoot();
 
 #endif /* _SRC_EVENTS_EVENTS_H_ */

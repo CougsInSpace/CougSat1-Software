@@ -26,10 +26,11 @@
  * @param voltageFraction25C proportion of thermistor at 270K
  * @param voltageFraction85C proportion of thermistor at 350K
  */
-Thermistor::Thermistor(LTC2499 &adc, LTC2499Channel_t channel,
-                       double voltageFraction270K, double voltageFraction350K)
-    : adc(adc) {
+Thermistor::Thermistor(LTC2499 & adc, LTC2499::ADCChannel_t channel,
+    double voltageFraction270K, double voltageFraction350K) :
+  adc(adc) {
   this->channel = channel;
+  adc.addActiveChannel(channel);
   // resistance = 1/fraction - 1
   // beta = ln(R270K/R350K)/(1/(270K)-1/(350K))
 }
@@ -40,7 +41,7 @@ Thermistor::Thermistor(LTC2499 &adc, LTC2499Channel_t channel,
  * @param data to read into
  * @return uint8_t error code
  */
-uint8_t Thermistor::getTemperature(double *data) {
+uint8_t Thermistor::getTemperature(double * data) {
   // Read voltage fraction of thermistor (Vtherm/Vsource)
   // resistance = (1/fraction - 1)/resistance270K
   // temp = 1/(1/(270K)+ln(resistance)/beta)
