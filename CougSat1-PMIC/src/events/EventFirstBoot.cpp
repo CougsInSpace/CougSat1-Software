@@ -7,32 +7,21 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file Thermistor.h
+ * @file EventFirstBoot.cpp
  * @author Bradley Davis
- * @date 3 Nov 2018
- * @brief A class for a temperature sensor (thermistor based)
+ * @date 25 Dec 2018
+ * @brief Event to handle the first boot sequence
  *
  */
+#include "Events.h"
+#include "tools/CISConsole.h"
+#include "tools/CISError.h"
 
-#ifndef _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_
-#define _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_
-
-#include "drivers/LTC2499.h"
-#include "mbed.h"
-
-class Thermistor {
-public:
-  Thermistor(LTC2499 & adc, LTC2499::ADCChannel_t channel,
-      double voltageFraction270K, double voltageFraction350K);
-  uint8_t getTemperature(double * data);
-
-private:
-  LTC2499 & adc;
-
-  LTC2499::ADCChannel_t channel;
-
-  double resistance270K;
-  double beta;
-};
-
-#endif /* _SRC_COMPONENTS_TEMPERATURE_SENSOR_H_ */
+/**
+ * @brief Initializes hardware and timers into first boot configuration
+ *
+ * @return uint8_t error code
+ */
+uint8_t eventFirstBoot() {
+  return ERROR_NOT_SUPPORTED;
+}

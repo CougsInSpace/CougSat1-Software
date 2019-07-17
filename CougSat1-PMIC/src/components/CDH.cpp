@@ -20,14 +20,14 @@
 
 /**
  * @brief Construct a new CDH::CDH object
- * 
+ *
  * @param i2c connected to the C&DH
  */
-CDH::CDH(I2C &i2c) : i2c(i2c) {}
+CDH::CDH(I2C & i2c) : i2c(i2c) {}
 
 /**
  * @brief Handles the message coming from the C&DH
- * 
+ *
  * @return uint8_t error code
  */
 uint8_t CDH::processMessage() {
@@ -39,11 +39,11 @@ uint8_t CDH::processMessage() {
 
 /**
  * @brief Handles the power change message
- * 
+ *
  * @param msgBody array to the incoming message body
  * @return uint8_t error code
  */
-uint8_t CDH::processMsgPowerChange(char* msgBody) {
+uint8_t CDH::processMsgPowerChange(char * msgBody) {
   // Do what it says
   // Give them what they want
   return ERROR_NOT_SUPPORTED;
@@ -51,11 +51,11 @@ uint8_t CDH::processMsgPowerChange(char* msgBody) {
 
 /**
  * @brief Handles the voltage request message
- * 
+ *
  * @param msgBody array to the incoming message body
  * @return uint8_t error code
  */
-uint8_t CDH::processMsgVoltageRequest(char* msgBody) {
+uint8_t CDH::processMsgVoltageRequest(char * msgBody) {
   // Do what it says
   // Give them what they want
   return ERROR_NOT_SUPPORTED;
@@ -63,11 +63,11 @@ uint8_t CDH::processMsgVoltageRequest(char* msgBody) {
 
 /**
  * @brief Handles the current request message
- * 
+ *
  * @param msgBody array to the incoming message body
  * @return uint8_t error code
  */
-uint8_t CDH::processMsgCurrentRequest(char* msgBody) {
+uint8_t CDH::processMsgCurrentRequest(char * msgBody) {
   // Do what it says
   // Give them what they want
   return ERROR_NOT_SUPPORTED;
@@ -75,11 +75,11 @@ uint8_t CDH::processMsgCurrentRequest(char* msgBody) {
 
 /**
  * @brief Handles the temperature request message
- * 
+ *
  * @param msgBody array to the incoming message body
  * @return uint8_t error code
  */
-uint8_t CDH::processMsgTemperatureRequest(char* msgBody) {
+uint8_t CDH::processMsgTemperatureRequest(char * msgBody) {
   // Do what it says
   // Give them what they want
   return ERROR_NOT_SUPPORTED;
@@ -87,11 +87,11 @@ uint8_t CDH::processMsgTemperatureRequest(char* msgBody) {
 
 /**
  * @brief Handles the power channel status message
- * 
+ *
  * @param msgBody array to the incoming message body
  * @return uint8_t error code
  */
-uint8_t CDH::processMsgPowerChannelStatus(char* msgBody) {
+uint8_t CDH::processMsgPowerChannelStatus(char * msgBody) {
   // Do what it says
   // Give them what they want
   return ERROR_NOT_SUPPORTED;
@@ -99,11 +99,11 @@ uint8_t CDH::processMsgPowerChannelStatus(char* msgBody) {
 
 /**
  * @brief Handles the solar panel channel status message
- * 
+ *
  * @param msgBody array to the incoming message body
  * @return uint8_t error code
  */
-uint8_t CDH::processMsgSolarChannelStatus(char* msgBody) {
+uint8_t CDH::processMsgSolarChannelStatus(char * msgBody) {
   // Do what it says
   // Give them what they want
   return ERROR_NOT_SUPPORTED;

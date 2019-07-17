@@ -24,8 +24,8 @@
 
 class PowerNodeDirect : public PowerNode {
 public:
-  PowerNodeDirect(LTC2499 &adc, LTC2499Channel_t channel, double shunt,
-                  PinName switchA, PinName switchB);
+  PowerNodeDirect(LTC2499 & adc, LTC2499::ADCChannel_t channel, double shunt,
+      PinName pinSwitchA, PinName pinSwitchB);
 
   uint8_t setSwitch(bool pathA, bool pathB);
 
