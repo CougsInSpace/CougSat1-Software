@@ -18,7 +18,8 @@
  */
 
 #include "CISConsole.h"
-#include "IHUPins.h"
+//#include "IHUPins.h"
+#include "ADCSPins.h"
 
 SWO_Channel swo;
-Serial umbilical(UART0_TX, UART0_RX, 115200);
+Serial umbilical(PIN_SERIAL_OUT_TX, PIN_SERIAL_OUT_RX, 115200);
