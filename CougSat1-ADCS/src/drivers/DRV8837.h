@@ -7,33 +7,30 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file PowerNodeDirect.h
- * @author Bradley Davis
- * @date 3 Nov 2018
- * @brief A class for a power node consisting of switching, and current
- * monitoring whose switches are connected direct to the processor
- *
+ * @file DRV8837.h
+ * @author Eric Curtland
+ * @date 27 January 2019
+ * @brief Provides an interface for output to h-bridge
  */
 
-#ifndef _SRC_COMPONENTS_POWER_NODE_DIRECT_H_
-#define _SRC_COMPONENTS_POWER_NODE_DIRECT_H_
+#ifndef DRV8837_H_
+#define DRV8837_H_
 
-#include "components/PowerNode.h"
-#include "drivers/LTC2499.h"
+#include "ADCSPins.h"
 #include "mbed.h"
 
-class PowerNodeDirect : public PowerNode 
-{
+class DRV8837 {
 public:
-  PowerNodeDirect(LTC2499 & adc, LTC2499::ADCChannel_t channel, double shunt,
-      PinName pinSwitchA, PinName pinSwitchB);
-
-  uint8_t setSwitch(bool pathA, bool pathB);
-
+  DRV8837(PinName forPin, PinName revPin, PinName pSleep);
+  uint8_t setOutput(float input);
+  uint8_t disable();
+  uint8_t wake();
+  uint8_t stop();
 
 private:
-  DigitalOut switchA;
-  DigitalOut switchB;
+  PwmOut     forward;
+  PwmOut     reverse;
+  DigitalOut sleep;
 };
 
-#endif /* _SRC_COMPONENTS_POWER_NODE_DIRECT_H_ */
+#endif

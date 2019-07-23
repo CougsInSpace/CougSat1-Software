@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2018 by Cougs in Space - Washington State University         *
+ * Copyright (c) 2019 by Cougs in Space - Washington State University         *
  * Cougs in Space website: cis.vcea.wsu.edu                                   *
  *                                                                            *
  * This file is a part of flight and/or ground software for Cougs in Space's  *
@@ -7,20 +7,23 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file Events.h
- * @author Bradley Davis
- * @date 7 Nov 2018
- * @brief List of events
+ * @file main.cpp
+ * @author Ryal O'Neil
+ * @date 2019-1-27
+ * @brief Starts the ADCS software
  *
+ * Initializes ADCS object and starts the priority queue
  */
 
-#ifndef _SRC_EVENTS_EVENTS_H_
-#define _SRC_EVENTS_EVENTS_H_
+#include "ADCS.h"
 
-#include "mbed.h"
-
-uint8_t eventADC();
-uint8_t eventPeriodic();
-uint8_t eventFirstBoot();
-
-#endif /* _SRC_EVENTS_EVENTS_H_ */
+/**
+ * @brief main, initializes ADCS object 
+ * 
+ * @return int 
+ */
+int main()
+{
+    ADCS adcs;
+    adcs.mainThread();
+}

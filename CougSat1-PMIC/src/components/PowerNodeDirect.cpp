@@ -25,8 +25,8 @@
  * @param adc connected to the shunt
  * @param channel connected to the shunt
  * @param shunt resistance
- * @param switchA control pin
- * @param switchB control pin
+ * @param pinSwitchA control pin
+ * @param pinSwitchB control pin
  */
 PowerNodeDirect::PowerNodeDirect(LTC2499 & adc, LTC2499Channel_t channel,
 double shunt, PinName switchA, PinName switchB) :
@@ -44,6 +44,11 @@ double shunt, PinName switchA, PinName switchB) :
  * @return uint8_t error code
  */
 uint8_t PowerNodeDirect::setSwitch(bool pathA, bool pathB) {
-  // change each switch accordingly
-  return ERROR_NOT_SUPPORTED;
+  this->pathA = pathA;
+  this->pathB = pathB;
+  DEBUG("PowerNode", "Setting direct switch");
+  
+  switchA = 1; //inverted ? !pathA : pathA;
+  switchB = 1; //inverted ? !pathB : pathB;
+  return ERROR_SUCCESS;
 }

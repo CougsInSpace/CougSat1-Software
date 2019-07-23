@@ -18,7 +18,6 @@
 #define _SRC_PMIC_OBJECTS_H_
 
 #include "PMICConfiguration.h"
-#include "PMICPins.h"
 #include "components/CDH.h"
 #include "components/PowerNode.h"
 #include "components/PowerNodeDirect.h"
@@ -29,35 +28,31 @@
 #include "mbed.h"
 
 /*************************** Interfaces and Drivers ***************************/
-I2C i2cLocal(PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL);
-I2C i2cBus(PIN_I2C_LOCAL_SDA, PIN_I2C_LOCAL_SCL);
+extern I2C i2cLocal;
+extern I2C i2cBus;
 
-CDH cdh(i2cBus);
+extern CDH cdh;
 
-LTC2499 adcEPS0(i2cBus, I2C_ADDR_ADC_EPS0);
-LTC2499 adcEPS1(i2cBus, I2C_ADDR_ADC_EPS1);
-LTC2499 adcEPS2(i2cBus, I2C_ADDR_ADC_EPS2);
-LTC2499 adcEPS3(i2cBus, I2C_ADDR_ADC_EPS3);
-LTC2499 adcEPS4(i2cBus, I2C_ADDR_ADC_EPS4);
-LTC2499 adcEPS5(i2cBus, I2C_ADDR_ADC_EPS5);
-LTC2499 adcPV0(i2cBus, I2C_ADDR_ADC_PV0);
-LTC2499 adcPV1(i2cBus, I2C_ADDR_ADC_PV1);
-LTC2499 adcPV2(i2cBus, I2C_ADDR_ADC_PV2);
-LTC2499 adcPV3(i2cBus, I2C_ADDR_ADC_PV3);
+extern LTC2499 adcEPS0;
+extern LTC2499 adcEPS1;
+extern LTC2499 adcEPS2;
+extern LTC2499 adcEPS3;
+extern LTC2499 adcEPS4;
+extern LTC2499 adcEPS5;
+extern LTC2499 adcPV0;
+extern LTC2499 adcPV1;
+extern LTC2499 adcPV2;
+extern LTC2499 adcPV3;
 
-TCA9535 gpioEPS0(i2cBus, I2C_ADDR_GPIO_EPS0);
-TCA9535 gpioEPS1(i2cBus, I2C_ADDR_GPIO_EPS1);
-TCA9535 gpioPV0(i2cBus, I2C_ADDR_GPIO_PV0);
-TCA9535 gpioPV1(i2cBus, I2C_ADDR_GPIO_PV1);
-TCA9535 gpioPV2(i2cBus, I2C_ADDR_GPIO_PV2);
-TCA9535 gpioPV3(i2cBus, I2C_ADDR_GPIO_PV3);
+extern TCA9535 gpioEPS0;
+extern TCA9535 gpioEPS1;
 
-DigitalOut led(PIN_LED);
-DigitalOut umbilicalSwitchA(PIN_UMB_SW_A);
-DigitalOut umbilicalSwitchB(PIN_UMB_SW_B);
+extern DigitalOut statusLED;
+extern DigitalOut umbilicalSwitchA;
+extern DigitalOut umbilicalSwitchB;
 
-InterruptIn interruptCtrlSync(PIN_CTRL_SYNC);
-InterruptIn interruptBusI2CIRQ(PIN_I2C_BUS_IRQ);
+extern InterruptIn interruptCtrlSync;
+extern InterruptIn interruptBusI2CIRQ;
 
 /******************************** Power Nodes *********************************/
 PowerNode nodesPVIn[] = {PowerNode(adcPV0, PIN_ADC_PVIN_I_A, SHUNT_PVIN_0A),
@@ -143,68 +138,36 @@ PowerNode node3V3InB(adcEPS3, PIN_ADC_3V3_IN_B, SHUNT_3V3_IN_B);
 PowerNode node3V3OutA(adcEPS4, PIN_ADC_3V3_OUT_A, SHUNT_3V3_OUT_A);
 PowerNode node3V3OutB(adcEPS3, PIN_ADC_3V3_OUT_B, SHUNT_3V3_OUT_B);
 
+// extern PowerNode * nodesPVIn[COUNT_PV];
+// extern PowerNode * nodesPVOut[COUNT_PV];
+// extern PowerNode * nodesPR3V3[COUNT_PR_3V3];
+// extern PowerNode * nodesPRBatt[COUNT_PR_BATT];
+// extern PowerNode * nodesPV3V3[COUNT_PV_3V3];
+// extern PowerNode * nodesBatteryHeaters[COUNT_BH];
+
+// extern PowerNodeDirect nodeDeployables;
+
+// extern PowerNode nodeVBattA;
+// extern PowerNode nodeVBattB;
+// extern PowerNode nodeBattA;
+// extern PowerNode nodeBattB;
+// extern PowerNode node3V3InA;
+// extern PowerNode node3V3InB;
+// extern PowerNode node3V3OutA;
+// extern PowerNode node3V3OutB;
+
 /******************************** Thermistors *********************************/
-Thermistor thermistorBattA(
-    adcEPS5, PIN_ADC_TEMP_BATT_A, THERM_CAL_BATT_A_270K, THERM_CAL_BATT_A_350K);
-Thermistor thermistorBattB(
-    adcEPS5, PIN_ADC_TEMP_BATT_B, THERM_CAL_BATT_B_270K, THERM_CAL_BATT_B_350K);
-Thermistor thermistorPMIC(
-    adcEPS5, PIN_ADC_TEMP_PMIC, THERM_CAL_PMIC_270K, THERM_CAL_PMIC_350K);
-Thermistor thermistorRegA(
-    adcEPS5, PIN_ADC_TEMP_REG_A, THERM_CAL_REG_A_270K, THERM_CAL_REG_A_350K);
-Thermistor thermistorRegB(
-    adcEPS5, PIN_ADC_TEMP_REG_B, THERM_CAL_REG_B_270K, THERM_CAL_REG_B_350K);
-Thermistor thermistorpXpY(
-    adcEPS5, PIN_ADC_TEMP_pXpY, THERM_CAL_pXpY_270K, THERM_CAL_pXpY_350K);
-Thermistor thermistornXpY(
-    adcEPS5, PIN_ADC_TEMP_nXpY, THERM_CAL_nXpY_270K, THERM_CAL_nXpY_350K);
-Thermistor thermistorpXnY(
-    adcEPS5, PIN_ADC_TEMP_pXnY, THERM_CAL_pXnY_270K, THERM_CAL_pXnY_350K);
-Thermistor thermistornXnY(
-    adcEPS5, PIN_ADC_TEMP_nXnY, THERM_CAL_nXnY_270K, THERM_CAL_nXnY_350K);
+extern Thermistor thermistorBattA;
+extern Thermistor thermistorBattB;
+extern Thermistor thermistorPMIC;
+extern Thermistor thermistorRegA;
+extern Thermistor thermistorRegB;
+extern Thermistor thermistorpXpY;
+extern Thermistor thermistornXpY;
+extern Thermistor thermistorpXnY;
+extern Thermistor thermistornXnY;
 
-Thermistor thermistorsMPPT[] = {
-    Thermistor(adcPV0, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV0_MPPT_A_270K,
-        THERM_CAL_PV0_MPPT_A_350K),
-    Thermistor(adcPV0, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV0_MPPT_B_270K,
-        THERM_CAL_PV0_MPPT_B_350K),
-    Thermistor(adcPV1, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV1_MPPT_A_270K,
-        THERM_CAL_PV1_MPPT_A_350K),
-    Thermistor(adcPV1, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV1_MPPT_B_270K,
-        THERM_CAL_PV1_MPPT_B_350K),
-    Thermistor(adcPV2, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV2_MPPT_A_270K,
-        THERM_CAL_PV2_MPPT_A_350K),
-    Thermistor(adcPV2, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV2_MPPT_B_270K,
-        THERM_CAL_PV2_MPPT_B_350K),
-    Thermistor(adcPV3, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV3_MPPT_A_270K,
-        THERM_CAL_PV3_MPPT_A_350K),
-    Thermistor(adcPV3, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV3_MPPT_B_270K,
-        THERM_CAL_PV3_MPPT_B_350K)};
-
-Thermistor thermistorsPVBoard[] = {
-    Thermistor(adcPV0, PIN_ADC_TEMP_BACK, THERM_CAL_PV0_BACK_270K,
-        THERM_CAL_PV0_BACK_350K),
-    Thermistor(adcPV0, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV0_FRONT_TOP_270K,
-        THERM_CAL_PV0_FRONT_TOP_350K),
-    Thermistor(adcPV0, PIN_ADC_TEMP_FRONT_BOTTOM,
-        THERM_CAL_PV0_FRONT_BOTTOM_270K, THERM_CAL_PV0_FRONT_BOTTOM_350K),
-    Thermistor(adcPV1, PIN_ADC_TEMP_BACK, THERM_CAL_PV1_BACK_270K,
-        THERM_CAL_PV1_BACK_350K),
-    Thermistor(adcPV1, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV1_FRONT_TOP_270K,
-        THERM_CAL_PV1_FRONT_TOP_350K),
-    Thermistor(adcPV1, PIN_ADC_TEMP_FRONT_BOTTOM,
-        THERM_CAL_PV1_FRONT_BOTTOM_270K, THERM_CAL_PV1_FRONT_BOTTOM_350K),
-    Thermistor(adcPV2, PIN_ADC_TEMP_BACK, THERM_CAL_PV1_BACK_270K,
-        THERM_CAL_PV2_BACK_350K),
-    Thermistor(adcPV2, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV2_FRONT_TOP_270K,
-        THERM_CAL_PV2_FRONT_TOP_350K),
-    Thermistor(adcPV2, PIN_ADC_TEMP_FRONT_BOTTOM,
-        THERM_CAL_PV2_FRONT_BOTTOM_270K, THERM_CAL_PV2_FRONT_BOTTOM_350K),
-    Thermistor(adcPV3, PIN_ADC_TEMP_BACK, THERM_CAL_PV3_BACK_270K,
-        THERM_CAL_PV3_BACK_350K),
-    Thermistor(adcPV3, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV3_FRONT_TOP_270K,
-        THERM_CAL_PV3_FRONT_TOP_350K),
-    Thermistor(adcPV3, PIN_ADC_TEMP_FRONT_BOTTOM,
-        THERM_CAL_PV3_FRONT_BOTTOM_270K, THERM_CAL_PV3_FRONT_BOTTOM_350K)};
+extern Thermistor thermistorsMPPT[8];
+extern Thermistor thermistorsPVBoard[12];
 
 #endif /* _SRC_PMIC_OBJECTS_H_ */

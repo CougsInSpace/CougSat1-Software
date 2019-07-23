@@ -34,6 +34,15 @@ PowerNode(LTC2499& adc, LTC2499Channel_t channel double shunt, int priority_leve
   this->pathB   = false;
   this->priority =  priority_level;
   this->expectedCurrent = expectedCurrent;
+PowerNode::PowerNode(
+    LTC2499 & adc, LTC2499::ADCChannel_t channel, double shunt) :
+  adc(adc) {
+  this->channel  = channel;
+  this->shunt    = shunt;
+  this->pathA    = false;
+  this->pathB    = false;
+  this->inverted = true;
+  adc.addActiveChannel(channel);
 }
 
 
@@ -58,7 +67,15 @@ void PowerNode::getSwitch(bool * pathA, bool * pathB)
 uint8_t PowerNode::getCurrent(double * current) {
   // Read ADC to get voltage
   // current = voltage / shunt
-  return ERROR_NOT_SUPPORTED;
+  double  value  = 0.0;
+  uint8_t result = adc.readVoltage(channel, &value);
+  if (result != ERROR_SUCCESS) {
+    ERROR("PowerNode", "Failed to read shunt resistor: 0x%02X", result);
+    return result;
+  }
+  DEBUG("PowerNode", "Shunt resistor is %8.6fV", value);
+  (*current) = value / shunt;
+  return ERROR_SUCCESS;
 }
 
 
@@ -69,9 +86,8 @@ uint8_t PowerNode::getCurrent(double * current) {
  * @param pathB is connected if true
  * @return uint8_t error code
  */
-uint8_t PowerNode::setSwitch(bool pathA, bool pathB) 
-{
-  DEBUG("PowerNode", "Set switch improperly called on the base class");
+uint8_t PowerNode::setSwitch(bool pathA, bool pathB) {
+  ERROR("PowerNode", "Set switch improperly called on the base class");
   return ERROR_NOT_SUPPORTED;
 }
 
