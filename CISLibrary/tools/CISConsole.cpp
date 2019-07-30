@@ -7,22 +7,16 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file main.cpp
+ * @file CISConsole.cpp
  * @author Bradley Davis
  * @date 6 Mar 2018
- * @brief Starts the IHU software
+ * @brief Communicates between the IHU and the testing computer
  *
- * Initializes IHU object and starts the eventQueue
+ * For use during testing via the umbilical
+ * SWO is for debug printing
+ * USART is for message printing and recieving
  */
 
-#include <mbed.h>
-#include <rtos.h>
-#include "tools/CISError.h"
+#include "CISConsole.h"
 
-/**
- * Program start routine
- * @return error code
- */
-int main(void) {
-  return ERROR_SUCCESS;
-}
+SWO_Channel swo;

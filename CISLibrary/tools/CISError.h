@@ -16,6 +16,14 @@
 #ifndef SRC_TOOLS_CISERROR_H_
 #define SRC_TOOLS_CISERROR_H_
 
+#include <string>
+
+struct CISResult_t {
+  uint8_t     value;
+  std::string message;
+};
+
+// clang-format off
 #define ERROR_SUCCESS           (0x00) //The operation completed successfully
 #define ERROR_INVALID_ARGS      (0x01) //The arguments are incorrect
 #define ERROR_OUT_OF_MEMORY     (0x02) //Not enough memory to complete the operation
@@ -41,5 +49,6 @@
 #define ERROR_POWER_EMERGENCY   (0x16) //Emergency power level reached
 #define ERROR_COMMS_INTERRUPTED (0x17) //Communication link lost
 #define ERROR_UNKNOWN_COMMAND   (0x18) //The requested command is unknown
+// clang-format on
 
 #endif /* SRC_TOOLS_CISERROR_H_ */

@@ -7,18 +7,29 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.  *
  ******************************************************************************/
 /**
- * @file CISConsole.cpp
+ * @file main.cpp
  * @author Bradley Davis
  * @date 6 Mar 2018
- * @brief Communicates between the IHU and the testing computer
+ * @brief Starts the IHU software
  *
- * For use during testing via the umbilical
- * SWO is for debug printing
- * USART is for message printing and recieving
+ * Initializes IHU object and starts the eventQueue
  */
 
-#include "CISConsole.h"
-#include "IHUPins.h"
+#include <mbed.h>
 
-SWO_Channel swo;
-Serial umbilical(UART0_TX, UART0_RX, 115200);
+#include <ADC/AD7291.h>
+#include <ADC/AD7689.h>
+#include <CISError.h>
+
+SPI spi(SPI_MOSI, SPI_MISO, SPI_SCK);
+
+/**
+ * Program start routine
+ * @return error code
+ */
+int main(void) {
+  AD7689 adc(spi, PA_10);
+  ADC *  pADC = &adc;
+  pADC->getReferenceVoltage();
+  return ERROR_SUCCESS;
+}

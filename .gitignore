@@ -1,17 +1,4 @@
-# Mbed OS
-*.mbed
-mbed-os
-*mbed-os.lib
-*mbed_settings.*
-BUILD
-
-# Eclipse
-.metadata
-RemoteSystemsTempFiles
-*.cproject
-
 # Visual Studio Code
-.vscode
 *.code-workspace
 
 # Microsoft Office Lock Files
