@@ -21,8 +21,10 @@ AD7689::~AD7689() {}
  *
  * @param channel to read
  * @param value to return in counts
+ * @param blocking will wait until data is present if true
  * @return CISResult_t error code
  */
-CISResult_t AD7689::readRaw(ADCChannel_t channel, int32_t & value) {
+CISResult_t AD7689::readRaw(
+    ADCChannel_t channel, int32_t & value, bool blocking) {
   return {ERROR_NOT_SUPPORTED, ""};
 }

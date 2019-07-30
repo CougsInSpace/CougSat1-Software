@@ -14,7 +14,7 @@ public:
   Venus838FLPx(Serial & serial, PinName reset, PinName pulse);
   ~Venus838FLPx();
 
-  CISResult_t update(bool blocking = true);
+  CISResult_t read(GPSData_t & data, bool blocking = true);
 
 private:
   Serial &   serial;

@@ -27,7 +27,8 @@ public:
   AD7291(I2C & i2c, AD7291Addr_t addr, double refVoltage = 2.5);
   ~AD7291();
 
-  CISResult_t readRaw(ADCChannel_t channel, int32_t & value);
+  CISResult_t readRaw(
+      ADCChannel_t channel, int32_t & value, bool blocking = true);
 
 private:
   I2C &        i2c;

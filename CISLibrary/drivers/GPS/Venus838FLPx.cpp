@@ -17,11 +17,12 @@ Venus838FLPx::Venus838FLPx(Serial & serial, PinName reset, PinName pulse) :
 Venus838FLPx::~Venus838FLPx() {}
 
 /**
- * @brief Read a Venus838FLPx message and update fields
+ * @brief Read a GPS message and update fields
  *
- * @param blocking will wait until data is present
+ * @param data struct to return result
+ * @param blocking will wait until data is present if true
  * @return CISResult_t error code
  */
-CISResult_t Venus838FLPx::update(bool blocking = true) {
+CISResult_t read(GPSData_t & data, bool blocking = true) {
   return {ERROR_NOT_SUPPORTED, ""};
 }
