@@ -170,7 +170,15 @@
 // Comparison Constant for Thermistor readings in celcius
 #define THRES_BATT_TEMP_LOW (0)
 #define THRES_BATT_TEMP_HIGH (50)
+#define THRES_BATT_MAX_HIGH_TEMP  (75)
+#define ACCEPTABLE_BATT_TEMP (10)
 #define THRES_REG_TEMP_HIGH (85)
+
+#define max_threshold (2.275) // Sum of all the payloads and bus currents
+#define temp_threshold (1.1375) // Half of the payloads and buc currents
+
+
+#define REG_EXPECTED_CURRENT (3) // currentl levels of REG3V3 Should be this in amps
 
 // Priority Levels
 #define priority_PR3V3_one      100
@@ -189,7 +197,7 @@
 #define priority_PR3V3_fourteen 113
 #define priority_PR3V3_fifteen  114
 
-// expected current for payloads
+// expected current for payloads in Amps
 #define PR3V3_one      0.090
 #define PR3V3_two      0.105
 #define PRBATT_three   0.400

@@ -18,7 +18,7 @@
 #ifndef _SRC_COMPONENTS_POWER_NODE_TCA9535_H_
 #define _SRC_COMPONENTS_POWER_NODE_TCA9535_H_
 
-#include "components/PowerNode.h"
+#include "PowerNode.h"
 #include "drivers/LTC2499.h"
 #include "drivers/TCA9535.h"
 #include "mbed.h"

@@ -26,14 +26,15 @@
  * @param channel connected to the shunt
  * @param shunt resistance
  */
-PowerNode(LTC2499& adc, LTC2499Channel_t channel double shunt, int priority_level, double expectedCurrent); : adc(adc) 
-{
-  this->channel = channel;
-  this->shunt   = shunt;
-  this->pathA   = false;
-  this->pathB   = false;
-  this->priority =  priority_level;
-  this->expectedCurrent = expectedCurrent;
+// PowerNode(LTC2499& adc, LTC2499Channel_t channel double shunt, int priority_level, double expectedCurrent); : adc(adc) 
+// {
+//   this->channel = channel;
+//   this->shunt   = shunt;
+//   this->pathA   = false;
+//   this->pathB   = false;
+//   this->priority =  priority_level;
+//   this->expectedCurrent = expectedCurrent;
+
 PowerNode::PowerNode(
     LTC2499 & adc, LTC2499::ADCChannel_t channel, double shunt) :
   adc(adc) {
@@ -100,7 +101,7 @@ uint8_t PowerNode::setSwitch(bool pathA, bool pathB) {
 
 uint8_t PowerNode::getPriority(int priority_value)
 {
-  *(priority) = this->priority;
+  (priority) = this->priority;
 }
 
 /**
@@ -111,5 +112,5 @@ uint8_t PowerNode::getPriority(int priority_value)
 uint8_t PowerNode::getExpectedCurrent(double *current )
 {
 
-  return ERROR_NOT_SUPPORTED;
+   return ERROR_NOT_SUPPORTED;
 }

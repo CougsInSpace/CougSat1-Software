@@ -18,7 +18,7 @@
 #ifndef _SRC_COMPONENTS_POWER_NODE_H_
 #define _SRC_COMPONENTS_POWER_NODE_H_
 
-#include "LTC2499.h"
+#include "../drivers/LTC2499.h"
 #include "mbed.h"
 
 class PowerNode 
@@ -32,23 +32,20 @@ public:
 
   virtual uint8_t setSwitch(bool pathA, bool pathB);
 
-protected:
-  bool pathA;
-  bool pathB;
-  bool inverted;
-
   uint8_t getVoltage(double * voltage);
 
   uint8_t getPriority(int priority_value);
 
-  uint8_t getExpectedCurrent(double current);
+  uint8_t getExpectedCurrent(double * current);
 
-  
-private:
+  protected:
+  bool pathA;
+  bool pathB;
+  bool inverted;
+
+  private:
   LTC2499 & adc;
-
   LTC2499::ADCChannel_t channel;
-
   double shunt;
   int    priority;
   int    expectedCurrent;
