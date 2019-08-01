@@ -22,9 +22,9 @@ AD7291::~AD7291() {}
  * @param channel to read
  * @param value to return in counts
  * @param blocking will wait until data is present if true
- * @return CISResult_t error code
+ * @return mbed_error_code_t
  */
-CISResult_t AD7291::readRaw(
+mbed_error_code_t AD7291::readRaw(
     ADCChannel_t channel, int32_t & value, bool blocking) {
-  return {ERROR_NOT_SUPPORTED, ""};
+  return mbed_error_code_t::MBED_ERROR_UNSUPPORTED;
 }

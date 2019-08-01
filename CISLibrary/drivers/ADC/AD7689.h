@@ -2,7 +2,6 @@
 #define _LIBRARY_DRIVER_ADC_AD7689_H_
 
 #include "ADC.h"
-#include "CISError.h"
 
 #include <mbed.h>
 
@@ -14,7 +13,7 @@ public:
   AD7689(SPI & spi, PinName cnv, double refVoltage = 2.5);
   ~AD7689();
 
-  CISResult_t readRaw(ADCChannel_t channel, int32_t & value, bool blocking = true);
+  mbed_error_code_t readRaw(ADCChannel_t channel, int32_t & value, bool blocking = true);
 
 private:
   SPI &      spi;

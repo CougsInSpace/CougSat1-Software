@@ -34,20 +34,20 @@ bool PowerNode::getSwitch() {
  * @brief Gets the current flowing through the node
  *
  * @param current to read into
- * @return CISResult_t error code
+ * @return mbed_error_code_t
  */
-CISResult_t PowerNode::getCurrent(double & current) {
+mbed_error_code_t PowerNode::getCurrent(double & current) {
   // Read ADC to get voltage
   // current = voltage / shunt
   // double  value  = 0.0;
-  // CISResult_t result = adc.readVoltage(channel, value);
+  // mbed_error_code_t result = adc.readVoltage(channel, value);
   // if (!result != ERROR_SUCCESS) {
   //   ERROR("PowerNode", "Failed to read shunt resistor: 0x%02X", result);
   //   return result;
   // }
   // DEBUG("PowerNode", "Shunt resistor is %8.6fV", value);
   // (*current) = value / shunt;
-  return {ERROR_NOT_SUPPORTED, ""};
+  return mbed_error_code_t::MBED_ERROR_UNSUPPORTED;
 }
 
 /**

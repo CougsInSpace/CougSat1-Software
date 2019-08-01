@@ -1,8 +1,6 @@
 #ifndef _LIBRARY_DRIVER_IMU_IMU_H_
 #define _LIBRARY_DRIVER_IMU_IMU_H_
 
-#include "CISError.h"
-
 #include <mbed.h>
 
 struct IMUValueSet_t {
@@ -41,19 +39,19 @@ public:
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  CISResult_t read(IMUData_t & data, bool blocking = true) {
-    CISResult_t result = readMag(data.mag, blocking);
-    if (result.value != ERROR_SUCCESS)
+  mbed_error_status_t read(IMUData_t & data, bool blocking = true) {
+    mbed_error_status_t result = readMag(data.mag, blocking);
+    if (result)
       return result;
     result = readGyro(data.gyro, blocking);
-    if (result.value != ERROR_SUCCESS)
+    if (result)
       return result;
     result = readAccel(data.accel, blocking);
-    if (result.value != ERROR_SUCCESS)
+    if (result)
       return result;
-    return {ERROR_SUCCESS, ""};
+    return MBED_SUCCESS;
   }
 
   /**
@@ -61,27 +59,30 @@ public:
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  virtual CISResult_t readMag(IMUValueSet_t & data, bool blocking = true) = 0;
+  virtual mbed_error_code_t readMag(
+      IMUValueSet_t & data, bool blocking = true) = 0;
 
   /**
    * @brief Read gyroscope
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  virtual CISResult_t readGyro(IMUValueSet_t & data, bool blocking = true) = 0;
+  virtual mbed_error_code_t readGyro(
+      IMUValueSet_t & data, bool blocking = true) = 0;
 
   /**
    * @brief Read accelerometer
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  virtual CISResult_t readAccel(IMUValueSet_t & data, bool blocking = true) = 0;
+  virtual mbed_error_code_t readAccel(
+      IMUValueSet_t & data, bool blocking = true) = 0;
 };
 
 #endif /* _LIBRARY_DRIVER_IMU_IMU_H_ */

@@ -1,7 +1,6 @@
 #ifndef _LIBRARY_DRIVER_IMU_BNO055_H_
 #define _LIBRARY_DRIVER_IMU_BNO055_H_
 
-#include "CISError.h"
 #include "IMU.h"
 
 
@@ -18,9 +17,9 @@ public:
   BNO055(I2C & i2c, BNO055Addr_t addr);
   ~BNO055();
 
-  CISResult_t readMag(IMUValueSet_t & data, bool blocking = true);
-  CISResult_t readGyro(IMUValueSet_t & data, bool blocking = true);
-  CISResult_t readAccel(IMUValueSet_t & data, bool blocking = true);
+  mbed_error_code_t readMag(IMUValueSet_t & data, bool blocking = true);
+  mbed_error_code_t readGyro(IMUValueSet_t & data, bool blocking = true);
+  mbed_error_code_t readAccel(IMUValueSet_t & data, bool blocking = true);
 
 private:
   I2C &        i2c;

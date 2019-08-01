@@ -1,7 +1,6 @@
 #ifndef _LIBRARY_DRIVER_GPS_VENUS838FLPX_H_
 #define _LIBRARY_DRIVER_GPS_VENUS838FLPX_H_
 
-#include "CISError.h"
 #include "GPS.h"
 
 #include <mbed.h>
@@ -14,7 +13,7 @@ public:
   Venus838FLPx(Serial & serial, PinName reset, PinName pulse);
   ~Venus838FLPx();
 
-  CISResult_t read(GPSData_t & data, bool blocking = true);
+  mbed_error_code_t read(GPSData_t & data, bool blocking = true);
 
 private:
   Serial &   serial;

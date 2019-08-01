@@ -9,7 +9,7 @@ public:
   Thermistor(ADC & adc, ADCChannel_t channel, double voltageFraction270K,
       double voltageFraction350K);
 
-  CISResult_t getTemperature(double & data, bool blocking = true);
+  mbed_error_code_t getTemperature(double & data, bool blocking = true);
 
 private:
   ADC & adc;

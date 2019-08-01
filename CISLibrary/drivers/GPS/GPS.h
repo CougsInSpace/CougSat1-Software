@@ -1,7 +1,6 @@
 #ifndef _LIBRARY_DRIVER_GPS_GPS_H_
 #define _LIBRARY_DRIVER_GPS_GPS_H_
 
-#include "CISError.h"
 
 #include <mbed.h>
 
@@ -35,9 +34,9 @@ public:
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  virtual CISResult_t read(GPSData_t & data, bool blocking = true) = 0;
+  virtual mbed_error_code_t read(GPSData_t & data, bool blocking = true) = 0;
 };
 
 #endif /* _LIBRARY_DRIVER_GPS_GPS_H_ */

@@ -19,10 +19,10 @@ BNO055::~BNO055() {}
  *
  * @param data struct to return result
  * @param blocking will wait until data is present if true
- * @return CISResult_t error code
+ * @return mbed_error_code_t
  */
-CISResult_t BNO055::readMag(IMUValueSet_t & data, bool blocking) {
-  return {ERROR_NOT_SUPPORTED, ""};
+mbed_error_code_t BNO055::readMag(IMUValueSet_t & data, bool blocking) {
+  return mbed_error_code_t::MBED_ERROR_UNSUPPORTED;
 }
 
 /**
@@ -30,10 +30,10 @@ CISResult_t BNO055::readMag(IMUValueSet_t & data, bool blocking) {
  *
  * @param data struct to return result
  * @param blocking will wait until data is present if true
- * @return CISResult_t error code
+ * @return mbed_error_code_t
  */
-CISResult_t BNO055::readGyro(IMUValueSet_t & data, bool blocking) {
-  return {ERROR_NOT_SUPPORTED, ""};
+mbed_error_code_t BNO055::readGyro(IMUValueSet_t & data, bool blocking) {
+  return mbed_error_code_t::MBED_ERROR_UNSUPPORTED;
 }
 
 /**
@@ -41,8 +41,8 @@ CISResult_t BNO055::readGyro(IMUValueSet_t & data, bool blocking) {
  *
  * @param data struct to return result
  * @param blocking will wait until data is present if true
- * @return CISResult_t error code
+ * @return mbed_error_code_t
  */
-CISResult_t BNO055::readAccel(IMUValueSet_t & data, bool blocking) {
-  return {ERROR_NOT_SUPPORTED, ""};
+mbed_error_code_t BNO055::readAccel(IMUValueSet_t & data, bool blocking) {
+  return mbed_error_code_t::MBED_ERROR_UNSUPPORTED;
 }

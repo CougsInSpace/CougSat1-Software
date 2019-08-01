@@ -1,8 +1,6 @@
 #ifndef _LIBRARY_DRIVER_ADC_ADC_H_
 #define _LIBRARY_DRIVER_ADC_ADC_H_
 
-#include "CISError.h"
-
 #include <cmath>
 #include <mbed.h>
 
@@ -68,9 +66,9 @@ public:
    * @param channel to read
    * @param value to return in counts
    * @param blocking will wait until data is present if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  virtual CISResult_t readRaw(
+  virtual mbed_error_code_t readRaw(
       ADCChannel_t channel, int32_t & value, bool blocking = true) = 0;
 
   /**
@@ -100,13 +98,13 @@ public:
    * @param channel to read
    * @param value to return in volts
    * @param blocking will wait until data is present if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  CISResult_t readVoltage(
+  mbed_error_code_t readVoltage(
       ADCChannel_t channel, double & value, bool blocking = true) {
-    int32_t     buf    = 0;
-    CISResult_t result = readRaw(channel, buf, blocking);
-    value              = (double)buf * conversionFactor;
+    int32_t           buf    = 0;
+    mbed_error_code_t result = readRaw(channel, buf, blocking);
+    value                    = (double)buf * conversionFactor;
     return result;
   }
 

@@ -1,7 +1,6 @@
 #ifndef _LIBRARY_DRIVER_HBRIDGE_HBRIDGE_H_
 #define _LIBRARY_DRIVER_HBRIDGE_HBRIDGE_H_
 
-#include "CISError.h"
 
 #include <mbed.h>
 
@@ -27,18 +26,18 @@ public:
    *
    * @param value [-1.0, 1.0]
    * @param blocking will wait until operation is complete if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  virtual CISResult_t set(double value, bool blocking = true) = 0;
+  virtual mbed_error_code_t set(double value, bool blocking = true) = 0;
 
   /**
    * @brief Stop the output, brake or coast
    * 
    * @param brake will short output if true, high impedance if true
    * @param blocking will wait until operation is complete if true
-   * @return CISResult_t 
+   * @return mbed_error_code_t 
    */
-  virtual CISResult_t stop(bool brake = true, bool blocking = true) = 0;
+  virtual mbed_error_code_t stop(bool brake = true, bool blocking = true) = 0;
 };
 
 #endif /* _LIBRARY_DRIVER_HBRIDGE_HBRIDGE_H_ */

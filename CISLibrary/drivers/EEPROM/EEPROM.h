@@ -1,7 +1,6 @@
 #ifndef _LIBRARY_DRIVER_EEPROM_EEPROM_H_
 #define _LIBRARY_DRIVER_EEPROM_EEPROM_H_
 
-#include "CISError.h"
 
 #include <mbed.h>
 
@@ -28,9 +27,9 @@ public:
    * @param addr of byte
    * @param data to return result
    * @param blocking will wait until operation is complete if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  virtual CISResult_t read(uint32_t addr, uint8_t & data, bool blocking = true) = 0;
+  virtual mbed_error_code_t read(uint32_t addr, uint8_t & data, bool blocking = true) = 0;
 
   /**
    * @brief Write a byte
@@ -38,9 +37,9 @@ public:
    * @param addr of byte
    * @param data to write
    * @param blocking will wait until operation is complete if true
-   * @return CISResult_t error code
+   * @return mbed_error_code_t
    */
-  virtual CISResult_t write(uint32_t addr, uint8_t data, bool blocking = true) = 0;
+  virtual mbed_error_code_t write(uint32_t addr, uint8_t data, bool blocking = true) = 0;
 };
 
 #endif /* _LIBRARY_DRIVER_EEPROM_EEPROM_H_ */
