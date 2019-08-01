@@ -19,6 +19,7 @@
 
 #include <ADC/AD7291.h>
 #include <ADC/AD7689.h>
+#include <Thermistor.h>
 #include <CISError.h>
 
 SPI spi(SPI_MOSI, SPI_MISO, SPI_SCK);
@@ -30,6 +31,7 @@ SPI spi(SPI_MOSI, SPI_MISO, SPI_SCK);
 int main(void) {
   AD7689 adc(spi, PA_10);
   ADC *  pADC = &adc;
+  Thermistor t(adc, ADCChannel_t::CM_00, 0.0, 0.0);
   pADC->getReferenceVoltage();
   return ERROR_SUCCESS;
 }
