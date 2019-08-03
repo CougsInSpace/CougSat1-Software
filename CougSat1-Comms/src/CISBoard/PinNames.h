@@ -151,9 +151,6 @@ typedef enum {
   ADC_VREF = 0xF1,
   ADC_VBAT = 0xF2,
 
-  // Generic signals namings
-  LED1 = PD_2,
-
   /**** OSCILLATOR pins ****/
   RCC_OSC32_IN  = PC_14,
   RCC_OSC32_OUT = PC_15,
@@ -178,7 +175,67 @@ typedef enum {
   STDIO_UART_TX = NC,
   STDIO_UART_RX = NC,
   USBTX         = STDIO_UART_TX,
-  USBRX         = STDIO_UART_RX
+  USBRX         = STDIO_UART_RX,
+
+  /*** Comms HW V1.0 ***/
+  LED1 = PD_2,
+
+  // RF clock  generators
+  RFCLK_CS_230     = PC_3,
+  RFCLK_CS_DEMOD   = PA_7,
+  RFCLK_CS_MOD     = PA_3,
+  RFCLK_LOCK_230   = PA_8,
+  RFCLK_LOCK_DEMOD = PC_4,
+  RFCLK_LOCK_MOD   = PA_6,
+  RFCLK_MOSI       = PA_12,
+  RFCLK_SCK        = PA_1,
+
+  // Modulators and demodulator
+  DEMOD_ID = PC_0,
+  DEMOD_QD = PC_1,
+
+  MOD_230_ID = PC_6,
+  MOD_230_QD = PC_7,
+  MOD_700_ID = PA_4,
+  MOD_700_QD = PA_5,
+
+  // RF chain control
+  ANTENNA_SW = PA_2,
+
+  PA_230_BIAS = PB_11,
+  PA_700_BIAS = PB_2,
+
+  RX_LNA_EN_N = PB_1,
+
+  // Power rail control
+  PC_DEMOD_LV   = PC_5,
+  PC_LDO_3V3    = PC_8,
+  PC_MOD_230_LV = PA_9,
+  PC_MOD_700_LV = PB_0,
+
+  REG_INACT = PB_9,
+  REG_EN_5  = PC_13,
+  REG_EN_9  = PC_9,
+
+  // SPI flash
+  FLASH_CE_A = PB_5,
+  FLASH_CE_B = PB_4,
+  FLASH_WP_N = PB_8,
+
+  SPI_SCK  = PC_10,
+  SPI_MISO = PC_11,
+  SPI_MOSI = PC_12,
+
+  // Backplane connections
+  I2C_SCL = PB_6,
+  I2C_SDA = PB_7,
+
+  COM_SPI_CS   = PB_13,
+  COM_SPI_MISO = PB_14,
+  COM_SPI_MOSI = PB_15,
+  COM_SPI_SCK  = PB_10,
+
+  CTRL_SYNC = PB_12,
 } PinName;
 
 #ifdef __cplusplus
