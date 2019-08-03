@@ -9,7 +9,7 @@ public:
   PowerNode(ADC & adc, ADCChannel_t channel, double shunt,
       PinName switchOut = NC, bool inverted = false);
 
-  mbed_error_code_t getCurrent(double & current);
+  mbed_error_status_t getCurrent(double & current);
 
   bool getSwitch();
 

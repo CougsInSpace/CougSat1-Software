@@ -66,9 +66,9 @@ public:
    * @param channel to read
    * @param value to return in counts
    * @param blocking will wait until data is present if true
-   * @return mbed_error_code_t
+   * @return mbed_error_status_t
    */
-  virtual mbed_error_code_t readRaw(
+  virtual mbed_error_status_t readRaw(
       ADCChannel_t channel, int32_t & value, bool blocking = true) = 0;
 
   /**
@@ -98,12 +98,12 @@ public:
    * @param channel to read
    * @param value to return in volts
    * @param blocking will wait until data is present if true
-   * @return mbed_error_code_t
+   * @return mbed_error_status_t
    */
-  mbed_error_code_t readVoltage(
+  mbed_error_status_t readVoltage(
       ADCChannel_t channel, double & value, bool blocking = true) {
     int32_t           buf    = 0;
-    mbed_error_code_t result = readRaw(channel, buf, blocking);
+    mbed_error_status_t result = readRaw(channel, buf, blocking);
     value                    = (double)buf * conversionFactor;
     return result;
   }

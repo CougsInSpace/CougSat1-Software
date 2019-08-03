@@ -34,9 +34,9 @@ public:
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return mbed_error_code_t
+   * @return mbed_error_status_t
    */
-  virtual mbed_error_code_t read(GPSData_t & data, bool blocking = true) = 0;
+  virtual mbed_error_status_t read(GPSData_t & data, bool blocking = true) = 0;
 };
 
 #endif /* _LIBRARY_DRIVER_GPS_GPS_H_ */

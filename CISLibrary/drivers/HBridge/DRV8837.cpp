@@ -21,10 +21,10 @@ DRV8837::~DRV8837() {}
  *
  * @param value [-1.0, 1.0]
  * @param blocking will wait until operation is complete if true
- * @return mbed_error_code_t
+ * @return mbed_error_status_t
  */
-mbed_error_code_t DRV8837::set(double value, bool blocking) {
-  return mbed_error_code_t::MBED_ERROR_UNSUPPORTED;
+mbed_error_status_t DRV8837::set(double value, bool blocking) {
+  return MBED_ERROR_UNSUPPORTED;
 }
 
 /**
@@ -32,8 +32,8 @@ mbed_error_code_t DRV8837::set(double value, bool blocking) {
  *
  * @param brake will short output if true, high impedance if true
  * @param blocking will wait until operation is complete if true
- * @return mbed_error_code_t
+ * @return mbed_error_status_t
  */
-mbed_error_code_t DRV8837::stop(bool brake, bool blocking) {
-  return mbed_error_code_t::MBED_ERROR_UNSUPPORTED;
+mbed_error_status_t DRV8837::stop(bool brake, bool blocking) {
+  return MBED_ERROR_UNSUPPORTED;
 }

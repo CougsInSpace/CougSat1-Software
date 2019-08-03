@@ -17,9 +17,9 @@ public:
   BNO055(I2C & i2c, BNO055Addr_t addr);
   ~BNO055();
 
-  mbed_error_code_t readMag(IMUValueSet_t & data, bool blocking = true);
-  mbed_error_code_t readGyro(IMUValueSet_t & data, bool blocking = true);
-  mbed_error_code_t readAccel(IMUValueSet_t & data, bool blocking = true);
+  mbed_error_status_t readMag(IMUValueSet_t & data, bool blocking = true);
+  mbed_error_status_t readGyro(IMUValueSet_t & data, bool blocking = true);
+  mbed_error_status_t readAccel(IMUValueSet_t & data, bool blocking = true);
 
 private:
   I2C &        i2c;

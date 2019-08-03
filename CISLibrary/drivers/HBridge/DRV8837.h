@@ -13,8 +13,8 @@ public:
   DRV8837(PinName fwd, PinName rev, PinName sleep);
   ~DRV8837();
 
-  mbed_error_code_t set(double value, bool blocking = true);
-  mbed_error_code_t stop(bool brake = true, bool blocking = true);
+  mbed_error_status_t set(double value, bool blocking = true);
+  mbed_error_status_t stop(bool brake = true, bool blocking = true);
 
 private:
   PwmOut     fwd;

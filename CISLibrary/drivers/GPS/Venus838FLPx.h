@@ -13,7 +13,7 @@ public:
   Venus838FLPx(Serial & serial, PinName reset, PinName pulse);
   ~Venus838FLPx();
 
-  mbed_error_code_t read(GPSData_t & data, bool blocking = true);
+  mbed_error_status_t read(GPSData_t & data, bool blocking = true);
 
 private:
   Serial &   serial;

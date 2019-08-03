@@ -1,27 +1,9 @@
-/******************************************************************************
- * Copyright (c) 2018 by Cougs in Space - Washington State University         *
- * Cougs in Space website: cis.vcea.wsu.edu                                   *
- *                                                                            *
- * This file is a part of flight and/or ground software for Cougs in Space's  *
- * satellites. This file is proprietary and confidential.                     *
- * Unauthorized copying of this file, via any medium is strictly prohibited.  *
- ******************************************************************************/
-/**
- * @file PMICConfiguration.h
- * @author Bradley Davis
- * @date 4 Nov 2018
- * @brief Contains all configuration settings
- *
- * Resistances of shunts, themistor calibration points, and parameter thresholds
- */
-
-#ifndef _SRC_PMIC_CONFIGURATION_H_
-#define _SRC_PMIC_CONFIGURATION_H_
+#ifndef _SRC_CONFIGURATION_H_
+#define _SRC_CONFIGURATION_H_
 
 /*********************************** Timing ***********************************/
-#define PERIOD_MS_IDLE_SLEEP (10)  // Sleep time during idle
-#define PERIOD_MS_ADC_UPDATE (150) // Read next active channels on ADCs
-#define PERIOD_MS_PERIODIC (5000)  // The periodic event
+#define PERIOD_MS_IDLE_SLEEP (10) // Sleep time during idle
+#define PERIOD_MS_PERIODIC (5000) // The periodic event
 
 /************************************ ADCs ************************************/
 #define ADC_AVREF (1.7995)
@@ -29,11 +11,14 @@
 #define ADC_GAIN_EPS5 (0.231)
 
 /******************************** Array Counts ********************************/
+#define COUNT_ADC_EPS (5)
+#define COUNT_ADC_PV (4)
 #define COUNT_PV (8)
 #define COUNT_PR_3V3 (13)
 #define COUNT_PR_BATT (7)
 #define COUNT_PV_3V3 (4)
 #define COUNT_BH (2)
+#define COUNT_DEPLOYABLES (2)
 #define COUNT_THERM_MPPT (8)
 #define COUNT_THERM_BOARD (12)
 
@@ -166,4 +151,4 @@
 #define THERM_CAL_PV3_FRONT_BOTTOM_270K (0.158)
 #define THERM_CAL_PV3_FRONT_BOTTOM_350K (0.852)
 
-#endif /* _SRC_PMIC_CONFIGURATION_H_ */
+#endif /* _SRC_CONFIGURATION_H_ */

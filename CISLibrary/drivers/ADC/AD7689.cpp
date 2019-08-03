@@ -22,9 +22,9 @@ AD7689::~AD7689() {}
  * @param channel to read
  * @param value to return in counts
  * @param blocking will wait until data is present if true
- * @return mbed_error_code_t
+ * @return mbed_error_status_t
  */
-mbed_error_code_t AD7689::readRaw(
+mbed_error_status_t AD7689::readRaw(
     ADCChannel_t channel, int32_t & value, bool blocking) {
-  return mbed_error_code_t::MBED_ERROR_UNSUPPORTED;
+  return MBED_ERROR_UNSUPPORTED;
 }

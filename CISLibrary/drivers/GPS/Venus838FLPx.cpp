@@ -21,8 +21,8 @@ Venus838FLPx::~Venus838FLPx() {}
  *
  * @param data struct to return result
  * @param blocking will wait until data is present if true
- * @return mbed_error_code_t
+ * @return mbed_error_status_t
  */
-mbed_error_code_t read(GPSData_t & data, bool blocking = true) {
-  return mbed_error_code_t::MBED_ERROR_UNSUPPORTED;
+mbed_error_status_t read(GPSData_t & data, bool blocking = true) {
+  return MBED_ERROR_UNSUPPORTED;
 }

@@ -39,7 +39,7 @@ public:
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return mbed_error_code_t
+   * @return mbed_error_status_t
    */
   mbed_error_status_t read(IMUData_t & data, bool blocking = true) {
     mbed_error_status_t result = readMag(data.mag, blocking);
@@ -59,9 +59,9 @@ public:
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return mbed_error_code_t
+   * @return mbed_error_status_t
    */
-  virtual mbed_error_code_t readMag(
+  virtual mbed_error_status_t readMag(
       IMUValueSet_t & data, bool blocking = true) = 0;
 
   /**
@@ -69,9 +69,9 @@ public:
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return mbed_error_code_t
+   * @return mbed_error_status_t
    */
-  virtual mbed_error_code_t readGyro(
+  virtual mbed_error_status_t readGyro(
       IMUValueSet_t & data, bool blocking = true) = 0;
 
   /**
@@ -79,9 +79,9 @@ public:
    *
    * @param data struct to return result
    * @param blocking will wait until data is present if true
-   * @return mbed_error_code_t
+   * @return mbed_error_status_t
    */
-  virtual mbed_error_code_t readAccel(
+  virtual mbed_error_status_t readAccel(
       IMUValueSet_t & data, bool blocking = true) = 0;
 };
 
