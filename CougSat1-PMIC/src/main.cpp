@@ -144,5 +144,9 @@ int main(void) {
   if (result) {
     ERROR("PMIC", "Failed to initialize: 0x%02X", result);
   }
+  result = run();
+  if (result) {
+    ERROR("PMIC", "Failed to run: 0x%02X", result);
+  }
   return MBED_SUCCESS;
 }
