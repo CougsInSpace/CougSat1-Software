@@ -18,6 +18,7 @@
 #include "PowerNodeDirect.h"
 #include "tools/CISConsole.h"
 #include "tools/CISError.h"
+#include "drivers/LTC2499.h"
 
 /**
  * @brief Construct a new Power Node Direct:: Power Node Direct object
@@ -28,8 +29,8 @@
  * @param pinSwitchA control pin
  * @param pinSwitchB control pin
  */
-PowerNodeDirect::PowerNodeDirect(LTC2499 & adc, LTC2499Channel_t channel,
-double shunt, PinName switchA, PinName switchB) :
+PowerNodeDirect::PowerNodeDirect(LTC2499 & adc, LTC2499::ADCChannel_t channel, double shunt,
+                PinName pinSwitchA, PinName pinSwitchB) :
   PowerNode(adc, channel, shunt),
   switchA(switchA), switchB(switchB) 
 {

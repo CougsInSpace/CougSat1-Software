@@ -99,9 +99,10 @@ uint8_t PowerNode::setSwitch(bool pathA, bool pathB) {
  * 
  */
 
-uint8_t PowerNode::getPriority(int priority_value)
+uint8_t PowerNode::getPriority(int *priority_value)
 {
-  (priority) = this->priority;
+  *priority_value = this->priority;
+  return ERROR_NOT_SUPPORTED;
 }
 
 /**

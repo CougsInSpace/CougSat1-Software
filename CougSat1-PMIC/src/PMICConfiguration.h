@@ -178,7 +178,8 @@
 #define temp_threshold (1.1375) // Half of the payloads and buc currents
 
 
-#define REG_EXPECTED_CURRENT (3) // currentl levels of REG3V3 Should be this in amps
+#define REG_EXPECTED_CURRENT (3)   // current levels of REG3V3 Should be this
+#define BATT_EXPECTED_CURRENT (4) // current levels of battery shoul dbe this
 
 // Priority Levels
 #define priority_PR3V3_one      100

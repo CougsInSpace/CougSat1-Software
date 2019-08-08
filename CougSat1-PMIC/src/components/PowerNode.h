@@ -34,7 +34,7 @@ public:
 
   uint8_t getVoltage(double * voltage);
 
-  uint8_t getPriority(int priority_value);
+  uint8_t getPriority(int * priority_value);
 
   uint8_t getExpectedCurrent(double * current);
 
