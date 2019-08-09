@@ -35,6 +35,11 @@
 #define NMEA_VTG 5
 #define NMEA_ZDA 6
 
+#define NMEA_MAX_LENGTH 83
+
+#define ACK 0x83  // message id of ACK
+#define NACK 0x84 // message id of NACK
+
 // TODO: test the underlying types of enum values, typed enum
 // support in C++11
 typedef enum attributes : uint8_t {
@@ -43,9 +48,19 @@ typedef enum attributes : uint8_t {
   TEMP      = 2
 } Attributes_t;
 
+typedef struct rmc {
+  float   utcTime;
+  float   latitude;
+  float   longitude;
+  float   speedOverGround;  // measures sspeed in knots
+  float   courseOverGround; // measures speed in degrees
+  uint8_t utcDate;
+} RMC;
+
 class Venus838FLPx {
 public:
-  Venus838FLPx(Serial & serial, DigitalOut & reset, DigitalIn & pulse, bool mode);
+  Venus838FLPx(
+      Serial & serial, DigitalOut & reset, DigitalIn & pulse, bool mode);
   ~Venus838FLPx();
 
   // Accessors
@@ -62,7 +77,6 @@ public:
 
   uint8_t read();
 
-  // GPS configuration methods
   uint8_t setUpdateRate(uint8_t frequency, Attributes_t attribute);
   uint8_t resetReceiver(bool reboot);
   uint8_t configNMEA(uint8_t messageName, bool enable, Attributes_t attribute);
@@ -84,20 +98,19 @@ private:
   uint8_t nmeaState; // stores current configuration of which NMEA strings are
                      // enabled
 
-  // RMC attributes
-  uint32_t utcTime; // UTC time in hundredths of a second
-  float    lat;
-  float    longitude;
-  int32_t  altitude; // meters above sea level
-  uint32_t speed;    // speed over ground in knots
-  uint8_t  date;     // date
+  RMC rmcData;
 
   // Utility functions
-  uint8_t rmcParser(uint8_t * nmea);
+  uint8_t rmcParser(char * nmea);
   uint8_t sendCommand(uint8_t messageid, uint8_t * messagebody,
-      uint32_t bodylen, uint32_t timemout = GPS_ACK_TIMEOUT_MS);
-  uint8_t sendPacket(uint8_t * packet, uint32_t size, uint32_t timeout);
-  void    printPacket(uint8_t * packet, uint32_t size);
+      uint32_t bodylen, uint32_t timeout = GPS_ACK_TIMEOUT_MS);
+  uint8_t sendCommandResponce(uint8_t messageid, uint8_t * messagebody,
+      uint32_t bodylen, char * response, uint8_t responseLen,
+      uint32_t timeout =
+          GPS_ACK_TIMEOUT_MS); // overloaded function to indirecly return
+                               // response to the command
+  uint8_t sendPacket(char * packet, uint32_t size, uint32_t timeout);
+  void    printPacket(char * packet, uint32_t size);
 };
 
 #endif /* !SRC_SYSTEMINTERFACES_GPS_H_ */

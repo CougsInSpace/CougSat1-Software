@@ -34,36 +34,38 @@ bool GPS::getMode() const{
 }
 */
 uint32_t Venus838FLPx::getUtcTime() const {
-  return this->utcTime;
+  return this->rmcData.utcDate;
 }
 
 float Venus838FLPx::getLat() const {
-  return this->lat;
+  return this->rmcData.latitude;
 }
 
 float Venus838FLPx::getLong() const {
-  return this->longitude;
+  return this->rmcData.longitude;
 }
 
+//Altitude is not given in RMC data
+/*
 int32_t Venus838FLPx::getAltitude() const {
   return this->altitude;
-}
+}*/
 
 uint32_t Venus838FLPx::getSpeedOverGround() const {
-  return this->speed;
+  return this->rmcData.speedOverGround;
 }
 
 uint8_t Venus838FLPx::getDate() const {
-  return this->date;
+  return this->rmcData.utcDate;
 }
 
 // TODO: implement
 uint8_t Venus838FLPx::read() {
-  // Read NMEA data from the GPS using mbed API
-  // ie. serial.read(uint8_t *buffer, int length, const event_callback_t
-  // &callback, int event=SERIAL_EVENT_RX_COMPLETE, unsigned char
-  // char_match=SERIAL_RESERVED_CHAR_MATCH) Parse data into usable format for
-  // subscribers of this data
+  char data [83] = {'\0'};
+  serial.gets(data, 83);
+  
+  //TODO: setup different data parsers for other formats
+  rmcParser(data);
 }
 
 // Attribute:
@@ -146,29 +148,41 @@ void Venus838FLPx::setMode(bool nMode) {
 
 // TODO: implement
 uint8_t Venus838FLPx::initialize() {
-  // This function should initialize the GPS into a "default" state
-  // Use the sendCommand() function to configure the GPS
+ uint8_t messageBody[2];
+ char response[21];
+
+  configNMEA(0x10,RAM_FLASH); //disable all NMEA mesages exept RMC and set that to default on device
+  messageBody[0] = 0;
+  sendCommandResponce(0x2,messageBody,1,response,21);
+  DEBUG("GPS", "Software Kernal Version: %d.%d.%d \n Software ODM Version: %d.%d.%d \n Revision Date (YMD): %d/%d/%d\n ")
+        response[7], response[8],response[9],response[11],response[12],response[13], response[14],response[15],response[16];
+  
+  sendCommandResponce(0x3,messageBody,1,response,11);
+  DEBUG("GPS", "Software CRC Version: %d%d") response[7],response[8];
 }
 
-// Private Utility Functions for parsing NMEA data
-/*
-        Time, date, position, course and speed data provided by a GNSS
-   navigation receiver. Structure:
-        $GPRMC,hhmmss.sss,A,dddmm.mmmm,a,dddmm.mmmm,a,x.x,x.x,ddmmyy,,,a*hh<CR><LF>
-        Example:
-        $GPRMC,111636.932,A,2447.0949,N,12100.5223,E,000.0,000.0,030407,,,A*61<CR><LF>
-*/
-uint8_t Venus838FLPx::rmcParser(uint8_t * nmea) {
-  /*
-  TODO: implement
-  Parse the RMC NMEA sentence and populate:
-  1. UTC time
-  2. latitude
-  3. longitude
-  4. altitude
-  5. speed over ground
-  6. date
-  */
+uint8_t Venus838FLPx::rmcParser(char * nmea) {
+
+  uint8_t error = ERROR_SUCCESS;
+
+  strtok(nmea, ",");//remove device id from mesage
+  if(*strtok(NULL,",") == 'A'){
+  rmcData.utcTime = atof(strtok(NULL, ","));//UTC time field
+  rmcData.latitude = atof(strtok(NULL,","));//lattituded field
+  if(*strtok(NULL,",") == 'S'){ // if in souther hemishphere save as negative value
+    rmcData.latitude *= -1;
+  }
+  rmcData.longitude = atof(strtok(NULL,",")); //longitude field
+  if(*strtok(NULL,",") == 'E'){ // if in eastern hemishphere save as negative value
+    rmcData.longitude *= -1;
+  }
+  rmcData.speedOverGround = atof(strtok(NULL,",")); // speed over ground in knots
+  rmcData.courseOverGround = atof(strtok(NULL,",")); //course over ground in degrees
+  rmcData.utcDate = atoi(strtok(NULL,","));
+  }else{
+    error = ERROR_INVALID_DATA;
+  }
+  return error;
 }
 
 uint8_t Venus838FLPx::sendCommand(uint8_t messageId, uint8_t * messageBody,
@@ -176,7 +190,7 @@ uint8_t Venus838FLPx::sendCommand(uint8_t messageId, uint8_t * messageBody,
   DEBUG("GPS", "sending command\n");
   // Assemble Packet
   uint32_t packetLength = 8 + bodyLen;
-  uint8_t  packet[packetLength];
+  char  packet[packetLength];
   memset(packet, 0, packetLength);
 
   packet[0] = 0xA0; // start sequence
@@ -217,11 +231,20 @@ uint8_t Venus838FLPx::sendCommand(uint8_t messageId, uint8_t * messageBody,
   return code;
 }
 
-uint8_t Venus838FLPx::sendPacket(uint8_t * packet, uint32_t size, uint32_t timeout) {
+uint8_t Venus838FLPx::sendCommandResponce(uint8_t messageid, uint8_t * messagebody,
+      uint32_t bodylen, char *response, uint8_t responseLen, uint32_t timeout){
+
+      uint8_t code = sendCommand(messageid,messagebody,bodylen,timeout);
+      serial.gets(response,responseLen); // add the seven extra values of package
+      return code;
+
+      }
+
+uint8_t Venus838FLPx::sendPacket(char * packet, uint32_t size, uint32_t timeout) {
   uint8_t c        = 0;
   uint8_t last     = 0;
   bool    response = false;
-  serial.putc(*packet);
+  serial.puts(packet);
   // TODO: wait for ACK, need to use different API to get current
   // time in ms
   Timer t;
@@ -230,12 +253,12 @@ uint8_t Venus838FLPx::sendPacket(uint8_t * packet, uint32_t size, uint32_t timeo
       c = serial.getc();
       if (last == 0xA0 && c == 0xA1 && response == false)
         response = true;
-      if (response && last == 0x83) {
+      if (response && last == ACK) {
         if (c == packet[4]) // packet[4] = messageid
           return ERROR_SUCCESS;
         else
           return ERROR_UNKNOWN_COMMAND;
-      } else if (response && last == 0x84) {
+      } else if (response && last == NACK) {
         if (c == packet[4]) // packet[4] = messageid
           return ERROR_NACK;
         else
@@ -247,7 +270,7 @@ uint8_t Venus838FLPx::sendPacket(uint8_t * packet, uint32_t size, uint32_t timeo
   return ERROR_WAIT_TIMEOUT;
 }
 
-void Venus838FLPx::printPacket(uint8_t * packet, uint32_t size) {
+void Venus838FLPx::printPacket(char * packet, uint32_t size) {
   DEBUG("GPS", "assembled Packet: {");
   for (int i = 0; i < size; i++) {
     char hexval[4];
