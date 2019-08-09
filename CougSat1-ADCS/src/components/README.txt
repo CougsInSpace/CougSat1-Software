@@ -1,1 +1,0 @@
-Mbed integrated functions and management classes
