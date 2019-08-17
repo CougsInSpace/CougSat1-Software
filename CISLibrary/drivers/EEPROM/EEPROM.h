@@ -19,7 +19,7 @@ public:
    * @brief Destroy the EEPROM object
    *
    */
-  ~EEPROM() {};
+  virtual ~EEPROM() {};
 
   /**
    * @brief Read a byte

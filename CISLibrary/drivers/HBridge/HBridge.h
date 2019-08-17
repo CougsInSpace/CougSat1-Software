@@ -19,7 +19,7 @@ public:
    * @brief Destroy the HBridge object
    *
    */
-  ~HBridge() {};
+  virtual ~HBridge() {};
 
   /**
    * @brief Set the output of the HBridge
