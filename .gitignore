@@ -1,7 +1,8 @@
 # Visual Studio Code
 *.code-workspace
-extensions.json
-settings.json
+*extensions.json
+*settings.json
+*.db*
 
 # Microsoft Office Lock Files
 *~$*

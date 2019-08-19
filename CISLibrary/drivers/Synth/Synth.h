@@ -11,8 +11,9 @@ public:
   /**
    * @brief Construct a new Synth object
    *
+   * uin32_t ref clock in Hertz
    */
-  Synth() {}
+  Synth(const uint32_t ref) : ref(ref) {}
 
   /**
    * @brief Destroy the Synth object
@@ -21,7 +22,7 @@ public:
   virtual ~Synth() {};
 
   /**
-   * @brief Set the frequency outputed from the synth
+   * @brief Set the frequency outputted from the synth
    *
    * @param freq in Hertz
    * @return mbed_error_status_t
@@ -45,7 +46,8 @@ public:
     return frequency;
   }
 
-private:
+protected:
+  const uint32_t ref = 0;
   uint32_t frequency = 0;
 };
 
