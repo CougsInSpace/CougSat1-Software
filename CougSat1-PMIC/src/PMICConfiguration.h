@@ -166,13 +166,15 @@
 #define THERM_CAL_PV3_FRONT_BOTTOM_270K (0.158)
 #define THERM_CAL_PV3_FRONT_BOTTOM_350K (0.852)
 
-
+/****** I added this to PMICConfiguration.h **********/
 // Comparison Constant for Thermistor readings in celcius
-#define THRES_BATT_TEMP_LOW (0)
-#define THRES_BATT_TEMP_HIGH (50)
-#define THRES_BATT_MAX_HIGH_TEMP  (75)
-#define ACCEPTABLE_BATT_TEMP (10)
-#define THRES_REG_TEMP_HIGH (85)
+
+#define THRES_BATT_TEMP_LOW (0) // Lowest Temp allowed by batt
+#define THRES_BATT_TEMP_HIGH (50) // highest temp allowed by batt
+#define THRES_BATT_MAX_HIGH_TEMP  (75) // used to determine if batt is really HOT
+#define ACCEPTABLE_BATT_TEMP (10) // if temp is between 10 C and 50C, we good
+
+#define THRES_REG_TEMP_HIGH (85) // max temp allowed by 3V3 Regulators
 
 #define max_threshold (2.275) // Sum of all the payloads and bus currents
 #define temp_threshold (1.1375) // Half of the payloads and buc currents
@@ -182,7 +184,7 @@
 #define BATT_EXPECTED_CURRENT (4) // current levels of battery shoul dbe this
 
 // Priority Levels
-#define priority_PR3V3_one      100
+#define priority_PR3V3_one      100 // Most Important
 #define priority_PR3V3_two      101
 #define priority_PRBATT_three   102
 #define priority_PR3V3_four     103
@@ -196,9 +198,10 @@
 #define priority_PR3V3_twelve   111
 #define priority_PR3V3_thirteen 112
 #define priority_PR3V3_fourteen 113
-#define priority_PR3V3_fifteen  114
+#define priority_PR3V3_fifteen  114 // Least Important
 
 // expected current for payloads in Amps
+// Update: Might Not Need these constants
 #define PR3V3_one      0.090
 #define PR3V3_two      0.105
 #define PRBATT_three   0.400
