@@ -13,7 +13,7 @@
 ADF4360::ADF4360(
     SPI & spi, const PinName cs, const uint8_t variant, const uint32_t ref) :
   Synth(ref),
-  spi(spi), cs(cs), variant(variant) {
+  spi(spi), cs(cs, 1), variant(variant) {
   LOG("ADF4360", "construct");
   MBED_ASSERT(variant <= 9);
   LOG("ADF4360", "past assert");
@@ -55,7 +55,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
            (freq / prescaler) > ADF4360Variants[variant].countersMaxFreq) {
       prescaler *= 2;
     }
-    LOG("setFreq", "prescaler: %d", prescaler);
+    LOG("setFreq", "prescaler: %u", prescaler);
 
     uint32_t frequencyRatio;
 
@@ -69,10 +69,10 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
       // freq = ((prescaler * B) + A) * frequencyPFD;
     } while ((counterA > counterB) && counterB < 3);
 
-    LOG("setFreq", "A %d, b%d r%d", counterA, counterB, counterR);
+    LOG("setFreq", "A %u, b%u r%u", counterA, counterB, counterR);
   }
   frequency = ((prescaler * counterB) + counterA) * frequencyPFD;
-  LOG("setFreq", "freq: %d", frequency);
+  LOG("setFreq", "freq: %lu", frequency);
 
   // Adjust the band select until divided counterR is less than 1MHz
   uint8_t  bandSelectRaw   = 1;
@@ -81,7 +81,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
     bandSelectRaw *= 2;
     dividedCounterR = frequencyPFD / bandSelectRaw;
   }
-  LOG("setFreq", "band %d", bandSelectRaw);
+  LOG("setFreq", "band %u", bandSelectRaw);
   switch (bandSelectRaw) {
     case 1:
       bandSelect = BandSelect_t::ONE;
@@ -188,8 +188,10 @@ mbed_error_status_t ADF4360::write(Register_t reg) {
   }
 
   // Ignore response, no data can be returned
+  cs = 0;
   spi.write((buf >> 16) & 0xFF);
   spi.write((buf >> 8) & 0xFF);
   spi.write((buf >> 0) & 0xFF);
+  cs = 1;
   return MBED_SUCCESS;
 }

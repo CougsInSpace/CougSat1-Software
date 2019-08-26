@@ -1,6 +1,6 @@
 #include "ArduCAM.h"
 
-#include <CISConsole.h>
+// #include <CISConsole.h>
 
 /**
  * Class to interface with an ArduCAM Module
@@ -9,8 +9,7 @@
  * @param pinSelect to enable SPI with ArduChip
  */
 ArduCAM::ArduCAM(SPI &spi, I2C &i2c, PinName pinSelect) :
-    spi(spi), i2c(i2c), select(pinSelect) {
-  select = 1;
+    spi(spi), i2c(i2c), select(pinSelect, 1) {
 }
 
 // /**
