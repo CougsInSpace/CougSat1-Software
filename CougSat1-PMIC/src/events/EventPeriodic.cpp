@@ -2,6 +2,8 @@
 #include "tools/CISError.h"
 #include "PMICObjects.h"
 #include "PMICConfiguration.h"
+#include <CISConsole.h>
+
 
 /*
 	Function: load_shedding()
@@ -107,10 +109,11 @@ uint8_t load_shedding(double threshold)
 	return 0;
 }
 
+
 /**
  * @brief Executes the periodic event
  *
- * @return uint8_t error code
+ * @return mbed_error_status_t error code
  */
 uint8_t eventPeriodic()
 {
@@ -345,4 +348,6 @@ uint8_t eventPeriodic()
 
 
 
+mbed_error_status_t eventPeriodic() {
+  return MBED_ERROR_UNSUPPORTED;
 }
