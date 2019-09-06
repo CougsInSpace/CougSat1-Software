@@ -28,6 +28,8 @@ Each processor (usually each subsystem) has a folder that contains its software.
   * [Doxygen Documentation Generator](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
   * [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
 * Open the folder to `CougSat1-Ground`. Save this as a workspace if you want.
+* Initialize the submodules using `git submodule update --init --recursive`
 * Run the `setupRTLSDR` script
   * This downloads the DLLs for the rtl-sdr library and opens Zadig for installing the driver for the RTL-SDR dongle
+  * When Zadig opens, insert the RTL-SDR dongle, select `Bulk-In, Interface (Interface 0)`, click install WinUSB driver
 * Execute the default test task which will compile everything and launch the executable
