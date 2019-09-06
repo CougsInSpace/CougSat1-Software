@@ -8,8 +8,8 @@
  * @param i2c connected to camera sensor
  * @param pinSelect to enable SPI with ArduChip
  */
-ArduCAM::ArduCAM(SPI &spi, I2C &i2c, PinName pinSelect) :
-    spi(spi), i2c(i2c), select(pinSelect) {
+ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
+  spi(spi), i2c(i2c), select(pinSelect) {
   select = 1;
 }
 
@@ -312,4 +312,3 @@ ArduCAM::ArduCAM(SPI &spi, I2C &i2c, PinName pinSelect) :
 //   select = 1;
 //   spi.unlock();
 // }
-

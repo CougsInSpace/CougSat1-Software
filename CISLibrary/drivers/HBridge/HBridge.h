@@ -1,7 +1,6 @@
 #ifndef _LIBRARY_DRIVER_HBRIDGE_HBRIDGE_H_
 #define _LIBRARY_DRIVER_HBRIDGE_HBRIDGE_H_
 
-
 #include <mbed.h>
 
 class HBridge {
@@ -32,10 +31,10 @@ public:
 
   /**
    * @brief Stop the output, brake or coast
-   * 
+   *
    * @param brake will short output if true, high impedance if true
    * @param blocking will wait until operation is complete if true
-   * @return mbed_error_status_t 
+   * @return mbed_error_status_t
    */
   virtual mbed_error_status_t stop(bool brake = true, bool blocking = true) = 0;
 };
