@@ -1,0 +1,9 @@
+[submodule "CougSat1-Ground/lib/rtl-sdr"]
+	path = CougSat1-Ground/lib/rtl-sdr
+	url = https://github.com/osmocom/rtl-sdr.git
+[submodule "CougSat1-Ground/lib/spdlog"]
+	path = CougSat1-Ground/lib/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "CougSat1-Ground/lib/ehbanana"]
+	path = CougSat1-Ground/lib/ehbanana
+	url = https://github.com/WattsUp/Ehbanana.git
