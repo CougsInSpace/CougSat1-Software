@@ -22,6 +22,7 @@ Each processor (usually each subsystem) has a folder that contains its software.
   * In the installer, select `C++ build tools`
   * Add `msbuild` to `PATH`
     * Default location `C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin`
+* Install [Visual C++ 2010 SP1](https://www.microsoft.com/en-US/download/confirmation.aspx?id=8328)
 * Install the following extensions:
   * [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
   * [Clang-Format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format) - follow instructions to setup clang-format executable location
