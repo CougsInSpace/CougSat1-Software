@@ -1,7 +1,6 @@
 #ifndef _LIBRARY_DRIVER_FLASH_FLASH_H_
 #define _LIBRARY_DRIVER_FLASH_FLASH_H_
 
-
 #include <mbed.h>
 
 class Flash {
@@ -30,7 +29,8 @@ public:
    * @param blocking will wait until operation is complete if true
    * @return mbed_error_status_t
    */
-  virtual mbed_error_status_t read(uint32_t addr, uint8_t & data, bool blocking = true) = 0;
+  virtual mbed_error_status_t read(
+      uint32_t addr, uint8_t & data, bool blocking = true) = 0;
 
   /**
    * @brief Write a block of data
@@ -40,7 +40,8 @@ public:
    * @param blocking will wait until operation is complete if true
    * @return mbed_error_status_t
    */
-  virtual mbed_error_status_t writeBlock(uint32_t addr, uint8_t * data, bool blocking = true) = 0;
+  virtual mbed_error_status_t writeBlock(
+      uint32_t addr, uint8_t * data, bool blocking = true) = 0;
 
 protected:
   uint16_t blockSize = 0;

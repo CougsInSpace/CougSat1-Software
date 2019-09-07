@@ -2,6 +2,7 @@
 *.code-workspace
 extensions.json
 settings.json
+*.DB
 
 # Microsoft Office Lock Files
 *~$*
