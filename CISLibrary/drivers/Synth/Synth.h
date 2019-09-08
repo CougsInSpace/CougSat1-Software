@@ -47,8 +47,8 @@ public:
   }
 
 protected:
-  const uint32_t ref = 0;
-  uint32_t frequency = 0;
+  const uint32_t ref       = 0;
+  uint32_t       frequency = 0;
 };
 
 #endif /* _LIBRARY_DRIVER_SYNTH_SYNTH_H_ */
