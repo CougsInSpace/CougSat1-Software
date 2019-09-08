@@ -1,0 +1,24 @@
+#!/bin/sh
+FILES=$(git diff --cached --name-only --diff-filter=ACM "*.cpp" "*.h" "*.js" | sed 's| |\\ |g')
+[ -z "$FILES" ] && exit 0
+
+NEEDS_FORMATTING=0
+
+# Check each file for proper formatting
+for file in $FILES
+do
+  [ -e "$file" ] || continue
+  # echo "Processing $file file"
+  if clang-format -style=file -output-replacements-xml $file | grep "<replacement " >/dev/null
+  then
+    echo "Does not adhere to coding style: $file"
+    NEEDS_FORMATTING=1
+  fi
+done
+
+if [ $NEEDS_FORMATTING -eq "1" ]
+then
+  echo "Please fix before commiting, changes aborted"
+fi
+
+exit $NEEDS_FORMATTING
