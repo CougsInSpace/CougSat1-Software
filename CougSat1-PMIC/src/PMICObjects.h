@@ -23,6 +23,7 @@ extern DigitalOut statusLED;
 extern InterruptIn interruptCtrlSync;
 extern InterruptIn interruptBusI2CIRQ;
 
+/******************************** Power Nodes *********************************/
 extern PowerNode * nodesPVIn[COUNT_PV];
 extern PowerNode * nodesPVOut[COUNT_PV];
 extern PowerNode * nodesPR3V3[COUNT_PR_3V3];
