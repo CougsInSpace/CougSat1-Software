@@ -19,11 +19,12 @@ ADF4360    rfClk230(spiRFClk, RFCLK_CS_230, 7, 20000000);
  * @return error code
  */
 int main(void) {
-  regEn5 = 1;
+  regEn5   = 1;
   pcLDO3V3 = 0;
   pcMod    = 1;
   pcDemod  = 1;
   pc230    = 1;
+  wait_ms(10);
   rfClkMod.setFrequency(435000000);
   rfClkDemod.setFrequency(700000000);
   rfClk230.setFrequency(1275000000);

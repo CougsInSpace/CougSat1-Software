@@ -105,7 +105,7 @@ private:
   bool             cpGainUse2              = false; // true=current 2, false=1
   bool             cpOutputTriState        = false;
   bool             phaseDetectPositive     = true;
-  MuxOutput_t      muxOutput               = MuxOutput_t::LOCK_DETECT;
+  MuxOutput_t      muxOutput               = MuxOutput_t::N_DIVIDER;
   bool             countersReset           = false;
   CorePower_t      corePower               = CorePower_t::MA_5;
   bool             divide2Select           = false;
