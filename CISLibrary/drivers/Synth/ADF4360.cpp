@@ -14,9 +14,7 @@ ADF4360::ADF4360(
     SPI & spi, const PinName cs, const uint8_t variant, const uint32_t ref) :
   Synth(ref),
   spi(spi), cs(cs, 1), variant(variant) {
-  LOG("ADF4360", "construct");
   MBED_ASSERT(variant <= 9);
-  LOG("ADF4360", "past assert");
 }
 
 /**
@@ -37,8 +35,6 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
   if (freq < ADF4360Variants[variant].vcoMinFreq)
     return MBED_ERROR_INVALID_ARGUMENT;
 
-  LOG("setFreq", "Start");
-
   uint32_t frequencyPFD;
   counterR = 0;
   if (variant >= 8) {
@@ -55,7 +51,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
            (freq / prescaler) > ADF4360Variants[variant].countersMaxFreq) {
       prescaler *= 2;
     }
-    LOG("setFreq", "prescaler: %u", prescaler);
+    DEBUG("setFreq", "prescaler: %u", prescaler);
 
     uint32_t frequencyRatio;
 
@@ -69,10 +65,10 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
       // freq = ((prescaler * B) + A) * frequencyPFD;
     } while ((counterA > counterB) && counterB < 3);
 
-    LOG("setFreq", "A %u, b%u r%u", counterA, counterB, counterR);
+    DEBUG("setFreq", "A %u, b%u r%u", counterA, counterB, counterR);
   }
   frequency = ((prescaler * counterB) + counterA) * frequencyPFD;
-  LOG("setFreq", "freq: %lu", frequency);
+  DEBUG("setFreq", "freq: %lu", frequency);
 
   // Adjust the band select until divided counterR is less than 1MHz
   uint8_t  bandSelectRaw   = 1;
@@ -81,7 +77,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
     bandSelectRaw *= 2;
     dividedCounterR = frequencyPFD / bandSelectRaw;
   }
-  LOG("setFreq", "band %u", bandSelectRaw);
+  DEBUG("setFreq", "band %u", bandSelectRaw);
   switch (bandSelectRaw) {
     case 1:
       bandSelect = BandSelect_t::ONE;
@@ -100,21 +96,17 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
   }
   mbed_error_status_t error = MBED_SUCCESS;
 
-  LOG("setFreq", "r");
   error = write(Register_t::COUNTER_R);
   if (error)
     return error;
-  LOG("setFreq", "contrl");
   error = write(Register_t::CONTROL);
   if (error)
     return error;
   wait_ms(10);
-  LOG("setFreq", "n");
   error = write(Register_t::COUNTER_N);
   if (error)
     return error;
 
-  LOG("setFreq", "done");
   return MBED_SUCCESS;
 }
 
@@ -126,8 +118,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
  */
 mbed_error_status_t ADF4360::setEnable(bool enable) {
   powerDown = enable ? PowerDown_t::ON : PowerDown_t::SYNC_OFF;
-  write(Register_t::CONTROL);
-  return MBED_SUCCESS;
+  return write(Register_t::CONTROL);
 }
 
 /**
