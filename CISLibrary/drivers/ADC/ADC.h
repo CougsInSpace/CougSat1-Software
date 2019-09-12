@@ -58,7 +58,7 @@ public:
    * @brief Destroy the ADC object
    *
    */
-  ~ADC() {};
+  virtual ~ADC() {};
 
   /**
    * @brief Read the raw conversion result of a channel

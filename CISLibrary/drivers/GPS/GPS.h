@@ -26,7 +26,7 @@ public:
    * @brief Destroy the GPS object
    *
    */
-  ~GPS() {};
+  virtual ~GPS() {};
 
   /**
    * @brief Read a GPS message and update fields

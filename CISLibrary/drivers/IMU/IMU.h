@@ -32,7 +32,7 @@ public:
    * @brief Destroy the IMU object
    *
    */
-  ~IMU() {};
+  virtual ~IMU() {};
 
   /**
    * @brief Read a IMU's sensors and update fields

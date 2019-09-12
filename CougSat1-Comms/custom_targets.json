@@ -12,8 +12,8 @@
     ],
     "config": {
       "clock_source": {
-        "help": "Mask value : USE_PLL_HSE_XTAL | USE_PLL_HSI | USE_PLL_MSI",
-        "value": "USE_PLL_HSE_XTAL",
+        "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
+        "value": "USE_PLL_MSI",
         "macro_name": "CLOCK_SOURCE"
       },
       "lpticker_lptim": {
@@ -21,17 +21,19 @@
         "value": 1
       }
     },
-    "macros_add": [
-      "MBED_TICKLESS"
-    ],
     "overrides": {
       "lpticker_delay_ticks": 4
     },
     "detect_code": [
-      "0823"
+      "0765"
+    ],
+    "macros_add": [
+      "MBED_TICKLESS",
+      "USBHOST_OTHER"
     ],
     "device_has_add": [
       "ANALOGOUT",
+      "CAN",
       "CRC",
       "SERIAL_ASYNCH",
       "TRNG",

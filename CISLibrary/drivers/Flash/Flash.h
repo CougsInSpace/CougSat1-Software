@@ -19,7 +19,7 @@ public:
    * @brief Destroy the Flash object
    *
    */
-  ~Flash() {};
+  virtual ~Flash() {};
 
   /**
    * @brief Read a byte

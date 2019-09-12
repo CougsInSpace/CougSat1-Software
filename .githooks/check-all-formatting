@@ -1,0 +1,26 @@
+#!/bin/sh
+
+FORMAT_DIR="CISLibrary/**/*.h CISLibrary/**/*.cpp CougSat1-ADCS/src/**/*.h CougSat1-ADCS/src/**/*.cpp CougSat1-Comms/src/**/*.h CougSat1-Comms/src/**/*.cpp CougSat1-Ground/source/**/*.h CougSat1-Ground/source/**/*.cpp CougSat1-Ground/http/**/*.js CougSat1-IFJR/src/**/*.h CougSat1-IFJR/src/**/*.cpp CougSat1-IHU/src/**/*.h CougSat1-IHU/src/**/*.cpp CougSat1-PMIC/src/**/*.h CougSat1-PMIC/src/**/*.cpp"
+
+GLOBIGNORE="CISLibrary/tools/SWO.*:CougSat1-ADCS/src/CISBoard/*:CougSat1-Comms/src/CISBoard/*:CougSat1-IFJR/src/CISBoard/*:CougSat1-IHU/src/CISBoard/*:CougSat1-PMIC/src/CISBoard/*"
+
+NEEDS_FORMATTING=0
+
+shopt -s globstar
+for file in $FORMAT_DIR
+do
+  [ -e "$file" ] || continue
+  # echo "Processing $file file"
+  if clang-format -style=file -output-replacements-xml $file | grep "<replacement " >/dev/null
+  then
+    echo "Does not adhere to coding style: $file"
+    NEEDS_FORMATTING=1
+  fi
+done
+
+if [ $NEEDS_FORMATTING -eq "1" ]
+then
+  echo "Please fix before commiting, changes aborted"
+fi
+
+exit $NEEDS_FORMATTING

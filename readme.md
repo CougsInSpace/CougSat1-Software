@@ -3,21 +3,21 @@ Each processor (usually each subsystem) has a folder that contains its software.
 
 ## Setup for STM32 ##
 * Install [VSCode](https://code.visualstudio.com/) (able to do any IDE but this is recommended).
-* Install [ClangFormat](http://releases.llvm.org/download.html) (Part of LLVM download)
+* Install [ClangFormat](http://releases.llvm.org/download.html) (Part of LLVM download, see pre-built binaries)
 * Install the following extensions:
   * [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
   * [Clang-Format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format) - follow instructions to setup clang-format executable location
-  * [Doxygen Documentation Generator](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+  * [Doxygen Documentation Generator](https://marketplace.visualstudio.com/items?itemName=cschlosser.doxdocgen)
   * [PlatformIO IDE](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
   * [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
-* Copy `.githooks/pre-commit` to `.git/hooks/pre-commit` using `cp .githooks/pre-commit ,git/hooks/pre-commit`
+* Copy `.githooks/pre-commit` to `.git/hooks/pre-commit` using `cp .githooks/pre-commit .git/hooks/pre-commit`
 * Open the folder to the target processor. Save this as a workspace if you want, you can then add the library folder to see those files too.
 * PlatformIO automatically will detect the `platformio.ini` file and begin initializing itself. If you do not have the `ST STM32` embedded platform under PlatformIO home installed, during the first time you build PlatformIO will automatically download it. If there are include errors, restart VSCode (which has PlatformIO run `Rebuild IntelliSense Index`) and those will disappear.
 * Run the default build task to have PlatformIO start the Mbed compiler.
 
 ## Setup for Ground Software ##
 * Install [VSCode](https://code.visualstudio.com/) (able to do any IDE but this is recommended).
-* Install [ClangFormat](http://releases.llvm.org/download.html) (Part of LLVM download)
+* Install [ClangFormat](http://releases.llvm.org/download.html) (Part of LLVM download, see pre-built binaries)
 * Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/?q=build+tools)
   * Select `Tools for Visual Studio 2019`
   * In the installer, select `C++ build tools`
@@ -27,9 +27,9 @@ Each processor (usually each subsystem) has a folder that contains its software.
 * Install the following extensions:
   * [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
   * [Clang-Format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format) - follow instructions to setup clang-format executable location
-  * [Doxygen Documentation Generator](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+  * [Doxygen Documentation Generator](https://marketplace.visualstudio.com/items?itemName=cschlosser.doxdocgen)
   * [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
-* Copy `.githooks/pre-commit` to `.git/hooks/pre-commit` using `cp .githooks/pre-commit ,git/hooks/pre-commit`
+* Copy `.githooks/pre-commit` to `.git/hooks/pre-commit` using `cp .githooks/pre-commit .git/hooks/pre-commit`
 * Open the folder to `CougSat1-Ground`. Save this as a workspace if you want.
 * Initialize the submodules using `git submodule update --init --recursive`
 * Run the `setupRTLSDR` script
