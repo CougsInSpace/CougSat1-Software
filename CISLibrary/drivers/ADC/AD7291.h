@@ -29,11 +29,40 @@ public:
   mbed_error_status_t readRaw(
       ADCChannel_t channel, int32_t & value, bool blocking = true);
 
+  mbed_error_status_t reset();
+
 private:
+  enum class Register_t : uint8_t {
+    CONTROL         = 0x00,
+    RESULT_VOLTAGE  = 0x01,
+    RESULT_TEMP     = 0x02,
+    RESULT_TEMP_AVG = 0x03,
+    DATA_HIGH_CH0   = 0x04, // Ch(x) = Ch0 + 3 * x
+    DATA_LOW_CH0    = 0x05, // Ch(x) = Ch0 + 3 * x
+    DATA_HYS_CH0    = 0x06, // Ch(x) = Ch0 + 3 * x
+    DATA_HIGH_TEMP  = 0x1C,
+    DATA_LOW_TEMP   = 0x1D,
+    DATA_HYS_TEMP   = 0x1E,
+    ALERT_A         = 0x1F,
+    ALERT_B         = 0x20
+  };
+
+  mbed_error_status_t read(
+      Register_t reg, uint16_t & value, uint8_t registerOffset = 0);
+  mbed_error_status_t write(
+      Register_t reg, uint16_t value, uint8_t registerOffset = 0);
+  mbed_error_status_t writeControlRegister();
+
   I2C &        i2c;
   AD7291Addr_t addr;
 
-  const uint8_t BIT_DEPTH = 12;
+  uint8_t channels;
+  bool    tempSense         = true;
+  bool    noiseDelayed      = true;
+  bool    externalReference = false;
+  bool    alertActiveLow    = false;
+  bool    clearAlert        = false;
+  bool    autocycle         = false;
 };
 
 #endif /* _LIBRARY_DRIVER_ADC_AD7291_H_ */
