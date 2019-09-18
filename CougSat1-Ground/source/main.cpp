@@ -11,15 +11,7 @@
 #include <chrono>
 #include <thread>
 
-/**
- * @brief Handle an input message
- *
- * @param msg
- * @return Result
- */
-Result handleInput(const EBMessage_t & msg) {
-  return ResultCode_t::SUCCESS;
-}
+#include "gui/GUI.h"
 
 /**
  * @brief Process incoming message from the GUI
@@ -37,7 +29,7 @@ ResultCode_t __stdcall guiProcess(const EBMessage_t & msg) {
       spdlog::info("Server shutting down");
       break;
     case EBMSGType_t::INPUT:
-      result = handleInput(msg);
+      result = GUI::GUI::Instance()->handleInput(msg);
       if (!result)
         spdlog::error(result.getMessage());
       break;
