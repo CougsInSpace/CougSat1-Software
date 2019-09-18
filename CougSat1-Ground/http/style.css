@@ -4,9 +4,16 @@ main {
   flex: 1;
 }
 
+.about, .config {
+  border-color: #981E32;
+  border-color: var(--color-tertiary);
+  border-style: solid;
+}
+
 .about {
   flex: 0.6;
   padding: 0.5rem;
+  border-width: 0 0.1rem 0 0;
 }
 
 .about img {
@@ -18,10 +25,7 @@ main {
 .config {
   flex: 0.4;
   padding: 0.5rem;
-  border-color: #981E32;
-  border-color: var(--color-tertiary);
-  border-style: solid;
-  border-width: 0 0 0 0.15rem;
+  border-width: 0 0 0 0.1rem;
   min-height: 100%;
 }
 
