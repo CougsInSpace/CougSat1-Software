@@ -1,6 +1,6 @@
 :root {
   --color-primary: #0E1C31;
-  --color-secondary: #464B4F;
+  --color-secondary: #373A3B;
   --color-tertiary: #981E32;
   --color-accent: #DBB776;
   --color-light: #FFFFFF;
@@ -27,14 +27,14 @@ a:hover, a:active {
 }
 
 .background-secondary {
-  background: #464B4F;
+  background: #373A3B;
   background: var(--color-secondary);
 }
 
 body {
   color: #FFFFFF;
   color: var(--color-light);
-  background: #464B4F;
+  background: #373A3B;
   background: var(--color-secondary);
   min-height: 100vh;
   display: flex;
@@ -71,51 +71,33 @@ body {
 }
 
 h1 {
-  font-size: 1.6rem;
-  margin-top: 0.6rem;
+  font-size: 2rem;
+  margin-top: 0.25rem;
   line-height: 1;
 }
 
 h2 {
-  font-size: 1.4rem;
-  margin-top: 0.5rem;
-  line-height: 1;
-}
-
-h3 {
-  font-size: 1.3rem;
-  margin-top: 0.4rem;
-  line-height: 1;
-}
-
-h4 {
-  font-size: 1.2rem;
-  margin-top: 0.3rem;
-  line-height: 1;
-}
-
-h5 {
-  font-size: 1.1rem;
+  font-size: 1.75rem;
   margin-top: 0.2rem;
   line-height: 1;
 }
 
-@media (min-width: 769px) {
-  h1 {
-    font-size: 3rem;
-  }
-  h2 {
-    font-size: 2.5rem;
-  }
-  h3 {
-    font-size: 2rem;
-  }
-  h4 {
-    font-size: 1.5rem;
-  }
-  h5 {
-    font-size: 1.25rem;
-  }
+h3 {
+  font-size: 1.5rem;
+  margin-top: 0.15rem;
+  line-height: 1;
+}
+
+h4 {
+  font-size: 1.25rem;
+  margin-top: 0.1rem;
+  line-height: 1;
+}
+
+h5 {
+  font-size: 1rem;
+  margin-top: 0.05rem;
+  line-height: 1;
 }
 
 header {
@@ -166,7 +148,7 @@ header>div>a.current {
 }
 
 html {
-  font-size: 16px;
+  font-size: 14px;
   word-break: break-word;
   color: #282828;
   color: var(--color-dark);
@@ -177,14 +159,16 @@ html {
   text-size-adjust: 100%;
 }
 
+@media (min-width: 999px) {
+  html {
+    font-size: 16px;
+  }
+}
+
 .main-text {
   width: 80%;
   margin: 0 auto;
   padding-bottom: 1rem;
-}
-
-.overflow-scroll {
-  /* overflow: scroll; */
 }
 
 p {
