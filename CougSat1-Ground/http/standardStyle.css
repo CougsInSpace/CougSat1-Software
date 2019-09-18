@@ -1,7 +1,8 @@
 :root {
   --color-primary: #0E1C31;
-  --color-secondary: #5E6A71;
-  --color-accent: #981E32;
+  --color-secondary: #464B4F;
+  --color-tertiary: #981E32;
+  --color-accent: #DBB776;
   --color-light: #FFFFFF;
   --color-dark: #282828;
 }
@@ -10,41 +11,63 @@
   margin: 0px;
 }
 
+a {
+  color: #DBB776;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover, a:active {
+  text-decoration: underline;
+}
+
 .background-primary {
   background: #0E1C31;
   background: var(--color-primary);
 }
 
 .background-secondary {
-  background: #5E6A71;
+  background: #464B4F;
   background: var(--color-secondary);
 }
 
 body {
   color: #FFFFFF;
   color: var(--color-light);
-  background: #5E6A71;
+  background: #464B4F;
   background: var(--color-secondary);
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.button-accent {
-  background: var(--color-accent-l50);
+.button-tertiary {
+  background: var(--color-tertiary-l50);
   transition: color 0.3s, background 0.3s;
 }
 
-.button-accent:hover {
-  background: var(--color-accent);
+.button-tertiary:hover {
+  background: var(--color-tertiary);
 }
 
-.button-accent:active {
+.button-tertiary:active {
   background: var(--color-dark);
-  color: var(--color-accent-l50);
+  color: var(--color-tertiary-l50);
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
 }
 
 .color-light {
   color: #FFFFFF;
   color: var(--color-light);
+}
+
+.fill-horz {
+  width: 100%;
 }
 
 h1 {
@@ -98,7 +121,7 @@ h5 {
 header {
   display: flex;
   border-color: #981E32;
-  border-color: var(--color-accent);
+  border-color: var(--color-tertiary);
   border-style: solid;
   border-width: 0 0 0.15rem 0;
 }
@@ -126,6 +149,7 @@ header>div>a {
 header>div>a:hover {
   background: #0E1C31;
   background: var(--color-primary);
+  text-decoration: none;
 }
 
 header>div>a:active {
@@ -133,11 +157,12 @@ header>div>a:active {
   background: var(--color-light);
   color: #0E1C31;
   color: var(--color-primary);
+  text-decoration: none;
 }
 
 header>div>a.current {
   background: #981E32;
-  background: var(--color-accent);
+  background: var(--color-tertiary);
 }
 
 html {
@@ -156,6 +181,10 @@ html {
   width: 80%;
   margin: 0 auto;
   padding-bottom: 1rem;
+}
+
+.overflow-scroll {
+  /* overflow: scroll; */
 }
 
 p {

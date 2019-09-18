@@ -1,0 +1,39 @@
+main {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.about {
+  flex: 0.6;
+  padding: 0.5rem;
+}
+
+.about img {
+  width: 30%;
+  float: left;
+  margin: 0.5rem;
+}
+
+.config {
+  flex: 0.4;
+  padding: 0.5rem;
+  border-color: #981E32;
+  border-color: var(--color-tertiary);
+  border-style: solid;
+  border-width: 0 0 0 0.15rem;
+  min-height: 100%;
+}
+
+.config>p>span {
+  width: 40%;
+}
+
+.config hr {
+  border-style: solid;
+  border-width: 1px;
+}
+
+.config input[type="text"], .config input[type="number"] {
+  width: 80%;
+}
