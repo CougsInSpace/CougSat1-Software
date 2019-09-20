@@ -6,7 +6,7 @@ main {
 
 .pane {
   flex: 1;
-  padding: 0.5rem;
+  padding: 0 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,6 +22,7 @@ main {
 
 .pane>table td:nth-child(2) {
   width: 40%;
+  padding: 0 0.25rem;
 }
 
 .pane select {
