@@ -32,12 +32,18 @@ mbed_error_status_t AD7291::readRaw(
   mbed_error_status_t result = MBED_SUCCESS;
   if (channel == ADCChannel_t::TEMP) {
     result = read(Register_t::RESULT_TEMP, raw);
+    if ((raw >> 12) != 0x8)
+      return MBED_ERROR_INVALID_DATA_DETECTED;
+
+    // Remove channel ID bits
+    raw = raw & 0x00000FFF;
+
     // Set the MSB bits to the same as the 11th
     // Handles negative temperatures
     value = raw | (0xFFFFF000 * ((raw >> 11) & 0x1));
   } else if (channel < ADCChannel_t::CM_08) {
     // Set the control's channel to the selected channel
-    channels = 1 << static_cast<uint8_t>(channel);
+    channels = ((uint8_t)0x80) >> static_cast<uint8_t>(channel);
     result   = writeControlRegister();
     if (result)
       return result;

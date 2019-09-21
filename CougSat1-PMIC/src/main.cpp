@@ -17,10 +17,10 @@ mbed_error_status_t initialize() {
   LOG("Init", "Initialization starting");
   mbed_error_status_t result = MBED_SUCCESS;
 
-  I2C    i2c(PB_7, PB_6);
+  I2C    i2c(PB_9, PB_8);
   ADC *  adc = new AD7291(i2c, AD7291Addr_t::FF);
   double value;
-  result = adc->readVoltage(ADCChannel_t::CM_00, value);
+  result = adc->readVoltage(ADCChannel_t::CM_03, value);
   if (result) {
     ERROR("Init", "Failed to read voltage from ADC");
     return result;
