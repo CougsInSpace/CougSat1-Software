@@ -19,6 +19,13 @@ var configECS = {
     responsive: true,
     legend: {display: false},
     title: {display: false},
+    tooltips: {
+      callbacks: {
+        label: function(tooltipItem, data) {
+          return tooltipItem.yLabel.toPrecision(3) + " °C";
+        }
+      }
+    },
     scales: {
       xAxes: [{
         display: true,
@@ -27,12 +34,15 @@ var configECS = {
       }],
       yAxes: [{
         display: true,
-        scaleLabel: {
-          display: true,
-          labelString: "Temperature - °C",
-          fontColor: "#FFFFFF"
+        scaleLabel: {display: false},
+        ticks: {
+          min: -50,
+          max: 90,
+          fontColor: "#FFFFFF",
+          callback: function(value, index, values) {
+            return value + " °C";
+          }
         },
-        ticks: {min: -50, max: 90, fontColor: "#FFFFFF"},
         gridLines: {color: "#FFFFFF55", zeroLineColor: "#FFFFFF"}
       }]
     }
@@ -46,7 +56,7 @@ var configEPS = {
       "Solar Cell", "Battery", "EPS Out", "VBatt", "3.3V", "Comms", "Heating"
     ],
     datasets: [{
-      data: [1.3, 4.0, 5.2, 4.3, 0.9, 1.3, 0.2, 0.4],
+      data: [1.312312, 4.0, 5.2, 4.3, 0.9, 1.3, 0.2, 0.4],
       "backgroundColor": [
         "#04C72C", "#C7042C", "#C7C72C", "#04C72C", "#04C72C", "#04C72C",
         "#04C72C"
@@ -57,7 +67,14 @@ var configEPS = {
   options: {
     responsive: true,
     legend: {display: false},
-    title: {display: false},
+    title: {display: true, text: "Power", fontColor: "#FFFFFF"},
+    tooltips: {
+      callbacks: {
+        label: function(tooltipItem, data) {
+          return formatMetricPrefix(tooltipItem.yLabel, 4) + "W";
+        }
+      }
+    },
     scales: {
       xAxes: [{
         display: true,
@@ -66,9 +83,18 @@ var configEPS = {
       }],
       yAxes: [{
         display: true,
-        scaleLabel:
-            {display: true, labelString: "Power - Watts", fontColor: "#FFFFFF"},
-        ticks: {beginAtZero: true, fontColor: "#FFFFFF"},
+        type: "logarithmic",
+        ticks: {
+          min: 0.01,
+          max: 20,
+          fontColor: "#FFFFFF",
+          callback: function(value, index, values) {
+            if ((Math.log10(value) % 1) == 0 || index == 0)
+              return formatMetricPrefix(value) + "W";
+            else
+              return ""
+          }
+        },
         gridLines: {color: "#FFFFFF55", zeroLineColor: "#FFFFFF"}
       }]
     }

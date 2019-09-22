@@ -203,6 +203,8 @@ main {
   height: 100%;
   width: 100%;
   flex: 1;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .main-text {
