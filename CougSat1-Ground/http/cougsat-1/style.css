@@ -50,6 +50,10 @@ main {
   width: 100%;
 }
 
+.row>table td:nth-child(1) {
+  text-align: right;
+}
+
 .row>table td:nth-child(2) {
   width: 50%;
   padding: 0 0.25rem;

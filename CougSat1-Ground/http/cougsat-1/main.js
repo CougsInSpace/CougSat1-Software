@@ -22,7 +22,7 @@ var configECS = {
     tooltips: {
       callbacks: {
         label: function(tooltipItem, data) {
-          return tooltipItem.yLabel.toPrecision(3) + " °C";
+          return tooltipItem.yLabel + " °C";
         }
       }
     },
