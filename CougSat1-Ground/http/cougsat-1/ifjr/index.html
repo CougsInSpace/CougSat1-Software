@@ -32,10 +32,48 @@
     <div><a href="/cougsat-1/payload-plant/"><img src="/cougsat-1/images/plant.png">Plant</a></div>
   </header>
   <main>
-    <div class="pane left">
-    </div>
-    <div class="pane right">
-    </div>
+    <div class="main-text">
+      <h2 class="text-title text-align-center">In-Flight JTAG Reprogrammer</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td>Status:</td>
+            <td class="background-primary text-monospace">Idle</td>
+          </tr>
+        </tbody>
+      </table>
+      <h2 class="text-title text-align-center">Reprogram Event</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <input type="file" id="image-input">
+              <label for="image-input" class="button-1 text-monospace">Select Image</label>
+            </td>
+            <td class="background-primary text-monospace">firmware.bin</td>
+          </tr>
+          <tr>
+            <td>Target subsystem:</td>
+            <td><select class="text-monospace">
+                <option>None</option>
+                <option>ADCS</option>
+                <option>C&DH</option>
+                <option>Comms</option>
+                <option>EPS</option>
+              </select></td>
+          </tr>
+          <tr>
+            <td>Target event time:</td>
+            <td class="text-monospace"><input type="datetime-local"></td>
+          </tr>
+          <tr>
+            <td>Reprogramming event:</td>
+            <td class="text-monospace">
+              <input type="button" value="Enqueue" class="button-1">
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </main>
 </body>

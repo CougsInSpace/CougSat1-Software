@@ -41,18 +41,45 @@ body {
   flex-direction: column;
 }
 
-.button-tertiary {
-  background: var(--color-tertiary-l50);
-  transition: color 0.3s, background 0.3s;
-}
-
-.button-tertiary:hover {
+.button-1 {
+  color: #FFFFFF;
+  color: var(--color-light);
+  background: #981E32;
   background: var(--color-tertiary);
+  display: inline-block;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.375rem;
+  -webkit-border-radius: 0.375rem;
+  -moz-border-radius: 0.375rem;
+  -ms-border-radius: 0.375rem;
+  -o-border-radius: 0.375rem;
+  border-color: #981E32;
+  border-color: var(--color-tertiary);
+  border-style: solid;
+  border-width: 0.125rem;
+  transition: color 0.3s, background 0.3s, border-color 0.3s;
+  -webkit-transition: color 0.3s, background 0.3s, border-color 0.3s;
+  -moz-transition: color 0.3s, background 0.3s, border-color 0.3s;
+  -ms-transition: color 0.3s, background 0.3s, border-color 0.3s;
+  -o-transition: color 0.3s, background 0.3s, border-color 0.3s;
 }
 
-.button-tertiary:active {
+.button-1:hover {
+  color: #282828;
+  color: var(--color-dark);
+  background: #DBB776;
+  background: var(--color-accent);
+  border-color: #DBB776;
+  border-color: var(--color-accent);
+}
+
+.button-1:active {
+  color: #DBB776;
+  color: var(--color-accent);
+  background: #282828;
   background: var(--color-dark);
-  color: var(--color-tertiary-l50);
+  border-color: #DBB776;
+  border-color: var(--color-accent);
 }
 
 .clearfix::after {
@@ -73,18 +100,21 @@ body {
 h1 {
   font-size: 2rem;
   margin-top: 0.25rem;
+  margin-bottom: 0.15rem;
   line-height: 1;
 }
 
 h2 {
   font-size: 1.75rem;
   margin-top: 0.2rem;
+  margin-bottom: 0.15rem;
   line-height: 1;
 }
 
 h3 {
   font-size: 1.5rem;
   margin-top: 0.15rem;
+  margin-bottom: 0.15rem;
   line-height: 1;
 }
 
@@ -197,6 +227,10 @@ html {
   html {
     font-size: 16px;
   }
+}
+
+input[type="file"] {
+  display: none;
 }
 
 main {

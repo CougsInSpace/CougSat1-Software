@@ -38,6 +38,5 @@ main {
 }
 
 .chart {
-  /* width: 50%; */
   flex-grow: 1;
 }
