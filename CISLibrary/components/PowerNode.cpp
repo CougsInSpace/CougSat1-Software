@@ -10,13 +10,12 @@
  * @param inverted if set will invert the switchOut
  */
 PowerNode::PowerNode(ADC & adc, ADCChannel_t channel, double shunt,
-    PinName switchOut, bool inverted, uint8_t priority) :
+    PinName switchOut, bool inverted) :
   switchOut(switchOut, inverted ? 1 : 0),
   adc(adc) {
   this->channel  = channel;
   this->shunt    = shunt;
   this->inverted = inverted;
-  this->priority = priority;
 }
 
 /**
@@ -30,26 +29,6 @@ bool PowerNode::getSwitch() {
     return switchOut.read() ^ inverted;
   return true;
 }
-
-/**
- * @brief Calculates the AggregatePriority value
- *
- * @return aggregate Priority value
- */
-double PowerNode::getAggregatePriority()
-{
-  double AggregatePriority = 0;
-  double Measured_Current = 0;
-
-  //1. Get current
-  this->getCurrent(Measured_Current);
-
-  //2. Multiply current with priority value
-  AggregatePriority = this->priority * Measured_Current;
-
-  return AggregatePriority;
-} 
-
 
 /**
  * @brief Gets the current flowing through the node

@@ -58,7 +58,7 @@ public:
    * @brief Destroy the ADC object
    *
    */
-  ~ADC() {};
+  virtual ~ADC() {};
 
   /**
    * @brief Read the raw conversion result of a channel
@@ -102,9 +102,9 @@ public:
    */
   mbed_error_status_t readVoltage(
       ADCChannel_t channel, double & value, bool blocking = true) {
-    int32_t           buf    = 0;
+    int32_t             buf    = 0;
     mbed_error_status_t result = readRaw(channel, buf, blocking);
-    value                    = (double)buf * conversionFactor;
+    value                      = (double)buf * conversionFactor;
     return result;
   }
 

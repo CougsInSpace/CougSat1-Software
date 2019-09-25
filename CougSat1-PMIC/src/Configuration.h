@@ -151,18 +151,4 @@
 #define THERM_CAL_PV3_FRONT_BOTTOM_270K (0.158)
 #define THERM_CAL_PV3_FRONT_BOTTOM_350K (0.852)
 
-/******************** EventPeriodic.cpp ********************/
-#define EXPECTED_BATT_CURRENT           (4)
-#define MAX_BATT_TEMP                   (50)
-#define MIN_BATT_TEMP                   (-5)
-#define ACCEPTABLE_BATT_TEMP            (5)
-#define OVERHEATED_BATT_TEMP            (75)
-#define MAX_3V3_REG_TEMP                (125)
-#define EXPECTED_REG_CURRENT            (3)
-#define PR3V3_TOTAL_CURRENT             (1.74)
-#define PRBATT_TOTAL_CURRENT            (0.95)
-// Payload && Bus priority value
-
-
-
 #endif /* _SRC_CONFIGURATION_H_ */

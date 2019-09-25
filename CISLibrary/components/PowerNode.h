@@ -7,11 +7,9 @@
 class PowerNode {
 public:
   PowerNode(ADC & adc, ADCChannel_t channel, double shunt,
-      PinName switchOut = NC, bool inverted = false, uint8_t priority = 0);
+      PinName switchOut = NC, bool inverted = false);
 
   mbed_error_status_t getCurrent(double & current);
-
-  double getAggregatePriority();
 
   bool getSwitch();
 
@@ -24,7 +22,6 @@ private:
   ADC &        adc;
   ADCChannel_t channel;
   double       shunt;
-  uint8_t      priority;
 };
 
 #endif /* _LIBRARY_COMPONENT_POWER_NODE_H_ */
