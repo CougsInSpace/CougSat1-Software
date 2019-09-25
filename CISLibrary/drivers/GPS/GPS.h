@@ -1,7 +1,6 @@
 #ifndef _LIBRARY_DRIVER_GPS_GPS_H_
 #define _LIBRARY_DRIVER_GPS_GPS_H_
 
-
 #include <mbed.h>
 
 struct GPSData_t {
@@ -27,7 +26,7 @@ public:
    * @brief Destroy the GPS object
    *
    */
-  ~GPS() {};
+  virtual ~GPS() {};
 
   /**
    * @brief Read a GPS message and update fields
