@@ -1,6 +1,6 @@
 #include "ArduCAM.h"
 
-// #include <CISConsole.h>
+#include <CISConsole.h>
 
 /**
  * Class to interface with an ArduCAM Module
@@ -8,8 +8,10 @@
  * @param i2c connected to camera sensor
  * @param pinSelect to enable SPI with ArduChip
  */
-ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
-  spi(spi), i2c(i2c), select(pinSelect, 1) {}
+ArduCAM::ArduCAM(SPI &spi, I2C &i2c, PinName pinSelect) :
+    spi(spi), i2c(i2c), select(pinSelect) {
+  select = 1;
+}
 
 // /**
 //  * Initializes camera to default settings
@@ -310,3 +312,4 @@ ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
 //   select = 1;
 //   spi.unlock();
 // }
+

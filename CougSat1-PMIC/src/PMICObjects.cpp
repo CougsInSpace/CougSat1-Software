@@ -27,17 +27,16 @@
 // InterruptIn interruptCtrlSync(PIN_CTRL_SYNC);
 // InterruptIn interruptBusI2CIRQ(PIN_I2C_BUS_IRQ);
 
-// /******************************** Power Nodes
-// *********************************/ PowerNode   nodePVIn_0A(adcPV0,
-// PIN_ADC_PVIN_I_A, SHUNT_PVIN_0A); PowerNode   nodePVIn_0B(adcPV0,
-// PIN_ADC_PVIN_I_B, SHUNT_PVIN_0B); PowerNode   nodePVIn_1A(adcPV1,
-// PIN_ADC_PVIN_I_A, SHUNT_PVIN_1A); PowerNode   nodePVIn_1B(adcPV1,
-// PIN_ADC_PVIN_I_B, SHUNT_PVIN_1B); PowerNode   nodePVIn_2A(adcPV2,
-// PIN_ADC_PVIN_I_A, SHUNT_PVIN_2A); PowerNode   nodePVIn_2B(adcPV2,
-// PIN_ADC_PVIN_I_B, SHUNT_PVIN_2B); PowerNode   nodePVIn_3A(adcPV3,
-// PIN_ADC_PVIN_I_A, SHUNT_PVIN_3A); PowerNode   nodePVIn_3B(adcPV3,
-// PIN_ADC_PVIN_I_B, SHUNT_PVIN_3B); PowerNode * nodesPVIn[COUNT_PV] =
-// {&nodePVIn_0A, &nodePVIn_0B, &nodePVIn_1A,
+// /******************************** Power Nodes *********************************/
+// PowerNode   nodePVIn_0A(adcPV0, PIN_ADC_PVIN_I_A, SHUNT_PVIN_0A);
+// PowerNode   nodePVIn_0B(adcPV0, PIN_ADC_PVIN_I_B, SHUNT_PVIN_0B);
+// PowerNode   nodePVIn_1A(adcPV1, PIN_ADC_PVIN_I_A, SHUNT_PVIN_1A);
+// PowerNode   nodePVIn_1B(adcPV1, PIN_ADC_PVIN_I_B, SHUNT_PVIN_1B);
+// PowerNode   nodePVIn_2A(adcPV2, PIN_ADC_PVIN_I_A, SHUNT_PVIN_2A);
+// PowerNode   nodePVIn_2B(adcPV2, PIN_ADC_PVIN_I_B, SHUNT_PVIN_2B);
+// PowerNode   nodePVIn_3A(adcPV3, PIN_ADC_PVIN_I_A, SHUNT_PVIN_3A);
+// PowerNode   nodePVIn_3B(adcPV3, PIN_ADC_PVIN_I_B, SHUNT_PVIN_3B);
+// PowerNode * nodesPVIn[COUNT_PV] = {&nodePVIn_0A, &nodePVIn_0B, &nodePVIn_1A,
 //     &nodePVIn_1B, &nodePVIn_2A, &nodePVIn_2B, &nodePVIn_3A, &nodePVIn_3B};
 
 // PowerNodeTCA9535 nodePVOut_0A(adcPV0, PIN_ADC_PVOUT_I_A, SHUNT_PVOUT_0A,
@@ -57,10 +56,8 @@
 // PowerNodeTCA9535 nodePVOut_3B(adcPV0, PIN_ADC_PVOUT_I_A, SHUNT_PVOUT_3B,
 //     gpioEPS1, PIN_PV_SW_7A, PIN_PV_SW_7B);
 
-// PowerNode * nodesPVOut[COUNT_PV] = {&nodePVOut_0A, &nodePVOut_0B,
-// &nodePVOut_1A,
-//     &nodePVOut_1B, &nodePVOut_2A, &nodePVOut_2B, &nodePVOut_3A,
-//     &nodePVOut_3B};
+// PowerNode * nodesPVOut[COUNT_PV] = {&nodePVOut_0A, &nodePVOut_0B, &nodePVOut_1A,
+//     &nodePVOut_1B, &nodePVOut_2A, &nodePVOut_2B, &nodePVOut_3A, &nodePVOut_3B};
 
 // PowerNodeTCA9535 nodePR3V3_0(adcEPS0, PIN_ADC_PR_3V3_0, SHUNT_PR_3V3_0,
 //     gpioEPS1, PIN_PC_3V3_0A, PIN_PC_3V3_0B);
@@ -110,8 +107,7 @@
 //     PIN_PC_BATT_6A, PIN_PC_BATT_6B);
 
 // PowerNode * nodesPRBatt[COUNT_PR_BATT] = {&nodePRBatt_0, &nodePRBatt_1,
-//     &nodePRBatt_2, &nodePRBatt_3, &nodePRBatt_4, &nodePRBatt_5,
-//     &nodePRBatt_6};
+//     &nodePRBatt_2, &nodePRBatt_3, &nodePRBatt_4, &nodePRBatt_5, &nodePRBatt_6};
 
 // PowerNodeTCA9535 nodePV3V3_0(adcEPS4, PIN_ADC_PV_3V3_0, SHUNT_PV_3V3_0,
 //     gpioEPS0, PIN_PVC_3V3_0A, PIN_PVC_3V3_0B);
@@ -126,16 +122,13 @@
 //     &nodePV3V3_0, &nodePV3V3_1, &nodePV3V3_2, &nodePV3V3_3};
 
 // PowerNodeTCA9535 nodeBH_0(
-//     adcEPS4, PIN_ADC_PR_BH_0, SHUNT_BH_0, gpioEPS0, PIN_PC_BH_0A,
-//     PIN_PC_BH_0B);
+//     adcEPS4, PIN_ADC_PR_BH_0, SHUNT_BH_0, gpioEPS0, PIN_PC_BH_0A, PIN_PC_BH_0B);
 // PowerNodeTCA9535 nodeBH_1(
-//     adcEPS3, PIN_ADC_PR_BH_1, SHUNT_BH_1, gpioEPS0, PIN_PC_BH_1A,
-//     PIN_PC_BH_1B);
+//     adcEPS3, PIN_ADC_PR_BH_1, SHUNT_BH_1, gpioEPS0, PIN_PC_BH_1A, PIN_PC_BH_1B);
 
 // PowerNode * nodesBatteryHeaters[COUNT_BH] = {&nodeBH_0, &nodeBH_1};
 
-// PowerNodeDirect nodeDeployables(adcEPS3, PIN_ADC_PR_DEPLOY,
-// SHUNT_DEPLOYABLES,
+// PowerNodeDirect nodeDeployables(adcEPS3, PIN_ADC_PR_DEPLOY, SHUNT_DEPLOYABLES,
 //     PIN_PC_DEPLOY_A, PIN_PC_DEPLOY_B);
 
 // PowerNode nodeVBattA(adcEPS4, PIN_ADC_VBATT_I_A, SHUNT_VBATT_A);
@@ -147,13 +140,11 @@
 // PowerNode node3V3OutA(adcEPS4, PIN_ADC_3V3_OUT_A, SHUNT_3V3_OUT_A);
 // PowerNode node3V3OutB(adcEPS3, PIN_ADC_3V3_OUT_B, SHUNT_3V3_OUT_B);
 
-// /******************************** Thermistors
-// *********************************/ Thermistor thermistorBattA(
-//     adcEPS5, PIN_ADC_TEMP_BATT_A, THERM_CAL_BATT_A_270K,
-//     THERM_CAL_BATT_A_350K);
+// /******************************** Thermistors *********************************/
+// Thermistor thermistorBattA(
+//     adcEPS5, PIN_ADC_TEMP_BATT_A, THERM_CAL_BATT_A_270K, THERM_CAL_BATT_A_350K);
 // Thermistor thermistorBattB(
-//     adcEPS5, PIN_ADC_TEMP_BATT_B, THERM_CAL_BATT_B_270K,
-//     THERM_CAL_BATT_B_350K);
+//     adcEPS5, PIN_ADC_TEMP_BATT_B, THERM_CAL_BATT_B_270K, THERM_CAL_BATT_B_350K);
 // Thermistor thermistorPMIC(
 //     adcEPS5, PIN_ADC_TEMP_PMIC, THERM_CAL_PMIC_270K, THERM_CAL_PMIC_350K);
 // Thermistor thermistorRegA(

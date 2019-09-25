@@ -13,8 +13,7 @@ public:
   AD7689(SPI & spi, PinName cnv, double refVoltage = 2.5);
   ~AD7689();
 
-  mbed_error_status_t readRaw(
-      ADCChannel_t channel, int32_t & value, bool blocking = true);
+  mbed_error_status_t readRaw(ADCChannel_t channel, int32_t & value, bool blocking = true);
 
 private:
   SPI &      spi;
