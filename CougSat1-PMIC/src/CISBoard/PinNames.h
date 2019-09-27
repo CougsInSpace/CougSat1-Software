@@ -176,8 +176,62 @@ typedef enum {
   USBTX         = STDIO_UART_TX,
   USBRX         = STDIO_UART_RX,
 
-  /*** Comms HW V1.0 ***/
+  /*** EPS HW V3.0 ***/
   LED1 = PD_2,
+
+  /*** Power Control Signals ***/
+  // Suffix _N is active low: low turns on
+  PC_PV02A = PA_2,
+  PC_PV02B = PA_1,
+  PC_PV13A = PC_3,
+  PC_PV13B = PA_0,
+
+  PC_3V3_0_N  = PB_5,
+  PC_3V3_1_N  = PB_4,
+  PC_3V3_2_N  = PC_12,
+  PC_3V3_3_N  = PC_11,
+  PC_3V3_4_N  = PC_10,
+  PC_3V3_5    = PB_0,
+  PC_3V3_6_N  = PA_12,
+  PC_3V3_7_N  = PA_11,
+  PC_3V3_8_N  = PA_10,
+  PC_3V3_9_N  = PA_9,
+  PC_3V3_10_N = PA_8,
+  PC_3V3_11_N = PC_8,
+  PC_3V3_12_N = PC_9,
+  PC_3V3_PV_N = PA_4,
+
+  PC_BATT_0_N = PC_7,
+  PC_BATT_1_N = PC_6,
+  PC_BATT_2_N = PB_15,
+  PC_BATT_3_N = PB_14,
+  PC_BATT_4_N = PB_13,
+  PC_BATT_5_N = PB_12,
+  PC_BATT_6_N = PB_8,
+
+  PC_BH_0_N = PB_9,
+  PC_BH_1_N = PA_3,
+
+  PC_DEPLOY_0_N = PC_1,
+  PC_DEPLOY_1_N = PC_5,
+
+  /*** Digital Busses ***/
+  SPI_MOSI = PA_7,
+  SPI_MISO = PA_6,
+  SPI_SCK  = PA_5,
+
+  ADC_SEL_0_N = PC_4,
+  ADC_SEL_1_N = PC_13,
+  ADC_SEL_2_N = PC_2,
+
+  CTRL_SYNC = PB_1,
+
+  BUS_I2C_SDA = PB_11,
+  BUS_I2C_SCL = PB_10,
+  BUS_I2C_IRQ = PB_2,
+
+  I2C_SDA = PB_7,
+  I2C_SCL = PB_6,
 
 } PinName;
 

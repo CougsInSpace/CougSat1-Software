@@ -6,6 +6,7 @@
 #include <mbed.h>
 
 // H = high, F = float, L = low
+// AS1, AS0
 enum class AD7291Addr_t : uint8_t {
   HH = 0x20 << 1,
   HF = 0x22 << 1,
