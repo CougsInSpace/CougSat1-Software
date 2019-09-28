@@ -1,6 +1,7 @@
 :root {
   --color-primary: #0E1C31;
   --color-secondary: #373A3B;
+  --color-secondary-l10: #4B4E4F;
   --color-tertiary: #981E32;
   --color-accent: #DBB776;
   --color-light: #FFFFFF;
@@ -42,10 +43,10 @@ body {
 }
 
 .button-1 {
-  color: #FFFFFF;
-  color: var(--color-light);
-  background: #981E32;
-  background: var(--color-tertiary);
+  color: #981E32;
+  color: var(--color-accent);
+  background: #282828;
+  background: var(--color-dark);
   display: inline-block;
   padding: 0.125rem 0.25rem;
   border-radius: 0.375rem;
@@ -53,8 +54,8 @@ body {
   -moz-border-radius: 0.375rem;
   -ms-border-radius: 0.375rem;
   -o-border-radius: 0.375rem;
-  border-color: #981E32;
-  border-color: var(--color-tertiary);
+  border-color: #282828;
+  border-color: var(--color-dark);
   border-style: solid;
   border-width: 0.125rem;
   transition: color 0.3s, background 0.3s, border-color 0.3s;
@@ -62,24 +63,19 @@ body {
   -moz-transition: color 0.3s, background 0.3s, border-color 0.3s;
   -ms-transition: color 0.3s, background 0.3s, border-color 0.3s;
   -o-transition: color 0.3s, background 0.3s, border-color 0.3s;
+  font-size: 1rem;
 }
 
 .button-1:hover {
-  color: #282828;
-  color: var(--color-dark);
-  background: #DBB776;
-  background: var(--color-accent);
   border-color: #DBB776;
   border-color: var(--color-accent);
 }
 
 .button-1:active {
-  color: #DBB776;
-  color: var(--color-accent);
-  background: #282828;
-  background: var(--color-dark);
-  border-color: #DBB776;
-  border-color: var(--color-accent);
+  color: #282828;
+  color: var(--color-dark);
+  background: #DBB776;
+  background: var(--color-accent);
 }
 
 .clearfix::after {
@@ -229,6 +225,10 @@ html {
   }
 }
 
+input {
+  font-size: 1rem;
+}
+
 input[type="file"] {
   display: none;
 }
@@ -237,7 +237,7 @@ main {
   height: 100%;
   width: 100%;
   flex: 1;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -251,6 +251,9 @@ p {
   margin-top: 0.75rem;
   margin-bottom: 0.25rem;
 }
+
+select {
+  font-size: 1rem;}
 
 .text-align-center {
   text-align: center;

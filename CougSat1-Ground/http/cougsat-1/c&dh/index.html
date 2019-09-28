@@ -32,10 +32,60 @@
     <div><a href="/cougsat-1/payload-plant/"><img src="/cougsat-1/images/plant.png">Plant</a></div>
   </header>
   <main>
-    <div class="pane left">
+    <div class="col left">
+      <h2 class="text-title text-align-center">Command & Data Handling</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td>Status:</td>
+            <td class="background-primary text-monospace">Idle</td>
+          </tr>
+          <tr>
+            <td>Events enqueued:</td>
+            <td class="background-primary text-monospace">5 Events</td>
+          </tr>
+          <tr>
+            <td>Storage usage:</td>
+            <td class="background-primary text-monospace">72.1 MiB</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div class="pane right">
-    </div>
+    <div class="col right">
+      <h2 class="text-title text-align-center">Payload Event Queue</h2>
+      <p class="text-align-center">
+        <input type="button" value="Request" class="button-1 text-body">
+        <input type="button" value="Update" class="button-1 text-body">
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th colspan="2">Trigger Date</th>
+            <th>Description</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="datetime-local" class="text-monospace"></td>
+            <td>T-100 Days</td>
+            <td>Camera - Earth - Pullman</td>
+            <td><input type="image" src="../images/recycle.png" title="Remove event"></td>
+          </tr>
+          <tr>
+            <td><input type="datetime-local"></td>
+            <td>T-100 Days</td>
+            <td>Camera - Earth - Area 51</td>
+            <td><input type="image" src="../images/recycle.png" title="Remove event"></td>
+          </tr>
+          <tr>
+            <td><input type="datetime-local"></td>
+            <td>T-100 Days</td>
+            <td>Germination - Release water</td>
+            <td><input type="image" src="../images/recycle.png" title="Remove event"></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </main>
 </body>
