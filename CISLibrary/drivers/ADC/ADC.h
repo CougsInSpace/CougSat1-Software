@@ -36,7 +36,8 @@ enum class ADCChannel_t : uint8_t {
   DM_12 = 0x8C,
   DM_13 = 0x8D,
   DM_14 = 0x8E,
-  DM_15 = 0x8F
+  DM_15 = 0x8F,
+  TEMP  = 0xFF
 };
 
 class ADC {
@@ -79,7 +80,16 @@ public:
    */
   void setReferenceVoltage(double refVoltage, uint8_t bitDepth) {
     this->refVoltage = refVoltage;
-    conversionFactor = refVoltage / pow(2, bitDepth);
+    conversionFactor = refVoltage / (1 << bitDepth);
+  }
+
+  /**
+   * @brief Set the Temperature Conversion Factor
+   *
+   * @param conversionFactorTemp Celsius per count
+   */
+  void setTemperatureConversionFactor(double conversionFactorTemp) {
+    this->conversionFactorTemp = conversionFactorTemp;
   }
 
   /**
@@ -108,9 +118,25 @@ public:
     return result;
   }
 
+  /**
+   * @brief Read the temperature of the ADC
+   * Reads the raw value and multiplies by the conversionFactorTemp
+   *
+   * @param value to return in Celsius
+   * @param blocking will wait until data is present if true
+   * @return mbed_error_status_t
+   */
+  mbed_error_status_t readTemp(double & value, bool blocking = true) {
+    int32_t             buf    = 0;
+    mbed_error_status_t result = readRaw(ADCChannel_t::TEMP, buf, blocking);
+    value                      = (double)buf * conversionFactorTemp;
+    return result;
+  }
+
 protected:
-  double refVoltage       = 0.0; // Volts
-  double conversionFactor = 0.0; // Volts per count
+  double refVoltage           = 0.0; // Volts
+  double conversionFactor     = 0.0; // Volts per count
+  double conversionFactorTemp = 0.0; // Celsius per count
 };
 
 #endif /* _LIBRARY_DRIVER_ADC_ADC_H_ */

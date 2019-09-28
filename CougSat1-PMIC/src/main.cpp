@@ -1,5 +1,7 @@
-#include <CISConsole.h>
 #include <mbed.h>
+
+#include <ADC/AD7291.h>
+#include <CISConsole.h>
 
 #include "Configuration.h"
 #include "PMICObjects.h"
@@ -14,6 +16,23 @@
 mbed_error_status_t initialize() {
   LOG("Init", "Initialization starting");
   mbed_error_status_t result = MBED_SUCCESS;
+
+  I2C    i2c(PB_9, PB_8);
+  ADC *  adc = new AD7291(i2c, AD7291Addr_t::FF);
+  double value;
+  result = adc->readVoltage(ADCChannel_t::CM_03, value);
+  if (result) {
+    ERROR("Init", "Failed to read voltage from ADC");
+    return result;
+  }
+  LOG("Init", "Read %f V", value);
+
+  result = adc->readTemp(value);
+  if (result) {
+    ERROR("Init", "Failed to read temperature from ADC");
+    return result;
+  }
+  LOG("Init", "Read %f C", value);
 
   // statusLED = 1;
 
@@ -40,7 +59,7 @@ mbed_error_status_t initialize() {
   //   }
   //   DEBUG("Init", "Set switch nodesPVOut[%d]: 0x%02X", i, result);
   // }
-  // LOG("Init", "nodesPVOut were set succesfully");
+  // LOG("Init", "nodesPVOut were set successfully");
   // for (int i = 0; i < COUNT_PR_3V3; i++) {
   //   result = nodesPR3V3[i]->setSwitch(pathA, pathB);
   //   if (result != ERROR_SUCCESS) {
@@ -49,7 +68,7 @@ mbed_error_status_t initialize() {
   //   }
   //   DEBUG("Init", "Set switch nodesPR3V3[%d]: 0x%02X", i, result);
   // }
-  // LOG("Init", "nodesPR3V3 were set succesfully");
+  // LOG("Init", "nodesPR3V3 were set successfully");
   // for (int i = 0; i < COUNT_PR_BATT; i++) {
   //   result = nodesPRBatt[i]->setSwitch(pathA, pathB);
   //   if (result != ERROR_SUCCESS) {
@@ -58,7 +77,7 @@ mbed_error_status_t initialize() {
   //   }
   //   DEBUG("Init", "Set switch nodesPRBatt[%d]: 0x%02X", i, result);
   // }
-  // LOG("Init", "nodesPRBatt were set succesfully");
+  // LOG("Init", "nodesPRBatt were set successfully");
   // for (int i = 0; i < COUNT_PV_3V3; i++) {
   //   result = nodesPV3V3[i]->setSwitch(pathA, pathB);
   //   if (result != ERROR_SUCCESS) {
@@ -66,7 +85,7 @@ mbed_error_status_t initialize() {
   //     return result;
   //   }
   // }
-  // LOG("Init", "nodesPV3V3 were set succesfully");
+  // LOG("Init", "nodesPV3V3 were set successfully");
   // for (int i = 0; i < COUNT_BH; i++) {
   //   result = nodesBatteryHeaters[i]->setSwitch(pathA, pathB);
   //   if (result != ERROR_SUCCESS) {
@@ -74,13 +93,13 @@ mbed_error_status_t initialize() {
   //     return result;
   //   }
   // }
-  // LOG("Init", "nodesBatteryHeaters were set succesfully");
+  // LOG("Init", "nodesBatteryHeaters were set successfully");
   // result = nodeDeployables.setSwitch(pathA, pathB);
   // if (result != ERROR_SUCCESS) {
   //   ERROR("Init", "Failed to switch nodeDeployable: 0x%02X", result);
   //   return result;
   // }
-  // LOG("Init", "nodeDeployable was set succesfully");
+  // LOG("Init", "nodeDeployable was set successfully");
 
   // double value = 0.0;
   // result       = adcEPS5.readVoltage(PIN_ADC_EJECT_TIMER, &value);
@@ -104,7 +123,7 @@ mbed_error_status_t initialize() {
 }
 
 /**
- * @brief Exectutes the main loop of the PMIC
+ * @brief Executes the main loop of the PMIC
  *
  * @return mbed_error_status_t error code
  */
@@ -123,12 +142,12 @@ mbed_error_status_t run() {
         return result;
       }
       nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
-    } else if (cdh.hasMessage()) {
-      result = cdh.processMessage();
-      if (result) {
-        ERROR("Run", "Failed to process message from the bus: 0x%02X", result);
-        return result;
-      }
+      // } else if (cdh.hasMessage()) {
+      //   result = cdh.processMessage();
+      //   if (result) {
+      //     ERROR("Run", "Failed to process message from the bus: 0x%02X",
+      //     result); return result;
+      //   }
     } else {
       wait_ms(PERIOD_MS_IDLE_SLEEP);
     }
