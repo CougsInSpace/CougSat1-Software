@@ -11,7 +11,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <meta name="theme-color" content="#981E32">
-  <script src="/Ehbanana.js" async></script>
+  <script src="/lib/Ehbanana.js" async></script>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/css/main.css">
 </head>
 
 <body class="text-body">
@@ -32,12 +33,118 @@
     <div><a href="/cougsat-1/payload-plant/"><img src="/cougsat-1/images/plant.png">Plant</a></div>
   </header>
   <main>
-    <div class="pane left">
+    <div class="col left">
+      <div class="row top">
+        <h2 class="text-title text-align-center">Determination</h2>
+        <table>
+          <tbody>
+            <tr>
+              <td>Latitude:</td>
+              <td class="background-primary text-monospace">47 &deg;N</td>
+            </tr>
+            <tr>
+              <td>Longitude:</td>
+              <td class="background-primary text-monospace">-120 &deg;E</td>
+            </tr>
+            <tr>
+              <td>Altitude:</td>
+              <td class="background-primary text-monospace">400 km</td>
+            </tr>
+            <tr>
+              <td>Roll:</td>
+              <td class="background-primary text-monospace">-120 &deg;</td>
+            </tr>
+            <tr>
+              <td>Pitch:</td>
+              <td class="background-primary text-monospace">130 &deg;</td>
+            </tr>
+            <tr>
+              <td>Yaw:</td>
+              <td class="background-primary text-monospace">10 &deg;</td>
+            </tr>
+            <tr>
+              <td>Velocity:</td>
+              <td class="background-primary text-monospace">8000 ms<sup>-1</sup></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row bottom">
+        <h2 class="text-title text-align-center">Control</h2>
+        <table>
+          <tbody>
+            <tr>
+              <td>Status:</td>
+              <td class="background-primary text-monospace">Attitude lock</td>
+            </tr>
+            <tr>
+              <td>Target:</td>
+              <td class="background-primary text-monospace">Pullman</td>
+            </tr>
+            <tr>
+              <td>X magnetorquer:</td>
+              <td class="background-primary text-monospace">2 mA</td>
+            </tr>
+            <tr>
+              <td>Y magnetorquer:</td>
+              <td class="background-primary text-monospace">30 mA</td>
+            </tr>
+            <tr>
+              <td>Z magnetorquer:</td>
+              <td class="background-primary text-monospace">-17 mA</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="pane right">
-    </div>
+    <div class="col right">
+      <div class="row top">
+        <h2 class="text-title text-align-center">Map Settings</h2>
+        <table>
+          <tbody>
+            <tr>
+              <td>Satellite time (<span>orange</span>):</td>
+              <td class="text-monospace"><input type="datetime-local"></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">Orbit projection (<span>white</span>)</label>
+              </td>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">Include Earth's Rotation</label>
+              </td>
+            <tr>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">Wide camera FOV (<span>green</span>)</label>
+              </td>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">Narrow camera FOV (<span>blue</span>)</label>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">Low gain antenna FOV
+                  (<span>pink</span>)</label></td>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">High gain antenna FOV
+                  (<span>purple</span>)</label></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">Magnetorquer vector (<span>red</span>)</label>
+              </td>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">Sun vector (<span>yellow</span>)</label></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">Ground station (<span>aqua</span>)</label></td>
+              <td><input type="checkbox" id="en-sun"><label for="en-sun">Satellite GPS location
+                  (<span>crimson</span>)</label></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row bottom">
+        <div id="map"></div>
+      </div>
     </div>
   </main>
+  <script src="/lib/satellite.min.js"></script>
+  <script src="/lib/three.min.js"></script>
+  <script src="https://js.arcgis.com/4.12/"></script>
+  <script src="map.js"></script>
 </body>
 
 </html>

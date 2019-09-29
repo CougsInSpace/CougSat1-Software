@@ -8,7 +8,7 @@
 debug
 release
 bin
-http/Ehbanana.js
+http/lib/Ehbanana.js
 *.lib
 *.zip
 
