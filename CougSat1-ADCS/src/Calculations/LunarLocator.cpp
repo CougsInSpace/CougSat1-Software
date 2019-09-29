@@ -3,43 +3,8 @@
 
 */
 
+#include "LunarLocator.h"
 
-#include <math.h>
-#include <iostream>
-#include <string>
-
-using namespace std;
-
-//function declar.
-double T(double x);
-double L(double x);
-double D(double x);
-double MS(double x);
-double ML(double x);
-double F(double x);
-double RLT360(double x);
-double A1(double x);
-double A2(double x);
-double A3(double x);
-double E(double x);
-double Lambda(double x, double y);
-double Beta(double x);
-double Delta(double x);
-double Delta(double x);
-double sinesum(double a, double b, double c, double d, double e, double f, double g, double h, double l, double m);
-double cossum(double a, double b, double c, double d, double e, double f, double g, double h, double l, double m);
-double calc_long_sums(double(&pass_sum_long_elts)[60], double(&pass_Arg1)[60][4], double d, double ms, double ml, double Time, double f);
-double calc_lat_sums(double(&pass_sum_lats_elts)[60], double(&pass_Arg2)[60][4], double d, double ms, double ml, double Time, double f);
-double calc_dist_sums(double(&pass_sum_dist_elts)[60], double(&pass_Arg1)[60][4], double d, double ms, double ml, double Time, double f);
-double GimmeRA(double a, double b);
-double GimmeDec(double a, double b);
-void final_calcs_and_print_data(double RA, double dec, double Longitude, double Latitude, double Distance);
-double degtoArc_degrees(double x);
-double degtoArc_hours(double x);
-double degtoArc_declination_minutes(double x, double degrees);
-double degtoArc_minutes(double x, double Hours);
-double degtoArc_DecSecs(double x, double Degrees, double DeclinationMinutes);
-double degtoArc_seconds(double x, double Hours, double Minutes);
 
 double pi = 3.14159265358979323846;
 
@@ -100,9 +65,10 @@ double sum_lat_elts[60] = { 5128122, 280602, 277693, 173237, 55413, 46271, 32573
 -351, 331, 315, 302, -283, -229, 223, 223, -220, -220, -185, 181,
 -177, 176, 166, -164, 132, -119, 115, 107 };
 
-int main(void)
+lunar_prop(int tm /*double utc_time*/)
 {
-	double t = 2458754.114583;
+	double t = tm;//2458754.114583;
+	//double t = julian_date(utc_date, utc_time);
 	double Time = T(t);
 	cout.precision(16);
 	cout << "T: " << Time << endl;
@@ -159,6 +125,12 @@ int main(void)
 	final_calcs_and_print_data(RA, dec, Longitude, Latitude, Distance); //what a name lol
 	return 0;
 }
+
+double julian_date(int utc_date, double utc_time)
+{
+
+}
+
 void final_calcs_and_print_data(double RA, double dec, double Longitude, double Latitude, double Distance)
 {
 	double RA_degrees = degtoArc_degrees(RA);
