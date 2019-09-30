@@ -1,7 +1,13 @@
 // Satellite map adapted from
 // https://github.com/richiecarmichael/Esri-Satellite-Map
 
-var TRAJECTORY_SEGMENTS = 1000;
+var TRAJECTORY_SEGMENT_HR = 50;
+var TRAJECTORY_STEP_MS    = (60 * 60 * 1000) / TRAJECTORY_SEGMENT_HR;
+var UPDATE_INTERVAL_MS    = 500;
+
+var satelliteRoll  = 0;
+var satellitePitch = 0;
+var satelliteYaw   = 0;
 
 require(
     [
@@ -10,14 +16,14 @@ require(
       "dojo/domReady!"
     ],
     function(Map, Camera, SceneView, ExternalRenderers, number, string) {
-      var view        = new SceneView({
+      var view = new SceneView({
         map: new Map({basemap: "satellite"}),
         container: "map",
         ui: {components: ["zoom", "compass"]},
         environment: {
           lighting: {
             date: new Date(),
-            directShadowsEnabled: true,
+            directShadowsEnabled: false,
             ambientOcclusionEnabled: false,
             cameraTrackingEnabled: false
           },
@@ -25,21 +31,21 @@ require(
           atmosphere: {quality: "high"},
           starsEnabled: true
         },
-        constraints: {altitude: {max: 12000000000}},
+        constraints: {altitude: {max: 250000000}},
         camera: {
           position: {latitude: 46.73, longitude: -117.17, altitude: 25000000}
         }
       });
+
       var satRenderer = {
         view: null,
         renderer: null,
         camera: null,
         scene: null,
         vbo: null,
-        satellites: [],
-        normal: null,
+        satellite: null,
         trajectory: null,
-        setup: function(context) { // Store view
+        setup: function(context) {
           this.view = context.view;
 
           // Create the THREE.js webgl renderer
@@ -56,11 +62,12 @@ require(
           this.renderer.autoClearStencil = false;
 
           // The ArcGIS JS API renders to custom offscreen buffers, and not to
-          // the default framebuffers. We have to inject this bit of code into
+          // the default framebuffer. We have to inject this bit of code into
           // the three.js runtime in order for it to bind those buffers instead
           // of the default ones.
           var originalSetRenderTarget =
               this.renderer.setRenderTarget.bind(this.renderer);
+
           this.renderer.setRenderTarget = function(target) {
             originalSetRenderTarget(target);
             if (target === null) {
@@ -68,19 +75,20 @@ require(
             }
           };
 
+          // Create THREE.js scene
           this.scene  = new THREE.Scene();
           this.camera = new THREE.PerspectiveCamera();
 
           // Create both a directional light, as well as an ambient light
-          this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-          this.ambientLight     = new THREE.AmbientLight(0xffffff, 0.5);
+          this.directionalLight = new THREE.DirectionalLight(0xFFFFFF, 0.5);
+          this.ambientLight     = new THREE.AmbientLight(0xFFFFFF, 0.5);
           this.scene.add(this.directionalLight, this.ambientLight);
 
           // Create objects and add them to the scene
-          this.normal = new THREE.Points(
+          this.satellite = new THREE.Points(
               new THREE.BufferGeometry(), new THREE.PointsMaterial({
-                color: 0xff7f00,
-                size: 6,
+                color: 0xFF9640,
+                size: 5,
                 sizeAttenuation: false,
                 vertexColors: THREE.NoColors,
                 fog: false
@@ -88,38 +96,15 @@ require(
 
           this.trajectory = new THREE.Line(
               new THREE.BufferGeometry(), new THREE.LineBasicMaterial({
-                color: 0xffffff,
-                linewidth: 1,
+                color: 0xFFFFFF,
+                linewidth: 2,
                 vertexColors: THREE.NoColors,
                 fog: false
               }));
           this.trajectory.frustumCulled = false;
 
-          // Add all satellites to normal layer.
-          var vertex = [];
-          var valid  = [];
-          var date   = new Date();
-          for (var i = 0; i < this.satellites.length; i++) {
-            var satellite = this.satellites[i];
-            var eci       = this.getSatelliteLocation(satellite, date);
-            if (eci === null || eci === undefined || isNaN(eci.x) ||
-                isNaN(eci.y) || isNaN(eci.z)) {
-              continue;
-            }
-            vertex.push(eci.x * 1000, eci.y * 1000, eci.z * 1000);
-            valid.push(satellite);
-          }
-
-          // Satellites that returned a computable location.
-          this.satellites = valid;
-
-          // Assign buffer.
-          var position = new THREE.Float32Attribute(vertex, 3);
-          position.setDynamic(true);
-          this.normal.geometry.addAttribute("position", position);
-
           // Add to scene
-          this.scene.add(this.normal, this.trajectory);
+          this.scene.add(this.satellite, this.trajectory);
 
           // Refresh the screen
           ExternalRenderers.requestRender(this.view);
@@ -159,9 +144,6 @@ require(
           this.renderer.resetGLState();
           this.renderer.render(this.scene, this.camera);
 
-          // Request a re-render
-          ExternalRenderers.requestRender(this.view);
-
           // Cleanup
           context.resetWebGLState();
         },
@@ -169,24 +151,41 @@ require(
           var position_and_velocity = satellite.propagate(satrec,
               date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
               date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-          return position_and_velocity.position;
-        },
-        showOrbit: function() {
-          // Time between orbital vertex
-          var ms = 114.87 * 60000;
-          ms /= TRAJECTORY_SEGMENTS;
 
-          // Show orbit
+          var ecf = satellite.eciToEcf(position_and_velocity.position,
+              satellite.gstimeFromDate(date.getUTCFullYear(),
+                  date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(),
+                  date.getUTCMinutes(), date.getUTCSeconds()));
+          return ecf;
+        },
+        updateSatellite: function(satrec, date, orbitHours, enabledElements) {
+          // Satellite position
           var vertex = [];
-          var start  = new Date();
-          for (var i = 0; i <= TRAJECTORY_SEGMENTS; i++) {
-            var date = new Date(start.valueOf() + i * ms);
-            var eci  = this.getSatelliteLocation(this.satellites[0], date);
-            if (eci === null || eci === undefined || isNaN(eci.x) ||
-                isNaN(eci.y) || isNaN(eci.z)) {
+          var pos    = this.getSatelliteLocation(satrec, date);
+          if (pos === null || pos === undefined || isNaN(pos.x) ||
+              isNaN(pos.y) || isNaN(pos.z)) {
+            console.log("Bad satellite location from: ", satrec);
+            return;
+          }
+          vertex.push(pos.x * 1000, pos.y * 1000, pos.z * 1000);
+
+          this.satellite.geometry.removeAttribute("position");
+          this.satellite.geometry.addAttribute(
+              "position", new THREE.Float32Attribute(vertex, 3));
+
+          // Orbit projection
+          var segments = TRAJECTORY_SEGMENT_HR * orbitHours;
+          vertex       = [];
+          for (var i = 0; i <= segments; i++) {
+            var trajectoryDate =
+                new Date(date.valueOf() + i * TRAJECTORY_STEP_MS);
+            pos = this.getSatelliteLocation(satrec, trajectoryDate);
+            if (pos === null || pos === undefined || isNaN(pos.x) ||
+                isNaN(pos.y) || isNaN(pos.z)) {
+              console.log("Bad satellite location from: ", satrec);
               continue;
             }
-            vertex.push(eci.x * 1000, eci.y * 1000, eci.z * 1000);
+            vertex.push(pos.x * 1000, pos.y * 1000, pos.z * 1000);
           }
           this.trajectory.geometry.removeAttribute("position");
           this.trajectory.geometry.addAttribute(
@@ -196,13 +195,127 @@ require(
           ExternalRenderers.requestRender(this.view);
         }
       };
-      var satrec = satellite.twoline2satrec(
-          "1  7530U 74089B   19271.85075181 -.00000044  00000-0  71821-5 0  9991",
-          "2  7530 101.7568 238.5079 0012202 148.2872 267.9139 12.53640078 53324");
-      satRenderer.satellites.push(satrec);
       ExternalRenderers.add(view, satRenderer);
-      console.log(satRenderer.trajectory);
-      setTimeout(function() {
-        satRenderer.showOrbit();
-      }, 2000);
+      view.when(function() {
+        var satelliteTime = document.getElementById("satellite-time");
+        var date          = new Date();
+        var timeStep      = UPDATE_INTERVAL_MS;
+        var orbitHours    = 1.5;
+
+        var enabled = {
+          cameraWide: false,
+          cameraNarrow: false,
+          antennaLow: false,
+          antennaHigh: false,
+          magnetorquer: false,
+          sun: false,
+          ground: false,
+          gps: false
+        };
+
+        var update = function() {
+          if (satelliteTime != document.activeElement)
+            satelliteTime.value = date.toDatetimeLocal();
+          satRenderer.updateSatellite(satrec, date, orbitHours, enabled);
+        };
+
+        document.getElementById("time-speed")
+            .addEventListener("input", function(event) {
+              timeStep = event.target.value * UPDATE_INTERVAL_MS;
+              update();
+            });
+
+        document.getElementById("time-projection")
+            .addEventListener("input", function(event) {
+              orbitHours = event.target.value;
+              update();
+            });
+
+        document.getElementById("en-cam-wide")
+            .addEventListener("input", function(event) {
+              enabled.cameraWide = event.target.checked;
+              update();
+            });
+
+        document.getElementById("en-cam-wide")
+            .addEventListener("input", function(event) {
+              enabled.cameraWide = event.target.checked;
+              update();
+            });
+
+        document.getElementById("en-cam-narrow")
+            .addEventListener("input", function(event) {
+              enabled.cameraNarrow = event.target.checked;
+              update();
+            });
+
+        document.getElementById("en-antenna-low")
+            .addEventListener("input", function(event) {
+              enabled.antennaLow = event.target.checked;
+              update();
+            });
+
+        document.getElementById("en-antenna-high")
+            .addEventListener("input", function(event) {
+              enabled.antennaHigh = event.target.checked;
+              update();
+            });
+
+        document.getElementById("en-magnetorquer")
+            .addEventListener("input", function(event) {
+              enabled.magnetorquer = event.target.checked;
+              update();
+            });
+
+        document.getElementById("en-sun-vector")
+            .addEventListener("input", function(event) {
+              enabled.sun = event.target.checked;
+              update();
+            });
+
+        document.getElementById("en-ground")
+            .addEventListener("input", function(event) {
+              enabled.ground = event.target.checked;
+              update();
+            });
+
+        document.getElementById("en-gps").addEventListener(
+            "input", function(event) {
+              enabled.gps = event.target.checked;
+              update();
+            });
+
+        satelliteTime.addEventListener("input", function(event) {
+          date = new Date(event.target.value);
+          console.log(event.target.value);
+          update();
+        });
+
+        var satrec = satellite.twoline2satrec(
+            "1 25544U 98067A   19272.17332272  .00000706  00000-0  20336-4 0  9999",
+            "2 25544  51.6426 205.5801 0007437  95.6316 228.4969 15.50113298191385")
+        setInterval(function() {
+          if (satelliteTime != document.activeElement) {
+            date = new Date(date.valueOf() + timeStep);
+            update();
+          }
+        }, UPDATE_INTERVAL_MS);
+      });
     });
+
+/**
+ * Convert a date to a string in the format "YYY-MM-DDTHH:mm:ss"
+ * From WebReflection:
+ * https://gist.github.com/WebReflection/6076a40777b65c397b2b9b97247520f0
+ */
+Date.prototype.toDatetimeLocal = function toDatetimeLocal() {
+  var date = this,
+      ten =
+          function(i) {
+        return (i < 10 ? "0" : "") + i;
+      },
+      YYYY = date.getFullYear(), MM = ten(date.getMonth() + 1),
+      DD = ten(date.getDate()), HH = ten(date.getHours()),
+      II = ten(date.getMinutes()), SS = ten(date.getSeconds());
+  return YYYY + "-" + MM + "-" + DD + "T" + HH + ":" + II + ":" + SS;
+};
