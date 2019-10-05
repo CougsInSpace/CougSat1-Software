@@ -1,25 +1,26 @@
 // Satellite map adapted from
 // https://github.com/richiecarmichael/Esri-Satellite-Map
 
-var TRAJECTORY_SEGMENT_HR = 50;
+var TRAJECTORY_SEGMENT_HR = 100;
 var TRAJECTORY_STEP_MS    = (60 * 60 * 1000) / TRAJECTORY_SEGMENT_HR;
 var UPDATE_INTERVAL_MS    = 500;
 
-var satelliteRoll  = 0;
-var satellitePitch = 0;
-var satelliteYaw   = 0;
+var attitude      = new THREE.Euler(0, 0, 0, "XYZ");
+var vectorCamWide = new THREE.Vector3(1, 0, 0);
+var ground        = null;
 
 require(
     [
       "esri/Map", "esri/Camera", "esri/views/SceneView",
-      "esri/views/3d/externalRenderers", "dojo/number", "dojo/string",
-      "dojo/domReady!"
+      "esri/views/3d/externalRenderers", "esri/layers/GraphicsLayer",
+      "esri/Graphic", "dojo/number", "dojo/string", "dojo/domReady!"
     ],
-    function(Map, Camera, SceneView, ExternalRenderers, number, string) {
+    function(Map, Camera, SceneView, ExternalRenderers, GraphicsLayer, Graphic,
+        number, string) {
       var view = new SceneView({
         map: new Map({basemap: "satellite"}),
         container: "map",
-        ui: {components: ["zoom", "compass"]},
+        // ui: {components: ["zoom", "compass", "tilt"]},
         environment: {
           lighting: {
             date: new Date(),
@@ -37,14 +38,30 @@ require(
         }
       });
 
+      var graphicsLayer = new GraphicsLayer();
+      view.map.add(graphicsLayer);
+
+      var groundPoint = {
+        type: "point", // autocasts as new Point()
+        x: -117.17,
+        y: 46.73,
+        z: 0
+      };
+      var groundSymbol = {
+        type: "simple-marker",
+        color: "#2BEEF5",
+        size: 6,
+        outline: {width: 0}
+      };
+      var ground = new Graphic({geometry: groundPoint, symbol: groundSymbol})
+      graphicsLayer.add(ground);
+
       var satRenderer = {
         view: null,
         renderer: null,
         camera: null,
         scene: null,
         vbo: null,
-        satellite: null,
-        trajectory: null,
         setup: function(context) {
           this.view = context.view;
 
@@ -93,6 +110,7 @@ require(
                 vertexColors: THREE.NoColors,
                 fog: false
               }));
+          this.satellite.frustumCulled = false;
 
           this.trajectory = new THREE.Line(
               new THREE.BufferGeometry(), new THREE.LineBasicMaterial({
@@ -103,8 +121,25 @@ require(
               }));
           this.trajectory.frustumCulled = false;
 
+          this.satX = new THREE.ArrowHelper(
+              new THREE.Vector3(), new THREE.Vector3(), 1000000, 0xFF0000);
+          this.satX.frustumCulled = false;
+
+          this.satY = new THREE.ArrowHelper(
+              new THREE.Vector3(), new THREE.Vector3(), 1000000, 0x00FF00);
+          this.satY.frustumCulled = false;
+
+          this.satZ = new THREE.ArrowHelper(
+              new THREE.Vector3(), new THREE.Vector3(), 1000000, 0x0000FF);
+          this.satZ.frustumCulled = false;
+
+          this.arrowCamWide = new THREE.ArrowHelper(
+              new THREE.Vector3(), new THREE.Vector3(), 2000000, 0x00FFFF);
+          this.arrowCamWide.frustumCulled = false;
+
           // Add to scene
-          this.scene.add(this.satellite, this.trajectory);
+          this.scene.add(this.satellite, this.trajectory, this.satX, this.satY,
+              this.satZ, this.arrowCamWide);
 
           // Refresh the screen
           ExternalRenderers.requestRender(this.view);
@@ -119,6 +154,7 @@ require(
           this.camera.lookAt(
               new THREE.Vector3(c.center[0], c.center[1], c.center[2]));
           this.camera.projectionMatrix.fromArray(c.projectionMatrix);
+          this.camera.near - c.near;
 
           // Get Esri's current sun settings
           this.view.environment.lighting.date = this.date;
@@ -147,31 +183,113 @@ require(
           // Cleanup
           context.resetWebGLState();
         },
-        getSatelliteLocation: function(satrec, date) {
-          var position_and_velocity = satellite.propagate(satrec,
-              date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(),
-              date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-
-          var ecf = satellite.eciToEcf(position_and_velocity.position,
-              satellite.gstimeFromDate(date.getUTCFullYear(),
-                  date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(),
-                  date.getUTCMinutes(), date.getUTCSeconds()));
-          return ecf;
+        /**
+         * Get the position and velocity of the satellite at a date in Earth
+         * fixed coordinates
+         *
+         * @param {satellite.satrec} satrec satellite record from the TLE
+         * @param {Date} date to know where the earth is rotated
+         */
+        getSatelliteDynamics: function(satrec, date) {
+          var result = satellite.propagate(satrec, date.getUTCFullYear(),
+              date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(),
+              date.getUTCMinutes(), date.getUTCSeconds());
+          return this.eciToEcf(result, date);
         },
+        /**
+         * Convert Earth inertial coordinates to Earth fixed coordinates
+         *
+         * @param {set} dynamics position and velocity, each are sets of x, y, z
+         * @param {Date} date to know where the earth is rotated
+         */
+        eciToEcf: function(dynamics, date) {
+          var omega       = 7.29211514668855e-5; // rad/sec of earth
+          var gmst        = satellite.gstimeFromDate(date.getUTCFullYear(),
+              date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(),
+              date.getUTCMinutes(), date.getUTCSeconds());
+          var ecfPosition = satellite.eciToEcf(dynamics.position, gmst);
+          var ecfVelocity = satellite.eciToEcf(dynamics.velocity, gmst);
+          ecfVelocity.x += omega * ((-dynamics.position.x * Math.sin(gmst)) +
+                                       (dynamics.position.y * Math.cos(gmst)));
+          ecfVelocity.y += omega * ((-dynamics.position.x * Math.cos(gmst)) -
+                                       (dynamics.position.y * Math.sin(gmst)));
+          ecfPosition.x *= 1000.0; // km to m
+          ecfPosition.y *= 1000.0;
+          ecfPosition.z *= 1000.0;
+          ecfVelocity.x *= 1000.0; // km/s to m/s
+          ecfVelocity.y *= 1000.0;
+          ecfVelocity.z *= 1000.0;
+          return {position: ecfPosition, velocity: ecfVelocity};
+        },
+        /**
+         * Set the properties of an arrow, transforming from satellite's XYZ to
+         * world direction coordinates
+         *
+         * @param {THREE.ArrowHelper} arrow
+         * @param {THREE.Vector3} vector relative to the satellite's XYZ
+         * @param {THREE.Vector3} attitude of the satellite's XYZ to its
+         *     trajectory vector (aka roll, pitch, yaw)
+         * @param {THREE.Vector3} position of the satellite origin
+         * @param {THREE.Vector3} x basis of trajectory vector
+         * @param {THREE.Vector3} y basis of trajectory vector
+         * @param {THREE.Vector3} z basis of trajectory vector
+         */
+        updateArrow: function(arrow, vector, attitude, position, x, y, z) {
+          // Rotate the satellite vector to the trajectory frame (roll, pitch,
+          // yaw)
+          var trajectoryFrame = vector.clone().applyEuler(attitude);
+
+          // Project trajectory frame onto the world frame given the trajectory
+          // frame's basis vectors
+          var worldFrame = new THREE.Vector3();
+          worldFrame.addScaledVector(x, trajectoryFrame.x);
+          worldFrame.addScaledVector(y, trajectoryFrame.y);
+          worldFrame.addScaledVector(z, trajectoryFrame.z);
+          worldFrame.normalize();
+          arrow.position.copy(position);
+          arrow.setDirection(worldFrame);
+        },
+        /**
+         * Update the map based on the trajectory, date, and desired elements
+         *
+         * @param {satellite.satrec} satrec satellite record from the TLE
+         * @param {Date} date to calculate everything for
+         * @param {float} orbitHours to project the trajectory for
+         * @param {set} enabledElements to display: cameraWide, cameraNarrow,
+         *     antennaLow, antennaHigh, magnetorquer, sun, ground, gps
+         */
         updateSatellite: function(satrec, date, orbitHours, enabledElements) {
           // Satellite position
-          var vertex = [];
-          var pos    = this.getSatelliteLocation(satrec, date);
-          if (pos === null || pos === undefined || isNaN(pos.x) ||
-              isNaN(pos.y) || isNaN(pos.z)) {
-            console.log("Bad satellite location from: ", satrec);
-            return;
-          }
-          vertex.push(pos.x * 1000, pos.y * 1000, pos.z * 1000);
-
+          var vertex   = [];
+          var dynamics = this.getSatelliteDynamics(satrec, date);
+          vertex.push(
+              dynamics.position.x, dynamics.position.y, dynamics.position.z);
           this.satellite.geometry.removeAttribute("position");
           this.satellite.geometry.addAttribute(
               "position", new THREE.Float32Attribute(vertex, 3));
+
+          var position = new THREE.Vector3(
+              dynamics.position.x, dynamics.position.y, dynamics.position.z);
+
+          // Generate the coordinate system for roll pitch yaw
+          // x = velocity, y = z cross x, z = position
+          var x = (new THREE.Vector3(dynamics.velocity.x, dynamics.velocity.y,
+                       dynamics.velocity.z))
+                      .normalize();
+          var z = position.clone().normalize();
+          var y = (new THREE.Vector3()).crossVectors(z, x);
+
+          this.satX.position.copy(position);
+          this.satX.setDirection(x);
+
+          this.satY.position.copy(position);
+          this.satY.setDirection(y);
+
+          this.satZ.position.copy(position);
+          this.satZ.setDirection(z);
+
+          this.updateArrow(
+              this.arrowCamWide, vectorCamWide, attitude, position, x, y, z);
 
           // Orbit projection
           var segments = TRAJECTORY_SEGMENT_HR * orbitHours;
@@ -179,17 +297,15 @@ require(
           for (var i = 0; i <= segments; i++) {
             var trajectoryDate =
                 new Date(date.valueOf() + i * TRAJECTORY_STEP_MS);
-            pos = this.getSatelliteLocation(satrec, trajectoryDate);
-            if (pos === null || pos === undefined || isNaN(pos.x) ||
-                isNaN(pos.y) || isNaN(pos.z)) {
-              console.log("Bad satellite location from: ", satrec);
-              continue;
-            }
-            vertex.push(pos.x * 1000, pos.y * 1000, pos.z * 1000);
+            dynamics = this.getSatelliteDynamics(satrec, trajectoryDate);
+            vertex.push(
+                dynamics.position.x, dynamics.position.y, dynamics.position.z);
           }
           this.trajectory.geometry.removeAttribute("position");
           this.trajectory.geometry.addAttribute(
               "position", new THREE.Float32Attribute(vertex, 3));
+
+          view.environment.lighting.date = date;
 
           // Immediately request a new redraw
           ExternalRenderers.requestRender(this.view);
@@ -200,7 +316,7 @@ require(
         var satelliteTime = document.getElementById("satellite-time");
         var date          = new Date();
         var timeStep      = UPDATE_INTERVAL_MS;
-        var orbitHours    = 1.5;
+        var orbitHours    = 1.7;
 
         var enabled = {
           cameraWide: false,
@@ -228,12 +344,6 @@ require(
         document.getElementById("time-projection")
             .addEventListener("input", function(event) {
               orbitHours = event.target.value;
-              update();
-            });
-
-        document.getElementById("en-cam-wide")
-            .addEventListener("input", function(event) {
-              enabled.cameraWide = event.target.checked;
               update();
             });
 
@@ -275,8 +385,7 @@ require(
 
         document.getElementById("en-ground")
             .addEventListener("input", function(event) {
-              enabled.ground = event.target.checked;
-              update();
+              ground.visible = event.target.checked;
             });
 
         document.getElementById("en-gps").addEventListener(
@@ -287,7 +396,6 @@ require(
 
         satelliteTime.addEventListener("input", function(event) {
           date = new Date(event.target.value);
-          console.log(event.target.value);
           update();
         });
 
