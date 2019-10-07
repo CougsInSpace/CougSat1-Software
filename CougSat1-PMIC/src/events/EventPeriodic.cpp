@@ -16,27 +16,34 @@ double SHED_SOME = 0.48;
  * @return mbed_error_status_t
  */
 mbed_error_status_t shedLoad(
-    CurrentNode * nodes[], uint8_t nodeCount, double currentToShed) {
-  double              buf   = 0.0;
-  mbed_error_status_t error = MBED_SUCCESS;
-  while (currentToShed > 0.0) {
-    // Could get stuck in this loop if all nodes are off but there is more
-    // current to shed TODO fix this
-    double        maxAggregate = 0.0;
-    CurrentNode * maxNode      = nullptr;
+  CurrentNode * nodes[], uint8_t nodeCount, double currentToShed) 
+{
+      double buf = 0.0;
+      mbed_error_status_t error = MBED_SUCCESS;
 
-    // Find the node with the largest aggregate rank that is enabled
-    for (int i = 0; i < nodeCount; ++i) {
-      error = nodes[i]->getAggregateRank(buf);
-      if (error) {
-        ERROR("shedLoad", "Failed to get aggregate rank: 0x%08X", error);
-        return error;
-      }
-      if (buf > maxAggregate && nodes[i]->getSwitch()) {
-        maxAggregate = buf;
-        maxNode      = nodes[i];
-      }
-    }
+      while (currentToShed > 0.0) 
+      {
+        // Could get stuck in this loop if all nodes are off but there is more
+        // current to shed TODO fix this
+        double        maxAggregate = 0.0;
+        CurrentNode * maxNode      = nullptr;
+
+        // Find the node with the largest aggregate rank that is enabled
+        for (int i = 0; i < nodeCount; ++i)
+         {
+            error = nodes[i]->getAggregateRank(buf);
+            if (error)
+            {
+              ERROR("shedLoad", "Failed to get aggregate rank: 0x%08X", error);
+              return error;
+            }
+            if (buf > maxAggregate && nodes[i]->getSwitch())
+            {
+              maxAggregate = buf;
+              maxNode      = nodes[i];
+            }
+
+          }
 
     // Turn off the max node and remove its current
     currentToShed -= maxNode->getCurrent();
@@ -52,18 +59,27 @@ mbed_error_status_t shedLoad(
  * @return mbed_error_status_t error code
  */
 mbed_error_status_t eventPeriodic() {
+  
   // Check 3.3V rails first as reducing their load reduces VBatt load
   // Update current for 3.3V nodes
   mbed_error_status_t error = MBED_SUCCESS;
-  double              buf   = 0.0;
-  for (uint8_t i = 0; i < COUNT_PR_3V3; ++i) {
+  double buf = 0.0;
+
+  // Update the current by reading the ADC's value and doing some math
+  for (uint8_t i = 0; i < COUNT_PR_3V3; ++i) 
+  {
     error = nodesPR3V3[i]->updateCurrent();
+    
     if (error) {
       ERROR("eventPeriodic",
           "Failed to update current for nodesPR3V3[%d]: 0x%08X", i, error);
       return error;
     }
+
   }
+
+  /***************************************************************/
+  // get newest current reading for node3V3OutA
   error = node3V3OutA.updateCurrent();
   if (error) {
     ERROR("eventPeriodic", "Failed to update current for node3V3OutA: 0x%08X",
@@ -71,6 +87,7 @@ mbed_error_status_t eventPeriodic() {
     return error;
   }
 
+   // calculate newest current reading for node3V3OutB
   error = node3V3OutB.updateCurrent();
   if (error) {
     ERROR("eventPeriodic", "Failed to update current for node3V3OutB: 0x%08X",
@@ -81,25 +98,33 @@ mbed_error_status_t eventPeriodic() {
   // Find the current to shed if regulator > its maximum
   double toShed = 0.0;
 
+  // set buf to the difference of the new current and expected current of 3V3Out
   buf = node3V3OutA.getCurrent() - THRES_CURRENT_REG_MAX;
   if (buf > toShed)
     toShed = buf;
 
+  // set buf to the difference of the new current and expected current of 3V3Out
   buf = node3V3OutB.getCurrent() - THRES_CURRENT_REG_MAX;
   if (buf > toShed)
     toShed = buf;
-
+  
+  /*****************************************************************************/
   // Check the regulators' temperature
   bool regulatorsOvertemp = false;
 
+  // get the temperature of Regulator A
   error = thermistorRegA.getTemperature(buf);
   if (error) {
     ERROR("eventPeriodic", "Failed to get temp for regulator A: 0x%08X", error);
     return error;
   }
-  if (buf > (THRES_REG_HOT + THRES_OVERHEATED)) {
+
+  // check temperature cases: 
+  if (buf > (THRES_REG_HOT + THRES_OVERHEATED)) 
+  {
     // TODO turn off all nodes
-  } else if (buf > THRES_REG_HOT) {
+  } else if (buf > THRES_REG_HOT) 
+  {
     regulatorsOvertemp = true;
   }
 
@@ -108,9 +133,13 @@ mbed_error_status_t eventPeriodic() {
     ERROR("eventPeriodic", "Failed to get temp for regulator B: 0x%08X", error);
     return error;
   }
-  if (buf > (THRES_REG_HOT + THRES_OVERHEATED)) {
-    // TODO turn off all nodes
-  } else if (buf > THRES_REG_HOT) {
+
+  if (buf > (THRES_REG_HOT + THRES_OVERHEATED)) 
+  {
+    // If really overtemp, reduce load by 100%
+    toShed = node3V3OutA.getCurrent() + node3V3OutB.getCurrent();
+  } 
+  else if (buf > THRES_REG_HOT) {
     regulatorsOvertemp = true;
   }
 
@@ -118,12 +147,14 @@ mbed_error_status_t eventPeriodic() {
     // If overtemp, reduce load by 25%
     toShed = node3V3OutA.getCurrent() * 0.25 + node3V3OutB.getCurrent() * 0.25;
   }
+
   error = shedLoad(nodesPR3V3, COUNT_PR_3V3, toShed);
   if (error) {
     ERROR("eventPeriodic", "Failed to shed load from 3.3V: 0x%08X", error);
     return error;
   }
 
+  /*******************************************************/
   // Check battery rails
   // Update current for battery rails
   for (uint8_t i = 0; i < COUNT_PR_3V3; ++i) {
@@ -134,6 +165,7 @@ mbed_error_status_t eventPeriodic() {
       return error;
     }
   }
+
   error = nodeBattOutA.updateCurrent();
   if (error) {
     ERROR("eventPeriodic", "Failed to update current for nodeBattOutA: 0x%08X",
@@ -167,6 +199,7 @@ mbed_error_status_t eventPeriodic() {
     ERROR("eventPeriodic", "Failed to get temp for battery A: 0x%08X", error);
     return error;
   }
+
   if (buf > (THRES_BATT_HOT + THRES_OVERHEATED)) {
     // TODO: turn off all loads
   } else if (buf > THRES_BATT_HOT) {
@@ -181,6 +214,7 @@ mbed_error_status_t eventPeriodic() {
     ERROR("eventPeriodic", "Failed to get temp for battery B: 0x%08X", error);
     return error;
   }
+
   if (buf > (THRES_BATT_HOT + THRES_OVERHEATED)) {
     // TODO: turn off all loads
   } else if (buf > THRES_BATT_HOT) {
@@ -192,9 +226,9 @@ mbed_error_status_t eventPeriodic() {
 
   if (toShed < 0 && batteriesOvertemp) {
     // If overtemp, shed 25%
-    toShed =
-        nodeBattOutA.getCurrent() * 0.25 + nodeBattOutB.getCurrent() * 0.25;
+    toShed = nodeBattOutA.getCurrent() * 0.25 + nodeBattOutB.getCurrent() * 0.25;
   }
+  
   error = shedLoad(nodesPRBatt, COUNT_PR_BATT, toShed);
   if (error) {
     ERROR("eventPeriodic", "Failed to shed load from VBatt: 0x%08X", error);
