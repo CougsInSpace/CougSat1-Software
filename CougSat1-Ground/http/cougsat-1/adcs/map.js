@@ -5,9 +5,20 @@ var TRAJECTORY_SEGMENT_HR = 100;
 var TRAJECTORY_STEP_MS    = (60 * 60 * 1000) / TRAJECTORY_SEGMENT_HR;
 var UPDATE_INTERVAL_MS    = 500;
 
-var attitude      = new THREE.Euler(0, 0, 0, "XYZ");
-var vectorCamWide = new THREE.Vector3(1, 0, 0);
-var ground        = null;
+var attitude           = new THREE.Euler(0, 0, 0, "XYZ");
+var vectorCamWide      = new THREE.Vector3(0, 0, -1);
+var vectorCamNarrow    = new THREE.Vector3(0, 0, -1);
+var vectorAntennaHigh  = new THREE.Vector3(0, 0, -1);
+var vectorMagnetorquer = new THREE.Vector3(1, 0, 0);
+var vectorSun          = new THREE.Vector3(-0.3, -3, 6);
+
+var fovCamWide     = 142 / 180 * Math.PI;
+var fovCamNarrow   = 21 / 180 * Math.PI;
+var fovAntennaHigh = 40 / 180 * Math.PI;
+
+var ground     = null;
+var gps        = null;
+var antennaLow = null;
 
 require(
     [
@@ -20,7 +31,6 @@ require(
       var view = new SceneView({
         map: new Map({basemap: "satellite"}),
         container: "map",
-        // ui: {components: ["zoom", "compass", "tilt"]},
         environment: {
           lighting: {
             date: new Date(),
@@ -38,7 +48,7 @@ require(
         }
       });
 
-      var graphicsLayer = new GraphicsLayer();
+      graphicsLayer = new GraphicsLayer();
       view.map.add(graphicsLayer);
 
       var groundPoint = {
@@ -53,8 +63,23 @@ require(
         size: 6,
         outline: {width: 0}
       };
-      var ground = new Graphic({geometry: groundPoint, symbol: groundSymbol})
+      ground = new Graphic({geometry: groundPoint, symbol: groundSymbol})
       graphicsLayer.add(ground);
+
+      var gpsPoint = {
+        type: "point", // autocasts as new Point()
+        x: -117.17,
+        y: 46.73,
+        z: 0
+      };
+      var gpsSymbol = {
+        type: "simple-marker",
+        color: "#18FF65",
+        size: 6,
+        outline: {width: 0}
+      };
+      gps = new Graphic({geometry: gpsPoint, symbol: gpsSymbol})
+      graphicsLayer.add(gps);
 
       var satRenderer = {
         view: null,
@@ -121,25 +146,59 @@ require(
               }));
           this.trajectory.frustumCulled = false;
 
-          this.satX = new THREE.ArrowHelper(
-              new THREE.Vector3(), new THREE.Vector3(), 1000000, 0xFF0000);
-          this.satX.frustumCulled = false;
+          this.magnetorquer = new THREE.ArrowHelper(
+              new THREE.Vector3(), new THREE.Vector3(), 1000000, 0xFF2626);
+          this.magnetorquer.frustumCulled = false;
 
-          this.satY = new THREE.ArrowHelper(
-              new THREE.Vector3(), new THREE.Vector3(), 1000000, 0x00FF00);
-          this.satY.frustumCulled = false;
+          this.sun = new THREE.ArrowHelper(
+              new THREE.Vector3(), new THREE.Vector3(), 1000000, 0xFFFB16);
+          this.sun.frustumCulled = false;
 
-          this.satZ = new THREE.ArrowHelper(
-              new THREE.Vector3(), new THREE.Vector3(), 1000000, 0x0000FF);
-          this.satZ.frustumCulled = false;
+          this.cameraWide = new THREE.Mesh(
+              new THREE.ConeGeometry(
+                  Math.tan(fovCamWide / 2) * 1000000, 1000000, 32),
+              new THREE.MeshBasicMaterial({
+                color: 0x31B431,
+                transparent: true,
+                opacity: 0.25,
+                depthWrite: false
+              }));
+          this.cameraWide.geometry.translate(0, -500000, 0);
+          this.cameraWide.geometry.rotateX(-Math.PI / 2);
+          this.cameraWide.renderOrder   = 3;
+          this.cameraWide.frustumCulled = false;
 
-          this.arrowCamWide = new THREE.ArrowHelper(
-              new THREE.Vector3(), new THREE.Vector3(), 2000000, 0x00FFFF);
-          this.arrowCamWide.frustumCulled = false;
+          this.cameraNarrow = new THREE.Mesh(
+              new THREE.ConeGeometry(
+                  Math.tan(fovCamNarrow / 2) * 1000000, 1000000, 32),
+              new THREE.MeshBasicMaterial({
+                color: 0x5782C2,
+                transparent: true,
+                opacity: 0.25,
+                depthWrite: false
+              }));
+          this.cameraNarrow.geometry.translate(0, -500000, 0);
+          this.cameraNarrow.geometry.rotateX(-Math.PI / 2);
+          this.cameraNarrow.renderOrder   = 1;
+          this.cameraNarrow.frustumCulled = false;
+
+          this.antennaHigh = new THREE.Mesh(
+              new THREE.ConeGeometry(
+                  Math.tan(fovAntennaHigh / 2) * 1000000, 1000000, 32),
+              new THREE.MeshBasicMaterial({
+                color: 0xA149F3,
+                transparent: true,
+                opacity: 0.25,
+                depthWrite: false
+              }));
+          this.antennaHigh.geometry.translate(0, -500000, 0);
+          this.antennaHigh.geometry.rotateX(-Math.PI / 2);
+          this.antennaHigh.renderOrder   = 2;
+          this.antennaHigh.frustumCulled = false;
 
           // Add to scene
-          this.scene.add(this.satellite, this.trajectory, this.satX, this.satY,
-              this.satZ, this.arrowCamWide);
+          this.scene.add(this.satellite, this.trajectory, this.magnetorquer,
+              this.sun, this.cameraWide, this.cameraNarrow, this.antennaHigh);
 
           // Refresh the screen
           ExternalRenderers.requestRender(this.view);
@@ -250,13 +309,44 @@ require(
           arrow.setDirection(worldFrame);
         },
         /**
+         * Set the properties of an obj, transforming from satellite's XYZ to
+         * world direction coordinates
+         *
+         * @param {THREE.Mesh} obj
+         * @param {THREE.Vector3} vector relative to the satellite's XYZ
+         * @param {THREE.Vector3} attitude of the satellite's XYZ to its
+         *     trajectory vector (aka roll, pitch, yaw)
+         * @param {THREE.Vector3} position of the satellite origin
+         * @param {THREE.Vector3} x basis of trajectory vector
+         * @param {THREE.Vector3} y basis of trajectory vector
+         * @param {THREE.Vector3} z basis of trajectory vector
+         */
+        updateMesh: function(obj, vector, attitude, position, x, y, z) {
+          // Rotate the satellite vector to the trajectory frame (roll, pitch,
+          // yaw)
+          var trajectoryFrame = vector.clone().applyEuler(attitude);
+
+          // Project trajectory frame onto the world frame given the trajectory
+          // frame's basis vectors
+          var worldFrame = new THREE.Vector3();
+          worldFrame.addScaledVector(x, trajectoryFrame.x);
+          worldFrame.addScaledVector(y, trajectoryFrame.y);
+          worldFrame.addScaledVector(z, trajectoryFrame.z);
+          worldFrame.normalize().scale;
+          var matrix = new THREE.Matrix4().lookAt(worldFrame,
+              new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 1));
+
+          obj.position.copy(position);
+          obj.setRotationFromMatrix(matrix);
+        },
+        /**
          * Update the map based on the trajectory, date, and desired elements
          *
          * @param {satellite.satrec} satrec satellite record from the TLE
          * @param {Date} date to calculate everything for
          * @param {float} orbitHours to project the trajectory for
          * @param {set} enabledElements to display: cameraWide, cameraNarrow,
-         *     antennaLow, antennaHigh, magnetorquer, sun, ground, gps
+         *     antennaLow, antennaHigh, magnetorquer, sun
          */
         updateSatellite: function(satrec, date, orbitHours, enabledElements) {
           // Satellite position
@@ -279,17 +369,24 @@ require(
           var z = position.clone().normalize();
           var y = (new THREE.Vector3()).crossVectors(z, x);
 
-          this.satX.position.copy(position);
-          this.satX.setDirection(x);
+          this.updateArrow(this.magnetorquer, vectorMagnetorquer, attitude,
+              position, x, y, z);
+          this.magnetorquer.visible = enabledElements.magnetorquer;
 
-          this.satY.position.copy(position);
-          this.satY.setDirection(y);
+          this.updateArrow(this.sun, vectorSun, attitude, position, x, y, z);
+          this.sun.visible = enabledElements.sun;
 
-          this.satZ.position.copy(position);
-          this.satZ.setDirection(z);
+          this.updateMesh(
+              this.cameraWide, vectorCamWide, attitude, position, x, y, z);
+          this.cameraWide.visible = enabledElements.cameraWide;
 
-          this.updateArrow(
-              this.arrowCamWide, vectorCamWide, attitude, position, x, y, z);
+          this.updateMesh(
+              this.cameraNarrow, vectorCamNarrow, attitude, position, x, y, z);
+          this.cameraNarrow.visible = enabledElements.cameraNarrow;
+
+          this.updateMesh(
+              this.antennaHigh, vectorAntennaHigh, attitude, position, x, y, z);
+          this.antennaHigh.visible = enabledElements.antennaHigh;
 
           // Orbit projection
           var segments = TRAJECTORY_SEGMENT_HR * orbitHours;
@@ -319,19 +416,23 @@ require(
         var orbitHours    = 1.7;
 
         var enabled = {
-          cameraWide: false,
-          cameraNarrow: false,
-          antennaLow: false,
-          antennaHigh: false,
-          magnetorquer: false,
-          sun: false,
-          ground: false,
-          gps: false
+          cameraWide: true,
+          cameraNarrow: true,
+          antennaLow: true,
+          antennaHigh: true,
+          magnetorquer: true,
+          sun: true
         };
 
         var update = function() {
           if (satelliteTime != document.activeElement)
             satelliteTime.value = date.toDatetimeLocal();
+          gps.geometry = { // TODO Replace with getting GPS from telemetry
+            type: "point", // autocasts as new Point()
+            x: gps.geometry.x + 1,
+            y: 46.73,
+            z: 0
+          };
           satRenderer.updateSatellite(satrec, date, orbitHours, enabled);
         };
 
@@ -390,8 +491,7 @@ require(
 
         document.getElementById("en-gps").addEventListener(
             "input", function(event) {
-              enabled.gps = event.target.checked;
-              update();
+              gps.visible = event.target.checked;
             });
 
         satelliteTime.addEventListener("input", function(event) {
