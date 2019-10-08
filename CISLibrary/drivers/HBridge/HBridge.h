@@ -27,7 +27,7 @@ public:
    * @param blocking will wait until operation is complete if true
    * @return mbed_error_status_t
    */
-  virtual mbed_error_status_t set(double value, bool blocking = true) = 0;
+  virtual mbed_error_status_t set(double value) = 0;
 
   /**
    * @brief Stop the output, brake or coast
@@ -36,7 +36,7 @@ public:
    * @param blocking will wait until operation is complete if true
    * @return mbed_error_status_t
    */
-  virtual mbed_error_status_t stop(bool brake = true, bool blocking = true) = 0;
+  virtual mbed_error_status_t stop(bool brake = true) = 0;
 };
 
 #endif /* _LIBRARY_DRIVER_HBRIDGE_HBRIDGE_H_ */
