@@ -16,9 +16,12 @@ var fovCamWide     = 142 / 180 * Math.PI;
 var fovCamNarrow   = 21 / 180 * Math.PI;
 var fovAntennaHigh = 40 / 180 * Math.PI;
 
-var ground     = null;
-var gps        = null;
-var antennaLow = null;
+var ground = null;
+var gps    = null;
+
+var satrec = satellite.twoline2satrec(
+    "1 25544U 98067A   19272.17332272  .00000706  00000-0  20336-4 0  9999",
+    "2 25544  51.6426 205.5801 0007437  95.6316 228.4969 15.50113298191385");
 
 require(
     [
@@ -154,51 +157,81 @@ require(
               new THREE.Vector3(), new THREE.Vector3(), 1000000, 0xFFFB16);
           this.sun.frustumCulled = false;
 
-          this.cameraWide = new THREE.Mesh(
-              new THREE.ConeGeometry(
-                  Math.tan(fovCamWide / 2) * 1000000, 1000000, 32),
-              new THREE.MeshBasicMaterial({
-                color: 0x31B431,
+          var satRadius =
+              this.getSatelliteDynamics(satrec, new Date()).position;
+          satRadius =
+              Math.sqrt(satRadius.x * satRadius.x + satRadius.y * satRadius.y +
+                        satRadius.z * satRadius.z);
+          var earthRadius = 6378100;
+          var radius =
+              earthRadius *
+              Math.sqrt(satRadius * satRadius - earthRadius * earthRadius) /
+              satRadius;
+          var height      = earthRadius * earthRadius / satRadius + 10000;
+          this.antennaLow = new THREE.Mesh(
+              new THREE.CylinderGeometry(radius, radius, height, 32, 1, true),
+              new THREE.MeshPhongMaterial({
+                color: 0xF162DA,
                 transparent: true,
-                opacity: 0.25,
-                depthWrite: false
+                opacity: 0.75,
+                depthWrite: false,
+                side: THREE.DoubleSide
               }));
-          this.cameraWide.geometry.translate(0, -500000, 0);
+          this.antennaLow.geometry.translate(0, -6400000 / 2, 0);
+          this.antennaLow.geometry.rotateX(-Math.PI / 2);
+          this.antennaLow.renderOrder   = 4;
+          this.antennaLow.frustumCulled = false;
+
+          height = satRadius - height;
+
+          this.cameraWide =
+              new THREE.Mesh(new THREE.ConeGeometry(
+                                 Math.tan(fovCamWide / 2) * height, height, 32),
+                  new THREE.MeshBasicMaterial({
+                    color: 0x31B431,
+                    transparent: true,
+                    opacity: 0.25,
+                    depthWrite: false
+                  }));
+          this.cameraWide.geometry.translate(0, -height / 2, 0);
           this.cameraWide.geometry.rotateX(-Math.PI / 2);
           this.cameraWide.renderOrder   = 3;
           this.cameraWide.frustumCulled = false;
 
           this.cameraNarrow = new THREE.Mesh(
               new THREE.ConeGeometry(
-                  Math.tan(fovCamNarrow / 2) * 1000000, 1000000, 32),
+                  Math.tan(fovCamNarrow / 2) * height, height, 32),
               new THREE.MeshBasicMaterial({
                 color: 0x5782C2,
                 transparent: true,
                 opacity: 0.25,
-                depthWrite: false
+                depthWrite: false,
+                side: THREE.DoubleSide
               }));
-          this.cameraNarrow.geometry.translate(0, -500000, 0);
+          this.cameraNarrow.geometry.translate(0, -height / 2, 0);
           this.cameraNarrow.geometry.rotateX(-Math.PI / 2);
           this.cameraNarrow.renderOrder   = 1;
           this.cameraNarrow.frustumCulled = false;
 
           this.antennaHigh = new THREE.Mesh(
               new THREE.ConeGeometry(
-                  Math.tan(fovAntennaHigh / 2) * 1000000, 1000000, 32),
+                  Math.tan(fovAntennaHigh / 2) * height, height, 32),
               new THREE.MeshBasicMaterial({
                 color: 0xA149F3,
                 transparent: true,
                 opacity: 0.25,
-                depthWrite: false
+                depthWrite: false,
+                side: THREE.DoubleSide
               }));
-          this.antennaHigh.geometry.translate(0, -500000, 0);
+          this.antennaHigh.geometry.translate(0, -height / 2, 0);
           this.antennaHigh.geometry.rotateX(-Math.PI / 2);
           this.antennaHigh.renderOrder   = 2;
           this.antennaHigh.frustumCulled = false;
 
           // Add to scene
           this.scene.add(this.satellite, this.trajectory, this.magnetorquer,
-              this.sun, this.cameraWide, this.cameraNarrow, this.antennaHigh);
+              this.sun, this.cameraWide, this.cameraNarrow, this.antennaHigh,
+              this.antennaLow);
 
           // Refresh the screen
           ExternalRenderers.requestRender(this.view);
@@ -388,6 +421,10 @@ require(
               this.antennaHigh, vectorAntennaHigh, attitude, position, x, y, z);
           this.antennaHigh.visible = enabledElements.antennaHigh;
 
+          // this.antennaLow.position.copy(position);
+          this.antennaLow.lookAt(position);
+          this.antennaLow.visible = enabledElements.antennaLow;
+
           // Orbit projection
           var segments = TRAJECTORY_SEGMENT_HR * orbitHours;
           vertex       = [];
@@ -420,6 +457,7 @@ require(
           cameraNarrow: true,
           antennaLow: true,
           antennaHigh: true,
+          antennaLow: true,
           magnetorquer: true,
           sun: true
         };
@@ -430,7 +468,7 @@ require(
           gps.geometry = { // TODO Replace with getting GPS from telemetry
             type: "point", // autocasts as new Point()
             x: gps.geometry.x + 1,
-            y: 46.73,
+            y: gps.geometry.y + 1,
             z: 0
           };
           satRenderer.updateSatellite(satrec, date, orbitHours, enabled);
@@ -463,7 +501,6 @@ require(
         document.getElementById("en-antenna-low")
             .addEventListener("input", function(event) {
               enabled.antennaLow = event.target.checked;
-              update();
             });
 
         document.getElementById("en-antenna-high")
@@ -499,9 +536,6 @@ require(
           update();
         });
 
-        var satrec = satellite.twoline2satrec(
-            "1 25544U 98067A   19272.17332272  .00000706  00000-0  20336-4 0  9999",
-            "2 25544  51.6426 205.5801 0007437  95.6316 228.4969 15.50113298191385")
         setInterval(function() {
           if (satelliteTime != document.activeElement) {
             date = new Date(date.valueOf() + timeStep);
