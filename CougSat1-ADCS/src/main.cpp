@@ -24,6 +24,22 @@
  */
 int main()
 {
-    ADCS adcs;
-    adcs.mainThread();
+  //  ADCS adcs;
+   // adcs.mainThread();
+    Serial gpsSerial(PA_9,PA_10);
+   // gpsSerial.format(8,mbed::SerialBase::None,1);
+    DigitalIn gpsPulse(PinName(44));
+    DigitalOut gpsReset(PinName(33));
+    Venus838FLPx gps(gpsSerial,gpsReset,gpsPulse,true);
+    gps.initialize();
+    DEBUG("ADCS", "Starting Main")
+    while (true){
+        Thread::wait(500);
+        int error = gps.read();
+        if(!error){
+            DEBUG("GPS", "RMC data: \n utcTime: %f\nlatitude: %f\nlongitude: %f\nspeedOverGround: %f\nrtcDate: %d\n",gps.getUtcTime(),gps.getLat(),gps.getLong(),gps.getSpeedOverGround(),gps.getDate());
+        }else{
+            DEBUG("GPS", "No Data: %d", error);
+        }
+    }
 }

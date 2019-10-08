@@ -28,18 +28,22 @@
 #include <mbed.h>
 #include <rtos.h>
 #include "ADCSPins.h"
+#include "tools/CISConsole.h"
 #include "components/CDHCOM.h"
+#include "drivers/Venus838FLPx.h"
 
 class ADCS
 {
   private:
 	Thread monitor;
 	Thread cdhRead;
+	Thread readGPS;
 	char message[4];
 	CDHCOM cdh;
 	
   public:
 	ADCS();
+	void readGPSThread();
 	void monitorThread();
 	void cdhThread();
 	void mainThread();

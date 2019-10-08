@@ -16,7 +16,7 @@
 
 #include "Venus838FLPx.h"
 #include "tools/CISConsole.h"
-#include "tools/CISError.h"
+#include "../tools/CISError.h"
 
 // TODO: implement
 Venus838FLPx::Venus838FLPx(Serial & serial, DigitalOut & reset, DigitalIn & pulse, bool mode)
@@ -62,10 +62,19 @@ uint8_t Venus838FLPx::getDate() const {
 // TODO: implement
 uint8_t Venus838FLPx::read() {
   char data [83] = {'\0'};
-  serial.gets(data, 83);
-  
-  //TODO: setup different data parsers for other formats
-  rmcParser(data);
+  uint8_t error = ERROR_SUCCESS;
+  if(serial.readable()){
+    DEBUG("GPS", "Reading data\n");
+   /* for(int i = 0; data[i] != '\r' && i < 83; ++i){
+    data[i] = serial.getc();
+    }*/
+    serial.gets(data,83);
+   error = rmcParser(data +1);
+  }else{
+    error = ERROR_READ;
+  }
+  return error;
+
 }
 
 // Attribute:
@@ -149,14 +158,16 @@ void Venus838FLPx::setMode(bool nMode) {
 // TODO: implement
 uint8_t Venus838FLPx::initialize() {
  uint8_t messageBody[2];
- char response[21];
+ char response[10] = {'\0'};
 
   configNMEA(0x10,RAM_FLASH); //disable all NMEA mesages exept RMC and set that to default on device
   messageBody[0] = 0;
+  DEBUG("GPS", "Query Kernal Version");
   sendCommandResponce(0x2,messageBody,1,response,21);
   DEBUG("GPS", "Software Kernal Version: %d.%d.%d \n Software ODM Version: %d.%d.%d \n Revision Date (YMD): %d/%d/%d\n ")
         response[7], response[8],response[9],response[11],response[12],response[13], response[14],response[15],response[16];
   
+  DEBUG("GPS", "Query Software CRC Version");
   sendCommandResponce(0x3,messageBody,1,response,11);
   DEBUG("GPS", "Software CRC Version: %d%d") response[7],response[8];
 }
@@ -164,21 +175,22 @@ uint8_t Venus838FLPx::initialize() {
 uint8_t Venus838FLPx::rmcParser(char * nmea) {
 
   uint8_t error = ERROR_SUCCESS;
+  DEBUG("GPS", nmea);
 
   strtok(nmea, ",");//remove device id from mesage
   if(*strtok(NULL,",") == 'A'){
-  rmcData.utcTime = atof(strtok(NULL, ","));//UTC time field
-  rmcData.latitude = atof(strtok(NULL,","));//lattituded field
-  if(*strtok(NULL,",") == 'S'){ // if in souther hemishphere save as negative value
-    rmcData.latitude *= -1;
-  }
-  rmcData.longitude = atof(strtok(NULL,",")); //longitude field
-  if(*strtok(NULL,",") == 'E'){ // if in eastern hemishphere save as negative value
-    rmcData.longitude *= -1;
-  }
-  rmcData.speedOverGround = atof(strtok(NULL,",")); // speed over ground in knots
-  rmcData.courseOverGround = atof(strtok(NULL,",")); //course over ground in degrees
-  rmcData.utcDate = atoi(strtok(NULL,","));
+    rmcData.utcTime = atof(strtok(NULL, ","));//UTC time field
+    rmcData.latitude = atof(strtok(NULL,","));//lattituded field
+    if(*strtok(NULL,",") == 'S'){ // if in souther hemishphere save as negative value
+     rmcData.latitude *= -1;
+    }
+    rmcData.longitude = atof(strtok(NULL,",")); //longitude field
+    if(*strtok(NULL,",") == 'E'){ // if in eastern hemishphere save as negative value
+      rmcData.longitude *= -1;
+   }
+    rmcData.speedOverGround = atof(strtok(NULL,",")); // speed over ground in knots
+    rmcData.courseOverGround = atof(strtok(NULL,",")); //course over ground in degrees
+    rmcData.utcDate = atoi(strtok(NULL,","));
   }else{
     error = ERROR_INVALID_DATA;
   }
@@ -189,6 +201,9 @@ uint8_t Venus838FLPx::sendCommand(uint8_t messageId, uint8_t * messageBody,
     uint32_t bodyLen, uint32_t timeout) {
   DEBUG("GPS", "sending command\n");
   // Assemble Packet
+
+  
+
   uint32_t packetLength = 8 + bodyLen;
   char  packet[packetLength];
   memset(packet, 0, packetLength);
@@ -196,8 +211,7 @@ uint8_t Venus838FLPx::sendCommand(uint8_t messageId, uint8_t * messageBody,
   packet[0] = 0xA0; // start sequence
   packet[1] = 0xA1;
 
-  packet[2] =
-      (uint8_t)((bodyLen + 1) >> 8); // payload length includes message id
+  packet[2] = (uint8_t)((bodyLen + 1) >> 8); // payload length includes message id
   packet[3] = (uint8_t)bodyLen + 1;
 
   packet[4] = messageId;
@@ -216,18 +230,19 @@ uint8_t Venus838FLPx::sendCommand(uint8_t messageId, uint8_t * messageBody,
   packet[packetLength - 1] = 0x0A;
 
   // Send Packet
+   DEBUG("GPS", "assembled Packet: {");
   printPacket(packet, packetLength);
 
-  char code = sendPacket(packet, packetLength, timeout / 2);
+  uint8_t code = sendPacket(packet, packetLength, timeout / 2);
   DEBUG("GPS", "response code ");
-  DEBUG("GPS", &code);
+  DEBUG("GPS", "%d",code);
 
-  if (code != ERROR_SUCCESS) {
+  /*if (code != ERROR_SUCCESS) {
     DEBUG("GPS", "failed, trying again\n");
     code = sendPacket(packet, packetLength, timeout / 2);
     DEBUG("GPS", "response code ");
-    DEBUG("GPS", &code);
-  }
+    DEBUG("GPS", "%d",code);
+  }*/
   return code;
 }
 
@@ -235,43 +250,58 @@ uint8_t Venus838FLPx::sendCommandResponce(uint8_t messageid, uint8_t * messagebo
       uint32_t bodylen, char *response, uint8_t responseLen, uint32_t timeout){
 
       uint8_t code = sendCommand(messageid,messagebody,bodylen,timeout);
-      serial.gets(response,responseLen); // add the seven extra values of package
+      if(serial.readable()){
+        DEBUG("GPS", "Reading Response");
+      }
+       for(int i = 0,  j = 7; i < j; ++i){
+          response[i] = serial.getc();
+          if(i == 4){
+            j += (int)response[i];
+          }
+        }
       return code;
 
       }
 
 uint8_t Venus838FLPx::sendPacket(char * packet, uint32_t size, uint32_t timeout) {
-  uint8_t c        = 0;
+  char c[100]   = {'\0'};
   uint8_t last     = 0;
   bool    response = false;
-  serial.puts(packet);
-  // TODO: wait for ACK, need to use different API to get current
-  // time in ms
-  Timer t;
-  for (t.start(); t.read_ms() < timeout;) {
-    while (serial.readable()) {
-      c = serial.getc();
-      if (last == 0xA0 && c == 0xA1 && response == false)
-        response = true;
-      if (response && last == ACK) {
-        if (c == packet[4]) // packet[4] = messageid
-          return ERROR_SUCCESS;
-        else
-          return ERROR_UNKNOWN_COMMAND;
-      } else if (response && last == NACK) {
-        if (c == packet[4]) // packet[4] = messageid
-          return ERROR_NACK;
-        else
-          return ERROR_UNKNOWN_COMMAND;
-      }
-      last = c;
+  if(serial.writable()){
+    for(int i = 0; i < size; ++i){
+      serial.putc(packet[i]);
     }
+  }else{
+    return ERROR_WRITE;
+  }
+  clock_t t = clock();
+  // look for ack
+  if(serial.fsync()) DEBUG("GPS", "ERROR: %d", ERROR_BUFFER_OVERFLOW); // clear current message
+  for (clock_t t = clock(); (clock() - t)  < timeout;) {
+     if(serial.readable()){
+      ("GPS", "Retrving Responce");
+      for(int i = 0; i < 9; ++i){
+        c[i] = serial.getc(); // read responce
+      }
+       DEBUG("GPS", "Recieved Packet: {");
+      printPacket(c,9);
+      if(c[0] == 0xA0 && c[1] == 0xA1 && c[5] == packet[4]){
+        return ERROR_SUCCESS;
+      }else{
+        if(c[5] == 0x3){ //0x3 id of nack
+          return ERROR_NACK;
+        }else{
+          return ERROR_UNKNOWN_COMMAND;
+        }
+      }
+    }
+    wait(.005);
   }
   return ERROR_WAIT_TIMEOUT;
 }
 
 void Venus838FLPx::printPacket(char * packet, uint32_t size) {
-  DEBUG("GPS", "assembled Packet: {");
+ 
   for (int i = 0; i < size; i++) {
     char hexval[4];
     sprintf(hexval, "0x%02X", packet[i]);
@@ -280,6 +310,9 @@ void Venus838FLPx::printPacket(char * packet, uint32_t size) {
       DEBUG("GPS", ", ");
     }
   }
-  DEBUG("GPS", "}");
+  DEBUG("GPS", "}\n");
+ 
 }
+
+
 // END GPS_CPP IMPLEMENTATION

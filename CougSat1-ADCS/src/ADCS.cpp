@@ -50,15 +50,29 @@ void ADCS::cdhThread()
         cdh.readCDH();
     }
 }
-
+void ADCS::readGPSThread(){
+    Serial gpsSerial(PinName(42),PinName(43));
+    DigitalIn gpsPulse(PinName(44));
+    DigitalOut gpsReset(PinName(33));
+    Venus838FLPx gps(gpsSerial,gpsReset,gpsPulse,true);
+    gps.initialize();
+    while (true){
+        Thread::wait(1000);
+        DEBUG("GPS", "Reading data\n");
+        gps.read();
+        DEBUG("GPS", "RMC data: \n utcTime: %f\nlatitude: %f\nlongitude: %f\nspeedOverGround: %f\nrtcDate: %d\n",gps.getUtcTime(),gps.getLat(),gps.getLong(),gps.getSpeedOverGround(),gps.getDate());
+        
+    }
+}
 /**
  * @brief Construct a new ADCS::ADCS object
- * 
  */
 ADCS::ADCS() : cdh(IHU_ADDRESS, PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL)
 {
+    readGPS.set_priority(osPriorityRealtime);
     monitor.set_priority(osPriorityRealtime);
     cdhRead.set_priority(osPriorityRealtime);
+    readGPS.start(callback(this, &ADCS::readGPSThread));
     cdhRead.start(callback(this, &ADCS::cdhThread));
     monitor.start(callback(this, &ADCS::monitorThread));
 }
@@ -69,6 +83,7 @@ ADCS::ADCS() : cdh(IHU_ADDRESS, PIN_I2C_BUS_SDA, PIN_I2C_BUS_SCL)
  */
 void ADCS::mainThread()
 {
+    
     printf("Outside Main!\r\n");
     while (true)
     {
