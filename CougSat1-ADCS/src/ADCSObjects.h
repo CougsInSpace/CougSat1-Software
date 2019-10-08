@@ -1,20 +1,25 @@
-#ifndef _SRC_PMIC_OBJECTS_H_
-#define _SRC_PMIC_OBJECTS_H_
-
-#include "Configuration.h"
-#include "interfaces/CDH.h"
+#ifndef ADCS_H
+#define ADCS_H
 
 #include <mbed.h>
+#include <rtos.h>
+#include "Configuration.h"
+#include "interfaces/CDH.h"
+#include "CISBoard/PinNames.h"
 
-/*************************** Interfaces and Drivers ***************************/
-extern I2C      i2cLocal;
-extern I2CSlave i2cBus;
-
-extern CDH cdh;
-
-extern DigitalOut statusLED;
-
-extern InterruptIn interruptCtrlSync;
-extern InterruptIn interruptBusI2CIRQ;
-
-#endif /* _SRC_PMIC_OBJECTS_H_ */
+class ADCS
+{
+  private:
+	Thread monitor;
+	Thread cdhRead;
+	char message[4];
+    #define IHU_ADDRESS_TEST 0xAC
+	CDH cdh;
+	
+  public:
+	ADCS();
+	void monitorThread();
+	void cdhThread();
+	void initThread();
+};
+#endif /* ADCS_H */
