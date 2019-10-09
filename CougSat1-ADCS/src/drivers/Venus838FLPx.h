@@ -24,7 +24,7 @@
 #include <mbed.h>
 #include <rtos.h>
 
-#define MSG_SIZE 120 // max size of NEMA response is 120 chars
+#define MSG_SIZE 120 // max size of NMEA response is 120 chars
 #define GPS_ACK_TIMEOUT_MS                                                     \
   1000 // default wait time for how long the sender should wait for ack
 
@@ -53,7 +53,7 @@ typedef struct rmc {
   float   utcTime;
   float   latitude;
   float   longitude;
-  float   speedOverGround;  // measures sspeed in knots
+  float   speedOverGround;  // measures speed in knots
   float   courseOverGround; // measures speed in degrees
   uint8_t utcDate;
 } RMC;
@@ -108,10 +108,11 @@ private:
   uint8_t sendCommandResponce(uint8_t messageid, uint8_t * messagebody,
       uint32_t bodylen, char * response, uint8_t responseLen,
       uint32_t timeout =
-          GPS_ACK_TIMEOUT_MS); // overloaded function to indirecly return
+          GPS_ACK_TIMEOUT_MS); // overloaded function to indirectly return
                                // response to the command
   uint8_t sendPacket(char * packet, uint32_t size, uint32_t timeout);
   void    printPacket(char * packet, uint32_t size);
+  uint8_t NMEACheckSum(char * string);
 };
 
 #endif /* !SRC_SYSTEMINTERFACES_GPS_H_ */
