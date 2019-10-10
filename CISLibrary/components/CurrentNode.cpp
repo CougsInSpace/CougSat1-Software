@@ -40,17 +40,12 @@ bool CurrentNode::getSwitch() {
  * @param aggregateRank to return to
  * @return double (current * rank)
  */
-mbed_error_status_t CurrentNode::getAggregateRank(double & aggregateRank) {
-  double              current = 0.0;
-  mbed_error_status_t status  = getCurrent(current);
-  if (status) {
-    ERROR("CurrentNode", "Failed to get current: 0x%08X", status);
-    return status;
-  }
+double CurrentNode::getAggregateRank() {
+  double current = 0.0, aggregateRank;
+  current        = getCurrent();
+  aggregateRank  = rank * current;
 
-  aggregateRank = rank * current;
-
-  return MBED_SUCCESS;
+  return aggregateRank;
 }
 
 /**

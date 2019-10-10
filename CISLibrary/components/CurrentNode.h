@@ -12,7 +12,7 @@ public:
   double              getCurrent();
   mbed_error_status_t updateCurrent();
 
-  mbed_error_status_t getAggregateRank(double & aggregateRank);
+  double getAggregateRank();
 
   bool getSwitch();
 

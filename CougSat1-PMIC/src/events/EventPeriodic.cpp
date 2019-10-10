@@ -2,9 +2,7 @@
 #include <CISConsole.h>
 #include <PMICObjects.h>
 
-double SHED_ALL  = 2.69;
-double SHED_HALF = 1.51;
-double SHED_SOME = 0.48;
+
 
 /**
  * @brief Shed current from the nodes based on their rank
@@ -18,7 +16,8 @@ double SHED_SOME = 0.48;
 mbed_error_status_t shedLoad(
   CurrentNode * nodes[], uint8_t nodeCount, double currentToShed) 
 {
-      double buf = 0.0;
+      double              buf   = 0.0;
+      int                 count = 0;
       mbed_error_status_t error = MBED_SUCCESS;
 
       while (currentToShed > 0.0) 
@@ -30,26 +29,31 @@ mbed_error_status_t shedLoad(
 
         // Find the node with the largest aggregate rank that is enabled
         for (int i = 0; i < nodeCount; ++i)
-         {
-            error = nodes[i]->getAggregateRank(buf);
-            if (error)
-            {
-              ERROR("shedLoad", "Failed to get aggregate rank: 0x%08X", error);
-              return error;
-            }
+        {
+            buf = nodes[i]->getAggregateRank();
             if (buf > maxAggregate && nodes[i]->getSwitch())
             {
               maxAggregate = buf;
               maxNode      = nodes[i];
             }
+            count++; // keep track how many times entered this loop
+        }
 
-          }
+   
+        // Turn off the max node and remove its current
+        currentToShed -= maxNode->getCurrent();
+        maxNode->setSwitch(false);
 
-    // Turn off the max node and remove its current
-    currentToShed -= maxNode->getCurrent();
-    maxNode->setSwitch(false);
-  }
+        // all nodes off and still looping\
+        // return error code
+        if (count >= nodeCount && currentToShed > 0.0)
+        {
+          ERROR("eventPeriodic", 
+            "current to shed exceeds total current from loads");
+          return MBED_ERROR_FAILED_OPERATION;
+        }
 
+      }
   return MBED_SUCCESS;
 }
 
@@ -77,9 +81,6 @@ mbed_error_status_t eventPeriodic() {
     }
 
   }
-
-  /***************************************************************/
-  // get newest current reading for node3V3OutA
   error = node3V3OutA.updateCurrent();
   if (error) {
     ERROR("eventPeriodic", "Failed to update current for node3V3OutA: 0x%08X",
@@ -87,7 +88,7 @@ mbed_error_status_t eventPeriodic() {
     return error;
   }
 
-   // calculate newest current reading for node3V3OutB
+  // calculate newest current reading for node3V3OutB
   error = node3V3OutB.updateCurrent();
   if (error) {
     ERROR("eventPeriodic", "Failed to update current for node3V3OutB: 0x%08X",
@@ -103,6 +104,7 @@ mbed_error_status_t eventPeriodic() {
   if (buf > toShed)
     toShed = buf;
 
+  
   // set buf to the difference of the new current and expected current of 3V3Out
   buf = node3V3OutB.getCurrent() - THRES_CURRENT_REG_MAX;
   if (buf > toShed)
@@ -120,9 +122,9 @@ mbed_error_status_t eventPeriodic() {
   }
 
   // check temperature cases: 
-  if (buf > (THRES_REG_HOT + THRES_OVERHEATED)) 
-  {
-    // TODO turn off all nodes
+  if (buf > (THRES_REG_HOT + THRES_OVERHEATED)) {
+    for (uint8_t i = 0; i < COUNT_PR_3V3; ++i) 
+      nodesPR3V3[i]->setSwitch(false);
   } else if (buf > THRES_REG_HOT) 
   {
     regulatorsOvertemp = true;
@@ -136,8 +138,9 @@ mbed_error_status_t eventPeriodic() {
 
   if (buf > (THRES_REG_HOT + THRES_OVERHEATED)) 
   {
-    // If really overtemp, reduce load by 100%
-    toShed = node3V3OutA.getCurrent() + node3V3OutB.getCurrent();
+    //Switch off all loads
+    for (uint8_t i = 0; i < COUNT_PR_3V3; ++i) 
+      nodesPR3V3[i]->setSwitch(false);
   } 
   else if (buf > THRES_REG_HOT) {
     regulatorsOvertemp = true;
@@ -148,6 +151,7 @@ mbed_error_status_t eventPeriodic() {
     toShed = node3V3OutA.getCurrent() * 0.25 + node3V3OutB.getCurrent() * 0.25;
   }
 
+
   error = shedLoad(nodesPR3V3, COUNT_PR_3V3, toShed);
   if (error) {
     ERROR("eventPeriodic", "Failed to shed load from 3.3V: 0x%08X", error);
@@ -156,7 +160,7 @@ mbed_error_status_t eventPeriodic() {
 
   /*******************************************************/
   // Check battery rails
-  // Update current for battery rails
+  // Update current readings for battery rails
   for (uint8_t i = 0; i < COUNT_PR_3V3; ++i) {
     error = nodesPRBatt[i]->updateCurrent();
     if (error) {
@@ -191,7 +195,7 @@ mbed_error_status_t eventPeriodic() {
   if (buf > toShed)
     toShed = buf;
 
-  // Check the regulators' temperature
+  // Check the battery temperature
   bool batteriesOvertemp = false;
 
   error = thermistorBattA.getTemperature(buf);
@@ -202,6 +206,8 @@ mbed_error_status_t eventPeriodic() {
 
   if (buf > (THRES_BATT_HOT + THRES_OVERHEATED)) {
     // TODO: turn off all loads
+    for (uint8_t i = 0; i < COUNT_PR_BATT; ++i) 
+      nodesPRBatt[i]->setSwitch(false);
   } else if (buf > THRES_BATT_HOT) {
     batteriesOvertemp = true;
   } else if (buf < THRES_BATT_COLD) {
@@ -216,7 +222,9 @@ mbed_error_status_t eventPeriodic() {
   }
 
   if (buf > (THRES_BATT_HOT + THRES_OVERHEATED)) {
-    // TODO: turn off all loads
+    // TODO: turn off all loads:
+    for (uint8_t i = 0; i < COUNT_PR_BATT; ++i) 
+      nodesPRBatt[i]->setSwitch(false);
   } else if (buf > THRES_BATT_HOT) {
     batteriesOvertemp = true;
   } else if (buf < THRES_BATT_COLD) {
