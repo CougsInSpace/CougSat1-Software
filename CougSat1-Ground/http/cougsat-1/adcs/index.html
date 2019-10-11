@@ -11,7 +11,11 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <meta name="theme-color" content="#981E32">
-  <script src="/lib/Ehbanana.js" async></script>
+  <script src="/lib/Ehbanana.js"></script>
+  <script src="/lib/satellite.min.js"></script>
+  <script src="/lib/three.min.js"></script>
+  <script src="https://js.arcgis.com/4.12/"></script>
+  <script src="map.js"></script>
   <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/css/main.css">
 </head>
 
@@ -40,35 +44,35 @@
           <tbody>
             <tr>
               <td>Latitude:</td>
-              <td class="background-primary text-monospace">47 &deg;N</td>
+              <td id="lat" class="background-primary text-monospace">47 &deg;N</td>
             </tr>
             <tr>
               <td>Longitude:</td>
-              <td class="background-primary text-monospace">-120 &deg;E</td>
+              <td id="long" class="background-primary text-monospace">-120 &deg;E</td>
             </tr>
             <tr>
               <td>Altitude:</td>
-              <td class="background-primary text-monospace">400 km</td>
+              <td id="alt" class="background-primary text-monospace">400 km</td>
             </tr>
             <tr>
               <td>Roll:</td>
-              <td class="background-primary text-monospace">-120 &deg;</td>
+              <td id="roll" class="background-primary text-monospace">-120 &deg;</td>
             </tr>
             <tr>
               <td>Pitch:</td>
-              <td class="background-primary text-monospace">130 &deg;</td>
+              <td id="pitch" class="background-primary text-monospace">130 &deg;</td>
             </tr>
             <tr>
               <td>Yaw:</td>
-              <td class="background-primary text-monospace">10 &deg;</td>
+              <td id="yaw" class="background-primary text-monospace">10 &deg;</td>
             </tr>
             <tr>
               <td>Linear velocity:</td>
-              <td class="background-primary text-monospace">8000 ms<sup>-1</sup></td>
+              <td id="velocity-linear" class="background-primary text-monospace">8000 ms<sup>-1</sup></td>
             </tr>
             <tr>
               <td>Angular velocity:</td>
-              <td class="background-primary text-monospace">8000 &deg;s<sup>-1</sup></td>
+              <td id="velocity-angular" class="background-primary text-monospace">8000 &deg;s<sup>-1</sup></td>
             </tr>
           </tbody>
         </table>
@@ -79,23 +83,23 @@
           <tbody>
             <tr>
               <td>Status:</td>
-              <td class="background-primary text-monospace">Attitude lock</td>
+              <td id="adcs-status" class="background-primary text-monospace">Attitude lock</td>
             </tr>
             <tr>
               <td>Target:</td>
-              <td class="background-primary text-monospace">Pullman</td>
+              <td id="adcs-target" class="background-primary text-monospace">Pullman</td>
             </tr>
             <tr>
               <td>X magnetorquer:</td>
-              <td class="background-primary text-monospace">2 mA</td>
+              <td id="magnet-x" class="background-primary text-monospace">2 mA</td>
             </tr>
             <tr>
               <td>Y magnetorquer:</td>
-              <td class="background-primary text-monospace">30 mA</td>
+              <td id="magnet-y" class="background-primary text-monospace">30 mA</td>
             </tr>
             <tr>
               <td>Z magnetorquer:</td>
-              <td class="background-primary text-monospace">-17 mA</td>
+              <td id="magnet-z" class="background-primary text-monospace">-17 mA</td>
             </tr>
           </tbody>
         </table>
@@ -144,17 +148,14 @@
               <td><input type="checkbox" id="en-ground" checked="true">
                 <label for="en-ground">Ground station (<span style="color: #2BEEF5">aqua</span>)</label></td>
               <td><input type="checkbox" id="en-gps" checked="true">
-                <label for="en-gps">Satellite GPS location (<span style="color: #18FF65">lime</span>)</label></td>
+                <label id="gps" for="en-gps">Satellite GPS location (<span style="color: #18FF65">lime</span>)</label>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   </main>
-  <script src="/lib/satellite.min.js"></script>
-  <script src="/lib/three.min.js"></script>
-  <script src="https://js.arcgis.com/4.12/"></script>
-  <script src="map.js"></script>
 </body>
 
 </html>

@@ -11,9 +11,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <meta name="theme-color" content="#981E32">
-  <script src="/lib/Ehbanana.js" async></script>
-  <script src="main.js" async></script>
-  <script src="/lib/Chart.bundle.min.js" async></script>
+  <script src="/lib/Ehbanana.js"></script>
+  <script src="main.js"></script>
+  <script src="/lib/Chart.bundle.min.js"></script>
 </head>
 
 <body class="text-body">
@@ -29,27 +29,27 @@
         <tbody>
           <tr>
             <td>Status:</td>
-            <td class="background-primary text-monospace">Connected</td>
+            <td id="link-status" class="background-primary text-monospace">Connected</td>
           </tr>
           <tr>
             <td>Antenna azimuth:</td>
-            <td class="background-primary text-monospace"><span>120</span> &deg;</td>
+            <td id="antenna-az" class="background-primary text-monospace"><span>120</span> &deg;</td>
           </tr>
           <tr>
             <td>Antenna elevation:</td>
-            <td class="background-primary text-monospace"><span>24</span> &deg;</td>
+            <td id="antenna-el" class="background-primary text-monospace"><span>24</span> &deg;</td>
           </tr>
           <tr>
             <td>Data rate:</td>
-            <td class="background-primary text-monospace">1.3 kbps</td>
+            <td id="data-rate" class="background-primary text-monospace">1.3 kbps</td>
           </tr>
           <tr>
             <td>Acquisition of signal:</td>
-            <td class="background-primary text-monospace">T+34</td>
+            <td id="aos" class="background-primary text-monospace">T+34</td>
           </tr>
           <tr>
             <td>Loss of signal:</td>
-            <td class="background-primary text-monospace">T-541</td>
+            <td id="los" class="background-primary text-monospace">T-541</td>
           </tr>
         </tbody>
       </table>
@@ -58,27 +58,29 @@
         <tbody>
           <tr>
             <td>RX radio source:</td>
-            <td style="padding: 0"><select class="text-monospace">
+            <td style="padding: 0">
+              <select id="rx-source" class="text-monospace eb-input">
                 <option>None</option>
                 <option>RTL-SDR</option>
                 <option>Audio</option>
-              </select></td>
+              </select>
+            </td>
           </tr>
           <tr>
             <td>Frequency offset:</td>
-            <td class="background-primary text-monospace">6.234 kHz</td>
+            <td id="freq-offset" class="background-primary text-monospace">6.234 kHz</td>
           </tr>
           <tr>
             <td>Signal to noise ratio:</td>
-            <td class="background-primary text-monospace">3.12 dB</td>
+            <td id="snr" class="background-primary text-monospace">3.12 dB</td>
           </tr>
           <tr>
             <td>Bit error rate:</td>
-            <td class="background-primary text-monospace">1.3 ppm</td>
+            <td id="ber" class="background-primary text-monospace">1.3 ppm</td>
           </tr>
           <tr>
             <td>Decoded frames:</td>
-            <td class="background-primary text-monospace">1.3 kFrames</td>
+            <td id="frames" class="background-primary text-monospace">1.3 kFrames</td>
           </tr>
         </tbody>
       </table>
@@ -87,7 +89,7 @@
         <tbody>
           <tr>
             <td>TX radio destination:</td>
-            <td style="padding: 0"><select class="text-monospace">
+            <td style="padding: 0"><select id="tx-destination" class="text-monospace eb-input">
                 <option>None</option>
                 <option>RTL-SDR</option>
                 <option>Audio</option>
@@ -96,7 +98,9 @@
       </table>
     </div>
     <div class="pane right">
-      <div class="chart"><canvas id="constellation-diagram" width="400" height="400"></canvas></div>
+      <div id="iq-diagram" class="chart">
+        <canvas id="constellation-diagram" width="400" height="400"></canvas>
+      </div>
     </div>
   </main>
 </body>

@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <meta name="theme-color" content="#981E32">
-  <script src="/lib/Ehbanana.js" async></script>
+  <script src="/lib/Ehbanana.js"></script>
 </head>
 
 <body class="text-body">
@@ -38,7 +38,7 @@
         <tbody>
           <tr>
             <td>Status:</td>
-            <td class="background-primary text-monospace">Idle</td>
+            <td id="ifjr-status" class="background-primary text-monospace">Idle</td>
           </tr>
         </tbody>
       </table>
@@ -47,14 +47,14 @@
         <tbody>
           <tr>
             <td>
-              <input type="file" id="image-input">
+              <input type="file" id="image-input" class="eb-input">
               <label for="image-input" class="button-1 text-body">Select Image</label>
             </td>
-            <td class="background-primary text-monospace">firmware.bin</td>
+            <td id="firmware" class="background-primary text-monospace">firmware.bin</td>
           </tr>
           <tr>
             <td>Target subsystem:</td>
-            <td style="padding: 0"><select class="text-monospace">
+            <td style="padding: 0"><select id="ifjr-target" class="text-monospace eb-input">
                 <option>None</option>
                 <option>ADCS</option>
                 <option>C&DH</option>
@@ -64,12 +64,14 @@
           </tr>
           <tr>
             <td>Target event time:</td>
-            <td style="padding: 0" class="text-monospace"><input type="datetime-local"></td>
+            <td style="padding: 0" class="text-monospace">
+              <input id="ifjr-time" type="datetime-local" class="eb-input">
+            </td>
           </tr>
           <tr>
             <td>Reprogramming event:</td>
             <td style="padding: 0" class="text-monospace">
-              <input type="button" value="Enqueue" class="button-1 text-body">
+              <input id="ifjr-enqueue" type="button" value="Enqueue" class="button-1 text-body eb-input">
             </td>
           </tr>
         </tbody>

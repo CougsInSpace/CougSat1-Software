@@ -17,7 +17,7 @@ GUI::~GUI() {}
  * @return Result
  */
 Result GUI::handleInput(const EBMessage_t & msg) {
-  spdlog::info("%s|%s|%s", msg.href.getString(), msg.id.getString(),
+  spdlog::info("{}|{}|{}", msg.href.getString(), msg.id.getString(),
       msg.value.getString());
   return ResultCode_t::SUCCESS;
 }

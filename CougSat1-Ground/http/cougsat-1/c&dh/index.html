@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <meta name="theme-color" content="#981E32">
-  <script src="/lib/Ehbanana.js" async></script>
+  <script src="/lib/Ehbanana.js"></script>
 </head>
 
 <body class="text-body">
@@ -38,15 +38,15 @@
         <tbody>
           <tr>
             <td>Status:</td>
-            <td class="background-primary text-monospace">Idle</td>
+            <td id="cdh-status" class="background-primary text-monospace">Idle</td>
           </tr>
           <tr>
             <td>Events enqueued:</td>
-            <td class="background-primary text-monospace">5 Events</td>
+            <td id="events-enqueued" class="background-primary text-monospace">5 Events</td>
           </tr>
           <tr>
             <td>Storage usage:</td>
-            <td class="background-primary text-monospace">72.1 MiB</td>
+            <td id="cdh-storage" class="background-primary text-monospace">72.1 MiB</td>
           </tr>
         </tbody>
       </table>
@@ -54,10 +54,10 @@
     <div class="col right">
       <h2 class="text-title text-align-center">Payload Event Queue</h2>
       <p class="text-align-center">
-        <input type="button" value="Request" class="button-1 text-body">
-        <input type="button" value="Update" class="button-1 text-body">
+        <input id="event-queue-request" type="button" value="Request" class="button-1 text-body eb-input">
+        <input id="event-queue-update" type="button" value="Update" class="button-1 text-body eb-input">
       </p>
-      <table>
+      <table id="event-queue">
         <thead>
           <tr>
             <th colspan="2">Trigger Date</th>
