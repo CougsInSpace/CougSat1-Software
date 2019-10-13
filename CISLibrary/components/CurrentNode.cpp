@@ -1,5 +1,4 @@
 #include "CurrentNode.h"
-
 #include <CISConsole.h>
 
 /**
@@ -37,15 +36,10 @@ bool CurrentNode::getSwitch() {
 /**
  * @brief Get the aggregate rank (current * rank)
  *
- * @param aggregateRank to return to
  * @return double (current * rank)
  */
 double CurrentNode::getAggregateRank() {
-  double current = 0.0, aggregateRank;
-  current        = getCurrent();
-  aggregateRank  = rank * current;
-
-  return aggregateRank;
+  return (getCurrent() * rank);
 }
 
 /**
@@ -64,7 +58,14 @@ double CurrentNode::getCurrent() {
  * @return mbed_error_status_t
  */
 mbed_error_status_t CurrentNode::updateCurrent() {
-  return MBED_ERROR_UNSUPPORTED;
+  double              volts = 0.0;
+  mbed_error_status_t error = adc.readVoltage(channel, volts);
+  if (error) {
+    ERROR("CurrentNode", "Failed to read Voltage from ADC: 0x%08X", error);
+    return error;
+  }
+  lastCurrent = volts * gain;
+  return error;
 }
 
 /**
