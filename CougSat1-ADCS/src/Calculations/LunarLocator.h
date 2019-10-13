@@ -4,8 +4,10 @@
 
 using namespace std;
 
+//wrapper function is lunar_prop, requires the UCT date int and UTC time of day double
+
 //function declar.
-lunar_prop(int utc_date, double utc_time);
+void lunar_prop(int utc_date, double utc_time);
 double julian_date(int utc_date, double utc_time);
 double T(double x);
 double L(double x);
@@ -14,9 +16,9 @@ double MS(double x);
 double ML(double x);
 double F(double x);
 double RLT360(double x);
-double A1(double x);
-double A2(double x);
-double A3(double x);
+double A11(double x);
+double A22(double x);
+double A33(double x);
 double E(double x);
 double Lambda(double x, double y);
 double Beta(double x);

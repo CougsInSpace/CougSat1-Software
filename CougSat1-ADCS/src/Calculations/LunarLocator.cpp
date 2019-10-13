@@ -65,10 +65,10 @@ double sum_lat_elts[60] = { 5128122, 280602, 277693, 173237, 55413, 46271, 32573
 -351, 331, 315, 302, -283, -229, 223, 223, -220, -220, -185, 181,
 -177, 176, 166, -164, 132, -119, 115, 107 };
 
-lunar_prop(int tm /*double utc_time*/)
+void lunar_prop(int utc_date, double utc_time)
 {
-	double t = tm;//2458754.114583;
-	//double t = julian_date(utc_date, utc_time);
+	//double t = 2458754.114583;
+	double t = julian_date(utc_date, utc_time);
 	double Time = T(t);
 	cout.precision(16);
 	cout << "T: " << Time << endl;
@@ -79,9 +79,9 @@ lunar_prop(int tm /*double utc_time*/)
 	double ml = RLT360(ML(Time));
 	double f = RLT360(F(Time));
 
-	double a1 = RLT360(A1(Time));
-	double a2 = RLT360(A2(Time));
-	double a3 = RLT360(A3(Time));
+	double a1 = RLT360(A11(Time));
+	double a2 = RLT360(A22(Time));
+	double a3 = RLT360(A33(Time));
 
 
 	double sumlong = calc_long_sums(sum_long_elts, Arg1, d, ms, ml, Time, f);
@@ -121,14 +121,31 @@ lunar_prop(int tm /*double utc_time*/)
 	cout << "Sumb: " << sumlat_final << endl;
 	cout << "Sumr: " << sumdist << endl;
 	*/
-	
-	final_calcs_and_print_data(RA, dec, Longitude, Latitude, Distance); //what a name lol
-	return 0;
+
+	final_calcs_and_print_data(RA, dec, Longitude, Latitude, Distance);
 }
 
-double julian_date(int utc_date, double utc_time)
+double julian_date(int utc_date, double utc_time) //hhmmss.sss - mmddyyyy
 {
+	double jd_time = 0.0;
+	//this will split the utc_date int into three separate ints mm - dd - yyyy
+	int month = ((utc_date / 1000000) % 100);
+	int day = ((utc_date / 10000) % 100);
+	int year = (utc_date % 10000);
+	//this will split the utc_time int into four separate ints hh - mm - ss - sss
+	int new_utc_time = utc_time * 1000;
+	int hour = ((new_utc_time / 10000000) % 100);
+	int minutes = ((new_utc_time / 100000) % 100);
+	int seconds = ((new_utc_time / 1000) % 100);
+	int mil_seconds = (new_utc_time % 1000);
 
+	/*
+		Julian date calculator for lunar prop
+	*/
+	double JDN = (1461 *(year + 4800 + (month - 14) / 12)) / 4 + (367 * (month - 2 - 12 *((month - 14) / 12))) / 12 -(3 * ((year + 4900 + (month - 14) / 12) / 100)) / 4 + day - 32075;
+	jd_time = JDN + ((hour - 12) / (double)24) + (minutes / (double)1440) + (seconds / (double)86400);
+
+	return jd_time; // retrun julian date for rest of program to use.
 }
 
 void final_calcs_and_print_data(double RA, double dec, double Longitude, double Latitude, double Distance)
@@ -209,19 +226,19 @@ double RLT360(double x)
 }
 
 //Venus Perturbation
-double A1(double x)
+double A11(double x)
 {
 	return 119.75 + (131.848 * x);
 }
 
 //Jupiter Perturbation
-double A2(double x)
+double A22(double x)
 {
 	return 53.09 + (479264.290 * x);
 }
 
 //Other Perturbation
-double A3(double x)
+double A33(double x)
 {
 	return 313.45 + (481266.484 * x);
 }
