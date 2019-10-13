@@ -3,7 +3,7 @@ Each processor (usually each subsystem) has a folder that contains its software.
 
 ## Setup for STM32 ##
 * Install [VSCode](https://code.visualstudio.com/) (able to do any IDE but this is recommended).
-* Install [ClangFormat](http://releases.llvm.org/download.html) (Part of LLVM download, see pre-built binaries)
+* Install [ClangFormat](http://releases.llvm.org/download.html) (Part of LLVM 9.0.0 download, see pre-built binaries)
 * Install the following extensions:
   * [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
   * [Clang-Format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format) - follow instructions to setup clang-format executable location
@@ -17,7 +17,7 @@ Each processor (usually each subsystem) has a folder that contains its software.
 
 ## Setup for Ground Software ##
 * Install [VSCode](https://code.visualstudio.com/) (able to do any IDE but this is recommended).
-* Install [ClangFormat](http://releases.llvm.org/download.html) (Part of LLVM download, see pre-built binaries)
+* Install [ClangFormat](http://releases.llvm.org/download.html) (Part of LLVM 9.0.0 download, see pre-built binaries)
 * Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/?q=build+tools)
   * Select `Tools for Visual Studio 2019`
   * In the installer, select `C++ build tools`
