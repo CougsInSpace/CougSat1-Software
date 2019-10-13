@@ -7,51 +7,38 @@
  * @param rev pin
  * @param sleep pin
  */
-DRV8837::DRV8837(PinName fwd, PinName rev, PinName nSleep)
-  : fwd(fwd), rev(rev), nSleep(nSleep)
-{
-  // set the pwm frequencies
-  this->fwd.period(1.0 / DRV8837_PWM_FREQ_HZ);
-  this->rev.period(1.0 / DRV8837_PWM_FREQ_HZ);
-
-  // disable initially
-  this->nSleep.write(1);
+DRV8837::DRV8837(PinName fwd, PinName rev, PinName nSleep) :
+  fwd(fwd), rev(rev), nSleep(nSleep, 0) {
+  // set the pwm periods
+  this->fwd.period_us(DRV8837_PWM_PERIOD_US);
+  this->rev.period_us(DRV8837_PWM_PERIOD_US);
 }
 
 /**
  * @brief Destroy the DRV8837::DRV8837 object
  *
  */
-DRV8837::~DRV8837() { }
+DRV8837::~DRV8837() {}
 
 /**
  * @brief Set the output of the HBridge
  *
  * @param value [-1.0, 1.0]
- * @param blocking will wait until operation is complete if true
+ * @param blocking parameter ignored on the DRV8837 implementation
  * @return mbed_error_status_t
  */
-mbed_error_status_t DRV8837::set(double value) {
-  if (value < -1.0 || value > 1.0) {
-    return MBED_ERROR_CODE_INVALID_ARGUMENT;
-  }
+mbed_error_status_t DRV8837::set(double value, bool blocking) {
+  this->setSleep(false);
 
-  this->wake();
-
-  if (value == 0) {
-    return this->stop(false);
+  if (value < 0) {
+    this->rev = -1.0f * value;
+    this->fwd = 0.0f;
   } else {
-    if (value < 0) {
-      this->rev = -value;
-      this->fwd = 0.0;
-    } else {
-      this->fwd = value;
-      this->rev = 0.0;
-    }
+    this->fwd = (float)value;
+    this->rev = 0.0f;
   }
 
-  wait_us(DRV8837_SET_WAIT_TIME_US);
-  this->sleep_immediate();
+  this->setSleep(true);
 
   return MBED_SUCCESS;
 }
@@ -60,31 +47,22 @@ mbed_error_status_t DRV8837::set(double value) {
  * @brief Stop the output, brake or coast
  *
  * @param brake will short output if true, high impedance if false
- * @param blocking will wait until operation is complete if true
+ * @param blocking parameter ignored on the DRV8837 implementation
  * @return mbed_error_status_t
  */
-mbed_error_status_t DRV8837::stop(bool brake) {
-  this->wake();
-  this->rev = this->fwd = (brake ? 1.0 : 0.0);
-
-  wait_us(DRV8837_SET_WAIT_TIME_US);
-  this->sleep_immediate();
+mbed_error_status_t DRV8837::stop(bool brake, bool blocking) {
+  this->setSleep(false);
+  this->rev = this->fwd = (brake ? 1.0f : 0.0f);
+  this->setSleep(true);
 
   return MBED_SUCCESS;
 }
 
 /**
- * @brief Wakes the Hbridge.
- * 
+ * @brief Sets the HBridge operating mode
+ * @param sleep sets the operating mode to sleep if true, and awakens the
+ * HBridge is false.
  */
-void DRV8837::wake() {
-  this->nSleep = 0;
-}
-
-/**
- * @brief Force the Hbridge to sleep.
- * 
- */
-void DRV8837::sleep_immediate() {
-  this->nSleep = 1;
+void DRV8837::setSleep(bool sleep) {
+  this->nSleep = !sleep;
 }
