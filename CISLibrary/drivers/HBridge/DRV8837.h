@@ -14,7 +14,7 @@ public:
   DRV8837(PinName fwd, PinName rev, PinName nSleep);
   ~DRV8837();
 
-  mbed_error_status_t set(double value, bool blocking);
+  mbed_error_status_t set(double value, bool blocking = true);
   mbed_error_status_t stop(bool brake = true, bool blocking = true);
 
 private:
