@@ -1,5 +1,7 @@
-#include <CISConsole.h>
 #include <mbed.h>
+
+#include <ADC/AD7291.h>
+#include <CISConsole.h>
 
 #include "Configuration.h"
 #include "PMICObjects.h"
@@ -42,12 +44,12 @@ mbed_error_status_t run() {
         return result;
       }
       nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
-    } else if (cdh.hasMessage()) {
-      result = cdh.processMessage();
-      if (result) {
-        ERROR("Run", "Failed to process message from the bus: 0x%02X", result);
-        return result;
-      }
+      // } else if (cdh.hasMessage()) {
+      //   result = cdh.processMessage();
+      //   if (result) {
+      //     ERROR("Run", "Failed to process message from the bus: 0x%02X",
+      //     result); return result;
+      //   }
     } else {
       wait_ms(PERIOD_MS_IDLE_SLEEP);
     }
