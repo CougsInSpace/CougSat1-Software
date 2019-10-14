@@ -1,0 +1,66 @@
+main {
+  position: relative;
+}
+
+.section {
+  display: flex;
+  justify-content: space-between;
+}
+
+.section.input .pvs {
+  width: 25%;
+}
+
+.pv {
+  margin: 1rem;
+  text-align: center;
+  position: relative;
+}
+
+.pv * {
+  width: 100%;
+}
+
+.pv h1, .pv h2 {
+  position: absolute;
+}
+
+.pv h2.top {
+  top: 1rem;
+}
+
+.pv h1.top {
+  top: 3rem;
+}
+
+.pv h2.bottom {
+  bottom: 3rem;
+}
+
+.pv h1.bottom {
+  bottom: 1rem;
+}
+
+.section>.bus {
+  background: #0E1C31;
+  background: var(--color-primary);
+  margin: 1rem 0;
+  text-align: center;
+  padding: 0.25rem;
+}
+
+.section>.bus>h3 {
+  padding: 0 1rem;
+}
+
+.mppt {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.mppt h2 {
+  background: #0E1C31;
+  background: var(--color-primary);
+  padding: 1.5rem;
+}

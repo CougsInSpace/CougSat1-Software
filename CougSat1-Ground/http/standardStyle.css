@@ -38,6 +38,7 @@ body {
   background: #373A3B;
   background: var(--color-secondary);
   min-height: 100vh;
+  min-width: 700px;
   display: flex;
   flex-direction: column;
 }
