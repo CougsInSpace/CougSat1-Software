@@ -5,6 +5,7 @@ main {
 .section {
   display: flex;
   justify-content: space-between;
+  padding: 1.5rem 1rem;
 }
 
 .section.input .pvs {
@@ -12,8 +13,6 @@ main {
 }
 
 .pv {
-  margin: 1rem;
-  text-align: center;
   position: relative;
 }
 
@@ -44,8 +43,6 @@ main {
 .section>.bus {
   background: #0E1C31;
   background: var(--color-primary);
-  margin: 1rem 0;
-  text-align: center;
   padding: 0.25rem;
 }
 
@@ -63,4 +60,28 @@ main {
   background: #0E1C31;
   background: var(--color-primary);
   padding: 1.5rem;
+}
+
+.battery {
+  display: flex;
+  flex-direction: column;
+  background: #0E1C31;
+  background: var(--color-primary);
+  padding: 0.25rem 0.5rem;
+}
+
+.battery .cell {
+  height: 5rem;
+}
+
+.battery .heater {
+  height: 2.5rem;
+  margin-top: 0.5rem;
+}
+
+.output {
+  background: #0E1C31;
+  background: var(--color-primary);
+  padding: 0.5rem 0.25rem;
+  margin: 0.75rem 0;
 }

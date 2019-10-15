@@ -31,21 +31,21 @@
     <div><a href="/cougsat-1/payload-camera/"><img src="/cougsat-1/images/camera.png">Camera</a></div>
     <div><a href="/cougsat-1/payload-plant/"><img src="/cougsat-1/images/plant.png">Plant</a></div>
   </header>
-  <main>
+  <main class="text-align-center">
     <div class="section input">
       <div class="pvs">
         <div class="pv">
           <img src="solar-panel.png">
-          <h2 class="top">PV-0</h2>
+          <h2 class="top">PV-0A: +Z</h2>
           <h1 class="text-monospace top">984 mW</h1>
-          <h2 class="bottom">PV-1</h2>
+          <h2 class="bottom">PV-0B: +Z</h2>
           <h1 class="text-monospace bottom">984 mW</h1>
         </div>
         <div class="pv">
           <img src="solar-panel.png">
-          <h2 class="top">PV-2</h2>
+          <h2 class="top">PV-1A: -Y</h2>
           <h1 class="text-monospace top">984 mW</h1>
-          <h2 class="bottom">PV-3</h2>
+          <h2 class="bottom">PV-1B: -Y</h2>
           <h1 class="text-monospace bottom">984 mW</h1>
         </div>
       </div>
@@ -69,17 +69,80 @@
       <div class="pvs">
         <div class="pv">
           <img src="solar-panel.png">
-          <h2 class="top">PV-4</h2>
+          <h2 class="top">PV-2A: -X</h2>
           <h1 class="text-monospace top">984 mW</h1>
-          <h2 class="bottom">PV-5</h2>
+          <h2 class="bottom">PV-2B: -X</h2>
           <h1 class="text-monospace bottom">984 mW</h1>
         </div>
         <div class="pv">
           <img src="solar-panel.png">
-          <h2 class="top">PV-6</h2>
+          <h2 class="top">PV-3A: +Y</h2>
           <h1 class="text-monospace top">984 mW</h1>
-          <h2 class="bottom">PV-7</h2>
+          <h2 class="bottom">PV-3B: +Y</h2>
           <h1 class="text-monospace bottom">984 mW</h1>
+        </div>
+      </div>
+    </div>
+    <div class="section vbatt">
+      <div class="left">
+        <div class="battery">
+          <h2>Battery A</h2>
+          <h1 class="text-monospace">5.3 Wh</h1>
+          <h2 class="text-monospace">3.8 V</h2>
+          <img class="cell" src="battery.png">
+          <img class="heater" src="heater.png">
+          <h2>Heater: <span class="text-monospace">987 mW</span></h2>
+        </div>
+        <div class="output">
+          <h4>PR_DEPLOY-0: +X</h4>
+          <h2 class="text-monospace">987 mW</h2>
+        </div>
+        <div class="output">
+          <h4>PR_DEPLOY-0: -Z</h4>
+          <h2 class="text-monospace">987 mW</h2>
+        </div>
+        <div class="output">
+          <h4>PR_BATT-5: ADCS</h4>
+          <h2 class="text-monospace">987 mW</h2>
+        </div>
+        <div class="output">
+          <h4>PR_BATT-6: Comms</h4>
+          <h2 class="text-monospace">987 mW</h2>
+        </div>
+      </div>
+      <div class="bus">
+        <h3>Vbatt</h3>
+        <h3>Switching</h3>
+        <h2 class="text-monospace">2.313 mW</h2>
+      </div>
+      <div class="right">
+        <div class="battery">
+          <h2>Battery B</h2>
+          <h1 class="text-monospace">3.1 Wh</h1>
+          <h2 class="text-monospace">3.7 V</h2>
+          <img class="cell" src="battery.png">
+          <img class="heater" src="heater.png">
+          <h2>Heater: <span class="text-monospace">987 mW</span></h2>
+        </div>
+        <div class="output">
+          <h4>PR_BATT-0: Plant Heater</h4>
+          <h2 class="text-monospace">987 mW</h2>
+        </div>
+        <div class="output">
+          <h4>PR_BATT-1: Unused</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_BATT-2: Unused</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_BATT-3: Unused</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_BATT-4: Unused</h4>
+          <h2 class="text-monospace">0 W</h2>
         </div>
       </div>
     </div>
