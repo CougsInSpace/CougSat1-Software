@@ -9,7 +9,7 @@ main {
 }
 
 .section.input .pvs {
-  width: 25%;
+  width: 22%;
 }
 
 .pv {
@@ -56,10 +56,10 @@ main {
   justify-content: space-evenly;
 }
 
-.mppt h2 {
+.mppt h3 {
   background: #0E1C31;
   background: var(--color-primary);
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .battery {
@@ -84,4 +84,17 @@ main {
   background: var(--color-primary);
   padding: 0.5rem 0.25rem;
   margin: 0.75rem 0;
+  min-width: 18rem;
+}
+
+.section.regulators {
+  justify-content: center;
+}
+
+.regulator {
+  background: #0E1C31;
+  background: var(--color-primary);
+  padding: 0.5rem 0.25rem;
+  margin: 0.75rem 0.5rem;
+  min-width: 12rem;
 }

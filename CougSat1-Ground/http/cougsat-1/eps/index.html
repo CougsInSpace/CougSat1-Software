@@ -12,6 +12,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <meta name="theme-color" content="#981E32">
   <script src="/lib/Ehbanana.js"></script>
+  <script src="main.js"></script>
 </head>
 
 <body class="text-body">
@@ -32,6 +33,8 @@
     <div><a href="/cougsat-1/payload-plant/"><img src="/cougsat-1/images/plant.png">Plant</a></div>
   </header>
   <main class="text-align-center">
+    <h2>Estimated time remaining: <span class="text-monospace">92.3 min</span></h2>
+    <h2>Overall efficiency <span class="text-monospace">&eta;: <span>90%</span></span></h2>
     <div class="section input">
       <div class="pvs">
         <div class="pv">
@@ -50,21 +53,22 @@
         </div>
       </div>
       <div class=mppt>
-        <h2 class="text-monospace">97%</h2>
-        <h2 class="text-monospace">97%</h2>
-        <h2 class="text-monospace">97%</h2>
-        <h2 class="text-monospace">97%</h2>
+        <h3 class="text-monospace">MPPT<br>&eta;: <span>97%</span></h3>
+        <h3 class="text-monospace">MPPT<br>&eta;: <span>97%</span></h3>
+        <h3 class="text-monospace">MPPT<br>&eta;: <span>97%</span></h3>
+        <h3 class="text-monospace">MPPT<br>&eta;: <span>97%</span></h3>
       </div>
       <div class="bus">
         <h3>Input</h3>
         <h3>Switching</h3>
         <h2 class="text-monospace">2.313 mW</h2>
+        <h3 class="text-monospace">&eta;: 97%</h3>
       </div>
       <div class=mppt>
-        <h2 class="text-monospace">97%</h2>
-        <h2 class="text-monospace">97%</h2>
-        <h2 class="text-monospace">97%</h2>
-        <h2 class="text-monospace">97%</h2>
+        <h3 class="text-monospace">MPPT<br>&eta;: <span>97%</span></h3>
+        <h3 class="text-monospace">MPPT<br>&eta;: <span>97%</span></h3>
+        <h3 class="text-monospace">MPPT<br>&eta;: <span>97%</span></h3>
+        <h3 class="text-monospace">MPPT<br>&eta;: <span>97%</span></h3>
       </div>
       <div class="pvs">
         <div class="pv">
@@ -87,7 +91,7 @@
       <div class="left">
         <div class="battery">
           <h2>Battery A</h2>
-          <h1 class="text-monospace">5.3 Wh</h1>
+          <h1 class="text-monospace">5.3 Ah</h1>
           <h2 class="text-monospace">3.8 V</h2>
           <img class="cell" src="battery.png">
           <img class="heater" src="heater.png">
@@ -114,11 +118,12 @@
         <h3>Vbatt</h3>
         <h3>Switching</h3>
         <h2 class="text-monospace">2.313 mW</h2>
+        <h3 class="text-monospace">&eta;: <span>90%</span></h3>
       </div>
       <div class="right">
         <div class="battery">
           <h2>Battery B</h2>
-          <h1 class="text-monospace">3.1 Wh</h1>
+          <h1 class="text-monospace">3.1 Ah</h1>
           <h2 class="text-monospace">3.7 V</h2>
           <img class="cell" src="battery.png">
           <img class="heater" src="heater.png">
@@ -142,6 +147,94 @@
         </div>
         <div class="output">
           <h4>PR_BATT-4: Unused</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+      </div>
+    </div>
+    <div class="section regulators">
+      <div class="regulator">
+        <h3>3.3V-A</h3>
+        <h2 class="text-monospace">1.313 W</h2>
+        <h2 class="text-monospace">3.34 V</h2>
+        <h3 class="text-monospace">&eta;: <span>90%</span></h3>
+      </div>
+      <div class="regulator">
+        <h3>3.3V-B</h3>
+        <h2 class="text-monospace">1.313 W</h2>
+        <h2 class="text-monospace">3.28 V</h2>
+        <h3 class="text-monospace">&eta;: <span>90%</span></h3>
+      </div>
+    </div>
+    <div class="section 3v3">
+      <div class="left">
+        <div class="output">
+          <h4>PR_3.3V-PV: PV Monitoring</h4>
+          <h2 class="text-monospace">987 mW</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-0: C&DH</h4>
+          <h2 class="text-monospace">987 mW</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-1: Unused</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-2: ADCS</h4>
+          <h2 class="text-monospace">987 mW</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-3: Unused</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-4: Unused</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-5: IFJR</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-6: Comms</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+      </div>
+      <div class="bus">
+        <h3>3.3V</h3>
+        <h3>Switching</h3>
+        <h2 class="text-monospace">1.313 mW</h2>
+        <h3 class="text-monospace">&eta;: <span>90%</span></h3>
+      </div>
+      <div class="right">
+        <div class="output">
+          <h4>3.3V: EPS</h4>
+          <h2 class="text-monospace">30 mW</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-7: Plant lighting</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-8: Plant camera</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-9: Plant sensors</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-10: Radiation sensor</h4>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-11: Ground camera</h4>
+          <h5>Wide field of view</h5>
+          <h2 class="text-monospace">0 W</h2>
+        </div>
+        <div class="output">
+          <h4>PR_3.3V-12: Ground camera</h4>
+          <h5>Narrow field of view</h5>
           <h2 class="text-monospace">0 W</h2>
         </div>
       </div>

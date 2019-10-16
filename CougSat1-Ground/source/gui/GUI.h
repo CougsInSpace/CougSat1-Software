@@ -3,6 +3,8 @@
 
 #include <Ehbanana.h>
 
+#include "Root.h"
+
 namespace GUI {
 
 class GUI {
@@ -13,7 +15,7 @@ public:
   /**
    * @brief Get the singleton instance
    *
-   * @return Logger*
+   * @return GUI*
    */
   static GUI * Instance() {
     static GUI instance;
@@ -22,7 +24,13 @@ public:
 
   ~GUI();
 
+  Result init();
+  Result run();
+  Result deinit();
+
   Result handleInput(const EBMessage_t & msg);
+
+  static ResultCode_t __stdcall guiProcess(const EBMessage_t & msg);
 
 private:
   /**
@@ -30,8 +38,12 @@ private:
    *
    */
   GUI() {}
+
+  EBGUI_t gui = nullptr;
+
+  Root * root;
 };
 
 } // namespace GUI
 
-#endif /* _GUI_GUI_H_ */
+#endif /* _GUI_H_ */

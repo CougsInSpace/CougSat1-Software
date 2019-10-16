@@ -31,7 +31,7 @@ main {
 
 .col.left table {
   margin: 0 auto;
-  min-width: 300px;
+  min-width: 250px;
 }
 
 .col.left table td:nth-child(1) {
