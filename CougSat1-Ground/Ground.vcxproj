@@ -19,38 +19,40 @@
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)\source;$(SolutionDir)\lib\ehbanana\include;$(SolutionDir)\lib\ehbanana\lib\FruitBowl\include;$(SolutionDir)\lib\spdlog\include;$(SolutionDir)\lib\rtl-sdr\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG;EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)\lib\ehbanana\include\Ehbanana.lib;$(SolutionDir)\lib\rtlsdr.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib\ehbanana\include\Ehbanana.lib;lib\rtlsdr.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)\source;$(SolutionDir)\lib\ehbanana\include;$(SolutionDir)\lib\ehbanana\lib\FruitBowl\include;$(SolutionDir)\lib\spdlog\include;$(SolutionDir)\lib\rtl-sdr\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)\lib\ehbanana\include\Ehbanana.lib;$(SolutionDir)\lib\rtlsdr.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib\ehbanana\include\Ehbanana.lib;lib\rtlsdr.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="$(SolutionDir)\source\**\*.cpp" />
-    <ClCompile Include="$(SolutionDir)\lib\ehbanana\lib\FruitBowl\include\**\*.cpp" />
+    <ClCompile Include="source\**\*.cpp" />
+    <ClCompile Include="lib\ehbanana\lib\FruitBowl\include\**\*.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(SolutionDir)\source\**\*.h" />
-    <ClInclude Include="$(SolutionDir)\lib\ehbanana\lib\FruitBowl\include\**\*.h" />
+    <ClInclude Include="source\**\*.h" />
+    <ClInclude Include="lib\ehbanana\lib\FruitBowl\include\**\*.h" />
     <ClInclude Include="lib\spdlog\include\**\*.h" />
     <ClInclude Include="lib\rtl-sdr\include\rtl-sdr.h" />
     <ClInclude Include="lib\rtl-sdr\include\rtl-sdr_export.h" />
   </ItemGroup>
   <Target Name="CopyFiles">
-    <Copy SourceFiles="$(SolutionDir)\lib\ehbanana\include\Ehbanana.js" DestinationFiles="$(SolutionDir)\http\lib\Ehbanana.js"/>
-    <Copy SourceFiles="$(SolutionDir)\lib\ehbanana\bin\Ehbanana.dll" DestinationFiles="$(SolutionDir)\bin\Ehbanana.dll"/>
-    <Copy SourceFiles="$(OutDir)\Ground.exe" DestinationFiles="$(SolutionDir)\bin\Ground.exe"/>
+    <Copy SourceFiles="lib\ehbanana\include\Ehbanana.js" DestinationFiles="http\lib\Ehbanana.js"/>
+    <Copy SourceFiles="lib\ehbanana\bin\Ehbanana.dll" DestinationFiles="bin\Ehbanana.dll"/>
+    <Copy SourceFiles="$(OutDir)\Ground.exe" DestinationFiles="bin\Ground.exe"/>
   </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Targets" />
 </Project>

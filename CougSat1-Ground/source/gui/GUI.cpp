@@ -59,6 +59,7 @@ Result GUI::init() {
     return resultCode + "EBCreateGUI";
 
   root = new Root(gui);
+  eps1 = new CougSat1::EPS(gui);
 
   resultCode = EBShowGUI(gui);
   if (!resultCode)
@@ -76,8 +77,6 @@ Result GUI::init() {
 Result GUI::run() {
   Result      result;
   EBMessage_t msg;
-  auto        nextPeriodic = clockStd_t::now();
-  auto        now          = clockStd_t::now();
   while ((result = EBGetMessage(msg)) == ResultCode_t::INCOMPLETE ||
          result == ResultCode_t::NO_OPERATION) {
     // If no messages were processed, wait a bit to save CPU
@@ -87,14 +86,6 @@ Result GUI::run() {
       result = EBDispatchMessage(msg);
       if (!result)
         return result + "EBDispatchMessage";
-    }
-
-    now = clockStd_t::now();
-    if (now > nextPeriodic) {
-      nextPeriodic += std::chrono::milliseconds(500);
-      result = root->sendUpdate();
-      if (!result)
-        return result + "Sending periodic update";
     }
   }
   return result + "EBGetMessage";
@@ -128,6 +119,8 @@ Result GUI::handleInput(const EBMessage_t & msg) {
     case Hash::calculateHash(""):
     case Hash::calculateHash("/"):
       return root->handleInput(msg);
+    case Hash::calculateHash("/cougsat-1/eps/"):
+      return eps1->handleInput(msg);
     default:
       return ResultCode_t::UNKNOWN_HASH +
              ("Input message's href: " + msg.href.getString());

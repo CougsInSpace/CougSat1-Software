@@ -87,6 +87,14 @@ main {
   min-width: 18rem;
 }
 
+.output:first-child {
+  margin-top: 0;
+}
+
+.output:last-child {
+  margin-bottom: 0;
+}
+
 .section.regulators {
   justify-content: center;
 }

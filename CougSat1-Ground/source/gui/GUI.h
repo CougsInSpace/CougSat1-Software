@@ -4,6 +4,7 @@
 #include <Ehbanana.h>
 
 #include "Root.h"
+#include "cougsat-1/EPS.h"
 
 namespace GUI {
 
@@ -41,7 +42,8 @@ private:
 
   EBGUI_t gui = nullptr;
 
-  Root * root;
+  Root *          root;
+  CougSat1::EPS * eps1;
 };
 
 } // namespace GUI
