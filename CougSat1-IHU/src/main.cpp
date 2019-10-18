@@ -4,6 +4,13 @@
 #include "Configuration.h"
 #include "IHUObjects.h"
 #include "events/Events.h"
+#include <cstdio>
+#include "SDBlockDevice.h"
+#include <FATFileSystem.h>
+
+SDBlockDevice sd(D11, D12, D13, D10);
+FATFileSystem fs("sd");
+
 
 /**
  * @brief Initializes the all of the subclasses of the IHU
@@ -13,7 +20,11 @@
 mbed_error_status_t initialize() {
   LOG("Init", "Initialization starting");
   mbed_error_status_t result = MBED_SUCCESS;
-
+  
+  // file system initialize
+  sd.init();
+  fs.mount(&sd);
+  
   LOG("Init", "Initialization complete");
   return result;
 }
