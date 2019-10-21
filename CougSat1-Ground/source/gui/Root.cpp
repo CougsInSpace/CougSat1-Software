@@ -1,5 +1,7 @@
 #include "Root.h"
 
+#include <spdlog/spdlog.h>
+
 namespace GUI {
 
 /**
@@ -59,6 +61,21 @@ Result Root::sendUpdate() {
 Result Root::handleInput(const EBMessage_t & msg) {
   try {
     createNewEBMessage();
+
+    switch (msg.id.get()) {
+      case Hash::calculateHash("upload"):
+      case Hash::calculateHash("name"):
+      case Hash::calculateHash("lat"):
+      case Hash::calculateHash("long"):
+      case Hash::calculateHash("grid"):
+      case Hash::calculateHash("alt"):
+      case Hash::calculateHash("desc"):
+        // TODO implement settings changes
+        break;
+      default:
+        spdlog::info("Unknown id for Root");
+        break;
+    }
 
     enqueueEBMessage();
   } catch (const std::exception & e) {

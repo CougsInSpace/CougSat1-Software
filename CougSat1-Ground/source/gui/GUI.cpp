@@ -58,8 +58,10 @@ Result GUI::init() {
   if (!resultCode)
     return resultCode + "EBCreateGUI";
 
-  root = new Root(gui);
-  eps1 = new CougSat1::EPS(gui);
+  root  = new Root(gui);
+  radio = new Radio(gui);
+
+  cougSat1 = new CougSat1(gui);
 
   resultCode = EBShowGUI(gui);
   if (!resultCode)
@@ -119,8 +121,18 @@ Result GUI::handleInput(const EBMessage_t & msg) {
     case Hash::calculateHash(""):
     case Hash::calculateHash("/"):
       return root->handleInput(msg);
+    case Hash::calculateHash("/radio/"):
+      return radio->handleInput(msg);
+    case Hash::calculateHash("/cougsat-1/"):
+    case Hash::calculateHash("/cougsat-1/adcs/"):
+    case Hash::calculateHash("/cougsat-1/c&dh/"):
+    case Hash::calculateHash("/cougsat-1/comms/"):
+    case Hash::calculateHash("/cougsat-1/ecs/"):
     case Hash::calculateHash("/cougsat-1/eps/"):
-      return eps1->handleInput(msg);
+    case Hash::calculateHash("/cougsat-1/ifjr/"):
+    case Hash::calculateHash("/cougsat-1/payload-camera/"):
+    case Hash::calculateHash("/cougsat-1/payload-plant/"):
+      return cougSat1->handleInput(msg);
     default:
       return ResultCode_t::UNKNOWN_HASH +
              ("Input message's href: " + msg.href.getString());

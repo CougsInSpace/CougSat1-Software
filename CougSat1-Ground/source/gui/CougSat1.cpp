@@ -1,20 +1,21 @@
-#include "EPS.h"
+#include "CougSat1.h"
+
+#include <spdlog/spdlog.h>
 
 namespace GUI {
-namespace CougSat1 {
 
 /**
- * @brief Construct a new EPS:", EPS object
+ * @brief Construct a new CougSat1: CougSat1 object
  *
  * @param gui
  */
-EPS::EPS(EBGUI_t gui) : Page(gui, "/cougsat-1/eps/") {}
+CougSat1::CougSat1(EBGUI_t gui) : Page(gui, "") {}
 
 /**
- * @brief Destroy the EPS: EPS object
+ * @brief Destroy the CougSat1: CougSat1 object
  *
  */
-EPS::~EPS() {}
+CougSat1::~CougSat1() {}
 
 /**
  * @brief Handle when the page first loads
@@ -22,7 +23,7 @@ EPS::~EPS() {}
  *
  * @return Result
  */
-Result EPS::onLoad() {
+Result CougSat1::onLoad() {
   try {
     createNewEBMessage();
 
@@ -40,11 +41,55 @@ Result EPS::onLoad() {
  *
  * @return Result
  */
-Result EPS::sendUpdate() {
+Result CougSat1::sendUpdate() {
   try {
     createNewEBMessage();
 
     // TODO get real numbers
+    // ADCS
+    messageSetProp("adcs-status", "innerHTML", "Target locked");
+    messageSetProp("adcs-target", "innerHTML", "Pullman");
+    messageSetProp("lat", "num", -124.3213);
+    messageSetProp("long", "num", 42.4321);
+    messageSetProp("alt", "num", 400.12345);
+    messageSetProp("roll", "num", (rand() % 3600) / 10.0);
+    messageSetProp("pitch", "num", (rand() % 3600) / 10.0);
+    messageSetProp("yaw", "num", (rand() % 3600) / 10.0);
+    messageSetProp("velocity-linear", "num", 8032.123);
+    messageSetProp("velocity-angular", "num", 1.3234);
+    messageSetProp("magnet-x", "num", 0.3 * (rand() % 10000) / 10000.0);
+    messageSetProp("magnet-y", "num", 0.3 * (rand() % 10000) / 10000.0);
+    messageSetProp("magnet-z", "num", 0.3 * (rand() % 10000) / 10000.0);
+    messageSetProp("map", "TLE",
+        "1 25544U 98067A   19272.17332272  .00000706  00000-0  20336-4 0  9999"
+        "2 25544  51.6426 205.5801 0007437  95.6316 228.4969 "
+        "15.50113298191385");
+
+    // C&DH
+    messageSetProp("cdh-status", "innerHTML", "Idle");
+    messageSetProp("events-enqueued", "num", (int64_t)5);
+    messageSetProp("cd-storage", "num", (int64_t)54315345);
+
+    // Comms
+    messageSetProp("comms-status", "innerHTML", "TX - Telemetry");
+
+    messageSetProp("comms-status-700", "innerHTML", "TX - Telemetry");
+    messageSetProp("antenna-700", "innerHTML", "Deployed");
+    messageSetProp("comms-usage-700", "num", (int64_t)1238057);
+    messageSetProp("tx-power-700", "num", 26.5234);
+    messageSetProp("rx-power", "num", -41.123);
+    messageSetProp("snr", "num", 10.32);
+    messageSetProp("ber", "num", 1.543e-5);
+    messageSetProp("enqueued-segments-700", "num", (int64_t)14);
+
+    messageSetProp("comms-status-230", "innerHTML", "Idle");
+    messageSetProp("antenna-230", "innerHTML", "Deployed");
+    messageSetProp("comms-usage-230", "num", (int64_t)154238057);
+    messageSetProp("tx-power-230", "num", -10.5234);
+    messageSetProp("enqueued-segments-230", "num", (int64_t)1);
+
+    // EPS
+    messageSetProp("eps-status", "innerHTML", "Nominal - Discharging");
     messageSetProp("main", "PV_CELL_0A_V", 2.11231);
     messageSetProp("main", "PV_CELL_0A_I", 0.27085);
     messageSetProp("main", "PV_CELL_0B_V", 2.11231);
@@ -118,6 +163,25 @@ Result EPS::sendUpdate() {
     messageSetProp("main", "PR_3V3_11_I", 0.0);
     messageSetProp("main", "PR_3V3_12_I", 0.0);
 
+    // ECS
+    messageSetProp("ecs-status", "innerHTML", "Subsystems overheating");
+    messageSetProp("main", "TEMP_ADCS", -20.112);
+    messageSetProp("main", "TEMP_CDH", 0.112);
+    messageSetProp("main", "TEMP_COMMS", 20.112);
+    messageSetProp("main", "TEMP_EPS", -40.112);
+    messageSetProp("main", "TEMP_BATT_A", 60.112);
+    messageSetProp("main", "TEMP_BATT_B", 70.112);
+    messageSetProp("main", "TEMP_PX", 85.112);
+    messageSetProp("main", "TEMP_NX", 90.112);
+    messageSetProp("main", "TEMP_PY", -47.112);
+    messageSetProp("main", "TEMP_NY", -20.112);
+    messageSetProp("main", "TEMP_PZ", -20.112);
+    messageSetProp("main", "TEMP_NZ", -20.112);
+    messageSetProp("main", "TEMP_PLANT", -20.112);
+
+    // IFJR
+    messageSetProp("ifjr-status", "innerHTML", "Idle");
+
     enqueueEBMessage();
   } catch (const std::exception & e) {
     return ResultCode_t::EXCEPTION_OCCURRED + e.what();
@@ -131,12 +195,22 @@ Result EPS::sendUpdate() {
  * @param msg to handle
  * @return Result
  */
-Result EPS::handleInput(const EBMessage_t & msg) {
+Result CougSat1::handleInput(const EBMessage_t & msg) {
   try {
     createNewEBMessage();
     switch (msg.id.get()) {
       case Hash::calculateHash("main"):
         return onLoad();
+      case Hash::calculateHash("event-queue-request"):
+      case Hash::calculateHash("event-queue-update"):
+      case Hash::calculateHash("image-input"):
+      case Hash::calculateHash("ifjr-target"):
+      case Hash::calculateHash("ifjr-time"):
+      case Hash::calculateHash("ifjr-enqueue"):
+        // TODO implement
+        break;
+      default:
+        spdlog::warn("Unknown input for " + msg.href.getString());
     }
 
     enqueueEBMessage();
@@ -146,5 +220,4 @@ Result EPS::handleInput(const EBMessage_t & msg) {
   return ResultCode_t::SUCCESS;
 }
 
-} // namespace CougSat1
 } // namespace GUI

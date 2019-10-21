@@ -4,10 +4,10 @@
       "name": "Win32",
       "includePath": [
         "${workspaceFolder}/source/**",
-        "${workspaceFolder}/lib/ehbanana/include/**",
-        "${workspaceFolder}/lib/ehbanana/lib/FruitBowl/include/**",
+        "${workspaceFolder}/lib/ehbanana/include/*",
+        "${workspaceFolder}/lib/ehbanana/lib/FruitBowl/include/*",
         "${workspaceFolder}/lib/spdlog/include/**",
-        "${workspaceFolder}/lib/rtl-sdr/include/**"
+        "${workspaceFolder}/lib/rtl-sdr/include/*"
       ],
       "defines": [
         "DEBUG",

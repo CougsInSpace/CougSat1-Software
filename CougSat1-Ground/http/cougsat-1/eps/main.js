@@ -16,33 +16,6 @@ var mpptIDs = [
 var chainSuffixes = ["A", "B"];
 
 /**
- * Set the innerHTML and value of the element to its num with percent formatting
- * and number of significant figures
- *
- * attributes: sigfig
- * @param {DOMElement} element to process
- */
-function numToPercent(element) {
-  if (element == document.activeElement)
-    return; // Don't change the focused element
-
-  var num = element["num"];
-  if (String(num).length == 0) {
-    element.innerHTML = "";
-    element.value     = "";
-    return;
-  }
-  if (num == "infinity") {
-    element.innerHTML = "infinity";
-    element.value     = "infinity";
-    return;
-  }
-  num               = num.toPrecision(element.getAttribute("sigfig"));
-  element.innerHTML = num + "%";
-  element.value     = num + "%";
-}
-
-/**
  * Update the diagram: labels, drawings, etc. from the data attached to the
  * element
  *
