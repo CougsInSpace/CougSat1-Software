@@ -106,3 +106,9 @@ main {
   margin: 0.75rem 0.5rem;
   min-width: 12rem;
 }
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

@@ -85,11 +85,15 @@ function updateDiagram(element) {
     var vinI     = element["BATT_IN_" + chainSuffixes[i] + "_I"];
     var vbattI   = element["BATT_OUT_" + chainSuffixes[i] + "_I"];
     var batteryI = vinI - vbattI;
+    element["BATT_" + chainSuffixes[i] + "_I"] = batteryI;
 
     var batteryV = element["BATT_" + chainSuffixes[i] + "_V"];
     var vinV     = batteryV + vinI * shunts["BATT_IN_" + chainSuffixes[i]];
-    var vbattV   = batteryV - vbattI * shunts["BATT_OUT_" + chainSuffixes[i]];
-    prBattV      = Math.max(prBattV, vbattV);
+    element["BATT_IN_" + chainSuffixes[i] + "_V"] = vinV;
+    var vbattV = batteryV - vbattI * shunts["BATT_OUT_" + chainSuffixes[i]];
+    element["BATT_OUT_" + chainSuffixes[i] + "_V"] = vbattV;
+
+    prBattV = Math.max(prBattV, vbattV);
 
     var vinP = vinV * vinI;
     vinPOut += vinP;
@@ -213,8 +217,21 @@ function updateDiagram(element) {
   obj     = document.getElementById("EPS_N");
   obj.num = totalPOut / totalPIn * 100.0;
   numToPercent(obj);
+
+  traces.updateGeometry();
+  traces.updateValues(element);
+  traces.renderLine();
 }
 
-function setup() {}
+function setup() {
+  traces.setup();
+  traces.renderLine();
+}
+
+function onResize() {
+  traces.updateGeometry();
+  traces.renderLine();
+}
 
 document.addEventListener("DOMContentLoaded", setup);
+window.addEventListener("resize", onResize);

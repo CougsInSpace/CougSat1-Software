@@ -12,6 +12,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <meta name="theme-color" content="#981E32">
   <script src="/lib/Ehbanana.js"></script>
+  <script src="traces.js"></script>
   <script src="main.js"></script>
 </head>
 
@@ -40,14 +41,14 @@
     <h2>Overall efficiency <span class="text-monospace">&eta;: <span id="EPS_N" sigfig="3"></span></span></h2>
     <div class="section input">
       <div class="pvs">
-        <div class="pv">
+        <div class="pv" id="PV_0">
           <img src="solar-panel.png">
           <h2 class="top">PV-0A: +Z</h2>
           <h1 class="text-monospace top" id="PV_CELL_0A" unit="W" sigfig="3"></h1>
           <h2 class="bottom">PV-0B: +Z</h2>
           <h1 class="text-monospace bottom" id="PV_CELL_0B" unit="W" sigfig="3"></h1>
         </div>
-        <div class="pv">
+        <div class="pv" id="PV_1">
           <img src="solar-panel.png">
           <h2 class="top">PV-1A: -Y</h2>
           <h1 class="text-monospace top" id="PV_CELL_1A" unit="W" sigfig="3"></h1>
@@ -56,32 +57,32 @@
         </div>
       </div>
       <div class=mppt>
-        <h3 class="text-monospace">MPPT<br>&eta;: <span id="PV_IN_0A" sigfig="3"></span></h3>
-        <h3 class="text-monospace">MPPT<br>&eta;: <span id="PV_IN_0B" sigfig="3"></span></h3>
-        <h3 class="text-monospace">MPPT<br>&eta;: <span id="PV_IN_1A" sigfig="3"></span></h3>
-        <h3 class="text-monospace">MPPT<br>&eta;: <span id="PV_IN_1B" sigfig="3"></span></h3>
+        <h3 class="text-monospace" id="MPPT_0A">MPPT<br>&eta;: <span id="PV_IN_0A" sigfig="3"></span></h3>
+        <h3 class="text-monospace" id="MPPT_0B">MPPT<br>&eta;: <span id="PV_IN_0B" sigfig="3"></span></h3>
+        <h3 class="text-monospace" id="MPPT_1A">MPPT<br>&eta;: <span id="PV_IN_1A" sigfig="3"></span></h3>
+        <h3 class="text-monospace" id="MPPT_1B">MPPT<br>&eta;: <span id="PV_IN_1B" sigfig="3"></span></h3>
       </div>
-      <div class="bus">
+      <div class="bus" id="BUS_INPUT">
         <h3>Input</h3>
         <h3>Switching</h3>
         <h2 class="text-monospace" id="INPUT_P" unit="W" sigfig="3"></h2>
         <h3 class="text-monospace">&eta;: <span id="INPUT_N" sigfig="3"></span></h3>
       </div>
       <div class=mppt>
-        <h3 class="text-monospace">MPPT<br>&eta;: <span id="PV_IN_2A" sigfig="3"></span></h3>
-        <h3 class="text-monospace">MPPT<br>&eta;: <span id="PV_IN_2B" sigfig="3"></span></h3>
-        <h3 class="text-monospace">MPPT<br>&eta;: <span id="PV_IN_3A" sigfig="3"></span></h3>
-        <h3 class="text-monospace">MPPT<br>&eta;: <span id="PV_IN_3B" sigfig="3"></span></h3>
+        <h3 class="text-monospace" id="MPPT_2A">MPPT<br>&eta;: <span id="PV_IN_2A" sigfig="3"></span></h3>
+        <h3 class="text-monospace" id="MPPT_2B">MPPT<br>&eta;: <span id="PV_IN_2B" sigfig="3"></span></h3>
+        <h3 class="text-monospace" id="MPPT_3A">MPPT<br>&eta;: <span id="PV_IN_3A" sigfig="3"></span></h3>
+        <h3 class="text-monospace" id="MPPT_3B">MPPT<br>&eta;: <span id="PV_IN_3B" sigfig="3"></span></h3>
       </div>
       <div class="pvs">
-        <div class="pv">
+        <div class="pv" id="PV_2">
           <img src="solar-panel.png">
           <h2 class="top">PV-2A: -X</h2>
           <h1 class="text-monospace top" id="PV_CELL_2A" unit="W" sigfig="3"></h1>
           <h2 class="bottom">PV-2B: -X</h2>
           <h1 class="text-monospace bottom" id="PV_CELL_2B" unit="W" sigfig="3"></h1>
         </div>
-        <div class="pv">
+        <div class="pv" id="PV_3">
           <img src="solar-panel.png">
           <h2 class="top">PV-3A: +Y</h2>
           <h1 class="text-monospace top" id="PV_CELL_3A" unit="W" sigfig="3"></h1>
@@ -96,8 +97,8 @@
           <h2>Battery A</h2>
           <h1 class="text-monospace" id="BATT_C_A" unit="Ah" sigfig="3"></h1>
           <h2 class="text-monospace" id="BATT_V_A" unit="V" sigfig="4"></h2>
-          <img class="cell" src="battery.png">
-          <img class="heater" src="heater.png">
+          <img class="cell" id="BATT_A" src="battery.png">
+          <img class="heater" id="HEATER_A" src="heater.png">
           <h2>Heater: <span class="text-monospace" id="PR_BH_0" unit="W" sigfig="3"></span></h2>
         </div>
         <div class="output">
@@ -117,7 +118,7 @@
           <h2 class="text-monospace" id="PR_BATT_6" unit="W" sigfig="3"></h2>
         </div>
       </div>
-      <div class="bus">
+      <div class="bus" id="BUS_BATT">
         <h3>Vbatt</h3>
         <h3>Switching</h3>
         <h2 class="text-monospace" id="VBATT_P" unit="W" sigfig="3"></h2>
@@ -128,8 +129,8 @@
           <h2>Battery B</h2>
           <h1 class="text-monospace" id="BATT_C_B" unit="Ah" sigfig="3"></h1>
           <h2 class="text-monospace" id="BATT_V_B" unit="V" sigfig="4"></h2>
-          <img class="cell" src="battery.png">
-          <img class="heater" src="heater.png">
+          <img class="cell" id="BATT_B" src="battery.png">
+          <img class="heater" id="HEATER_B" src="heater.png">
           <h2>Heater: <span class="text-monospace" id="PR_BH_1" unit="W" sigfig="3"></span></h2>
         </div>
         <div class="output">
@@ -155,13 +156,13 @@
       </div>
     </div>
     <div class="section regulators">
-      <div class="regulator">
+      <div class="regulator" id="REG_A">
         <h3>3.3V-A</h3>
         <h2 class="text-monospace" id="REG_P_A" unit="W" sigfig="3"></h2>
         <h2 class="text-monospace" id="REG_V_A" unit="V" sigfig="4"></h2>
         <h3 class="text-monospace">&eta;: <span id="REG_N_A" sigfig="3"></span></h3>
       </div>
-      <div class="regulator">
+      <div class="regulator" id="REG_B">
         <h3>3.3V-B</h3>
         <h2 class="text-monospace" id="REG_P_B" unit="W" sigfig="3"></h2>
         <h2 class="text-monospace" id="REG_V_B" unit="V" sigfig="4"></h2>
@@ -203,7 +204,7 @@
           <h2 class="text-monospace" id="PR_3V3_6" unit="W" sigfig="3"></h2>
         </div>
       </div>
-      <div class="bus">
+      <div class="bus" id="BUS_3V3">
         <h3>3.3V</h3>
         <h3>Switching</h3>
         <h2 class="text-monospace" id="PR3V3_P" unit="W" sigfig="3"></h2>
@@ -242,6 +243,8 @@
         </div>
       </div>
     </div>
+    <canvas id="overlay-traces"></canvas>
+    <canvas id="overlay-current"></canvas>
   </main>
 </body>
 
