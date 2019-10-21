@@ -31,22 +31,23 @@
     <div><a href="/cougsat-1/payload-camera/"><img src="/cougsat-1/images/camera.png">Camera</a></div>
     <div><a href="/cougsat-1/payload-plant/"><img src="/cougsat-1/images/plant.png">Plant</a></div>
   </header>
-  <main>
+  <main id="main" class="eb-onload">
     <div class="col left">
       <h2 class="text-title text-align-center">Command & Data Handling</h2>
       <table>
         <tbody>
           <tr>
             <td>Status:</td>
-            <td id="cdh-status" class="background-primary text-monospace">Idle</td>
+            <td id="cdh-status" class="background-primary text-monospace"></td>
           </tr>
           <tr>
             <td>Events enqueued:</td>
-            <td id="events-enqueued" class="background-primary text-monospace">5 Events</td>
+            <td id="events-enqueued" class="background-primary text-monospace eb-metric-prefix" unit="Events"
+              sigfig="3"></td>
           </tr>
           <tr>
             <td>Storage usage:</td>
-            <td id="cdh-storage" class="background-primary text-monospace">72.1 MiB</td>
+            <td id="cdh-storage" class="background-primary text-monospace eb-metric-prefix" unit="B" sigfig="3"></td>
           </tr>
         </tbody>
       </table>

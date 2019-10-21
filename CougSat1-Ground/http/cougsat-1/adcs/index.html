@@ -15,6 +15,7 @@
   <script src="/lib/satellite.min.js"></script>
   <script src="/lib/three.min.js"></script>
   <script src="https://js.arcgis.com/4.12/"></script>
+  <script src="/standard.js"></script>
   <script src="map.js"></script>
   <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/css/main.css">
 </head>
@@ -36,7 +37,7 @@
     <div><a href="/cougsat-1/payload-camera/"><img src="/cougsat-1/images/camera.png">Camera</a></div>
     <div><a href="/cougsat-1/payload-plant/"><img src="/cougsat-1/images/plant.png">Plant</a></div>
   </header>
-  <main>
+  <main id="main" class="eb-onload">
     <div class="col left">
       <div class="row top">
         <h2 class="text-title text-align-center">Determination</h2>
@@ -44,35 +45,37 @@
           <tbody>
             <tr>
               <td>Latitude:</td>
-              <td id="lat" class="background-primary text-monospace">47 &deg;N</td>
+              <td id="lat" class="background-primary text-monospace" ebcallback="updateMap"></td>
             </tr>
             <tr>
               <td>Longitude:</td>
-              <td id="long" class="background-primary text-monospace">-120 &deg;E</td>
+              <td id="long" class="background-primary text-monospace" ebcallback="updateMap"></td>
             </tr>
             <tr>
               <td>Altitude:</td>
-              <td id="alt" class="background-primary text-monospace">400 km</td>
+              <td id="alt" class="background-primary text-monospace eb-metric-prefix" unit="m" sigfig="3"></td>
             </tr>
             <tr>
               <td>Roll:</td>
-              <td id="roll" class="background-primary text-monospace">-120 &deg;</td>
+              <td id="roll" class="background-primary text-monospace" ebcallback="updateAngle"></td>
             </tr>
             <tr>
               <td>Pitch:</td>
-              <td id="pitch" class="background-primary text-monospace">130 &deg;</td>
+              <td id="pitch" class="background-primary text-monospace" ebcallback="updateAngle"></td>
             </tr>
             <tr>
               <td>Yaw:</td>
-              <td id="yaw" class="background-primary text-monospace">10 &deg;</td>
+              <td id="yaw" class="background-primary text-monospace" ebcallback="updateAngle"></td>
             </tr>
             <tr>
               <td>Linear velocity:</td>
-              <td id="velocity-linear" class="background-primary text-monospace">8000 ms<sup>-1</sup></td>
+              <td id="velocity-linear" class="background-primary text-monospace eb-metric-prefix" unit="m/s" sigfig="3">
+              </td>
             </tr>
             <tr>
               <td>Angular velocity:</td>
-              <td id="velocity-angular" class="background-primary text-monospace">8000 &deg;s<sup>-1</sup></td>
+              <td id="velocity-angular" class="background-primary text-monospace eb-metric-prefix" unit="&deg;/s"
+                sigfig="3"></td>
             </tr>
           </tbody>
         </table>
@@ -83,30 +86,33 @@
           <tbody>
             <tr>
               <td>Status:</td>
-              <td id="adcs-status" class="background-primary text-monospace">Attitude lock</td>
+              <td id="adcs-status" class="background-primary text-monospace"></td>
             </tr>
             <tr>
               <td>Target:</td>
-              <td id="adcs-target" class="background-primary text-monospace">Pullman</td>
+              <td id="adcs-target" class="background-primary text-monospace"></td>
             </tr>
             <tr>
               <td>X magnetorquer:</td>
-              <td id="magnet-x" class="background-primary text-monospace">2 mA</td>
+              <td id="magnet-x" class="background-primary text-monospace" ebcallback="updateMagnet" unit="A" sigfig="3">
+              </td>
             </tr>
             <tr>
               <td>Y magnetorquer:</td>
-              <td id="magnet-y" class="background-primary text-monospace">30 mA</td>
+              <td id="magnet-y" class="background-primary text-monospace" ebcallback="updateMagnet" unit="A" sigfig="3">
+              </td>
             </tr>
             <tr>
               <td>Z magnetorquer:</td>
-              <td id="magnet-z" class="background-primary text-monospace">-17 mA</td>
+              <td id="magnet-z" class="background-primary text-monospace" ebcallback="updateMagnet" unit="A" sigfig="3">
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
     <div class="col right">
-      <div class="row top" id="map">
+      <div class="row top" id="map" ebcallback="updateTLE">
       </div>
       <div class="row bottom">
         <h2 class="text-title text-align-center">Map Settings</h2>

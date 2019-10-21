@@ -16,6 +16,9 @@ var fovCamWide     = 142 / 180 * Math.PI;
 var fovCamNarrow   = 21 / 180 * Math.PI;
 var fovAntennaHigh = 40 / 180 * Math.PI;
 
+var lat  = 0;
+var long = 0;
+
 var ground = null;
 var gps    = null;
 
@@ -466,11 +469,11 @@ require(
           if (satelliteTime != document.activeElement)
             satelliteTime.value = date.toDatetimeLocal();
           gps.geometry = { // TODO Replace with getting GPS from telemetry
-            type: "point", // autocasts as new Point()
-            x: gps.geometry.x + 1,
-            y: gps.geometry.y + 1,
-            z: 0
-          };
+              type: "point", // autocasts as new Point()
+              x: lat,
+              y: long,
+              z: 0
+            };
           satRenderer.updateSatellite(satrec, date, orbitHours, enabled);
         };
 
@@ -561,3 +564,49 @@ Date.prototype.toDatetimeLocal = function toDatetimeLocal() {
       II = ten(date.getMinutes()), SS = ten(date.getSeconds());
   return YYYY + "-" + MM + "-" + DD + "T" + HH + ":" + II + ":" + SS;
 };
+
+/**
+ * Update the map's position locator dot
+ *
+ * @param {DOMElement} element
+ */
+function updateMap(element) {
+  formatDegrees(element);
+  lat  = document.getElementById("lat").num;
+  long = document.getElementById("long").num;
+}
+
+/**
+ * Update the map's attitude
+ *
+ * @param {DOMElement} element
+ */
+function updateAngle(element) {
+  formatDegrees(element);
+  attitude.x = document.getElementById("roll").num / 180 * Math.PI;
+  attitude.y = document.getElementById("pitch").num / 180 * Math.PI;
+  attitude.z = document.getElementById("yaw").num / 180 * Math.PI;
+}
+
+/**
+ * Update the map's magnetorquer
+ *
+ * @param {DOMElement} element
+ */
+function updateMagnet(element) {
+  ehbanana.numToMetricPrefix(element);
+  vectorMagnetorquer.x = document.getElementById("magnet-x").num;
+  vectorMagnetorquer.y = document.getElementById("magnet-y").num;
+  vectorMagnetorquer.z = document.getElementById("magnet-z").num;
+}
+
+/**
+ * Update the map's TLE
+ *
+ * @param {DOMElement} element
+ */
+function updateTLE(element) {
+  console.log(element.TLE.sub())
+  satrec = satellite.twoline2satrec(
+      element.TLE.substring(0, 69), element.TLE.substring(69));
+}

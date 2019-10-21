@@ -331,6 +331,11 @@ function updateDiagram(element) {
   numToPercent(obj);
 }
 
+/**
+ * Update the map's position locator dot
+ *
+ * @param {DOMElement} element
+ */
 function updateMap(element) {
   formatDegrees(element);
 

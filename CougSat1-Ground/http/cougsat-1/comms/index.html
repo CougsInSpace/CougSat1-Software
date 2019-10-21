@@ -12,6 +12,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <meta name="theme-color" content="#981E32">
   <script src="/lib/Ehbanana.js"></script>
+  <script src="/standard.js"></script>
 </head>
 
 <body class="text-body">
@@ -31,42 +32,44 @@
     <div><a href="/cougsat-1/payload-camera/"><img src="/cougsat-1/images/camera.png">Camera</a></div>
     <div><a href="/cougsat-1/payload-plant/"><img src="/cougsat-1/images/plant.png">Plant</a></div>
   </header>
-  <main>
+  <main id="main" class="eb-onload">
     <div class="main-text">
       <h2 class="text-title text-align-center">Primary Radio - 700mm</h2>
       <table>
         <tbody>
           <tr>
             <td>Status:</td>
-            <td id="comms-status-700" class="background-primary text-monospace">TX - Telemetry</td>
+            <td id="comms-status-700" class="background-primary text-monospace"></td>
           </tr>
           <tr>
             <td>Antenna status:</td>
-            <td id="antenna-700" class="background-primary text-monospace">Deployed</td>
+            <td id="antenna-700" class="background-primary text-monospace"></td>
           </tr>
           <tr>
             <td>Lifetime usage:</td>
-            <td id="comms-usage-700" class="background-primary text-monospace">13.2 MB</td>
+            <td id="comms-usage-700" class="background-primary text-monospace eb-metric-prefix" unit="B" sigfig="3">
+            </td>
           </tr>
           <tr>
             <td>TX power:</td>
-            <td id="tx-power-700" class="background-primary text-monospace">28.1 dBm</td>
+            <td id="tx-power-700" class="background-primary text-monospace eb-metric-prefix" unit="dBm" sigfig="3"></td>
           </tr>
           <tr>
             <td>RX power:</td>
-            <td id="rx-power" class="background-primary text-monospace">-21.2 dBm</td>
+            <td id="rx-power" class="background-primary text-monospace eb-metric-prefix" unit="dBm" sigfig="3"></td>
           </tr>
           <tr>
             <td>RX bit error rate:</td>
-            <td id="ber" class="background-primary text-monospace">1.2 ppm</td>
+            <td id="ber" class="background-primary text-monospace" ebcallback="formatPPM"></td>
           </tr>
           <tr>
             <td>RX signal to noise ratio:</td>
-            <td id="snr" class="background-primary text-monospace">13 dB</td>
+            <td id="snr" class="background-primary text-monospace eb-metric-prefix" unit="dB" sigfig="3"></td>
           </tr>
           <tr>
             <td>Enqueued segments:</td>
-            <td id="enqueued-segments-700" class="background-primary text-monospace">2 Segments</td>
+            <td id="enqueued-segments-700" class="background-primary text-monospace eb-metric-prefix" unit="Segments"
+              sigfig="3"></td>
           </tr>
         </tbody>
       </table>
@@ -75,23 +78,25 @@
         <tbody>
           <tr>
             <td>Status:</td>
-            <td id="comms-status-230" class="background-primary text-monospace">Idle</td>
+            <td id="comms-status-230" class="background-primary text-monospace"></td>
           </tr>
           <tr>
             <td>Antenna status:</td>
-            <td id="antenna-230" class="background-primary text-monospace">Deployed</td>
+            <td id="antenna-230" class="background-primary text-monospace"></td>
           </tr>
           <tr>
             <td>Lifetime usage:</td>
-            <td id="comms-usage-230" class="background-primary text-monospace">4.31 GB</td>
+            <td id="comms-usage-230" class="background-primary text-monospace eb-metric-prefix" unit="B" sigfig="3">
+            </td>
           </tr>
           <tr>
             <td>TX power:</td>
-            <td id="tx-power-230" class="background-primary text-monospace">29.1 dBm</td>
+            <td id="tx-power-230" class="background-primary text-monospace eb-metric-prefix" unit="dBm" sigfig="3"></td>
           </tr>
           <tr>
             <td>Enqueued segments:</td>
-            <td id="enqueued-segments-230" class="background-primary text-monospace">15 Segments</td>
+            <td id="enqueued-segments-230" class="background-primary text-monospace eb-metric-prefix" unit="Segments"
+              sigfig="3">s</td>
           </tr>
         </tbody>
       </table>

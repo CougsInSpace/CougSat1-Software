@@ -51,7 +51,7 @@ Result CougSat1::sendUpdate() {
     messageSetProp("adcs-target", "innerHTML", "Pullman");
     messageSetProp("lat", "num", -124.3213);
     messageSetProp("long", "num", 42.4321);
-    messageSetProp("alt", "num", 400.12345);
+    messageSetProp("alt", "num", 400.12345e3);
     messageSetProp("roll", "num", (rand() % 3600) / 10.0);
     messageSetProp("pitch", "num", (rand() % 3600) / 10.0);
     messageSetProp("yaw", "num", (rand() % 3600) / 10.0);
@@ -68,7 +68,7 @@ Result CougSat1::sendUpdate() {
     // C&DH
     messageSetProp("cdh-status", "innerHTML", "Idle");
     messageSetProp("events-enqueued", "num", (int64_t)5);
-    messageSetProp("cd-storage", "num", (int64_t)54315345);
+    messageSetProp("cdh-storage", "num", (int64_t)54315345);
 
     // Comms
     messageSetProp("comms-status", "innerHTML", "TX - Telemetry");

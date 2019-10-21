@@ -196,11 +196,17 @@ function updateDiagram(element) {
   traces.renderLine();
 }
 
+/**
+ * Setup the traces
+ */
 function setup() {
   traces.setup();
   traces.renderLine();
 }
 
+/**
+ * Adjust canvas geometry on resize
+ */
 function onResize() {
   traces.updateGeometry();
   traces.renderLine();
