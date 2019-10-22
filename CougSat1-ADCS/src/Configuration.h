@@ -3,6 +3,5 @@
 
 /*********************************** Timing ***********************************/
 #define PERIOD_MS_POLLING_SLEEP (1)    // Minimum wait for polling
-#define CDH_FLAG_MSG_READY 0x1 // Flag for a message waiting.
-
+#define MESSAGELENGTH (9) //9 byte messages will handle all possible communication
 #endif /* _SRC_CONFIGURATION_H_ */

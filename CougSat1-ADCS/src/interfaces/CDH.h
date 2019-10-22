@@ -3,14 +3,16 @@
 
 #include <mbed.h>
 #include <rtos.h>
-#define MESSAGELENGTH (8) //8 byte messages will handle all possible communication
+#include "Configuration.h"
 
 class CDH {
 public:
   CDH(uint8_t addr, PinName sda, PinName scl);
   void readCDH();
+  void writeCDH();
   char* getMessage();
-  bool hasMessage();
+  bool messageReceived();
+  bool messageRequested();
 
 private:
   I2CSlave i2c;

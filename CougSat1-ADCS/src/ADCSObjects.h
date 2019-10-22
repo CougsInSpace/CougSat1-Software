@@ -13,7 +13,6 @@ class ADCS
 	Thread monitor;
 	Thread cdhRead;
 	char message[4];
-    #define IHU_ADDRESS_TEST 0xAC
 	CDH cdh;
 	
   public:

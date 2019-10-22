@@ -1,24 +1,6 @@
 #include "ADCSObjects.h"
 
 /**
- * @brief Function for the polling thread
- * 
- */
-void ADCS::monitorThread()
-{
-    while (true)
-    {
-        ThisThread::sleep_for(PERIOD_MS_POLLING_SLEEP);
-        //printf("Checking for events!\r\n");
-        if (cdh.hasMessage())
-        {
-            cdhRead.flags_set(CDH_FLAG_MSG_READY);
-            //printf("Turning on I2C\r\n");
-        }
-    }
-}
-
-/**
  * @brief Function for cdh communication thread
  * 
  */
@@ -26,8 +8,15 @@ void ADCS::cdhThread()
 {
     while (true)
     {
-        ThisThread::flags_wait_all(CDH_FLAG_MSG_READY);
+    if(cdh.messageReceived())
+    {
         cdh.readCDH();
+    }
+    if(cdh.messageRequested())
+    {
+        cdh.writeCDH();
+    }
+    ThisThread::sleep_for(PERIOD_MS_POLLING_SLEEP);
     }
 }
 
@@ -36,12 +25,14 @@ void ADCS::cdhThread()
  * 
  */
 #define TEST_IHU_ADDRESS 0xAC
+#define BUS_I2C0_SDA PinName(25)
+#define BUS_I2C0_SCL PinName(24)
 ADCS::ADCS() : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL)
 {
-    monitor.set_priority(osPriorityRealtime);
-    cdhRead.set_priority(osPriorityRealtime);
+    //monitor.set_priority(osPriorityNormal);
+    //cdhRead.set_priority(osPriorityNormal);
     cdhRead.start(callback(this, &ADCS::cdhThread));
-    monitor.start(callback(this, &ADCS::monitorThread));
+    //monitor.start(callback(this, &ADCS::monitorThread));
 }
 
 /**
@@ -51,12 +42,12 @@ ADCS::ADCS() : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL)
 void ADCS::initThread()
 {
     printf("Outside Main!\r\n");
-    DigitalOut led1(LED1);
+    DigitalOut led1(PinName(5));
     while (true)
     {
         printf("Process Main!\r\n");
         led1 = !led1;
         ThisThread::sleep_for(1000);
+        //ThisThread::flags_wait_all(0x00);
     }
 }
-

@@ -1,7 +1,5 @@
 #include "CDH.h"
 
-#include <CISConsole.h>
-
 /**
  * @brief Construct a new CDH::CDH object
  *
@@ -17,9 +15,19 @@ CDH::CDH(uint8_t addr, PinName sda, PinName scl) : i2c(sda, scl)
  *
  * @return true is the PMIC is addressed
  */
-bool CDH::hasMessage() {
+bool CDH::messageReceived() {
   int state = i2c.receive();
-  return state == I2CSlave::ReadAddressed;
+  return state == mbed::I2CSlave::WriteAddressed ;
+}
+
+/**
+ * @brief Checks if a message is requested by master
+ *
+ * @return true is the PMIC is addressed
+ */
+bool CDH::messageRequested() {
+  int state = i2c.receive();
+  return state == mbed::I2CSlave::ReadAddressed ;
 }
 
 /**
@@ -28,12 +36,13 @@ bool CDH::hasMessage() {
  */
 void CDH::readCDH()
 {
-    i2c.read(message, MESSAGELENGTH);
-    i2c.write(message, MESSAGELENGTH);
-    // for (uint8_t i = 0; message[i] != NULL; i++)
-    // {
-    //     printf("%c\n", message[i]);
-    // }
+  printf("Reading i2c buffer\n Messsage = ");
+  i2c.read(message, MESSAGELENGTH);
+  for (uint8_t i = 0; message[i] != NULL; i++)
+  {
+      printf("%c,", message[i]);
+  }
+  printf("\n");
 }
 
 /**
@@ -43,4 +52,15 @@ void CDH::readCDH()
 char* CDH::getMessage()
 {
   return message;
+}
+
+void CDH::writeCDH()
+{
+  printf("Writing i2c buffer\n Messsage = ");
+  i2c.write(message, MESSAGELENGTH);
+  for (uint8_t i = 0; message[i] != NULL; i++)
+  {
+      printf("%c,", message[i]);
+  }
+  printf("\n");
 }
