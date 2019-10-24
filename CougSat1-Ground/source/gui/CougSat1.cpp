@@ -57,6 +57,8 @@ Result CougSat1::sendUpdate() {
     messageSetProp("yaw", "num", (rand() % 3600) / 10.0);
     messageSetProp("velocity-linear", "num", 8032.123);
     messageSetProp("velocity-angular", "num", 1.3234);
+    messageSetProp("magnetic-field", "num", 1.3234e-4);
+    messageSetProp("gravity", "num", 9.806);
     messageSetProp("magnet-x", "num", 0.3 * (rand() % 10000) / 10000.0);
     messageSetProp("magnet-y", "num", 0.3 * (rand() % 10000) / 10000.0);
     messageSetProp("magnet-z", "num", 0.3 * (rand() % 10000) / 10000.0);
