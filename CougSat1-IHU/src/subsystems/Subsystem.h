@@ -36,8 +36,8 @@ public:
    * @return T Value
    */
   template<typename T>
-  static T BufferToInt (char* buffer, size_t buffer_size, int offset=0) {
-      int8_t type_width = sizeof(T) * 8;
+  static T BufferToInt (char* buffer, size_t buffer_size, uint8_t offset=0) {
+      uint8_t type_width = sizeof(T) * 8;
 
       if (buffer_size - offset > type_width) {
           //It won't work. Throw error?
@@ -63,15 +63,15 @@ public:
    * @param offset Offset in Bytes
    */
   template<typename T>
-  static void BufferToArray (T* array, size_t array_size, char* buffer, size_t buffer_size, int offset=0) {
+  static void BufferToArray (T* array, size_t array_size, char* buffer, size_t buffer_size, uint_t offset=0) {
       const size_t data_width = sizeof(T);
 
       if (buffer_size - offset > array_size * data_width) {
           return;
       }
 
-      for (int8_t pos = 0; pos < array_size; pos++) {
-          *(array + pos) = BufferToInt<T>(buffer, buffer_size, pos * data_width);
+      for (uint8_t pos = 0; pos < array_size; pos++) {
+          *(array + pos) = BufferToInt<T>(buffer, buffer_size, pos * data_width + offset);
       }
   }
 };
