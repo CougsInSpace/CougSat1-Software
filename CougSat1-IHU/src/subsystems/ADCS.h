@@ -3,10 +3,8 @@
 
 #include "Subsystem.h"
 #include <mbed.h>
-#include <tuple>
 
-const uint8_t I2C_ADCS_ADDRESS = 0xAD;
-const uint8_t I2C_DATA_LENGTH  = 7;
+const uint8_t I2C_DATA_SIZE  = 9;
 
 enum ADCS_COMMAND {
     ADCS_CMD_LOCATION_REQ,
@@ -32,27 +30,18 @@ public:
   ~ADCS();
 
   mbed_error_status_t initialize();
-  mbed_error_status_t requestLocation();
-
-  std::tuple<int32_t, int32_t> getLocation();
-
-protected:
-  char tx_buffer[I2C_DATA_LENGTH] = {};
-  char rx_buffer[I2C_DATA_LENGTH] = {};
-
-  event_callback_t transfer_complete_callback;
+  mbed_error_status_t receiveBuffer(int8_t command, char* rx_buffer, size_t buffer_size);
 
 private:
   I2C & i2c;
 
-  bool i2c_busy = false;
-
-  int32_t latitude  = 0;
-  int32_t longitude = 0;
-
-  void receiveDataHandler(int);
-
-  void receiveLocation(int);
+  int32_t location[2] =        { 0 };
+  int16_t orientation[3] =     { 0 };
+  int8_t coil_temperature[3] = { 0 };
+  int8_t adcs_temperature =    0;
+  int8_t gps_temperature =     0;
+  int8_t coil_control[3] =     { 0 };
+  int8_t coil_current[3] =     { 0 };
 };
 
 #endif /* SRC_SUBSYSTEMS_ADCS_H_ */

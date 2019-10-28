@@ -14,67 +14,44 @@ ADCS::ADCS(I2C & i2c) : i2c(i2c) {}
 ADCS::~ADCS() {}
 
 /**
- * @brief Request Location from ADCS
+ * @brief Stores data from the ADCS
  * 
+ * @param command CommandID
+ * @param rx_buffer Response Buffer
+ * @param buffer_size Length in Bytes
  * @return mbed_error_status_t 
  */
-mbed_error_status_t ADCS::requestLocation() {
-  if (i2c_busy) {
-    return MBED_ERROR_DEVICE_BUSY;
+mbed_error_status_t ADCS::receiveBuffer(int8_t command, char* rx_buffer, size_t buffer_size) {
+  switch (command) {
+  case ADCS_CMD_LOCATION_REQ:
+    BufferToArray<int32_t>(location, 2, rx_buffer, buffer_size);
+    break;
+
+  case ADCS_CMD_ORIENTATION_REQ:
+    BufferToArray<int16_t>(orientation, 3, rx_buffer, buffer_size);
+    break;
+
+  case ADCS_CMD_TEMPERATURE_REQ:
+    BufferToArray<int8_t>(coil_temperature, 3, rx_buffer, buffer_size);
+    adcs_temperature = BufferToInt<int8_t>(rx_buffer, buffer_size, 3);
+    gps_temperature = BufferToInt<int8_t>(rx_buffer, buffer_size, 4);
+    break;
+
+  case ADCS_CMD_COIL_CONTROL_REQ:
+    BufferToArray<int8_t>(coil_control, 3, rx_buffer, buffer_size);
+    break;
+
+  case ADCS_CMD_COIL_CURRENT_REQ:
+    BufferToArray<int8_t>(coil_current, 3, rx_buffer, buffer_size);
+    break;
+
+  default:
+    return MBED_ERROR_EBADMSG;
   }
 
-  i2c_busy = true;
-
-  tx_buffer[0] = ADCS_CMD_LOCATION_REQ;
-
-  transfer_complete_callback = event_callback_t(this, &ADCS::receiveLocation);
-
-  int status = i2c.transfer(
-    I2C_ADCS_ADDRESS,
-    tx_buffer, I2C_DATA_LENGTH,
-    rx_buffer, I2C_DATA_LENGTH,
-    event_callback_t(this, &ADCS::receiveDataHandler),
-    I2C_EVENT_ALL
-  );
-
-  return status == 0 ? MBED_SUCCESS : MBED_ERROR_DEVICE_BUSY;
+  return MBED_SUCCESS;
 }
 
-/**
- * @brief Stores the location into the class.
- * 
- * @param status 
- */
-void ADCS::receiveLocation (int status) {
-  latitude  = Int32FromBuffer(rx_buffer, 0);
-  longitude = Int32FromBuffer(rx_buffer, 4);
-}
-
-/**
- * @brief Returns the latitude, longitude.
- * 
- * @return std::tuple<int32_t, int32_t> 
- */
-std::tuple<int32_t, int32_t> ADCS::getLocation() {
-  return std::make_tuple(latitude, longitude);
-}
-
-/**
- * @brief Handles all errors, and only passes data with correct statuses
- * to the parsers.
- * 
- * @param status 
- */
-void ADCS::receiveDataHandler(int status) {
-  if (status & I2C_EVENT_ERROR) {
-    //TODO: Handle the error somehow.
-  }
-
-  if (status & I2C_EVENT_TRANSFER_COMPLETE) {
-    transfer_complete_callback.call(status);
-    i2c_busy = false;
-  }
-}
 
 /**
  * @brief Initialize the ADCS
