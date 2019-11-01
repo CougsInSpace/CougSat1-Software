@@ -68,13 +68,25 @@ mbed_error_status_t AD7689::readRaw(ADCChannel_t channel, int32_t & value) {
     return error;
   }
 
+  value = static_cast<int32_t>(raw);
   if (inputConfig == InputConfig_t::BIPOLAR_DIFF)
     // Extend the sign for two's complement values
-    value = raw | (0xFFFF0000 * ((raw >> 15) & 0x1));
-  else
-    value = raw;
+    value = value | (0xFFFF0000 * ((value >> 15) & 0x1));
 
   return MBED_SUCCESS;
+}
+
+/**
+ * @brief Read the temperature of the ADC
+ *
+ * @param value to return in Celsius
+ * @return mbed_error_status_t
+ */
+mbed_error_status_t AD7689::readTemp(double & value) {
+  mbed_error_status_t result = readVoltage(ADCChannel_t::TEMP, value);
+
+  value = (value - TEMP_OFFSET) * TEMP_SLOPE;
+  return result;
 }
 
 /**

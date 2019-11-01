@@ -15,6 +15,7 @@ public:
   ~AD7689();
 
   mbed_error_status_t readRaw(ADCChannel_t channel, int32_t & value);
+  mbed_error_status_t readTemp(double & value);
 
   mbed_error_status_t selfTest();
 
@@ -53,6 +54,9 @@ private:
 
   const int     DELAY_CNV_US = 6;
   const uint8_t BIT_DEPTH    = 16;
+
+  const double TEMP_SLOPE  = 1000;
+  const double TEMP_OFFSET = 0.258;
 
   InputConfig_t      inputConfig   = InputConfig_t::UNIPOLAR_COM;
   uint8_t            inputChannel  = 0;

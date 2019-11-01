@@ -122,7 +122,7 @@ public:
    * @param value to return in Celsius
    * @return mbed_error_status_t
    */
-  mbed_error_status_t readTemp(double & value) {
+  virtual mbed_error_status_t readTemp(double & value) {
     int32_t             buf    = 0;
     mbed_error_status_t result = readRaw(ADCChannel_t::TEMP, buf);
     value                      = (double)buf * conversionFactorTemp;
