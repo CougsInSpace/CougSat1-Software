@@ -87,6 +87,10 @@ function updateDiagram(element) {
     obj     = document.getElementById("BATT_C_" + chainSuffixes[i]);
     obj.num = element["BATT_" + chainSuffixes[i] + "_C"];
     ehbanana.numToMetricPrefix(obj);
+
+    obj     = document.getElementById("BATT_P_" + chainSuffixes[i]);
+    obj.num = -batteryP;
+    ehbanana.numToMetricPrefix(obj);
   }
 
   // Vbatt switching
