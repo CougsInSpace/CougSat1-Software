@@ -66,11 +66,10 @@ public:
    *
    * @param channel to read
    * @param value to return in counts
-   * @param blocking will wait until data is present if true
    * @return mbed_error_status_t
    */
   virtual mbed_error_status_t readRaw(
-      ADCChannel_t channel, int32_t & value, bool blocking = true) = 0;
+      ADCChannel_t channel, int32_t & value) = 0;
 
   /**
    * @brief Set the reference voltage given the number of bits and vRef
@@ -107,13 +106,11 @@ public:
    *
    * @param channel to read
    * @param value to return in volts
-   * @param blocking will wait until data is present if true
    * @return mbed_error_status_t
    */
-  mbed_error_status_t readVoltage(
-      ADCChannel_t channel, double & value, bool blocking = true) {
+  mbed_error_status_t readVoltage(ADCChannel_t channel, double & value) {
     int32_t             buf    = 0;
-    mbed_error_status_t result = readRaw(channel, buf, blocking);
+    mbed_error_status_t result = readRaw(channel, buf);
     value                      = (double)buf * conversionFactor;
     return result;
   }
@@ -123,12 +120,11 @@ public:
    * Reads the raw value and multiplies by the conversionFactorTemp
    *
    * @param value to return in Celsius
-   * @param blocking will wait until data is present if true
    * @return mbed_error_status_t
    */
-  mbed_error_status_t readTemp(double & value, bool blocking = true) {
+  mbed_error_status_t readTemp(double & value) {
     int32_t             buf    = 0;
-    mbed_error_status_t result = readRaw(ADCChannel_t::TEMP, buf, blocking);
+    mbed_error_status_t result = readRaw(ADCChannel_t::TEMP, buf);
     value                      = (double)buf * conversionFactorTemp;
     return result;
   }

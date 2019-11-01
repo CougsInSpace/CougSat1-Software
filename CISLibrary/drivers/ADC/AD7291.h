@@ -27,8 +27,7 @@ public:
   AD7291(I2C & i2c, AD7291Addr_t addr, double refVoltage = 2.5);
   ~AD7291();
 
-  mbed_error_status_t readRaw(
-      ADCChannel_t channel, int32_t & value, bool blocking = true);
+  mbed_error_status_t readRaw(ADCChannel_t channel, int32_t & value);
 
   mbed_error_status_t reset();
 
@@ -56,6 +55,8 @@ private:
 
   I2C &        i2c;
   AD7291Addr_t addr;
+
+  const uint8_t BIT_DEPTH = 12;
 
   uint8_t channels;
   bool    tempSense         = true;
