@@ -1,7 +1,6 @@
 #ifndef _LIBRARY_DRIVER_ADC_ADC_H_
 #define _LIBRARY_DRIVER_ADC_ADC_H_
 
-#include <cmath>
 #include <mbed.h>
 
 enum class ADCChannel_t : uint8_t {
@@ -84,11 +83,17 @@ public:
 
   /**
    * @brief Set the Temperature Conversion Factor
+   * temp = (tempSensorVolts - tempOffset) * tempSlope;
    *
-   * @param conversionFactorTemp Celsius per count
+   * @param slope Celsius per unit
+   * @param offset units at 0 Celsius
+   * @param unitVolts will read the voltage of the temperature sensor when true,
+   * counts if false
    */
-  void setTemperatureConversionFactor(double conversionFactorTemp) {
-    this->conversionFactorTemp = conversionFactorTemp;
+  void setTemperatureFunction(double slope, double offset, bool unitsVolts) {
+    tempSlope      = slope;
+    tempOffset     = offset;
+    tempUnitsVolts = unitsVolts;
   }
 
   /**
@@ -117,22 +122,32 @@ public:
 
   /**
    * @brief Read the temperature of the ADC
-   * Reads the raw value and multiplies by the conversionFactorTemp
    *
    * @param value to return in Celsius
    * @return mbed_error_status_t
    */
-  virtual mbed_error_status_t readTemp(double & value) {
-    int32_t             buf    = 0;
-    mbed_error_status_t result = readRaw(ADCChannel_t::TEMP, buf);
-    value                      = (double)buf * conversionFactorTemp;
+  mbed_error_status_t readTemp(double & value) {
+    mbed_error_status_t result;
+    if (tempUnitsVolts)
+      result = readVoltage(ADCChannel_t::TEMP, value);
+    else {
+      int32_t buf = 0;
+      result      = readRaw(ADCChannel_t::TEMP, buf);
+      value       = (double)buf;
+    }
+
+    value = (value - tempOffset) * tempSlope;
     return result;
   }
 
 protected:
-  double refVoltage           = 0.0; // Volts
-  double conversionFactor     = 0.0; // Volts per count
-  double conversionFactorTemp = 0.0; // Celsius per count
+  double refVoltage       = 0.0; // Volts
+  double conversionFactor = 0.0; // Volts per count
+
+  // temp = (tempSensorVolts - tempOffset) * tempSlope;
+  double tempSlope      = 0;
+  double tempOffset     = 0;
+  bool   tempUnitsVolts = true;
 };
 
 #endif /* _LIBRARY_DRIVER_ADC_ADC_H_ */

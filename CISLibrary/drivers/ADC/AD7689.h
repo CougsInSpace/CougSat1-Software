@@ -11,11 +11,11 @@ public:
   AD7689 & operator=(const AD7689 &) = delete;
 
   AD7689(PinName mosi, PinName miso, PinName sclk, PinName cnv,
-      double refVoltage = 2.5);
+      double refVoltage = 2.5, double tempSlope = 1000,
+      double tempOffset = 0.258);
   ~AD7689();
 
   mbed_error_status_t readRaw(ADCChannel_t channel, int32_t & value);
-  mbed_error_status_t readTemp(double & value);
 
   mbed_error_status_t selfTest();
 
@@ -52,11 +52,8 @@ private:
 
   SPI spi;
 
-  const int     DELAY_CNV_US = 6;
-  const uint8_t BIT_DEPTH    = 16;
-
-  const double TEMP_SLOPE  = 1000;
-  const double TEMP_OFFSET = 0.258;
+  static const uint16_t DELAY_CNV_US = 6;
+  static const uint8_t  BIT_DEPTH    = 16;
 
   InputConfig_t      inputConfig   = InputConfig_t::UNIPOLAR_COM;
   uint8_t            inputChannel  = 0;

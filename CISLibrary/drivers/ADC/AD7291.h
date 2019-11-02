@@ -24,7 +24,8 @@ public:
   AD7291(const AD7291 &) = delete;
   AD7291 & operator=(const AD7291 &) = delete;
 
-  AD7291(I2C & i2c, AD7291Addr_t addr, double refVoltage = 2.5);
+  AD7291(I2C & i2c, AD7291Addr_t addr, double refVoltage = 2.5,
+      double tempSlope = 0.25, double tempOffset = 0.0);
   ~AD7291();
 
   mbed_error_status_t readRaw(ADCChannel_t channel, int32_t & value);
@@ -56,7 +57,7 @@ private:
   I2C &        i2c;
   AD7291Addr_t addr;
 
-  const uint8_t BIT_DEPTH = 12;
+  static const uint8_t BIT_DEPTH = 12;
 
   uint8_t channels;
   bool    tempSense         = true;

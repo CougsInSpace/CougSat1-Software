@@ -8,10 +8,14 @@
  * @param i2c connected to the ADC
  * @param addr address of the ADC
  * @param refVoltage reference voltage in volts
+ * @param tempSlope Celsius per count
+ * @param tempOffset counts at 0 Celsius
  */
-AD7291::AD7291(I2C & i2c, AD7291Addr_t addr, double refVoltage) :
-  ADC(refVoltage, BIT_DEPTH), i2c(i2c), addr(addr) {
-  setTemperatureConversionFactor(0.25);
+AD7291::AD7291(I2C & i2c, AD7291Addr_t addr, double refVoltage,
+    double tempSlope, double tempOffset) :
+  ADC(refVoltage, BIT_DEPTH),
+  i2c(i2c), addr(addr) {
+  setTemperatureFunction(tempSlope, tempOffset, false);
 }
 
 /**

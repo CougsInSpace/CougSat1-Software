@@ -13,8 +13,6 @@
 extern I2C      i2cLocal;
 extern I2CSlave i2cBus;
 
-extern SPI spi;
-
 extern CDH cdh;
 
 extern ADC * adcEPSs[COUNT_ADC_EPS];

@@ -60,10 +60,6 @@
 #define GAIN_PVOUT_3B (0.10)
 
 /******************************** Power Rails *********************************/
-#define GAIN_BATT_A (0.5)
-#define GAIN_BATT_IN_A (1.0)
-#define GAIN_BATT_OUT_A (1.0)
-
 #define GAIN_PR_3V3_0 (0.05)
 #define GAIN_PR_3V3_1 (0.05)
 #define GAIN_PR_3V3_2 (0.05)

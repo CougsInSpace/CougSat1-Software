@@ -10,11 +10,15 @@
  * @param sclk serial clock pin
  * @param cnv pin (chip select)
  * @param refVoltage reference voltage in volts
+ * @param tempSlope Celsius per volt
+ * @param tempOffset volts at 0 Celsius
  */
-AD7689::AD7689(
-    PinName mosi, PinName miso, PinName sclk, PinName cnv, double refVoltage) :
+AD7689::AD7689(PinName mosi, PinName miso, PinName sclk, PinName cnv,
+    double refVoltage, double tempSlope, double tempOffset) :
   ADC(refVoltage, BIT_DEPTH),
-  spi(mosi, miso, sclk, cnv, use_gpio_ssel) {}
+  spi(mosi, miso, sclk, cnv, use_gpio_ssel) {
+  setTemperatureFunction(tempSlope, tempOffset, true);
+}
 
 /**
  * @brief Destroy the AD7689::AD7689 object
@@ -46,23 +50,21 @@ mbed_error_status_t AD7689::readRaw(ADCChannel_t channel, int32_t & value) {
     ERROR("AD7291", "Selected channel is not available to read");
     return MBED_ERROR_INVALID_ARGUMENT;
   }
-  uint16_t config = getConfigRegister();
 
-  error = transfer(config, (uint16_t *)nullptr);
+  error = transfer(getConfigRegister(), (uint16_t *)nullptr);
   if (error) {
     ERROR("AD7689", "Failed to transfer config");
     return error;
   }
 
   // Discard second byte
-  error = transfer(config, (uint16_t *)nullptr);
+  error = transfer(0, (uint16_t *)nullptr);
   if (error) {
     ERROR("AD7689", "Failed to skip second byte");
     return error;
   }
 
-  uint16_t raw = 0;
-  error        = transfer(config, &raw);
+  error = transfer(0, &raw);
   if (error) {
     ERROR("AD7689", "Failed to read data");
     return error;
@@ -74,19 +76,6 @@ mbed_error_status_t AD7689::readRaw(ADCChannel_t channel, int32_t & value) {
     value = value | (0xFFFF0000 * ((value >> 15) & 0x1));
 
   return MBED_SUCCESS;
-}
-
-/**
- * @brief Read the temperature of the ADC
- *
- * @param value to return in Celsius
- * @return mbed_error_status_t
- */
-mbed_error_status_t AD7689::readTemp(double & value) {
-  mbed_error_status_t result = readVoltage(ADCChannel_t::TEMP, value);
-
-  value = (value - TEMP_OFFSET) * TEMP_SLOPE;
-  return result;
 }
 
 /**
@@ -105,18 +94,19 @@ mbed_error_status_t AD7689::selfTest() {
   }
 
   // Discard second byte
-  error = transfer(config, (uint16_t *)nullptr);
+  error = transfer(0, (uint16_t *)nullptr);
   if (error) {
     ERROR("AD7689", "Failed to skip second byte");
     return error;
   }
 
-  error = transfer(config, &bufRX);
+  error = transfer(0, &bufRX);
   if (error) {
     ERROR("AD7689", "Failed to read data");
     return error;
   }
 
+  DEBUG("AD7689", "Read back: 0x%04X vs 0x%04X", (bufRX & 0xFFFF), config);
   if ((bufRX & 0xFFFF) == config)
     return MBED_SUCCESS;
 
@@ -135,18 +125,15 @@ mbed_error_status_t AD7689::selfTest() {
  */
 mbed_error_status_t AD7689::transfer(
     const uint16_t write, uint16_t * read, bool conversionDelay) {
-  spi.select();
-  char bufTX[2] = {(write >> 8), (write & 0xFF)};
+  char bufTX[2] = {
+      static_cast<char>(write >> 8), static_cast<char>(write & 0xFF)};
   char bufRX[2] = {0};
   int  result   = spi.write(bufTX, 2, bufRX, 2);
   // Should return that it wrote and read 2 bytes
-  if (result != 2) {
-    spi.deselect();
+  if (result != 2)
     return MBED_ERROR_WRITE_FAILED;
-  }
   if (read != nullptr)
-    *read = (bufRX[1] << 8) | bufRX[0];
-  spi.deselect();
+    *read = (bufRX[0] << 8) | bufRX[1];
 
   if (conversionDelay)
     wait_us(DELAY_CNV_US);
@@ -165,18 +152,15 @@ mbed_error_status_t AD7689::transfer(
  */
 mbed_error_status_t AD7689::transfer(
     const uint16_t write, uint32_t * read, bool conversionDelay) {
-  spi.select();
-  char bufTX[4] = {(write >> 8), (write & 0xFF), 0, 0};
+  char bufTX[4] = {
+      static_cast<char>(write >> 8), static_cast<char>(write & 0xFF), 0, 0};
   char bufRX[4] = {0};
   int  result   = spi.write(bufTX, 4, bufRX, 4);
   // Should return that it wrote and read 4 bytes
-  if (result != 4) {
-    spi.deselect();
+  if (result != 4)
     return MBED_ERROR_WRITE_FAILED;
-  }
   if (read != nullptr)
-    *read = (bufRX[3] << 24) | (bufRX[2] << 16) | (bufRX[1] << 8) | bufRX[0];
-  spi.deselect();
+    *read = (bufRX[0] << 24) | (bufRX[1] << 16) | (bufRX[2] << 8) | bufRX[3];
 
   if (conversionDelay)
     wait_us(DELAY_CNV_US);
@@ -193,12 +177,13 @@ mbed_error_status_t AD7689::transfer(
  * @return uint16_t register[15:2] as defined in table 11 of datasheet
  */
 uint16_t AD7689::getConfigRegister(bool readback) {
-  uint16_t buf = 0x20; // Overwrite config register
+  uint16_t buf = 1 << 13; // Overwrite config register
   buf          = buf | (static_cast<uint16_t>(inputConfig) << 10);
   buf          = buf | (static_cast<uint16_t>(inputChannel & 0x7) << 7);
-  buf          = buf | (static_cast<uint16_t>(lowPassFilter) << 6);
+  buf          = buf | (static_cast<uint16_t>(!lowPassFilter) << 6);
   buf          = buf | (static_cast<uint16_t>(refConfig) << 3);
   buf          = buf | (static_cast<uint16_t>(channelSeq) << 1);
-  buf          = buf | (static_cast<uint16_t>(readback) << 0);
+  buf          = buf | (static_cast<uint16_t>(!readback) << 0);
+  buf          = buf << 2; // 14b to 16b
   return buf;
 }
