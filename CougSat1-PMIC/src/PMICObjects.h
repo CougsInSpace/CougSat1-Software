@@ -31,6 +31,8 @@ extern CurrentNode * nodesPRBatt[COUNT_PR_BATT];
 extern CurrentNode * nodesBatteryHeaters[COUNT_BH];
 extern CurrentNode * nodesDeployables[COUNT_DEPLOY];
 
+extern DigitalOut * inputSwitching[COUNT_INPUT_SW];
+
 extern CurrentNode nodeBattInA;
 extern CurrentNode nodeBattInB;
 extern CurrentNode nodeBattOutA;
@@ -39,6 +41,7 @@ extern CurrentNode node3V3InA;
 extern CurrentNode node3V3InB;
 extern CurrentNode node3V3OutA;
 extern CurrentNode node3V3OutB;
+extern CurrentNode nodePR3V3_EPS;
 
 /******************************** Thermistors *********************************/
 extern Thermistor thermistorBattA;

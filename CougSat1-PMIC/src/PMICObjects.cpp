@@ -77,6 +77,14 @@ InterruptIn interruptBusI2CIRQ(BUS_I2C_IRQ);
 //     &nodePVOut_1B, &nodePVOut_2A, &nodePVOut_2B, &nodePVOut_3A,
 //     &nodePVOut_3B};
 
+DigitalOut inputSwitch_02A(PC_PV02A, 1);
+DigitalOut inputSwitch_02B(PC_PV02B, 1);
+DigitalOut inputSwitch_13A(PC_PV13A, 1);
+DigitalOut inputSwitch_13B(PC_PV13B, 1);
+
+DigitalOut * inputSwitching[COUNT_INPUT_SW] = {
+    &inputSwitch_02A, &inputSwitch_02B, &inputSwitch_13A, &inputSwitch_13B};
+
 // clang-format off
 CurrentNode nodePR3V3_0(adcEPS3, ADCChannel_t::CM_07, GAIN_PR_3V3_0, PC_3V3_0_N, true, RANK_PR_3V3_0);
 CurrentNode nodePR3V3_1(adcEPS3, ADCChannel_t::CM_06, GAIN_PR_3V3_1, PC_3V3_1_N, true, RANK_PR_3V3_1);
@@ -147,64 +155,66 @@ CurrentNode node3V3InB(adcEPS0, ADCChannel_t::CM_06, GAIN_3V3_IN_B);
 CurrentNode node3V3OutA(adcEPS1, ADCChannel_t::CM_06, GAIN_3V3_OUT_A);
 CurrentNode node3V3OutB(adcEPS0, ADCChannel_t::CM_05, GAIN_3V3_OUT_B);
 
+CurrentNode nodePR3V3_EPS(adcEPS5, ADCChannel_t::CM_06, GAIN_PR_3V3_EPS);
+
 /******************************** Thermistors *********************************/
 // clang-format off
-Thermistor thermistorBattA(adcEPS6, ADCChannel_t::CM_05, THERM_BATT_A_270K, THERM_BATT_A_350K);
-Thermistor thermistorBattB(adcEPS7, ADCChannel_t::CM_04, THERM_BATT_B_270K, THERM_BATT_B_350K);
-Thermistor thermistorPMIC(adcEPS7, ADCChannel_t::CM_05, THERM_PMIC_270K, THERM_PMIC_350K);
-Thermistor thermistorRegA(adcEPS6, ADCChannel_t::CM_02, THERM_REG_A_270K, THERM_REG_A_350K);
-Thermistor thermistorRegB(adcEPS7, ADCChannel_t::CM_07, THERM_REG_A_270K, THERM_REG_A_350K);
-Thermistor thermistorSwIn0(adcEPS6, ADCChannel_t::CM_03, THERM_SW_IN_0_270K, THERM_SW_IN_0_350K);
-Thermistor thermistorSwIn1(adcEPS7, ADCChannel_t::CM_06, THERM_SW_IN_1_270K, THERM_SW_IN_1_350K);
-Thermistor thermistorSwOut0(adcEPS6, ADCChannel_t::CM_00, THERM_SW_OUT_0_270K, THERM_SW_OUT_0_350K);
-Thermistor thermistorSwOut1(adcEPS6, ADCChannel_t::CM_01, THERM_SW_OUT_1_270K, THERM_SW_OUT_1_350K);
-Thermistor thermistorPCB0(adcEPS7, ADCChannel_t::CM_01, THERM_PCB_0_270K, THERM_PCB_0_350K);
-Thermistor thermistorPCB1(adcEPS6, ADCChannel_t::CM_06, THERM_PCB_1_270K, THERM_PCB_1_350K);
-Thermistor thermistorPCB2(adcEPS7, ADCChannel_t::CM_02, THERM_PCB_2_270K, THERM_PCB_2_350K);
-Thermistor thermistorPCB3(adcEPS6, ADCChannel_t::CM_04, THERM_PCB_3_270K, THERM_PCB_3_350K);
-Thermistor thermistorPCB4(adcEPS7, ADCChannel_t::CM_03, THERM_PCB_4_270K, THERM_PCB_4_350K);
+Thermistor thermistorBattA(adcEPS6, ADCChannel_t::CM_05, THERM_BATT_A_300K, THERM_BATT_A_340K);
+Thermistor thermistorBattB(adcEPS7, ADCChannel_t::CM_04, THERM_BATT_B_300K, THERM_BATT_B_340K);
+Thermistor thermistorPMIC(adcEPS7, ADCChannel_t::CM_05, THERM_PMIC_300K, THERM_PMIC_340K);
+Thermistor thermistorRegA(adcEPS6, ADCChannel_t::CM_02, THERM_REG_A_300K, THERM_REG_A_340K);
+Thermistor thermistorRegB(adcEPS7, ADCChannel_t::CM_07, THERM_REG_A_300K, THERM_REG_A_340K);
+Thermistor thermistorSwIn0(adcEPS6, ADCChannel_t::CM_03, THERM_SW_IN_0_300K, THERM_SW_IN_0_340K);
+Thermistor thermistorSwIn1(adcEPS7, ADCChannel_t::CM_06, THERM_SW_IN_1_300K, THERM_SW_IN_1_340K);
+Thermistor thermistorSwOut0(adcEPS6, ADCChannel_t::CM_00, THERM_SW_OUT_0_300K, THERM_SW_OUT_0_340K);
+Thermistor thermistorSwOut1(adcEPS6, ADCChannel_t::CM_01, THERM_SW_OUT_1_300K, THERM_SW_OUT_1_340K);
+Thermistor thermistorPCB0(adcEPS7, ADCChannel_t::CM_01, THERM_PCB_0_300K, THERM_PCB_0_340K);
+Thermistor thermistorPCB1(adcEPS6, ADCChannel_t::CM_06, THERM_PCB_1_300K, THERM_PCB_1_340K);
+Thermistor thermistorPCB2(adcEPS7, ADCChannel_t::CM_02, THERM_PCB_2_300K, THERM_PCB_2_340K);
+Thermistor thermistorPCB3(adcEPS6, ADCChannel_t::CM_04, THERM_PCB_3_300K, THERM_PCB_3_340K);
+Thermistor thermistorPCB4(adcEPS7, ADCChannel_t::CM_03, THERM_PCB_4_300K, THERM_PCB_4_340K);
 // clang-format on
 
 // Thermistor thermistorsMPPT[8] = {
-//     Thermistor(adcPV0, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV0_MPPT_A_270K,
-//         THERM_CAL_PV0_MPPT_A_350K),
-//     Thermistor(adcPV0, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV0_MPPT_B_270K,
-//         THERM_CAL_PV0_MPPT_B_350K),
-//     Thermistor(adcPV1, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV1_MPPT_A_270K,
-//         THERM_CAL_PV1_MPPT_A_350K),
-//     Thermistor(adcPV1, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV1_MPPT_B_270K,
-//         THERM_CAL_PV1_MPPT_B_350K),
-//     Thermistor(adcPV2, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV2_MPPT_A_270K,
-//         THERM_CAL_PV2_MPPT_A_350K),
-//     Thermistor(adcPV2, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV2_MPPT_B_270K,
-//         THERM_CAL_PV2_MPPT_B_350K),
-//     Thermistor(adcPV3, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV3_MPPT_A_270K,
-//         THERM_CAL_PV3_MPPT_A_350K),
-//     Thermistor(adcPV3, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV3_MPPT_B_270K,
-//         THERM_CAL_PV3_MPPT_B_350K)};
+//     Thermistor(adcPV0, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV0_MPPT_A_300K,
+//         THERM_CAL_PV0_MPPT_A_340K),
+//     Thermistor(adcPV0, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV0_MPPT_B_300K,
+//         THERM_CAL_PV0_MPPT_B_340K),
+//     Thermistor(adcPV1, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV1_MPPT_A_300K,
+//         THERM_CAL_PV1_MPPT_A_340K),
+//     Thermistor(adcPV1, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV1_MPPT_B_300K,
+//         THERM_CAL_PV1_MPPT_B_340K),
+//     Thermistor(adcPV2, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV2_MPPT_A_300K,
+//         THERM_CAL_PV2_MPPT_A_340K),
+//     Thermistor(adcPV2, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV2_MPPT_B_300K,
+//         THERM_CAL_PV2_MPPT_B_340K),
+//     Thermistor(adcPV3, PIN_ADC_TEMP_MPPT_A, THERM_CAL_PV3_MPPT_A_300K,
+//         THERM_CAL_PV3_MPPT_A_340K),
+//     Thermistor(adcPV3, PIN_ADC_TEMP_MPPT_B, THERM_CAL_PV3_MPPT_B_300K,
+//         THERM_CAL_PV3_MPPT_B_340K)};
 
 // Thermistor thermistorsPVBoard[12] = {
-//     Thermistor(adcPV0, PIN_ADC_TEMP_BACK, THERM_CAL_PV0_BACK_270K,
-//         THERM_CAL_PV0_BACK_350K),
-//     Thermistor(adcPV0, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV0_FRONT_TOP_270K,
-//         THERM_CAL_PV0_FRONT_TOP_350K),
+//     Thermistor(adcPV0, PIN_ADC_TEMP_BACK, THERM_CAL_PV0_BACK_300K,
+//         THERM_CAL_PV0_BACK_340K),
+//     Thermistor(adcPV0, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV0_FRONT_TOP_300K,
+//         THERM_CAL_PV0_FRONT_TOP_340K),
 //     Thermistor(adcPV0, PIN_ADC_TEMP_FRONT_BOTTOM,
-//         THERM_CAL_PV0_FRONT_BOTTOM_270K, THERM_CAL_PV0_FRONT_BOTTOM_350K),
-//     Thermistor(adcPV1, PIN_ADC_TEMP_BACK, THERM_CAL_PV1_BACK_270K,
-//         THERM_CAL_PV1_BACK_350K),
-//     Thermistor(adcPV1, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV1_FRONT_TOP_270K,
-//         THERM_CAL_PV1_FRONT_TOP_350K),
+//         THERM_CAL_PV0_FRONT_BOTTOM_300K, THERM_CAL_PV0_FRONT_BOTTOM_340K),
+//     Thermistor(adcPV1, PIN_ADC_TEMP_BACK, THERM_CAL_PV1_BACK_300K,
+//         THERM_CAL_PV1_BACK_340K),
+//     Thermistor(adcPV1, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV1_FRONT_TOP_300K,
+//         THERM_CAL_PV1_FRONT_TOP_340K),
 //     Thermistor(adcPV1, PIN_ADC_TEMP_FRONT_BOTTOM,
-//         THERM_CAL_PV1_FRONT_BOTTOM_270K, THERM_CAL_PV1_FRONT_BOTTOM_350K),
-//     Thermistor(adcPV2, PIN_ADC_TEMP_BACK, THERM_CAL_PV1_BACK_270K,
-//         THERM_CAL_PV2_BACK_350K),
-//     Thermistor(adcPV2, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV2_FRONT_TOP_270K,
-//         THERM_CAL_PV2_FRONT_TOP_350K),
+//         THERM_CAL_PV1_FRONT_BOTTOM_300K, THERM_CAL_PV1_FRONT_BOTTOM_340K),
+//     Thermistor(adcPV2, PIN_ADC_TEMP_BACK, THERM_CAL_PV1_BACK_300K,
+//         THERM_CAL_PV2_BACK_340K),
+//     Thermistor(adcPV2, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV2_FRONT_TOP_300K,
+//         THERM_CAL_PV2_FRONT_TOP_340K),
 //     Thermistor(adcPV2, PIN_ADC_TEMP_FRONT_BOTTOM,
-//         THERM_CAL_PV2_FRONT_BOTTOM_270K, THERM_CAL_PV2_FRONT_BOTTOM_350K),
-//     Thermistor(adcPV3, PIN_ADC_TEMP_BACK, THERM_CAL_PV3_BACK_270K,
-//         THERM_CAL_PV3_BACK_350K),
-//     Thermistor(adcPV3, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV3_FRONT_TOP_270K,
-//         THERM_CAL_PV3_FRONT_TOP_350K),
+//         THERM_CAL_PV2_FRONT_BOTTOM_300K, THERM_CAL_PV2_FRONT_BOTTOM_340K),
+//     Thermistor(adcPV3, PIN_ADC_TEMP_BACK, THERM_CAL_PV3_BACK_300K,
+//         THERM_CAL_PV3_BACK_340K),
+//     Thermistor(adcPV3, PIN_ADC_TEMP_FRONT_TOP, THERM_CAL_PV3_FRONT_TOP_300K,
+//         THERM_CAL_PV3_FRONT_TOP_340K),
 //     Thermistor(adcPV3, PIN_ADC_TEMP_FRONT_BOTTOM,
-//         THERM_CAL_PV3_FRONT_BOTTOM_270K, THERM_CAL_PV3_FRONT_BOTTOM_350K)};
+//         THERM_CAL_PV3_FRONT_BOTTOM_300K, THERM_CAL_PV3_FRONT_BOTTOM_340K)};
