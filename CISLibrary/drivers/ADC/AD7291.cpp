@@ -8,10 +8,14 @@
  * @param i2c connected to the ADC
  * @param addr address of the ADC
  * @param refVoltage reference voltage in volts
+ * @param tempSlope Celsius per count
+ * @param tempOffset counts at 0 Celsius
  */
-AD7291::AD7291(I2C & i2c, AD7291Addr_t addr, double refVoltage) :
-  ADC(refVoltage, 12), i2c(i2c), addr(addr) {
-  setTemperatureConversionFactor(0.25);
+AD7291::AD7291(I2C & i2c, AD7291Addr_t addr, double refVoltage,
+    double tempSlope, double tempOffset) :
+  ADC(refVoltage, BIT_DEPTH),
+  i2c(i2c), addr(addr) {
+  setTemperatureFunction(tempSlope, tempOffset, false);
 }
 
 /**
@@ -25,11 +29,9 @@ AD7291::~AD7291() {}
  *
  * @param channel to read
  * @param value to return in counts
- * @param blocking will wait until data is present if true
  * @return mbed_error_status_t
  */
-mbed_error_status_t AD7291::readRaw(
-    ADCChannel_t channel, int32_t & value, bool blocking) {
+mbed_error_status_t AD7291::readRaw(ADCChannel_t channel, int32_t & value) {
   uint16_t            raw   = 0;
   mbed_error_status_t error = MBED_SUCCESS;
   if (channel == ADCChannel_t::TEMP) {
