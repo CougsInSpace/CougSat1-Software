@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Cougs In Space Ground</title>
+  <link rel="stylesheet" href="/standardStyle.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/fonts/fonts.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <meta name="theme-color" content="#981E32">
+  <script src="/lib/Ehbanana.js"></script>
+  <script src="/standard.js"></script>
+  <script src="main.js"></script>
+  <script src="/lib/Chart.bundle.min.js"></script>
+</head>
+
+<body class="text-body">
+  <header>
+    <div><a href="/">Home</a></div>
+    <div><a href="/radio/" class="current">Radio</a></div>
+    <div><a href="/cougsat-1/">CougSat-1</a></div>
+  </header>
+  <main class="eb-onload" id="main">
+    <div class="pane left">
+      <h2 class="text-title">Communication Link</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td>Status:</td>
+            <td id="link-status" class="background-primary text-monospace"></td>
+          </tr>
+          <tr>
+            <td>Antenna azimuth:</td>
+            <td class="background-primary text-monospace" id="antenna-az" ebcallback="formatDegrees"> </td>
+          </tr>
+          <tr>
+            <td>Antenna elevation:</td>
+            <td class="background-primary text-monospace" id="antenna-el" ebcallback="formatDegrees"> </td>
+          </tr>
+          <tr>
+            <td>Data rate:</td>
+            <td id="data-rate" class="background-primary text-monospace eb-metric-prefix" unit="bps" sigfig="3"></td>
+          </tr>
+          <tr>
+            <td>Acquisition of signal:</td>
+            <td id="aos" class="background-primary text-monospace" ebcallback="formatTime"></td>
+          </tr>
+          <tr>
+            <td>Loss of signal:</td>
+            <td id="los" class="background-primary text-monospace" ebcallback="formatTime"></td>
+          </tr>
+        </tbody>
+      </table>
+      <h2 class="text-title">Downlink</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td>RX radio source:</td>
+            <td style="padding: 0">
+              <select id="rx-source" class="text-monospace eb-input">
+                <option>None</option>
+                <option>RTL-SDR</option>
+                <option>Audio</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Frequency offset:</td>
+            <td id="freq-offset" class="background-primary text-monospace eb-metric-prefix" unit="Hz" sigfig="3"></td>
+          </tr>
+          <tr>
+            <td>Signal to noise ratio:</td>
+            <td id="snr" class="background-primary text-monospace eb-metric-prefix" unit="dB" sigfig="3"></td>
+          </tr>
+          <tr>
+            <td>Bit error rate:</td>
+            <td id="ber" class="background-primary text-monospace" ebcallback="formatPPM"></td>
+          </tr>
+          <tr>
+            <td>Decoded frames:</td>
+            <td id="frames" class="background-primary text-monospace eb-metric-prefix" unit="Frames" sigfig="3"></td>
+          </tr>
+        </tbody>
+      </table>
+      <h2 class="text-title">Uplink</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td>TX radio destination:</td>
+            <td style="padding: 0"><select id="tx-destination" class="text-monospace eb-input">
+                <option>None</option>
+                <option>RTL-SDR</option>
+                <option>Audio</option>
+              </select></td>
+          </tr>
+      </table>
+    </div>
+    <div class="pane right">
+      <div id="iq-diagram" class="chart" ebcallback="updateConstellation">
+        <canvas id="constellation-diagram" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>

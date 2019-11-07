@@ -1,0 +1,41 @@
+@font-face {
+  font-family: 'quicksand';
+  src: url('quicksand/regular.woff2') format('woff2'), url('quicksand/regular.woff') format('woff');
+  font-style: normal;
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'quicksand';
+  src: url('quicksand/bold.woff2') format('woff2'), url('quicksand/bold.woff') format('woff');
+  font-style: normal;
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'quicksand';
+  src: url('quicksand/light.woff2') format('woff2'), url('quicksand/light.woff') format('woff');
+  font-style: normal;
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'quicksand-dash';
+  src: url('quicksand/dash.woff2') format('woff2'), url('quicksand/dash.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'tektrron';
+  src: url('tektrron/regular.woff2') format('woff2'), url('tektrron/regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'code-new-roman';
+  src: url('code-new-roman/bold.woff2') format('woff2'), url('code-new-roman/bold.woff') format('woff');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'code-new-roman';
+  src: url('code-new-roman/regular.woff2') format('woff2'), url('code-new-roman/regular.woff') format('woff');
+}

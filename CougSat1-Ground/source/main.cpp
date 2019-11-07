@@ -11,41 +11,7 @@
 #include <chrono>
 #include <thread>
 
-/**
- * @brief Handle an input message
- *
- * @param msg
- * @return Result
- */
-Result handleInput(const EBMessage_t & msg) {
-  return ResultCode_t::SUCCESS;
-}
-
-/**
- * @brief Process incoming message from the GUI
- *
- * @param msg to process
- * @return ResultCode_t error code
- */
-ResultCode_t __stdcall guiProcess(const EBMessage_t & msg) {
-  Result result;
-  switch (msg.type) {
-    case EBMSGType_t::STARTUP:
-      spdlog::info("Server starting up");
-      break;
-    case EBMSGType_t::SHUTDOWN:
-      spdlog::info("Server shutting down");
-      break;
-    case EBMSGType_t::INPUT:
-      result = handleInput(msg);
-      if (!result)
-        spdlog::error(result.getMessage());
-      break;
-    default:
-      return EBDefaultGUIProcess(msg);
-  }
-  return ResultCode_t::SUCCESS;
-}
+#include "gui/GUI.h"
 
 /**
  * @brief Logger callback
@@ -140,43 +106,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
   EBSetLogger(logEhbanana);
 
-  EBGUISettings_t settings;
-  settings.guiProcess = guiProcess;
-  settings.configRoot = "config";
-  settings.httpRoot   = "http";
-
-  EBGUI_t      gui        = nullptr;
-  ResultCode_t resultCode = EBCreateGUI(settings, gui);
-  if (!resultCode)
-    return static_cast<int>(resultCode);
-
-  resultCode = EBShowGUI(gui);
-  if (!resultCode)
-    return static_cast<int>(resultCode);
+  result = GUI::GUI::Instance()->init();
+  if (!result) {
+    spdlog::error((result + "Initialize GUI").getMessage());
+    return static_cast<int>(result.getCode());
+  }
 
   int rtlSDRDeviceCount = rtlsdr_get_device_count();
   spdlog::info("RTL-SDR counts {} devices", rtlSDRDeviceCount);
 
-  EBMessage_t msg;
-  auto        nextUpdate = std::chrono::steady_clock::now();
-  while ((resultCode = EBGetMessage(msg)) == ResultCode_t::INCOMPLETE ||
-         resultCode == ResultCode_t::NO_OPERATION) {
-    // If no messages were processed, wait a bit to save CPU
-    if (resultCode == ResultCode_t::NO_OPERATION) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    } else {
-      resultCode = EBDispatchMessage(msg);
-      if (!resultCode)
-        return static_cast<int>(resultCode);
-    }
+  result = GUI::GUI::Instance()->run();
+  if (!result) {
+    spdlog::error((result + "Running GUI").getMessage());
+    return static_cast<int>(result.getCode());
   }
 
-  if (!result)
-    return static_cast<int>(resultCode);
-
-  resultCode = EBDestroyGUI(gui);
-  if (!resultCode)
-    return static_cast<int>(resultCode);
+  result = GUI::GUI::Instance()->deinit();
+  if (!result) {
+    spdlog::error((result + "Deiniting GUI").getMessage());
+    return static_cast<int>(result.getCode());
+  }
 
   spdlog::info("Cougs in Space Ground complete");
   return static_cast<int>(ResultCode_t::SUCCESS);
