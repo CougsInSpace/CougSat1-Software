@@ -6,17 +6,17 @@
 
 class Thermistor {
 public:
-  Thermistor(ADC & adc, ADCChannel_t channel, double voltageFraction270K,
-      double voltageFraction350K);
+  Thermistor(ADC & adc, ADCChannel_t channel, double voltageFraction300K,
+      double voltageFraction340K);
 
-  mbed_error_status_t getTemperature(double & data, bool blocking = true);
+  mbed_error_status_t getTemperature(double & temp);
 
 private:
   ADC & adc;
 
   ADCChannel_t channel;
 
-  double resistance270K;
+  double resistance300K;
   double beta;
 };
 

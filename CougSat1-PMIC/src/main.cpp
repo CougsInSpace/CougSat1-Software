@@ -17,28 +17,90 @@ mbed_error_status_t initialize() {
   LOG("Init", "Initialization starting");
   mbed_error_status_t error = MBED_SUCCESS;
 
-  statusLED = 1;
+  ((AD7689 *)adcEPSs[0])->selfTest();
+  ((AD7689 *)adcEPSs[1])->selfTest();
+  ((AD7689 *)adcEPSs[2])->selfTest();
 
-  error = ((AD7689 *)adcEPSs[2])->selfTest();
-  if (error) {
-    ERROR("Init", "ADC did not pass self test, 0x%08X", error);
-    return error;
-  }
+  bool inputAOn = true;
+  bool inputBOn = true;
+  inputSwitching[0]->write(inputAOn);
+  inputSwitching[1]->write(inputBOn);
+  inputSwitching[2]->write(inputAOn);
+  inputSwitching[3]->write(inputBOn);
 
-  double buf = 0.0;
+  bool outputsOn = true;
+  bool heatersOn = false;
+  for (uint8_t i = 0; i < COUNT_PR_3V3; i++)
+    nodesPR3V3[i]->setSwitch(outputsOn);
+  for (uint8_t i = 0; i < COUNT_PR_BATT; i++)
+    nodesPRBatt[i]->setSwitch(outputsOn);
+  for (uint8_t i = 0; i < COUNT_DEPLOY; i++)
+    nodesDeployables[i]->setSwitch(outputsOn);
+  for (uint8_t i = 0; i < COUNT_BH; i++)
+    nodesBatteryHeaters[i]->setSwitch(heatersOn);
+
+  double vbattA = 0.0;
+  double vbattB = 0.0;
+  double value  = 0.0;
   while (true) {
-    error = adcEPSs[2]->readTemp(buf);
+    statusLED = !statusLED;
+    error     = nodeBattInA.updateCurrent();
     if (error) {
-      ERROR("Init", "ADC failed to read its temp, 0x%08X", error);
+      ERROR("Init", "Failed to read in A, 0x%08X", error);
       return error;
     }
-    LOG("Init", "%7.5f", buf);
-    error = adcEPSs[5]->readTemp(buf);
+
+    error = nodeBattInB.updateCurrent();
     if (error) {
-      ERROR("Init", "ADC failed to read its temp, 0x%08X", error);
+      ERROR("Init", "Failed to read in B, 0x%08X", error);
       return error;
     }
-    LOG("Init", "%7.5f", buf);
+
+    error = nodeBattOutA.updateCurrent();
+    if (error) {
+      ERROR("Init", "Failed to read out A, 0x%08X", error);
+      return error;
+    }
+
+    error = nodeBattOutB.updateCurrent();
+    if (error) {
+      ERROR("Init", "Failed to read out B, 0x%08X", error);
+      return error;
+    }
+
+    error = node3V3OutA.updateCurrent();
+    if (error) {
+      ERROR("Init", "Failed to read out A, 0x%08X", error);
+      return error;
+    }
+
+    error = adcEPSs[2]->readVoltage(ADCChannel_t::CM_00, vbattA);
+    if (error) {
+      ERROR("Init", "Failed to read VbattA, 0x%08X", error);
+      return error;
+    }
+    vbattA =
+        2 * vbattA * (nodeBattOutA.getCurrent() - nodeBattInA.getCurrent());
+
+    error = adcEPSs[2]->readVoltage(ADCChannel_t::CM_07, vbattB);
+    if (error) {
+      ERROR("Init", "Failed to read VbattB, 0x%08X", error);
+      return error;
+    }
+    vbattB =
+        2 * vbattB * (nodeBattOutB.getCurrent() - nodeBattInB.getCurrent());
+
+    LOG("Test", "A: %9.5fW\tB: %9.5fW\tA+B: %9.5fW", vbattA, vbattB,
+        vbattA + vbattB);
+    // double temp;
+
+    // error = thermistorRegA.getTemperature(temp);
+    // if (error) {
+    //   ERROR("Init", "Failed to read VbattA, 0x%08X", error);
+    //   return error;
+    // }
+    // value = value * 0.875 + temp * 0.125;
+    // LOG("Test", "%9.5fA", value);
   }
 
   LOG("Init", "Initialization complete");
