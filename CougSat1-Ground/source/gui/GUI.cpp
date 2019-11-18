@@ -44,6 +44,15 @@ ResultCode_t __stdcall GUI::guiProcess(const EBMessage_t & msg) {
 }
 
 /**
+ * @brief Get the buffer for the constellation diagram
+ *
+ * @return CircularBuffer<PairDouble_t>*
+ */
+CircularBuffer<PairDouble_t> * GUI::getConstellationBuffer() {
+  return radio->getConstellationBuffer();
+}
+
+/**
  * @brief Initialize the GUI by creating an Ehbanana instance
  *
  * @return Result
@@ -89,6 +98,9 @@ Result GUI::run() {
       if (!result)
         return result + "EBDispatchMessage";
     }
+    result = radio->updateConstellation();
+    if (!result && result != ResultCode_t::INCOMPLETE)
+      return result + "Update constellation";
   }
   return result + "EBGetMessage";
 }

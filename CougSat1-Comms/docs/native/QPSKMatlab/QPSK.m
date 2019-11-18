@@ -51,7 +51,7 @@ end
 %%%%% Data is transmitted %%%%%
 %% Add noise
 % randn is a gaussian distribution with std. dev. of 1
-snr = 10; % link budget calculated >10dB snr
+snr = 6; % link budget calculated >10dB snr
 for i = 1 : RFSamples
     signalTX(i) = signalTX(i) + 10 ^ (-snr / 10) * randn();
 end
@@ -92,6 +92,9 @@ for i = 1 : samples
   sdrRXI(i) = round(signalRXI(t) * adcMax) / adcMax;
   sdrRXQ(i) = round(signalRXQ(t) * adcMax) / adcMax;
 end
+
+combined = transpose([sdrRXI; sdrRXQ]);
+audiowrite("IQOut.wav", combined, SDRSampleF);
 
 % Plot I/Q from the SDR, time domain
 figure;

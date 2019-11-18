@@ -58,13 +58,6 @@ Result Radio::sendUpdate() {
     messageSetProp("ber", "num", 21.13e-6);
     messageSetProp("frames", "num", (int64_t)123);
 
-    for (uint8_t i = 0; i < 100; i++) {
-      double v = -1.25 + 2.0 * (rand() & 0x01) + 0.5 * (rand() % 1000) / 1000.0;
-      messageSetProp("iq-diagram", "dataI-" + std::to_string(i), v);
-      v = -1.25 + 2.0 * (rand() & 0x01) + 0.5 * (rand() % 1000) / 1000.0;
-      messageSetProp("iq-diagram", "dataQ-" + std::to_string(i), v);
-    }
-
     enqueueEBMessage();
   } catch (const std::exception & e) {
     return ResultCode_t::EXCEPTION_OCCURRED + e.what();
@@ -92,6 +85,42 @@ Result Radio::handleInput(const EBMessage_t & msg) {
       default:
         spdlog::info("Unknown id for Radio");
         break;
+    }
+
+    enqueueEBMessage();
+  } catch (const std::exception & e) {
+    return ResultCode_t::EXCEPTION_OCCURRED + e.what();
+  }
+  return ResultCode_t::SUCCESS;
+}
+
+/**
+ * @brief Get the buffer for the constellation diagram
+ *
+ * @return CircularBuffer<PairDouble_t>*
+ */
+CircularBuffer<PairDouble_t> * Radio::getConstellationBuffer() {
+  return &data;
+}
+
+/**
+ * @brief Send out the constellation once the buffer has at least 100 symbols
+ *
+ * @return Result
+ */
+Result Radio::updateConstellation() {
+  if (data.size() < 100)
+    return ResultCode_t::INCOMPLETE;
+
+  try {
+    createNewEBMessage();
+
+    PairDouble_t pair;
+    uint8_t      i = 0;
+    while (data.pop(pair) == ResultCode_t::SUCCESS && i < 100) {
+      messageSetProp("iq-diagram", "dataI-" + std::to_string(i), pair.a);
+      messageSetProp("iq-diagram", "dataQ-" + std::to_string(i), pair.b);
+      i++;
     }
 
     enqueueEBMessage();

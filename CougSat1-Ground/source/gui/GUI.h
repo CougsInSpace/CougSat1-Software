@@ -34,6 +34,8 @@ public:
 
   static ResultCode_t __stdcall guiProcess(const EBMessage_t & msg);
 
+  CircularBuffer<PairDouble_t> * getConstellationBuffer();
+
 private:
   /**
    * @brief Construct a new GUI object

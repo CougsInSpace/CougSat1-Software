@@ -6,6 +6,7 @@
 
 # Build Executable
 debug
+CISLibrary
 release
 bin
 http/lib/Ehbanana.js

@@ -3,6 +3,8 @@
 
 #include <ehbanana/Page.h>
 
+#include <tools/CircularBuffer.h>
+
 namespace GUI {
 
 class Radio : public Ehbanana::Page {
@@ -15,7 +17,11 @@ public:
 
   Result handleInput(const EBMessage_t & msg);
 
+  CircularBuffer<PairDouble_t> * getConstellationBuffer();
+  Result                         updateConstellation();
+
 private:
+  CircularBuffer<PairDouble_t> data;
 };
 
 } // namespace GUI

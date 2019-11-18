@@ -19,7 +19,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;..\CISLibrary;lib\AudioFile;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG;EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
     </ClCompile>
@@ -30,7 +30,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;..\CISLibrary;lib\AudioFile;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
     </ClCompile>
@@ -41,6 +41,8 @@
   <ItemGroup>
     <ClCompile Include="source\**\*.cpp" />
     <ClCompile Include="lib\ehbanana\lib\FruitBowl\include\**\*.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\*.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\IQSource\WAVSource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\**\*.h" />
@@ -48,6 +50,9 @@
     <ClInclude Include="lib\spdlog\include\**\*.h" />
     <ClInclude Include="lib\rtl-sdr\include\rtl-sdr.h" />
     <ClInclude Include="lib\rtl-sdr\include\rtl-sdr_export.h" />
+    <ClInclude Include="lib\AudioFile\AudioFile.h" />
+    <ClInclude Include="..\CISLibrary\tools\*.h" />
+    <ClInclude Include="..\CISLibrary\components\communications\**\*.h" />
   </ItemGroup>
   <Target Name="CopyFiles">
     <Copy SourceFiles="lib\ehbanana\include\Ehbanana.js" DestinationFiles="http\lib\Ehbanana.js"/>

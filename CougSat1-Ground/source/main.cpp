@@ -1,17 +1,17 @@
 #include <Ehbanana.h>
 
+#include <spdlog/spdlog.h>
+
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
-#include <spdlog/spdlog.h>
-
-#include <rtl-sdr.h>
 
 #include <Windows.h>
 #include <chrono>
 #include <thread>
 
 #include "gui/GUI.h"
+#include "radio/RadioRX.h"
 
 /**
  * @brief Logger callback
@@ -108,12 +108,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
   result = GUI::GUI::Instance()->init();
   if (!result) {
-    spdlog::error((result + "Initialize GUI").getMessage());
+    spdlog::error((result + "Initializing GUI").getMessage());
     return static_cast<int>(result.getCode());
   }
 
-  int rtlSDRDeviceCount = rtlsdr_get_device_count();
-  spdlog::info("RTL-SDR counts {} devices", rtlSDRDeviceCount);
+  Radio::RadioRX radioRX;
+  result = radioRX.init(GUI::GUI::Instance()->getConstellationBuffer());
+  if (!result) {
+    spdlog::error((result + "Initializing RadioRX").getMessage());
+    return static_cast<int>(result.getCode());
+  }
+  radioRX.start();
 
   result = GUI::GUI::Instance()->run();
   if (!result) {
@@ -127,6 +132,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     return static_cast<int>(result.getCode());
   }
 
+  radioRX.stop();
+
   spdlog::info("Cougs in Space Ground complete");
+  spdlog::default_logger()->flush();
   return static_cast<int>(ResultCode_t::SUCCESS);
 }
