@@ -34,11 +34,14 @@ bool CDH::messageRequested() {
  * @brief Reads message from I2CSlave buffer into var message
  * 
  */
-void CDH::readCDH()
+void CDH::readI2C()
 {
   printf("Reading i2c buffer\n Messsage = ");
-  i2c.read(message, MESSAGELENGTH);
-  for (uint8_t i = 0; message[i] != NULL; i++)
+  if(!(i2c.read(message, MESSAGELENGTH)) != 0)
+  {
+    //ERROR("ADCS", "Failed");
+  }
+  for (uint8_t i = 0; i < MESSAGELENGTH; i++)
   {
       printf("%c,", message[i]);
   }
@@ -54,11 +57,14 @@ char* CDH::getMessage()
   return message;
 }
 
-void CDH::writeCDH()
+void CDH::writeI2C()
 {
   printf("Writing i2c buffer\n Messsage = ");
-  i2c.write(message, MESSAGELENGTH);
-  for (uint8_t i = 0; message[i] != NULL; i++)
+  if(!(i2c.write(message, MESSAGELENGTH)))
+  {
+    //ERROR("ADCS", "Failed");
+  }
+  for (uint8_t i = 0; i < MESSAGELENGTH; i++)
   {
       printf("%c,", message[i]);
   }

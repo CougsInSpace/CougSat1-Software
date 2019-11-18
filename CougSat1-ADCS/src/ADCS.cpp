@@ -1,4 +1,4 @@
-#include "ADCSObjects.h"
+#include "ADCS.h"
 
 /**
  * @brief Function for cdh communication thread
@@ -10,11 +10,11 @@ void ADCS::cdhThread()
     {
     if(cdh.messageReceived())
     {
-        cdh.readCDH();
+        cdh.readI2C();
     }
     if(cdh.messageRequested())
     {
-        cdh.writeCDH();
+        cdh.writeI2C();
     }
     ThisThread::sleep_for(PERIOD_MS_POLLING_SLEEP);
     }

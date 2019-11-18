@@ -5,7 +5,6 @@
 #include <rtos.h>
 #include "Configuration.h"
 #include "interfaces/CDH.h"
-#include "CISBoard/PinNames.h"
 
 class ADCS
 {

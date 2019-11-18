@@ -8,8 +8,8 @@
 class CDH {
 public:
   CDH(uint8_t addr, PinName sda, PinName scl);
-  void readCDH();
-  void writeCDH();
+  void readI2C();
+  void writeI2C();
   char* getMessage();
   bool messageReceived();
   bool messageRequested();
