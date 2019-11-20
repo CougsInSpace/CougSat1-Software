@@ -1,29 +1,30 @@
-#include "WAVSource.h"
+#include "WAV.h"
 
 namespace Communications {
+namespace IQSource {
 
 /**
- * @brief Construct a new WAVSource::WAVSource object
+ * @brief Construct a new WAV::WAV object
  *
  * Currently only compatible with PCM data
  * TODO implement other wave data formats
  *
  * @param file to read, should point to start of file
  */
-WAVSource::WAVSource(FILE * file) : file(file) {}
+WAV::WAV(FILE * file) : file(file) {}
 
 /**
- * @brief Destroy the WAVSource::WAVSource object
+ * @brief Destroy the WAV::WAV object
  *
  */
-WAVSource::~WAVSource() {}
+WAV::~WAV() {}
 
 /**
- * @brief Init the WAVSource by loading the audio file
+ * @brief Init the WAV by loading the audio file
  *
  * @return ResultCode_t
  */
-ResultCode_t WAVSource::init() {
+ResultCode_t WAV::init() {
   ResultCode_t result = ResultCode_t::SUCCESS;
 
   // Header chunk
@@ -117,7 +118,7 @@ ResultCode_t WAVSource::init() {
  * @param dataQ buffer
  * @return ResultCode_t
  */
-ResultCode_t WAVSource::getIQ(int16_t & dataI, int16_t & dataQ) {
+ResultCode_t WAV::getIQ(int16_t & dataI, int16_t & dataQ) {
   if (iqBuffer.size() == 0) {
     ResultCode_t result = ResultCode_t::SUCCESS;
     int32_t      buf;
@@ -145,7 +146,7 @@ ResultCode_t WAVSource::getIQ(int16_t & dataI, int16_t & dataQ) {
  * @return ResultCode_t
  */
 template <typename T>
-ResultCode_t WAVSource::read(T & number, const uint8_t bytes) {
+ResultCode_t WAV::read(T & number, const uint8_t bytes) {
   // WAV is little endian
   uint64_t temp = 0;
   int      c;
@@ -158,4 +159,5 @@ ResultCode_t WAVSource::read(T & number, const uint8_t bytes) {
   return ResultCode_t::SUCCESS;
 }
 
+} // namespace IQSource
 } // namespace Communications

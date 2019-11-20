@@ -46,7 +46,7 @@ private:
   std::thread *     thread  = nullptr;
   std::atomic<bool> running = false;
 
-  Communications::IQSource * iqSource = nullptr;
+  Communications::IQSource::IQSource * iqSource = nullptr;
 
   CircularBuffer<PairDouble_t> * gui = nullptr;
 };

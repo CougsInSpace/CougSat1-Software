@@ -1,5 +1,5 @@
-#ifndef _LIBRARY_COMPONENT_COMMUNICATIONS_WAV_SOURCE_H_
-#define _LIBRARY_COMPONENT_COMMUNICATIONS_WAV_SOURCE_H_
+#ifndef _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_WAV_H_
+#define _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_WAV_H_
 
 #include "IQSource.h"
 
@@ -8,14 +8,15 @@
 #include <stdio.h>
 
 namespace Communications {
+namespace IQSource {
 
-class WAVSource : public IQSource {
+class WAV : public IQSource {
 public:
-  WAVSource(const WAVSource &) = delete;
-  WAVSource & operator=(const WAVSource &) = delete;
+  WAV(const WAV &) = delete;
+  WAV & operator=(const WAV &) = delete;
 
-  WAVSource(FILE * file);
-  ~WAVSource();
+  WAV(FILE * file);
+  ~WAV();
 
   ResultCode_t init();
 
@@ -39,6 +40,7 @@ private:
   uint16_t bitsPerSample;
 };
 
+} // namespace IQSource
 } // namespace Communications
 
-#endif /* _LIBRARY_COMPONENT_COMMUNICATIONS_WAV_SOURCE_H_ */
+#endif /* _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_WAV_H_ */

@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 namespace Communications {
+namespace IQSource {
 
 class IQSource {
 public:
@@ -50,6 +51,7 @@ protected:
   CircularBuffer<PairInt16_t> iqBuffer;
 };
 
+} // namespace IQSource
 } // namespace Communications
 
 #endif /* _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_H_ */

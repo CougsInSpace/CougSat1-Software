@@ -3,7 +3,7 @@
 #include <chrono>
 #include <spdlog/spdlog.h>
 
-#include <components/communications/IQSource/WAVSource.h>
+#include <components/communications/IQSource/WAV.h>
 
 namespace Radio {
 
@@ -39,9 +39,10 @@ Result RadioRX::setIQFile(FILE * file) {
   if (fseek(file, 0L, SEEK_SET) != 0)
     return ResultCode_t::READ_FAULT + "Failed to rewind file";
 
-  Communications::IQSource *  oldSource = iqSource;
-  Communications::WAVSource * newSource = new Communications::WAVSource(file);
-  Result                      result    = newSource->init();
+  Communications::IQSource::IQSource * oldSource = iqSource;
+  Communications::IQSource::WAV *      newSource =
+      new Communications::IQSource::WAV(file);
+  Result result = newSource->init();
   if (!result)
     return result + "Failed to initialize WAV Source";
 
