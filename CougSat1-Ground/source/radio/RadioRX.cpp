@@ -8,12 +8,6 @@
 namespace Radio {
 
 /**
- * @brief Construct a new RadioRX:: RadioRX object
- *
- */
-RadioRX::RadioRX() {}
-
-/**
  * @brief Destroy the RadioRX:: RadioRX object
  *
  */
@@ -31,17 +25,29 @@ RadioRX::~RadioRX() {
 Result RadioRX::init(CircularBuffer<PairDouble_t> * guiBuf) {
   gui = guiBuf;
 
-  iqSource = new Communications::WAVSource(
-      "test/IQExamples/QPSK - MATLAB - 13kHz offset.wav");
-  ResultCode_t result = iqSource->init();
-  if (!result) {
-    delete iqSource;
-    iqSource = new Communications::WAVSource(
-        "../test/IQExamples/QPSK - MATLAB - 13kHz offset.wav");
-    result = iqSource->init();
-    if (!result)
-      return result + ("Failed to initialize WAVSource");
-  }
+  return ResultCode_t::SUCCESS;
+}
+
+/**
+ * @brief Set a WAV file as the IQ source
+ *
+ * @param file to read
+ * @return Result
+ */
+Result RadioRX::setIQFile(FILE * file) {
+  // Reset file to start just to be sure
+  if (fseek(file, 0L, SEEK_SET) != 0)
+    return ResultCode_t::READ_FAULT + "Failed to rewind file";
+
+  Communications::IQSource *  oldSource = iqSource;
+  Communications::WAVSource * newSource = new Communications::WAVSource(file);
+  Result                      result    = newSource->init();
+  if (!result)
+    return result + "Failed to initialize WAV Source";
+
+  iqSource = newSource;
+  delete oldSource;
+
   return ResultCode_t::SUCCESS;
 }
 
@@ -78,15 +84,24 @@ void RadioRX::run() {
   int16_t      q;
   ResultCode_t result;
   while (running) {
-    result = iqSource->getIQ(i, q);
-    if (!result) {
-      spdlog::error((result + "Failed to get IQ").getMessage());
-      running = false;
-      return;
-    }
-    while (running && !gui->push({i / 32768.0, q / 32768.0}))
+    if (iqSource != nullptr) {
+      result = iqSource->getIQ(i, q);
+      if (result == ResultCode_t::END_OF_FILE) {
+        // IQ buffer is empty, remove the source
+        i = 0;
+        q = 0;
+        delete iqSource;
+        iqSource = nullptr;
+      } else if (!result) {
+        spdlog::error((result + "Failed to get IQ").getMessage());
+        running = false;
+        return;
+      }
+      while (running && !gui->push({i / 32768.0, q / 32768.0}))
+        std::this_thread::sleep_for(millis_t(10));
+      std::this_thread::sleep_for(millis_t(1));
+    } else
       std::this_thread::sleep_for(millis_t(10));
-    std::this_thread::sleep_for(millis_t(1));
   }
 }
 

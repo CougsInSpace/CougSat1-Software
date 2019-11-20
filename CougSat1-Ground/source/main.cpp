@@ -112,13 +112,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     return static_cast<int>(result.getCode());
   }
 
-  Radio::RadioRX radioRX;
-  result = radioRX.init(GUI::GUI::Instance()->getConstellationBuffer());
+  result = Radio::RadioRX::Instance()->init(
+      GUI::GUI::Instance()->getConstellationBuffer());
   if (!result) {
     spdlog::error((result + "Initializing RadioRX").getMessage());
     return static_cast<int>(result.getCode());
   }
-  radioRX.start();
+  Radio::RadioRX::Instance()->start();
 
   result = GUI::GUI::Instance()->run();
   if (!result) {
@@ -132,7 +132,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     return static_cast<int>(result.getCode());
   }
 
-  radioRX.stop();
+  Radio::RadioRX::Instance()->stop();
 
   spdlog::info("Cougs in Space Ground complete");
   spdlog::default_logger()->flush();

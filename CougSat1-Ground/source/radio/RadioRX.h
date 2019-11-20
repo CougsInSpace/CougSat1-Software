@@ -15,15 +15,32 @@ public:
   RadioRX(const RadioRX &) = delete;
   RadioRX & operator=(const RadioRX &) = delete;
 
-  RadioRX();
+  /**
+   * @brief Get the singleton instance
+   *
+   * @return RadioRX*
+   */
+  static RadioRX * Instance() {
+    static RadioRX instance;
+    return &instance;
+  }
+
   ~RadioRX();
 
   Result init(CircularBuffer<PairDouble_t> * guiBuf);
+
+  Result setIQFile(FILE * file);
 
   void start();
   void stop();
 
 private:
+  /**
+   * @brief Construct a new Radio R X object
+   *
+   */
+  RadioRX() {}
+
   void run();
 
   std::thread *     thread  = nullptr;

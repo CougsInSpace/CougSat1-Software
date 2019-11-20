@@ -3,9 +3,9 @@
 
 #include "IQSource.h"
 
-#include <AudioFile.h>
 #include <ResultCode.h>
-#include <string>
+#include <cstring>
+#include <stdio.h>
 
 namespace Communications {
 
@@ -14,7 +14,7 @@ public:
   WAVSource(const WAVSource &) = delete;
   WAVSource & operator=(const WAVSource &) = delete;
 
-  WAVSource(const char * filename);
+  WAVSource(FILE * file);
   ~WAVSource();
 
   ResultCode_t init();
@@ -22,10 +22,21 @@ public:
   ResultCode_t getIQ(int16_t & dataI, int16_t & dataQ);
 
 private:
-  std::string filename;
+  enum class Format_t : uint16_t {
+    PCM        = 0x0001,
+    IEEE_FLOAT = 0x0003,
+    A_LAW      = 0x0006,
+    MU_LAW     = 0x0007,
+    EXTENSIBLE = 0xFFFE
+  };
 
-  AudioFile<double> file;
-  size_t            fileIndex = 0;
+  template <typename T> ResultCode_t read(T & number, const uint8_t bytes);
+
+  FILE * file;
+
+  uint16_t channels;
+  uint32_t sampleFreq;
+  uint16_t bitsPerSample;
 };
 
 } // namespace Communications

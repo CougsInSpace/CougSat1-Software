@@ -7,6 +7,3 @@
 [submodule "CougSat1-Ground/lib/ehbanana"]
 	path = CougSat1-Ground/lib/ehbanana
 	url = https://github.com/WattsUp/Ehbanana.git
-[submodule "CougSat1-Ground/lib/AudioFile"]
-	path = CougSat1-Ground/lib/AudioFile
-	url = https://github.com/adamstark/AudioFile.git

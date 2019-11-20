@@ -40,3 +40,7 @@ main {
 .chart {
   flex-grow: 1;
 }
+
+.button-1 {
+  box-sizing: border-box;
+}

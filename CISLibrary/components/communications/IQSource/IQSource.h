@@ -40,14 +40,14 @@ public:
    */
   virtual inline ResultCode_t getIQ(int16_t & dataI, int16_t & dataQ) {
     PairInt16_t  iqPair;
-    ResultCode_t result = buf.pop(iqPair);
+    ResultCode_t result = iqBuffer.pop(iqPair);
     dataI               = iqPair.a;
     dataQ               = iqPair.b;
     return result;
   }
 
 protected:
-  CircularBuffer<PairInt16_t> buf;
+  CircularBuffer<PairInt16_t> iqBuffer;
 };
 
 } // namespace Communications

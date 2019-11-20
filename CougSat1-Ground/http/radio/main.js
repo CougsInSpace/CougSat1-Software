@@ -42,6 +42,8 @@ function setup() {
   var context =
       document.getElementById("constellation-diagram").getContext("2d");
   chart = new Chart(context, config);
+  document.getElementById("rx-source")
+      .addEventListener("input", rxSourceListener);
 }
 window.addEventListener("DOMContentLoaded", setup);
 
@@ -59,4 +61,17 @@ function updateConstellation(element) {
   }
   console.log(config.data.datasets[0].data);
   chart.update();
+}
+
+/**
+ * Enables / disables the IQ file button when the source is / isn't IQ File
+ *
+ * @param {DOMElement} element
+ */
+function rxSourceListener(element) {
+  console.log(element);
+  if (element.target.value == "IQ File")
+    document.getElementById("iq-file-row").style.display = "";
+  else
+    document.getElementById("iq-file-row").style.display = "none";
 }

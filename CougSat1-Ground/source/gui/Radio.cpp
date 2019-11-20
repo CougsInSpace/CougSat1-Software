@@ -1,5 +1,7 @@
 #include "Radio.h"
 
+#include "radio/RadioRX.h"
+
 #include <spdlog/spdlog.h>
 
 namespace GUI {
@@ -58,6 +60,8 @@ Result Radio::sendUpdate() {
     messageSetProp("ber", "num", 21.13e-6);
     messageSetProp("frames", "num", (int64_t)123);
 
+    // TODO send rx and tx source config
+
     enqueueEBMessage();
   } catch (const std::exception & e) {
     return ResultCode_t::EXCEPTION_OCCURRED + e.what();
@@ -72,6 +76,7 @@ Result Radio::sendUpdate() {
  * @return Result
  */
 Result Radio::handleInput(const EBMessage_t & msg) {
+  Result result;
   try {
     createNewEBMessage();
 
@@ -82,6 +87,11 @@ Result Radio::handleInput(const EBMessage_t & msg) {
       case Hash::calculateHash("tx-destination"):
         // TODO implement settings changes
         break;
+      case Hash::calculateHash("iq-file-input"):
+        result = ::Radio::RadioRX::Instance()->setIQFile(msg.file);
+        if (!result)
+          return result + "Setting IQ file for RX radio";
+        return sendUpdate();
       default:
         spdlog::info("Unknown id for Radio");
         break;
