@@ -77,9 +77,10 @@ uint8_t Venus838FLPx::read() {
       i = 85;
     }
     }*/
-    for(int i = 0; i < 6; ++i){
-      serial.gets(data[i],83);
-      error = rmcParser(data[i]);
+    serial.gets(data,83);
+    error = NMEACheckSum(data)
+    if(!error){
+      error = rmcParser(data +1);
     }
   }else{
     error = ERROR_READ;
@@ -167,11 +168,10 @@ void Venus838FLPx::setMode(bool nMode) {
 }
 // TODO: implement
 uint8_t Venus838FLPx::initialize() {
- uint8_t messageBody[8] = {7,7,7,7,7,7,7,7};
- char response[100] = {'\0'};
- uint8_t code = ERROR_SUCCESS;
-  configNMEA(0,RAM_FLASH);
-  //disable all NMEA mesages exept RMC and set that to default on device
+ uint8_t messageBody[2];
+ char response[10] = {'\0'};
+
+  configNMEA(0x10,RAM_FLASH); //disable all NMEA mesages except RMC and set that to default on device
   messageBody[0] = 0;
  // DEBUG("GPS", "Query Kernal Version");
  // code = sendCommandResponce(0x2,messageBody,1,response,21);
@@ -224,12 +224,12 @@ if(nmea[3] == 'R'){
   
   if(*strtok(NULL,",") == 'A'){
     rmcData.utcTime = atof(strtok(NULL, ","));//UTC time field
-    rmcData.latitude = atof(strtok(NULL,","));//lattituded field
-    if(*strtok(NULL,",") == 'S'){ // if in souther hemishphere save as negative value
+    rmcData.latitude = atof(strtok(NULL,","));//latitude field
+    if(*strtok(NULL,",") == 'S'){ // if in souther hemisphere save as negative value
      rmcData.latitude *= -1;
     }
     rmcData.longitude = atof(strtok(NULL,",")); //longitude field
-    if(*strtok(NULL,",") == 'W'){ // if in eastern hemishphere save as negative value
+    if(*strtok(NULL,",") == 'E'){ // if in eastern hemisphere save as negative value
       rmcData.longitude *= -1;
    }
     rmcData.speedOverGround = atof(strtok(NULL,",")); // speed over ground in knots
@@ -324,13 +324,11 @@ uint8_t Venus838FLPx::sendPacket(char * packet, uint32_t size, uint32_t timeout)
   if(serial.fsync()) DEBUG("GPS", "ERROR: %d", ERROR_BUFFER_OVERFLOW); // clear current message
   for (clock_t t = clock(); (clock() - t)  < timeout;) {
      if(serial.readable()){
-      ("GPS", "Retrving Responce");
+      ("GPS", "Retrieving Responce");
       for(int i = 0; i < 9; ++i){
         c[i] = serial.getc(); // read responce
       }
-     // serial.gets(c,9);
-       DEBUG("GPS", "Recieved Packet: {");
-       wait(.01);
+       DEBUG("GPS", "Received Packet: {");
       printPacket(c,9);
       if(c[0] == 0xA0 && c[1] == 0xA1 && c[5] == packet[4]){
         return ERROR_SUCCESS;
@@ -361,5 +359,24 @@ void Venus838FLPx::printPacket(char * packet, uint32_t size) {
  
 }
 
+uint8_t Venus838FLPx::NMEACheckSum(char * string) {
+  uint8_t sum = 0;
+  uint8_t i = 1
+  uint8_t error = ERROR_SUCCESS;
+  if(string[0] == '$'){ // ensure valid string start
+    for(; string[i] != '*'; ++i){ //nmea string check sum range end at *
+      sum ^= string[i]; // check sum is XOR of all values
+    }
+    char compSum[] = {string[i],stirng[i+1]};
+
+    if(sum != atoi(compSum)){
+      error = ERROR_INVALID_DATA
+    }
+
+  }else{
+    error = ERROR_INVALID_DATA
+  }
+  return error;
+}
 
 // END GPS_CPP IMPLEMENTATION
