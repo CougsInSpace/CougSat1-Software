@@ -106,7 +106,7 @@ private:
   uint8_t sendCommand(uint8_t messageid, uint8_t * messagebody,
       uint32_t bodylen, uint32_t timeout = GPS_ACK_TIMEOUT_MS);
   uint8_t sendCommandResponce(uint8_t messageid, uint8_t * messagebody,
-      uint32_t bodylen, char * response, uint8_t responseLen,
+      uint32_t bodylen, char * response,
       uint32_t timeout =
           GPS_ACK_TIMEOUT_MS); // overloaded function to indirecly return
                                // response to the command
