@@ -42,7 +42,8 @@
     <ClCompile Include="source\**\*.cpp" />
     <ClCompile Include="lib\ehbanana\lib\FruitBowl\include\**\*.cpp" />
     <ClCompile Include="..\CISLibrary\components\communications\*.cpp" />
-    <ClCompile Include="..\CISLibrary\components\communications\IQSource\WAVSource.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\IQSource\WAV.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\IQSource\RTLSDR.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\**\*.h" />

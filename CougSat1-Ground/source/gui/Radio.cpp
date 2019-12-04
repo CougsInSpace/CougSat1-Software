@@ -84,6 +84,14 @@ Result Radio::handleInput(const EBMessage_t & msg) {
       case Hash::calculateHash("main"):
         return onLoad();
       case Hash::calculateHash("rx-source"):
+        if (msg.value.get() == Hash::calculateHash("RTL-SDR"))
+          result = ::Radio::RadioRX::Instance()->setRTLSDR();
+
+        if (!result) {
+          messageSetProp(
+              "radio-banner", "innerHTML", "Failed to change RX source");
+        }
+        break;
       case Hash::calculateHash("tx-destination"):
         // TODO implement settings changes
         break;

@@ -3,6 +3,7 @@
 #include <chrono>
 #include <spdlog/spdlog.h>
 
+#include <components/communications/IQSource/RTLSDR.h>
 #include <components/communications/IQSource/WAV.h>
 
 namespace Radio {
@@ -53,6 +54,26 @@ Result RadioRX::setIQFile(FILE * file) {
 }
 
 /**
+ * @brief Set a RTL SDR dongle as the IQ source
+ *
+ * @param centerFreq
+ * @return Result
+ */
+Result RadioRX::setRTLSDR(const uint32_t centerFreq) {
+  Communications::IQSource::IQSource * oldSource = iqSource;
+  Communications::IQSource::RTLSDR *   newSource =
+      new Communications::IQSource::RTLSDR(centerFreq);
+  Result result = newSource->init();
+  if (!result)
+    return result + "Failed to initialize RTL SDR Source";
+
+  iqSource = newSource;
+  delete oldSource;
+
+  return ResultCode_t::SUCCESS;
+}
+
+/**
  * @brief Start the RadioRX loop
  *
  */
@@ -94,13 +115,14 @@ void RadioRX::run() {
         delete iqSource;
         iqSource = nullptr;
       } else if (!result) {
-        spdlog::error((result + "Failed to get IQ").getMessage());
-        running = false;
-        return;
+        // spdlog::error((result + "Failed to get IQ").getMessage());
+        // running = false;
+        // return;
       }
-      while (running && !gui->push({i / 32768.0, q / 32768.0}))
-        std::this_thread::sleep_for(millis_t(10));
-      std::this_thread::sleep_for(millis_t(1));
+      spdlog::info("{} {}", i, q);
+      // while (running && !gui->push({i / 32768.0, q / 32768.0}))
+      //   std::this_thread::sleep_for(millis_t(1));
+      // std::this_thread::sleep_for(millis_t(1));
     } else
       std::this_thread::sleep_for(millis_t(10));
   }
