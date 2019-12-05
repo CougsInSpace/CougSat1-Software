@@ -31,7 +31,7 @@ public:
 
   Result setIQFile(FILE * file);
 
-  Result setRTLSDR(const uint32_t centerFreq = 104300000);
+  Result setRTLSDR(const uint32_t centerFreq = 90700000);
 
   void start();
   void stop();

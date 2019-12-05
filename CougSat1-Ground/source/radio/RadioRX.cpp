@@ -108,20 +108,20 @@ void RadioRX::run() {
   while (running) {
     if (iqSource != nullptr) {
       result = iqSource->getIQ(i, q);
-      if (result == ResultCode_t::END_OF_FILE) {
+      if (result == ResultCode_t::BUFFER_OVERFLOW) {
         // IQ buffer is empty, remove the source
         i = 0;
         q = 0;
-        delete iqSource;
-        iqSource = nullptr;
+        // delete iqSource;
+        // iqSource = nullptr;
       } else if (!result) {
-        // spdlog::error((result + "Failed to get IQ").getMessage());
-        // running = false;
-        // return;
+        spdlog::error((result + "Failed to get IQ").getMessage());
+        running = false;
+        return;
       }
-      spdlog::info("{} {}", i, q);
-      // while (running && !gui->push({i / 32768.0, q / 32768.0}))
-      //   std::this_thread::sleep_for(millis_t(1));
+      // spdlog::info("{} {}", i, q);
+      while (running && !gui->push({i / 32768.0, q / 32768.0}))
+        std::this_thread::sleep_for(millis_t(1));
       // std::this_thread::sleep_for(millis_t(1));
     } else
       std::this_thread::sleep_for(millis_t(10));

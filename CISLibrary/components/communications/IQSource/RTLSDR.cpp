@@ -16,7 +16,7 @@ RTLSDR::RTLSDR(const uint32_t centerFreq) : centerFrequency(centerFreq) {}
  *
  */
 RTLSDR::~RTLSDR() {
-  running = false;
+  stop();
   rtlsdr_close(device);
 }
 
@@ -29,24 +29,28 @@ ResultCode_t RTLSDR::init() {
   int deviceCount = rtlsdr_get_device_count();
   if (deviceCount == 0)
     return ResultCode_t::OPEN_FAILED;
-  int result;
+  int error;
   for (int i = 0; i < deviceCount; i++) {
-    result = rtlsdr_open(&device, i);
-    if (result == 0)
+    error = rtlsdr_open(&device, i);
+    if (error == 0)
       break;
   }
 
-  result = rtlsdr_set_sample_rate(device, 2048000);
-  if (result != 0)
+  error = rtlsdr_set_sample_rate(device, SAMPLE_FREQ);
+  if (error)
     return ResultCode_t::WRITE_FAULT;
 
-  result = rtlsdr_set_center_freq(device, centerFrequency);
-  if (result != 0)
+  error = rtlsdr_set_center_freq(device, centerFrequency);
+  if (error)
     return ResultCode_t::WRITE_FAULT;
 
   // Automatic gain control on
-  result = rtlsdr_set_agc_mode(device, 1);
-  if (result != 0)
+  error = rtlsdr_set_tuner_gain_mode(device, 0);
+  if (error)
+    return ResultCode_t::WRITE_FAULT;
+
+  error = rtlsdr_reset_buffer(device);
+  if (error)
     return ResultCode_t::WRITE_FAULT;
 
   running = true;
@@ -56,39 +60,55 @@ ResultCode_t RTLSDR::init() {
 }
 
 /**
+ * @brief Asynchronous callback for reading the RTL-SDR
+ *
+ * @param buf buffer, interleaved
+ * @param len length of buffer
+ * @param context
+ */
+void RTLSDR::asyncCallback(uint8_t * buf, uint32_t len, void * context) {
+  RTLSDR * thisCTX = (RTLSDR *)context;
+  if (context) {
+    while (len > 1) {
+      if (!thisCTX->running) {
+        rtlsdr_cancel_async(thisCTX->device);
+        return;
+      }
+      PairInt16_t pair = {static_cast<int16_t>(*buf) << 8,
+          static_cast<int16_t>(*(buf + 1)) << 8};
+      while (thisCTX->running && !thisCTX->iqBuffer.push(pair))
+        std::this_thread::sleep_for(millis_t(1));
+
+      buf += 2;
+      len -= 2;
+    }
+  }
+}
+
+/**
  * @brief Polls the RTL SDR dongle
  *
  */
 void RTLSDR::loop() {
-  int result      = 0;
-  int samplesRead = 0;
-
-  // min: 1 * 512, max: 256 * 32 * 512
-  uint32_t  outBlockSize = 16 * 32 * 512;
-  uint8_t * buffer       = new uint8_t[outBlockSize];
-
-  while (running) {
-    result = rtlsdr_read_sync(device, buffer, outBlockSize, &samplesRead);
-    if (result < 0) {
-      fprintf(stderr, "WARNING: sync read failed.\n");
-      running = false;
-      break;
-    }
-
-    for (size_t i = 0; i < samplesRead; i += 2) {
-      PairInt16_t pair = {static_cast<int16_t>(buffer[i]) << 8,
-          static_cast<int16_t>(buffer[i + 1]) << 8};
-      while (running && !iqBuffer.push(pair)) {
-        std::this_thread::sleep_for(millis_t(1));
-      }
-    }
-
-    if ((uint32_t)samplesRead < outBlockSize) {
-      fprintf(stderr, "Short read, samples lost, exiting!\n");
-      break;
-    }
+  // Start the async polling, blocks until cancel is called
+  int result = rtlsdr_read_async(device, asyncCallback, this, 0, 0);
+  if (result) {
+    printf("Error: %d\n", result);
   }
-  delete buffer;
+}
+
+/**
+ * @brief Stop the RTL-SDR reading thread
+ *
+ * @return ResultCode_t
+ */
+ResultCode_t RTLSDR::stop() {
+  running    = false;
+  int result = rtlsdr_cancel_async(device);
+  if (result)
+    return ResultCode_t::EXCEPTION_OCCURRED;
+  thread.join();
+  return ResultCode_t::SUCCESS;
 }
 
 } // namespace IQSource

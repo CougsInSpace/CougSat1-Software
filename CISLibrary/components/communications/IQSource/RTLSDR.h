@@ -23,11 +23,17 @@ public:
 private:
   void loop();
 
+  ResultCode_t stop();
+
+  static void asyncCallback(uint8_t * buf, uint32_t len, void * context);
+
   std::thread   thread;
   volatile bool running = false;
 
   uint32_t       centerFrequency;
   rtlsdr_dev_t * device;
+
+  const uint32_t SAMPLE_FREQ = 1024000;
 };
 
 } // namespace IQSource
