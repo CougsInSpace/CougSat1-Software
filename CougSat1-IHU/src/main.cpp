@@ -21,7 +21,7 @@ mbed_error_status_t initialize() {
   LOG("Init", "Initialization starting");
   mbed_error_status_t result = MBED_SUCCESS;
   
-  // file system initialize
+  // file system initialize - Christian Rouhana
   sd.init();
   fs.mount(&sd);
   
