@@ -99,7 +99,8 @@ Result Radio::handleInput(const EBMessage_t & msg) {
         result = ::Radio::RadioRX::Instance()->setIQFile(msg.file);
         if (!result)
           return result + "Setting IQ file for RX radio";
-        return sendUpdate();
+        messageSetProp("iq-file-input", "value", "");
+        break;
       default:
         spdlog::info("Unknown id for Radio");
         break;

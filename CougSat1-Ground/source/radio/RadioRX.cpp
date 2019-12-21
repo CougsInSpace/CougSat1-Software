@@ -109,11 +109,9 @@ void RadioRX::run() {
     if (iqSource != nullptr) {
       result = iqSource->getIQ(i, q);
       if (result == ResultCode_t::BUFFER_OVERFLOW) {
-        // IQ buffer is empty, remove the source
+        // IQ buffer is empty
         i = 0;
         q = 0;
-        // delete iqSource;
-        // iqSource = nullptr;
       } else if (!result) {
         spdlog::error((result + "Failed to get IQ").getMessage());
         running = false;

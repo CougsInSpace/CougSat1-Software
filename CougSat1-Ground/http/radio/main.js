@@ -59,7 +59,6 @@ function updateConstellation(element) {
 
     config.data.datasets[0].data[i] = {x: I, y: Q};
   }
-  console.log(config.data.datasets[0].data);
   chart.update();
 }
 
@@ -69,7 +68,6 @@ function updateConstellation(element) {
  * @param {DOMElement} element
  */
 function rxSourceListener(element) {
-  console.log(element);
   if (element.target.value == "IQ File")
     document.getElementById("iq-file-row").style.display = "";
   else

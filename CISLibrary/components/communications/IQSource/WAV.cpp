@@ -125,11 +125,15 @@ ResultCode_t WAV::getIQ(int16_t & dataI, int16_t & dataQ) {
     while (result == ResultCode_t::SUCCESS && iqBuffer.size() < 255) {
       PairInt16_t pair;
       result = read(pair.a, 2);
-      if (!result)
+      if (result == ResultCode_t::END_OF_FILE)
+        return ResultCode_t::BUFFER_OVERFLOW;
+      else if (!result)
         return result;
 
       result = read(pair.b, 2);
-      if (!result)
+      if (result == ResultCode_t::END_OF_FILE)
+        return ResultCode_t::BUFFER_OVERFLOW;
+      else if (!result)
         return result;
 
       result = iqBuffer.push(pair);
@@ -145,8 +149,7 @@ ResultCode_t WAV::getIQ(int16_t & dataI, int16_t & dataQ) {
  * @param bytes count to read
  * @return ResultCode_t
  */
-template <typename T>
-ResultCode_t WAV::read(T & number, const uint8_t bytes) {
+template <typename T> ResultCode_t WAV::read(T & number, const uint8_t bytes) {
   // WAV is little endian
   uint64_t temp = 0;
   int      c;
