@@ -2,7 +2,8 @@
 #define _LIBRARY_COMPONENT_COMMUNICATIONS_SYMBOL_SOURCE_H_
 
 #include "../IQSource/IQSource.h"
-#include <ResultCode.h>
+
+#include <memory>
 #include <stdint.h>
 
 namespace Communications {
@@ -20,9 +21,7 @@ public:
    * @brief Destroy the SymbolSource object
    *
    */
-  virtual ~SymbolSource() {
-    delete iqSource;
-  }
+  virtual ~SymbolSource() {}
 
   /**
    * @brief Set the iq source to use to demodulate symbols
@@ -30,9 +29,8 @@ public:
    *
    * @param source
    */
-  void setIQSource(IQSource::IQSource * source) {
-    delete iqSource;
-    iqSource = source;
+  void setIQSource(std::unique_ptr<IQSource::IQSource> source) {
+    iqSource = std::move(source);
   }
 
   /**
@@ -40,12 +38,12 @@ public:
    * All 8b will be used, if a symbol is 2b, byte will contain 4 symbols
    *
    * @param byte buffer
-   * @return ResultCode_t
+   * @throw std::underflow_error if there is no signal
    */
-  virtual inline ResultCode_t getByte(uint8_t & byte) = 0;
+  virtual inline uint8_t getByte() = 0;
 
 protected:
-  IQSource::IQSource * iqSource = nullptr;
+  std::unique_ptr<IQSource::IQSource> iqSource = nullptr;
 };
 
 } // namespace SymbolSource

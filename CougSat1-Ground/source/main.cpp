@@ -8,8 +8,8 @@
 
 #include <Windows.h>
 
+#include "communications/Radio.h"
 #include "gui/GUI.h"
-#include "radio/Radio.h"
 
 /**
  * @brief Logger callback
@@ -95,11 +95,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     EBSetLogger(logEhbanana);
 
     GUI::GUI::init();
-    Radio::Radio::start();
+    Communications::Radio::start();
 
     GUI::GUI::run();
 
-    Radio::Radio::stop();
+    Communications::Radio::stop();
     GUI::GUI::deinit();
   } catch (const std::exception & e) {
     spdlog::error(e.what());
