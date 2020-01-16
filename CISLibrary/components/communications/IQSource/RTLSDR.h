@@ -3,7 +3,6 @@
 
 #include "IQSource.h"
 
-#include <ResultCode.h>
 #include <rtl-sdr.h>
 #include <thread>
 
@@ -18,12 +17,10 @@ public:
   RTLSDR(const uint32_t centerFreq);
   ~RTLSDR();
 
-  ResultCode_t init();
-
 private:
   void loop();
 
-  ResultCode_t stop();
+  void stop();
 
   static void asyncCallback(uint8_t * buf, uint32_t len, void * context);
 

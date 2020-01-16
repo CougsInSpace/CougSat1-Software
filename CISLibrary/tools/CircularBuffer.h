@@ -1,7 +1,7 @@
 #ifndef _LIBRARY_TOOLS_CIRCULAR_BUFFER_H_
 #define _LIBRARY_TOOLS_CIRCULAR_BUFFER_H_
 
-#include <ResultCode.h>
+#include <stdexcept>
 #include <stdint.h>
 
 struct PairDouble_t {
@@ -30,29 +30,26 @@ public:
   /**
    * @brief Pop an element off the buffer
    *
-   * @param element to return
-   * @return ResultCode_t
+   * @return T element to return
    */
-  ResultCode_t pop(T & element) {
+  inline T pop() {
     if (indexRead == indexWrite)
-      return ResultCode_t::BUFFER_OVERFLOW;
-    element = data[indexRead];
+      throw std::underflow_error("Buffer is empty");
+    T element = data[indexRead];
     ++indexRead;
-    return ResultCode_t::SUCCESS;
+    return element;
   }
 
   /**
    * @brief Push an element into the buffer
    *
    * @param element to push
-   * @return ResultCode_t
    */
-  ResultCode_t push(const T & element) {
+  inline void push(const T & element) {
     if (((indexWrite + 1) & 0xFF) == indexRead)
-      return ResultCode_t::BUFFER_OVERFLOW;
+      throw std::overflow_error("Buffer is full");
     data[indexWrite] = element;
     ++indexWrite;
-    return ResultCode_t::SUCCESS;
   }
 
   /**
@@ -60,7 +57,7 @@ public:
    *
    * @return uint8_t
    */
-  uint8_t size() {
+  inline uint8_t size() {
     return indexWrite - indexRead;
   }
 };

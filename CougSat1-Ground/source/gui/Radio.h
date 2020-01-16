@@ -1,27 +1,20 @@
 #ifndef _GUI_RADIO_H_
 #define _GUI_RADIO_H_
 
-#include <ehbanana/Page.h>
-
 #include <tools/CircularBuffer.h>
 
 namespace GUI {
 
-class Radio : public Ehbanana::Page {
+class Radio {
 public:
-  Radio(EBGUI_t gui);
-  ~Radio();
+  Radio() = delete;
 
-  Result onLoad();
-  Result sendUpdate();
+  static void __stdcall callback(const char * id, const char * value);
 
-  Result handleInput(const EBMessage_t & msg);
-
-  CircularBuffer<PairDouble_t> * getConstellationBuffer();
-  Result                         updateConstellation();
+  static void sendUpdate();
 
 private:
-  CircularBuffer<PairDouble_t> data;
+  static void changeRXSource(const char * value);
 };
 
 } // namespace GUI

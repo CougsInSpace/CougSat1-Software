@@ -1,11 +1,11 @@
 <!-- fileMatch "regular expression" will have the encapulated cache control added to a response header -->
 <!-- They are tested in order so the last one should be the default-->
 
-<!-- 1 year -->
-<filesMatch ".*\.(ico|jpg|jpeg|png|gif|woff|woff2)$" cache-control="public, max-age=31536000"/>
-
 <!-- 1 day -->
-<filesMatch ".*\.(css)$" cache-control="public, max-age=86400"/>
+<filesMatch ".*\.(ico|jpg|jpeg|png|gif|woff|woff2)$" cache-control="public, max-age=86400"/>
+
+<!-- 15 minutes -->
+<filesMatch ".*\.(css)$" cache-control="public, max-age=900"/>
 
 <!-- default: no-cache -->
 <filesMatch ".*" cache-control="no-cache"/>

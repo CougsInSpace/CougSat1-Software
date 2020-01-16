@@ -606,7 +606,6 @@ function updateMagnet(element) {
  * @param {DOMElement} element
  */
 function updateTLE(element) {
-  console.log(element.TLE.sub())
   satrec = satellite.twoline2satrec(
       element.TLE.substring(0, 69), element.TLE.substring(69));
 }

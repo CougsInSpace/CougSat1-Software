@@ -5,10 +5,8 @@
       "includePath": [
         "${workspaceFolder}/source",
         "${workspaceFolder}/lib/ehbanana/include",
-        "${workspaceFolder}/lib/ehbanana/lib/FruitBowl/include",
         "${workspaceFolder}/lib/spdlog/include",
         "${workspaceFolder}/lib/rtl-sdr/include",
-        "${workspaceFolder}/lib/AudioFile",
         "${workspaceFolder}/../CISLibrary"
       ],
       "defines": [

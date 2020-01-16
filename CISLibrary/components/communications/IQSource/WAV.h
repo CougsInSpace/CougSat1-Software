@@ -3,7 +3,6 @@
 
 #include "IQSource.h"
 
-#include <ResultCode.h>
 #include <cstring>
 #include <stdio.h>
 
@@ -18,9 +17,7 @@ public:
   WAV(FILE * file);
   ~WAV();
 
-  ResultCode_t init();
-
-  ResultCode_t getIQ(int16_t & dataI, int16_t & dataQ);
+  void getIQ(int16_t & dataI, int16_t & dataQ);
 
 private:
   enum class Format_t : uint16_t {
@@ -31,7 +28,7 @@ private:
     EXTENSIBLE = 0xFFFE
   };
 
-  template <typename T> ResultCode_t read(T & number, const uint8_t bytes);
+  template <typename T> void read(T & number, const uint8_t bytes);
 
   FILE * file;
 

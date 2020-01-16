@@ -68,8 +68,10 @@ function updateConstellation(element) {
  * @param {DOMElement} element
  */
 function rxSourceListener(element) {
+  document.getElementById("iq-file-row").style.display = "none";
+  document.getElementById("iq-test-row").style.display = "none";
   if (element.target.value == "IQ File")
     document.getElementById("iq-file-row").style.display = "";
-  else
-    document.getElementById("iq-file-row").style.display = "none";
+  else if (element.target.value == "Test Telemetry")
+    document.getElementById("iq-test-row").style.display = "";
 }

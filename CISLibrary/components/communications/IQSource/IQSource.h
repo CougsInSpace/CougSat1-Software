@@ -2,7 +2,6 @@
 #define _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_H_
 
 #include "tools/CircularBuffer.h"
-#include <ResultCode.h>
 #include <stdint.h>
 
 namespace Communications {
@@ -23,28 +22,15 @@ public:
   virtual ~IQSource() {}
 
   /**
-   * @brief Initialize the IQ source,
-   *
-   * Setup an interrupt to poll ADC
-   * Initialize the USB device
-   *
-   * @return ResultCode_t
-   */
-  virtual ResultCode_t init() = 0;
-
-  /**
    * @brief Get the IQ data from the source
    *
    * @param dataI buffer
    * @param dataQ buffer
-   * @return ResultCode_t
    */
-  virtual inline ResultCode_t getIQ(int16_t & dataI, int16_t & dataQ) {
-    PairInt16_t  iqPair;
-    ResultCode_t result = iqBuffer.pop(iqPair);
-    dataI               = iqPair.a;
-    dataQ               = iqPair.b;
-    return result;
+  virtual inline void getIQ(int16_t & dataI, int16_t & dataQ) {
+    PairInt16_t iqPair = iqBuffer.pop();
+    dataI              = iqPair.a;
+    dataQ              = iqPair.b;
   }
 
 protected:

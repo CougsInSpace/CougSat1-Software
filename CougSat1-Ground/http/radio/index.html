@@ -66,6 +66,7 @@
                 <option>RTL-SDR</option>
                 <option>Audio</option>
                 <option>IQ File</option>
+                <option>Test Telemetry</option>
               </select>
             </td>
           </tr>
@@ -74,6 +75,12 @@
             <td>
               <input type="file" id="iq-file-input" class="eb-input" accept=".wav">
               <label for="iq-file-input" class="button-1 text-body fill-horz">Select</label>
+            </td>
+          </tr>
+          <tr id="iq-test-row" style="display: none;">
+            <td>Distortion</td>
+            <td>
+              <input type="range" min="0" max="10" value="0" id="iq-test-distortion" class="eb-input">
             </td>
           </tr>
           <tr>

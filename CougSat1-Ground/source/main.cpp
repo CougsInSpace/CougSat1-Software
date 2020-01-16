@@ -7,11 +7,9 @@
 #include <spdlog/sinks/stdout_sinks.h>
 
 #include <Windows.h>
-#include <chrono>
-#include <thread>
 
 #include "gui/GUI.h"
-#include "radio/RadioRX.h"
+#include "radio/Radio.h"
 
 /**
  * @brief Logger callback
@@ -47,9 +45,8 @@ void __stdcall logEhbanana(const EBLogLevel_t level, const char * string) {
  * @param rotatingLogs will rotate between 3 files and overwrite the oldest if
  * true, or overwrite the single file if false
  * @param showConsole will open a console output window if true
- * @return Result
  */
-Result configureLogging(
+void configureLogging(
     const char * fileName, bool rotatingLogs, bool showConsole) {
   std::vector<spdlog::sink_ptr> sinks;
 
@@ -64,10 +61,7 @@ Result configureLogging(
       }
       freopen_s((FILE **)stdout, "CONOUT$", "w", stdout);
     } else {
-      MessageBoxA(NULL, "Log console initialization failed", "Error", MB_OK);
-      std::cout << "Failed to AllocConsole with Win32 error: " << GetLastError()
-                << std::endl;
-      return ResultCode_t::OPEN_FAILED + "AllocConsole";
+      throw std::exception("Log console initialization failed");
     }
     sinks.push_back(std::make_shared<spdlog::sinks::wincolor_stdout_sink_mt>());
   }
@@ -81,10 +75,7 @@ Result configureLogging(
         sinks.push_back(
             std::make_shared<spdlog::sinks::basic_file_sink_mt>(fileName));
     } catch (const spdlog::spdlog_ex & e) {
-      MessageBoxA(NULL, "Log initialization failed", "Error", MB_OK);
-      std::cout << "Log initialization failed: " << e.what() << std::endl;
-      return ResultCode_t::OPEN_FAILED +
-             ("Opening log files to " + std::string(fileName));
+      throw std::exception("Log file initialization failed");
     }
   }
 
@@ -95,46 +86,27 @@ Result configureLogging(
 #ifdef DEBUG
   spdlog::set_level(spdlog::level::debug);
 #endif
-
-  return ResultCode_t::SUCCESS;
 }
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-  Result result = configureLogging("log.log", true, true);
+  try {
+    configureLogging("log.log", true, true);
+    spdlog::info("Cougs in Space Ground starting");
+    EBSetLogger(logEhbanana);
 
-  spdlog::info("Cougs in Space Ground starting");
+    GUI::GUI::init();
+    Radio::Radio::start();
 
-  EBSetLogger(logEhbanana);
+    GUI::GUI::run();
 
-  result = GUI::GUI::Instance()->init();
-  if (!result) {
-    spdlog::error((result + "Initializing GUI").getMessage());
-    return static_cast<int>(result.getCode());
+    Radio::Radio::stop();
+    GUI::GUI::deinit();
+  } catch (const std::exception & e) {
+    spdlog::error(e.what());
+    return -1;
   }
-
-  result = Radio::RadioRX::Instance()->init(
-      GUI::GUI::Instance()->getConstellationBuffer());
-  if (!result) {
-    spdlog::error((result + "Initializing RadioRX").getMessage());
-    return static_cast<int>(result.getCode());
-  }
-  Radio::RadioRX::Instance()->start();
-
-  result = GUI::GUI::Instance()->run();
-  if (!result) {
-    spdlog::error((result + "Running GUI").getMessage());
-    return static_cast<int>(result.getCode());
-  }
-
-  result = GUI::GUI::Instance()->deinit();
-  if (!result) {
-    spdlog::error((result + "Deiniting GUI").getMessage());
-    return static_cast<int>(result.getCode());
-  }
-
-  Radio::RadioRX::Instance()->stop();
 
   spdlog::info("Cougs in Space Ground complete");
   spdlog::default_logger()->flush();
-  return static_cast<int>(ResultCode_t::SUCCESS);
+  return 0;
 }

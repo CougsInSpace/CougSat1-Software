@@ -8,10 +8,11 @@
 debug
 CISLibrary
 release
-bin
 http/lib/Ehbanana.js
 *.lib
 *.zip
+*.dll
+*.exe
 
 # Log files
 *.log
