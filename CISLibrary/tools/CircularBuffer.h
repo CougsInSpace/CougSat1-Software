@@ -30,24 +30,39 @@ public:
   /**
    * @brief Pop an element off the buffer
    *
-   * @return T element to return
+   * @param element to return
+   * @return true if element was popped, false otherwise
    */
-  inline T pop() {
+  inline bool pop(T & element) {
     if (indexRead == indexWrite)
-      throw std::underflow_error("Buffer is empty");
-    T element = data[indexRead];
+      return false;
+    element = data[indexRead];
     ++indexRead;
-    return element;
+    return true;
   }
 
   /**
    * @brief Push an element into the buffer
    *
    * @param element to push
+   * @return bool true if element was pushed, false otherwise
    */
-  inline void push(const T & element) {
+  inline bool push(const T & element) {
     if (((indexWrite + 1) & 0xFF) == indexRead)
-      throw std::overflow_error("Buffer is full");
+      return false;
+    data[indexWrite] = element;
+    ++indexWrite;
+    return true;
+  }
+
+  /**
+   * @brief Push an element into the buffer, replace the oldest if full
+   *
+   * @param element to push
+   */
+  inline void pushReplace(const T & element) {
+    if (((indexWrite + 1) & 0xFF) == indexRead)
+      ++indexRead;
     data[indexWrite] = element;
     ++indexWrite;
   }

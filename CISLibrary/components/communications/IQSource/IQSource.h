@@ -12,8 +12,9 @@ public:
   /**
    * @brief Construct a new IQSource object
    *
+   * @param sampleFrequency
    */
-  IQSource() {}
+  IQSource(const uint32_t sampleFrequency) : sampleFrequency(sampleFrequency) {}
 
   /**
    * @brief Destroy the IQSource object
@@ -27,14 +28,17 @@ public:
    * @param dataI buffer
    * @param dataQ buffer
    */
-  virtual inline void getIQ(int16_t & dataI, int16_t & dataQ) {
-    PairInt16_t iqPair = iqBuffer.pop();
-    dataI              = iqPair.a;
-    dataQ              = iqPair.b;
+  virtual void getIQ(int16_t & dataI, int16_t & dataQ) {
+    PairInt16_t iqPair;
+    while (!iqBuffer.pop(iqPair))
+      ; // Block until element is popped
+    dataI = iqPair.a;
+    dataQ = iqPair.b;
   }
 
 protected:
   CircularBuffer<PairInt16_t> iqBuffer;
+  const uint32_t              sampleFrequency;
 };
 
 } // namespace IQSource

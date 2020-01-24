@@ -7,7 +7,8 @@ namespace IQSource {
  * @brief Construct a new RTLSDR::RTLSDR object
  *
  */
-RTLSDR::RTLSDR(const uint32_t centerFreq) : centerFrequency(centerFreq) {
+RTLSDR::RTLSDR(const uint32_t centerFreq) :
+  centerFrequency(centerFreq), IQSource(1024000) {
   int deviceCount = rtlsdr_get_device_count();
   if (deviceCount == 0)
     throw std::exception("No RTL SDR device detected");
@@ -19,7 +20,7 @@ RTLSDR::RTLSDR(const uint32_t centerFreq) : centerFrequency(centerFreq) {
       break;
   }
 
-  error = rtlsdr_set_sample_rate(device, SAMPLE_FREQ);
+  error = rtlsdr_set_sample_rate(device, sampleFrequency);
   if (error)
     throw std::exception("Failed to set sample rate");
 

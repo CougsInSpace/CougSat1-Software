@@ -3,7 +3,6 @@
 
 #include "../IQSink/IQSink.h"
 
-#include <memory>
 #include <stdint.h>
 
 namespace Communications {
@@ -14,8 +13,10 @@ public:
   /**
    * @brief Construct a new SymbolSink object
    *
+   * @param symbolFrequency
    */
-  SymbolSink() {}
+  SymbolSink(const uint32_t symbolFrequency) :
+    symbolFrequency(symbolFrequency) {}
 
   /**
    * @brief Destroy the SymbolSink object
@@ -25,12 +26,11 @@ public:
 
   /**
    * @brief Set the iq sink to use to modulate symbols
-   * Takes ownership of source
    *
    * @param sink
    */
-  void setIQSink(std::unique_ptr<IQSink::IQSink> sink) {
-    iqSink = std::move(sink);
+  void setIQSink(IQSink::IQSink * sink) {
+    iqSink = sink;
   }
 
   /**
@@ -39,10 +39,11 @@ public:
    *
    * @param byte buffer
    */
-  virtual inline void add(uint8_t byte) = 0;
+  virtual void add(uint8_t byte) = 0;
 
 protected:
-  std::unique_ptr<IQSink::IQSink> iqSink = nullptr;
+  IQSink::IQSink * iqSink = nullptr;
+  const uint32_t   symbolFrequency;
 };
 
 } // namespace SymbolSink

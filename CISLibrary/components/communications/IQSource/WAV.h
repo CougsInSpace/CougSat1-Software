@@ -33,7 +33,6 @@ private:
   FILE * file;
 
   uint16_t channels;
-  uint32_t sampleFreq;
   uint16_t bitsPerSample;
 };
 

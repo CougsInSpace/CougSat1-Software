@@ -30,7 +30,7 @@ void Frame::add(uint8_t byte) {}
  * @return false otherwise
  */
 bool Frame::isDone() {
-  return true;
+  return false;
 }
 
 /**

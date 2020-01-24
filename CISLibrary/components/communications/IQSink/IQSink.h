@@ -12,8 +12,9 @@ public:
   /**
    * @brief Construct a new IQSink object
    *
+   * @param sampleFrequency
    */
-  IQSink() {}
+  IQSink(const uint32_t sampleFrequency) : sampleFrequency(sampleFrequency) {}
 
   /**
    * @brief Destroy the IQSink object
@@ -22,12 +23,15 @@ public:
   virtual ~IQSink() {}
 
   /**
-   * @brief Get the IQ data from the source
+   * @brief Add IQ to the sink
    *
    * @param dataI buffer
    * @param dataQ buffer
    */
-  virtual inline void addIQ(int16_t dataI, int16_t dataQ) = 0;
+  virtual void addIQ(int16_t dataI, int16_t dataQ) = 0;
+
+protected:
+  const uint32_t sampleFrequency;
 };
 
 } // namespace IQSink

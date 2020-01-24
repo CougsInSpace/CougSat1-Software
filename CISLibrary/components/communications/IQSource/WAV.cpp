@@ -11,7 +11,7 @@ namespace IQSource {
  *
  * @param file to read, should point to start of file
  */
-WAV::WAV(FILE * file) : file(file) {
+WAV::WAV(FILE * file) : file(file), IQSource(0) {
   // // Header chunk
   // char buf[5];
   // if (fgets(buf, 5, file) == nullptr)

@@ -29,8 +29,6 @@ private:
 
   uint32_t       centerFrequency;
   rtlsdr_dev_t * device;
-
-  const uint32_t SAMPLE_FREQ = 1024000;
 };
 
 } // namespace IQSource

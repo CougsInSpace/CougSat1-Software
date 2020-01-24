@@ -11,7 +11,8 @@
       ],
       "defines": [
         "DEBUG",
-        "EB_USE_STD_STRING"
+        "EB_USE_STD_STRING",
+        "GROUND"
       ],
       "windowsSdkVersion": "10.0.18362.0",
       "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.21.27702/bin/Hostx64/x64/cl.exe",

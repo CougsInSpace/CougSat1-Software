@@ -53,11 +53,11 @@ window.addEventListener("DOMContentLoaded", setup);
  * @param {DOMElement} element
  */
 function updateConstellation(element) {
-  for (var i = 0; i < 100; i++) {
-    var I = element["dataI-" + i];
-    var Q = element["dataQ-" + i];
+  for (var index = 0; index < 200; index++) {
+    var i = element[index * 2];
+    var q = element[index * 2 + 1];
 
-    config.data.datasets[0].data[i] = {x: I, y: Q};
+    config.data.datasets[0].data[index] = {x: i, y: q};
   }
   chart.update();
 }

@@ -3,7 +3,6 @@
 
 #include "SymbolSource.h"
 
-#include <ResultCode.h>
 #include <stdint.h>
 
 namespace Communications {
@@ -11,15 +10,10 @@ namespace SymbolSource {
 
 class QPSK : public SymbolSource {
 public:
-  QPSK(const QPSK &) = delete;
-  QPSK & operator=(const QPSK &) = delete;
-
   QPSK(const uint32_t symbolFrequency);
   ~QPSK();
 
-  ResultCode_t init();
-
-  inline ResultCode_t getByte(uint8_t & byte);
+  uint8_t getByte();
 };
 
 } // namespace SymbolSource

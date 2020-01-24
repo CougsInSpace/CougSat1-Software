@@ -1,11 +1,14 @@
 #include "Radio.h"
 
 #include "Hash.h"
+#include "communications/Radio.h"
 
 #include <Ehbanana.h>
 #include <spdlog/spdlog.h>
 
 namespace GUI {
+
+CircularBuffer<PairInt16_t> Radio::constellationData;
 
 /**
  * @brief Process input from the GUI
@@ -36,17 +39,54 @@ void __stdcall Radio::callback(const char * id, const char * value) {
 }
 
 /**
+ * @brief Add IQ data to plot on the constellation diagram
+ *
+ * @param i
+ * @param q
+ */
+void Radio::addConstellationIQ(int16_t i, int16_t q) {
+  constellationData.pushReplace({i, q});
+}
+
+/**
+ * @brief Send the most recent 200 data points
+ *
+ */
+void Radio::sendConstellationDiagram() {
+  EBOutput_t output;
+  EBError_t  error = EBCreateOutput("/radio/", &output);
+  if (EB_FAILED(error))
+    throw std::exception(EBErrorName(error));
+
+  PairInt16_t pair;
+  for (int i = 0; i < 200; ++i) {
+    if (!constellationData.pop(pair))
+      break;
+
+    // clang-format off
+    EBAddOutputEx(output, "iq-diagram", std::to_string(i * 2).c_str(), pair.a / 32768.0);
+    EBAddOutputEx(output, "iq-diagram", std::to_string(i * 2 + 1).c_str(), pair.b / 32768.0);
+    // clang-format on
+  }
+
+  error = EBEnqueueOutput(output);
+  if (EB_FAILED(error))
+    throw std::exception(EBErrorName(error));
+}
+
+/**
  * @brief Change the RX source of the radio
  *
  * @param value
  */
 void Radio::changeRXSource(const char * value) {
   switch (Hash::calculateHash(value)) {
+    case Hash::calculateHash("Test Telemetry"):
+      return Communications::Radio::setTestMode();
     case Hash::calculateHash("None"):
     case Hash::calculateHash("RTL-SDR"):
     case Hash::calculateHash("Audio"):
     case Hash::calculateHash("IQ File"):
-    case Hash::calculateHash("Test Telemetry"):
     default:
       return spdlog::warn("Unknown changeRXSource: {}", value);
   }

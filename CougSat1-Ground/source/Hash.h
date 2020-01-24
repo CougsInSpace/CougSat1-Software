@@ -16,7 +16,7 @@ public:
    *
    * @param c to add
    */
-  virtual inline void add(const char c) {
+  virtual void add(const char c) {
     value = calculateHash(value, c);
   }
 

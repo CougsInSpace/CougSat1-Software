@@ -20,7 +20,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\spdlog\include;lib\rtl-sdr\include;..\CISLibrary;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG;EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG;GROUND;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <Link>
@@ -31,7 +31,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\spdlog\include;lib\rtl-sdr\include;..\CISLibrary;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GROUND;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <Link>
@@ -41,6 +41,8 @@
   <ItemGroup>
     <ClCompile Include="source\**\*.cpp" />
     <ClCompile Include="..\CISLibrary\components\communications\*.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\SymbolSink\*.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\SymbolSource\*.cpp" />
     <ClCompile Include="..\CISLibrary\components\communications\IQSource\WAV.cpp" />
     <ClCompile Include="..\CISLibrary\components\communications\IQSource\RTLSDR.cpp" />
   </ItemGroup>

@@ -86,7 +86,10 @@ void GUI::init() {
  */
 void GUI::run() {
   // Block until the GUI is done
-  EBIsDone(true);
+  while (!EBIsDone()) {
+    Radio::sendConstellationDiagram();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  }
 }
 
 /**

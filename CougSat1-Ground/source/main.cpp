@@ -10,6 +10,7 @@
 
 #include "communications/Radio.h"
 #include "gui/GUI.h"
+#include "gui/Radio.h"
 
 /**
  * @brief Logger callback
@@ -67,16 +68,12 @@ void configureLogging(
   }
 
   if (fileName != nullptr) {
-    try {
-      if (rotatingLogs)
-        sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-            fileName, 5 * 1024 * 1024, 3));
-      else
-        sinks.push_back(
-            std::make_shared<spdlog::sinks::basic_file_sink_mt>(fileName));
-    } catch (const spdlog::spdlog_ex & e) {
-      throw std::exception("Log file initialization failed");
-    }
+    if (rotatingLogs)
+      sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+          fileName, 5 * 1024 * 1024, 3));
+    else
+      sinks.push_back(
+          std::make_shared<spdlog::sinks::basic_file_sink_mt>(fileName));
   }
 
   std::shared_ptr<spdlog::logger> logger =
@@ -95,6 +92,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     EBSetLogger(logEhbanana);
 
     GUI::GUI::init();
+    Communications::Radio::setConstellationCallback(
+        GUI::Radio::addConstellationIQ);
     Communications::Radio::start();
 
     GUI::GUI::run();
