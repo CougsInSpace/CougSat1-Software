@@ -3,7 +3,7 @@
 /**
  * @brief Construct a new CDH::CDH object
  *
- * @param i2c connected to the C&DH
+ * @param i2cslave is given the proper address
  */
 CDH::CDH(uint8_t addr, PinName sda, PinName scl) : i2c(sda, scl) 
 {
@@ -13,7 +13,7 @@ CDH::CDH(uint8_t addr, PinName sda, PinName scl) : i2c(sda, scl)
 /**
  * @brief Checks if a message is available to read
  *
- * @return true is the PMIC is addressed
+ * @return true if the i2c state is WriteAddressed
  */
 bool CDH::messageReceived() {
   int state = i2c.receive();
@@ -23,7 +23,7 @@ bool CDH::messageReceived() {
 /**
  * @brief Checks if a message is requested by master
  *
- * @return true is the PMIC is addressed
+ * @return true if the i2c state is ReadAddressed
  */
 bool CDH::messageRequested() {
   int state = i2c.receive();
@@ -37,7 +37,7 @@ bool CDH::messageRequested() {
 void CDH::readI2C()
 {
   printf("Reading i2c buffer\n Messsage = ");
-  if(!(i2c.read(message, MESSAGELENGTH)) != 0)
+  if(i2c.read(message, MESSAGELENGTH) != 0)
   {
     //ERROR("ADCS", "Failed");
   }
@@ -57,10 +57,14 @@ char* CDH::getMessage()
   return message;
 }
 
+/**
+ * @brief Writes from var message into I2CSlave buffer 
+ * 
+ */
 void CDH::writeI2C()
 {
   printf("Writing i2c buffer\n Messsage = ");
-  if(!(i2c.write(message, MESSAGELENGTH)))
+  if(i2c.write(message, MESSAGELENGTH) != 0)
   {
     //ERROR("ADCS", "Failed");
   }

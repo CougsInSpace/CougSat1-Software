@@ -14,5 +14,5 @@
  */
 int main(void) {
   ADCS adcs;
-  adcs.initThread();  
+  adcs.startThread();  
 }

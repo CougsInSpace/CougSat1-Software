@@ -39,7 +39,7 @@ ADCS::ADCS() : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL)
  * @brief main function for ADCS object
  * 
  */
-void ADCS::initThread()
+void ADCS::startThread()
 {
     printf("Outside Main!\r\n");
     DigitalOut led1(PinName(5));

@@ -11,13 +11,12 @@ class ADCS
   private:
 	Thread monitor;
 	Thread cdhRead;
-	char message[4];
+	char message[9];
 	CDH cdh;
+	void cdhThread();
 	
   public:
 	ADCS();
-	void monitorThread();
-	void cdhThread();
-	void initThread();
+	void startThread();
 };
 #endif /* ADCS_H */
