@@ -4,6 +4,8 @@
  * @brief Construct a new CDH::CDH object
  *
  * @param i2cslave is given the proper address
+ * @param i2cslave is given the sda pin
+ * @param i2cslave is given the scl pin
  */
 CDH::CDH(uint8_t addr, PinName sda, PinName scl) : i2c(sda, scl) 
 {
@@ -51,6 +53,7 @@ void CDH::readI2C()
 /**
  * @brief Getter for private message array
  * 
+ * @return message private message array
  */
 char* CDH::getMessage()
 {

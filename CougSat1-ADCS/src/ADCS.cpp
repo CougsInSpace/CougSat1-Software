@@ -23,6 +23,9 @@ void ADCS::cdhThread()
 /**
  * @brief Construct a new ADCS::ADCS object
  * 
+ * @param cdh is given the proper address for the i2cslave
+ * @param cdh is given the sda pin for the i2cslave
+ * @param cdh is given the scl pin for the i2cslave
  */
 #define TEST_IHU_ADDRESS 0xAC
 #define BUS_I2C0_SDA PinName(25)
