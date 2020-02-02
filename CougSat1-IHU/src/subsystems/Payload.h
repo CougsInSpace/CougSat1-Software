@@ -4,9 +4,7 @@
 #include "Subsystem.h"
 
 #include "mbed.h"
-// Includes the BME280 driver inside the CISLibrary for
-// use by getPressure(), getTemperature(), and getHumidity().
-#include "../../../CISLibrary/drivers/BME280/BME280.h"
+#include <BME280/BME280.h>
 
 /** 
  * The Payload class is a Subsystem serving the purpose of collecting
