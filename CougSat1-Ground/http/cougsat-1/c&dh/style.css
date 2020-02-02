@@ -1,0 +1,88 @@
+.col {
+  display: flex;
+  flex-flow: column nowrap;
+  padding: 0.5rem;
+  border-color: #0E1C31;
+  border-color: var(--color-primary);
+  border-style: solid;
+  border-width: 0;
+}
+
+.col.left {
+  width: 35%;
+}
+
+.col.right {
+  width: 65%;
+}
+
+main {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.col.right {
+  border-left-width: 0.125rem;
+}
+
+.col.left {
+  border-right-width: 0.125rem;
+}
+
+.col.left table {
+  margin: 0 auto;
+  min-width: 250px;
+}
+
+.col.left table td:nth-child(1) {
+  text-align: right;
+}
+
+.col.left table td:nth-child(2) {
+  width: 50%;
+  padding: 0 0.25rem;
+}
+
+.col.right table {
+  border-collapse: collapse;
+}
+
+.col.right table td, .col.right table th {
+  border: 1px solid #FFFFFF;
+  padding: 0.25rem;
+}
+
+.col.right table th {
+  background: #0E1C31;
+  background: var(--color-primary);
+}
+
+.col.right table tr:nth-child(even) {
+  background: #4B4E4F;
+  background: var(--color-secondary-l10);
+}
+
+.col.right table tr:hover {
+  background: #282828;
+  background: var(--color-dark);
+}
+
+input[type="datetime-local"] {
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  color: var(--color-light);
+}
+
+input[type="image"] {
+  width: 1.5rem;
+  opacity: 0.5;
+  display: block;
+  margin: auto;
+}
+
+input[type="image"]:hover {
+  opacity: 1.0;
+}

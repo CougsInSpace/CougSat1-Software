@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.default.props" />
+  <PropertyGroup>
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>lib\ehbanana\include\Ehbanana.lib;lib\rtlsdr.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>lib\ehbanana\include\Ehbanana.lib;lib\rtlsdr.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="source\**\*.cpp" />
+    <ClCompile Include="lib\ehbanana\lib\FruitBowl\include\**\*.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\**\*.h" />
+    <ClInclude Include="lib\ehbanana\lib\FruitBowl\include\**\*.h" />
+    <ClInclude Include="lib\spdlog\include\**\*.h" />
+    <ClInclude Include="lib\rtl-sdr\include\rtl-sdr.h" />
+    <ClInclude Include="lib\rtl-sdr\include\rtl-sdr_export.h" />
+  </ItemGroup>
+  <Target Name="CopyFiles">
+    <Copy SourceFiles="lib\ehbanana\include\Ehbanana.js" DestinationFiles="http\lib\Ehbanana.js"/>
+    <Copy SourceFiles="lib\ehbanana\bin\Ehbanana.dll" DestinationFiles="bin\Ehbanana.dll"/>
+    <Copy SourceFiles="$(OutDir)\Ground.exe" DestinationFiles="bin\Ground.exe"/>
+  </Target>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Targets" />
+</Project>

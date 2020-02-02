@@ -1,1 +1,16 @@
-/build/
+# Pre compiled headers
+.vscode/ipch
+
+# VS code files
+.vscode/settings.json
+
+# Build Executable
+debug
+release
+bin
+http/lib/Ehbanana.js
+*.lib
+*.zip
+
+# Log files
+*.log

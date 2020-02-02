@@ -1,0 +1,114 @@
+main {
+  position: relative;
+}
+
+.section {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5rem 1rem;
+}
+
+.section.input .pvs {
+  width: 22%;
+}
+
+.pv {
+  position: relative;
+}
+
+.pv * {
+  width: 100%;
+}
+
+.pv h1, .pv h2 {
+  position: absolute;
+}
+
+.pv h2.top {
+  top: 1rem;
+}
+
+.pv h1.top {
+  top: 3rem;
+}
+
+.pv h2.bottom {
+  bottom: 3rem;
+}
+
+.pv h1.bottom {
+  bottom: 1rem;
+}
+
+.section>.bus {
+  background: #0E1C31;
+  background: var(--color-primary);
+  padding: 0.25rem;
+}
+
+.section>.bus>h3 {
+  padding: 0 1rem;
+}
+
+.mppt {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.mppt h3 {
+  background: #0E1C31;
+  background: var(--color-primary);
+  padding: 1rem;
+}
+
+.battery {
+  display: flex;
+  flex-direction: column;
+  background: #0E1C31;
+  background: var(--color-primary);
+  padding: 0.25rem 0.5rem;
+}
+
+.battery .cell {
+  height: 5rem;
+}
+
+.battery .heater {
+  height: 2.5rem;
+  margin-top: 0.5rem;
+}
+
+.output {
+  background: #0E1C31;
+  background: var(--color-primary);
+  padding: 0.5rem 0.25rem;
+  margin: 0.75rem 0;
+  min-width: 18rem;
+}
+
+.output:first-child {
+  margin-top: 0;
+}
+
+.output:last-child {
+  margin-bottom: 0;
+}
+
+.section.regulators {
+  justify-content: center;
+}
+
+.regulator {
+  background: #0E1C31;
+  background: var(--color-primary);
+  padding: 0.5rem 0.25rem;
+  margin: 0.75rem 0.5rem;
+  min-width: 12rem;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

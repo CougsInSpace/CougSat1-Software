@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Cougs In Space Ground</title>
+  <link rel="stylesheet" href="/standardStyle.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/fonts/fonts.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <meta name="theme-color" content="#981E32">
+  <script src="/lib/Ehbanana.js"></script>
+</head>
+
+<body class="text-body">
+  <header>
+    <div><a href="/" class="current">Home</a></div>
+    <div><a href="/radio/">Radio</a></div>
+    <div><a href="/cougsat-1/">CougSat-1</a></div>
+  </header>
+  <main>
+    <div class="about">
+      <div class="clearfix"><img src="logo.png">
+        <h1 class="text-title text-align-center">CougSat Ground</h1>
+        <p>CougSat Ground is the software to interface with the ground station hardware and provide a graphical user
+          interface into the testing, operation, and debugging of all CougSats created by Washington State University's
+          Cougs In Space. More information can be found on <a href="https://cougs.space"
+            target="_blank">https://cougs.space</a>.</p>
+      </div>
+      <h2 class="text-title">Release Notes</h2>
+      <div class="overflow-scroll">
+        <h3>V2.0.0</h3>
+        <ul>
+          <li>Refactored GUI to C++ using the Ehbanana framework</li>
+        </ul>
+      </div>
+    </div>
+    <div class="config">
+      <h2 class="text-title text-align-center">Configuration</h2>
+      <p><input id="upload" type="checkbox" class="eb-input"> Upload data to server</p>
+      <p>Station Name:<br><input id="name" type="text" class="text-monospace eb-input"></p>
+      <p>Latitude:<br><input id="lat" type="number" min="-90" max="90" class="text-monospace eb-input"> &deg;N</p>
+      <p>Longitude:<br><input id="long" type="number" min="-180" max="180" class="text-monospace eb-input"> &deg;E</p>
+      <p>Grid Locator:<br><input id="grid" type="text" class="text-monospace eb-input"></p>
+      <p>Altitude:<br><input id="alt" type="number" min="-500" max="9000" class="text-monospace eb-input"> m</p>
+      <p>Radio Description:<br><input id="desc" type="text" class="text-monospace eb-input"></p>
+    </div>
+  </main>
+</body>
+
+</html>
