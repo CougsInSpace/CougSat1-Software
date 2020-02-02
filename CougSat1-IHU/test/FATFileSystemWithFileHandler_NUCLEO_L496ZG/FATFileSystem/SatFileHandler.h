@@ -1,22 +1,26 @@
 #include "mbed.h"
 #include <cstdio>
-//#include "SDBlockDevice.h"
+#include "SDBlockDevice.h"
 #include "HeapBlockDevice.h"
 #include <FATFileSystem.h>
 #include <string>
 #include <fstream>
+#include <queue>
+#include "Mutex.h"
 
 //using namespace std;
 using std::string;
+using std::pair;
+using std::queue;
 
 // class that will handle all file read/write operations to a given medium on the sattelite
 // inherits from SDBlockDevice as I'm adding functionality to the class. 
 // though this does make the file handler limited to only an sd card over spi.
-class SatFileHandler : public HeapBlockDevice{
+class SatFileHandler : public SDBlockDevice{
 public:
 // create a SatFileHandler where the debug state can be enabled or disabled
 
-SatFileHandler(HeapBlockDevice &sd, bool debug = false):HeapBlockDevice(sd){
+/*SatFileHandler(SDBlockDevice &sd, bool debug = false):SDBlockDevice(sd){
     this->current = 0;
     this->priority = 0;
     
@@ -53,14 +57,14 @@ SatFileHandler(HeapBlockDevice &sd, bool debug = false):HeapBlockDevice(sd){
             pc->printf("CRITICAL ERROR\nFAILED MOUNT\nFAILED reformat");
         }
     }
-};
+};*/
 
-SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs, uint64_t hz= 1000000, bool crc_on = 0, bool debug = false):HeapBlockDevice(2048, 512){
+SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs, uint64_t hz= 1000000, bool crc_on = 0, bool debug = false):SDBlockDevice(mosi, miso, sclk, cs, hz, crc_on){
     this->current = 0;
     this->priority = 0;
 
     if(debug){
-        this->pc = new Serial(USBTX, USBRX);
+        this->pc = new Serial(SERIAL_TX, SERIAL_RX);
     }
 
     //make sure theres no error with the block device
@@ -84,7 +88,7 @@ SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs, uint64_t hz
     // check if the device is in the right format (FAT)
     status = this->mFs->mount(this->get_default_instance());
 
-    if (!status){
+    if (status){
         // check if the device reformatted properly if no give a critical error
         status = this->mFs->reformat(this->get_default_instance());
         if(pc && !status){
@@ -97,6 +101,16 @@ SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs, uint64_t hz
 
 bool writef(string filenameBase, const char *message);
 bool write(string filenameBase, string &message);
+bool writeStart();
+
+/*
+function to enqueue a message needed to stored on the SD card.
+input pair<fileBase, message>
+return true if enqueued; false if the queue is full
+
+USE FOR THREAD SAFETY
+*/
+bool enqueueMessage(pair<string, string> message);
 
 std::ofstream &read(string &fileNameFull);
 
@@ -104,6 +118,8 @@ std::ofstream &read(string &fileNameFull);
 private:
 
 FATFileSystem *mFs;
+
+
 
 // holds the current day of the sattelite will increment after each day
 uint16_t current;
@@ -120,5 +136,7 @@ bool clean();
 
 // checks for free memory
 bool check();
+
+queue<pair<string, string>> inputMessages;
 
 };
