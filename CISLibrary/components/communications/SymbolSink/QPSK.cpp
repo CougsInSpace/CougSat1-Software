@@ -25,9 +25,18 @@ void QPSK::add(uint8_t byte) {
   if (iqSink == nullptr)
     throw std::exception("QPSK iqSink is nullptr");
 
-  // Calculate next IQ for the four symbols, add to IQ sink
-  for (int i = 0; i < 10; ++i)
-    iqSink->addIQ((byte & 0xF0) << 8, (byte & 0x0F) << 12);
+  for (int8_t i = 6; i >= 0; i -= 2) {
+    uint8_t symbol = (byte >> i) & 0x03;
+    // Differential QPSK, the symbol rotates from the current
+    currentPhase = (currentPhase + symbol) & 0x03;
+
+    // Repeat the sample to get the correct samples per symbol
+    for (uint32_t sampleCount = 0; sampleCount < samplesPerSymbol;
+         ++sampleCount) {
+      iqSink->addIQ((currentPhase & 0x02) ? 0x7FFF : -0x8000,
+          (currentPhase & 0x01) ? 0x7FFF : -0x8000);
+    }
+  }
 }
 
 } // namespace SymbolSink

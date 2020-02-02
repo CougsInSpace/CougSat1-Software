@@ -12,6 +12,9 @@ public:
   ~QPSK();
 
   void add(uint8_t byte);
+
+private:
+  uint8_t currentPhase = 0;
 };
 
 } // namespace SymbolSink

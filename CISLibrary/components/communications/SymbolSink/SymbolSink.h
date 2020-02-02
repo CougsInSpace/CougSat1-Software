@@ -30,7 +30,8 @@ public:
    * @param sink
    */
   void setIQSink(IQSink::IQSink * sink) {
-    iqSink = sink;
+    iqSink           = sink;
+    samplesPerSymbol = iqSink->getSampleFrequency() / symbolFrequency;
   }
 
   /**
@@ -42,8 +43,9 @@ public:
   virtual void add(uint8_t byte) = 0;
 
 protected:
-  IQSink::IQSink * iqSink = nullptr;
-  const uint32_t   symbolFrequency;
+  IQSink::IQSink * iqSink           = nullptr;
+  const uint32_t   symbolFrequency  = 0;
+  uint32_t         samplesPerSymbol = 0;
 };
 
 } // namespace SymbolSink

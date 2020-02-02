@@ -30,6 +30,15 @@ public:
    */
   virtual void addIQ(int16_t dataI, int16_t dataQ) = 0;
 
+  /**
+   * @brief Get the sample frequency of the sink
+   *
+   * @return uint32_t samples per second
+   */
+  uint32_t getSampleFrequency() const {
+    return sampleFrequency;
+  }
+
 protected:
   const uint32_t sampleFrequency;
 };

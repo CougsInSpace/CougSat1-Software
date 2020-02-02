@@ -58,6 +58,9 @@ void TestSatellite::enqueueThread() {
  */
 void TestSatellite::addIQ(int16_t dataI, int16_t dataQ) {
   // Apply distortion and add to IQSource queue
+  // TODO variable distortion, phase noise, frequency offset, random jitter
+  dataI = (dataI >> 1) + (rand() & 0x1000);
+  dataQ = (dataQ >> 1) + (rand() & 0x1000);
   while (!iqBuffer.push({dataI, dataQ}) && running)
     // Block until element is pushed
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
