@@ -3,7 +3,7 @@
 
 #include "Subsystem.h"
 
-#include "mbed.h"
+#include <mbed.h>
 #include <BME280/BME280.h>
 
 /** 
@@ -94,20 +94,13 @@ public:
   bool isEnvironmentReady() const;
 
   /** 
-   * Turns on the LED inside the chamber.
+   * Sets the state of the LED to on when passed a 1 and off when
+   * passed a 0
    *  
    * TODO: Discuss whether this should be an internalized
    * method, and discuss when this should be used within this class.
    */
-  void turnOnLED();
-
-  /** 
-   * Turns off the LED inside the chamber.
-   * 
-   * TODO: Discuss whether this should be an internalized
-   * method, and discuss when this should be used within this class.
-   */
-  void turnOffLED();
+  void setLED(bool state);
 
   /** 
    * Activates the syringe for the germination process.
