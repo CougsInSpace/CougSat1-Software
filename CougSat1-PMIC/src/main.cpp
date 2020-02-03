@@ -1,6 +1,10 @@
 #include <mbed.h>
 
+<<<<<<< HEAD
 #include <ADC/AD7689.h>
+=======
+#include <ADC/AD7291.h>
+>>>>>>> ADCS-CONTROL-LOOP
 #include <CISConsole.h>
 
 #include "Configuration.h"

@@ -2,8 +2,6 @@
 #define _SRC_CONFIGURATION_H_
 
 /*********************************** Timing ***********************************/
-#define PERIOD_MS_IDLE_SLEEP (10)    // Sleep time during idle
-#define PERIOD_MS_PERIODIC (5000)    // The periodic event
-#define PERIOD_MS_CONTROL_LOOP (200) // The control loop (update actuators)
-
+#define PERIOD_MS_POLLING_SLEEP (1)    // Minimum wait for polling
+#define MESSAGELENGTH (9) //9 byte messages will handle all possible communication
 #endif /* _SRC_CONFIGURATION_H_ */
