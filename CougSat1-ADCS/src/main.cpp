@@ -7,10 +7,10 @@
  *
  * @return mbed_error_status_t
  */
-mbed_error_status_t run() {
-  uint32_t now               = HAL_GetTick();
-  uint32_t nextControlLoop   = now + PERIOD_MS_CONTROL_LOOP;
-  uint32_t nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
+//  mbed_error_status_t run() {
+//  uint32_t now               = HAL_GetTick();
+//  uint32_t nextControlLoop   = now + PERIOD_MS_CONTROL_LOOP;
+//  uint32_t nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
 
 /**
  * Program start routine

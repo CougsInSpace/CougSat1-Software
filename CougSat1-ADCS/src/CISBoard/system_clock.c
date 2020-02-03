@@ -1,3 +1,6 @@
+#ifndef system_clock
+#define system_clock
+
 /* mbed Microcontroller Library
 * Copyright (c) 2006-2017 ARM Limited
 *
@@ -368,3 +371,5 @@ uint8_t SetSysClock_PLL_MSI(void)
     return 1; // OK
 }
 #endif /* ((CLOCK_SOURCE) & USE_PLL_MSI) */
+
+#endif
