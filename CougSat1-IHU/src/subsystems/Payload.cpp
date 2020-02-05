@@ -12,11 +12,22 @@ Payload::Payload() {}
  */
 Payload::~Payload() {}
 
-/**
- * @brief Initialize the Payload
- *
- * @return mbed_error_status_t
- */
+float Payload::getCO2Concentration() const {}
+
+float Payload::getPressure() const {}
+
+float Payload::getTemperature() const {}
+
+float Payload::getHumidity() const {}
+
+bool Payload::isEnvironmentReady() const {}
+
+void Payload::setLED(bool state) {}
+
+void Payload::activateSyringe() {}
+
+void Payload::takePicture() {}
+
 mbed_error_status_t Payload::initialize() {
   return MBED_ERROR_UNSUPPORTED;
 }
