@@ -2,14 +2,15 @@
 #define _LIBRARY_DRIVER_GPS_GPS_H_
 
 #include <mbed.h>
+#include "../tools/CISConsole.h"
 
-struct GPSData_t {
+typedef struct gpsData_t {
   double   latitude    = nan("");
   double   longitude   = nan("");
   double   altitude    = nan("");
   double   groundSpeed = nan("");
   uint32_t time        = 0;
-};
+}GPSData_t;
 
 class GPS {
 public:

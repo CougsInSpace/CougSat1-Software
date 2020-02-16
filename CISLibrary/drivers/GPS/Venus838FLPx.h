@@ -9,8 +9,8 @@
 
 class Venus838FLPx : GPS {
 public:
-  Venus838FLPx(const Venus838FLPx &) = delete;
-  Venus838FLPx & operator=(const Venus838FLPx &) = delete;
+  Venus838FLPx(const Venus838FLPx &copy);
+  Venus838FLPx & operator=(const Venus838FLPx &);
 
   Venus838FLPx(Serial & serial, PinName reset, PinName pulse);
   ~Venus838FLPx();
