@@ -67,8 +67,8 @@ void RTLSDR::asyncCallback(uint8_t * buf, uint32_t len, void * context) {
       }
       PairInt16_t pair = {static_cast<int16_t>(*buf) << 8,
           static_cast<int16_t>(*(buf + 1)) << 8};
-      // while (thisCTX->running && !thisCTX->iqBuffer.push(pair))
-      //   std::this_thread::sleep_for(millis_t(1));
+      while (thisCTX->running && !thisCTX->iqBuffer.push(pair))
+        ; // Try again
 
       buf += 2;
       len -= 2;
