@@ -14,15 +14,14 @@ public:
   DRV8837(PinName fwd, PinName rev, PinName nSleep);
   ~DRV8837();
 
-  mbed_error_status_t set(double value, bool blocking = true);
-  mbed_error_status_t stop(bool brake = true, bool blocking = true);
+  mbed_error_status_t set(double value, bool /*blocking*/ = true);
+  mbed_error_status_t stop(bool brake = true, bool /*blocking*/ = true);
+  void                setSleep(bool sleep);
 
 private:
   PwmOut     fwd;
   PwmOut     rev;
   DigitalOut nSleep;
-
-  void setSleep(bool sleep);
 };
 
 #endif /* _LIBRARY_DRIVER_HBRIDGE_DRV8837_H_ */

@@ -7,15 +7,17 @@
  * @param rev pin
  * @param sleep pin
  */
-DRV8837::DRV8837(PinName fwd, PinName rev, PinName nSleep) :
-  fwd(fwd), rev(rev), nSleep(nSleep, 0) {
+DRV8837::DRV8837(PinName fwd, PinName rev, PinName nSleep,
+    uint8_t period = DRV8837_PWM_PERIOD_US) :
+  fwd(fwd),
+  rev(rev), nSleep(nSleep, 0) {
   // set the pwm periods
-  this->fwd.period_us(DRV8837_PWM_PERIOD_US);
-  this->rev.period_us(DRV8837_PWM_PERIOD_US);
+  this->fwd.period_us(period);
+  this->rev.period_us(period);
 }
 
 /**
- * @brief Destroy the DRV8837::DRV8837 object
+ * @brief Eradicate the DRV8837::DRV8837 object
  *
  */
 DRV8837::~DRV8837() {}
@@ -27,9 +29,7 @@ DRV8837::~DRV8837() {}
  * @param blocking parameter ignored on the DRV8837 implementation
  * @return mbed_error_status_t
  */
-mbed_error_status_t DRV8837::set(double value, bool blocking) {
-  this->setSleep(false);
-
+mbed_error_status_t DRV8837::set(double value, bool /*blocking*/) {
   if (value < 0) {
     this->rev = -1.0f * value;
     this->fwd = 0.0f;
@@ -38,8 +38,6 @@ mbed_error_status_t DRV8837::set(double value, bool blocking) {
     this->rev = 0.0f;
   }
 
-  this->setSleep(true);
-
   return MBED_SUCCESS;
 }
 
@@ -47,13 +45,11 @@ mbed_error_status_t DRV8837::set(double value, bool blocking) {
  * @brief Stop the output, brake or coast
  *
  * @param brake will short output if true, high impedance if false
- * @param blocking parameter ignored on the DRV8837 implementation
+
  * @return mbed_error_status_t
  */
-mbed_error_status_t DRV8837::stop(bool brake, bool blocking) {
-  this->setSleep(false);
+mbed_error_status_t DRV8837::stop(bool brake, bool /*blocking*/) {
   this->rev = this->fwd = (brake ? 1.0f : 0.0f);
-  this->setSleep(true);
 
   return MBED_SUCCESS;
 }
