@@ -2,6 +2,8 @@
 #include <stdio.h>
 typedef unsigned char  u8;
 typedef unsigned int  u32;
+
+//Remake the program to use big endian. So Vibes 
 class Packet
 {
 private:
@@ -46,92 +48,55 @@ Packet::~Packet()
 }
 
 void Packet::SetSender(u32 S){
-    if (S<8){
-sender = S;     //[7|6|5|4|3|2|1|0] bit ordering
-u8 T = Data[0];
-T = T >> 3;    //Clear up the sender region
-T = T << 3;
-T = T|S;       //Copy S into Sender region
-Data[0] = T;      //Overwrite 1st byte of Data
-    
-    }
-}
+    if (S>=8){return;}
+
+Data[0] = Data[0] && 31;//Zero out sender in data
+S = S <<5;//Push up s to the right position
+Data[0] = Data[0] | S;
+}//Big endian 
 
 u32 Packet::GetSender(){
-u8 T = Data[0];
 u32 S = 0;
-T = T >> 5;
-
-S = S|T;
-
+S = (Data[0] >> 5) & 0x07;
 return S;
-}
+} //Big Endian
 
 void Packet::SetRecipient(u32 R){
-///Store sender
-
+///check recipient value. 
 if(R > 7){
 return;
 }
-recipient = R;
-
-u8 T = Data[0];
-u8 tempsender = 0;
-T = T << 5;
-T = T >> 5;
-tempsender = T; //Store just the sender bits
-
-T = Data[0];
-T = T >> 6;
-T = T << 3;//Make space for recipient. 
-T = T | R;//Place recipient
-
-T = T << 3;//Make space for sender. 
-T = T | tempsender; //Place sender
-
-Data[0] = T;
-
-}
+Data[0] = Data[0] & 227;
+R = R << 2;
+Data[0] = Data[0] & R;
+}//big endian 
 
 u32 Packet::GetRecipient(){
-    u8 T = Data[0];
-    T = T << 2; //Cut 2 greatest length bits
-    T = T >> 5; //Cut sender and place recipient to lowest bit placement
-
     u32 R = 0;
-    R = R|T;
+    R = (Data[0] >>2) & 0x07;//Get three bits out. 
     return R;
-}
+}//big endian
 
 u32 Packet::GetLength(){
 u32 Product = 0;
-u8 T = Data[0];
-
-T = T>>6; //Leave only the greatest 2 bits.
-
-Product = T | Product; //Place 2 greatest bits of length into product 
-Product = Product << 8; //Push up the greatest two bits of length by 8 bits
-Product = Product | Data[1];//OR the first 8 bits of length to product
-
+Product = (Data[0]) & 0x03;//Grab lowest two bits. 
+Product <<= 8;//Push most iimportant bits up. 
+Product |= Data[1];//Grab 8 lowest bits. 
 return Product;
-}
+}//big endian
 
 void Packet::SetLength(u32 L){
 if(L > 1024){
     return;//Data can only be 1024 at most 
 }
 length = L;
+Data[1] = 0;//zero out lowest 8 bits. 
+Data[0] = Data[0] & 252;//zero out the 2 most important bits.
 
-u32 T = L; 
-Data[1] = 0; 
-Data[1] = Data[1] | L;//OR the lower 8 bits of Length to Data[1]
-
-L = L >> 8; // only greatest two bits remain
-L = L << 6; //Place greatest two bits into bits 6 and 7
-Data[0] = Data[0] << 2; 
-Data[0] = Data[0] >> 2;//Remove old greatest two bits
-
-Data[0] = Data[0] | L;
+Data[1] = Data[1] | L;
+L = L >> 8;
+Data[0] = Data[0] & L;
+//Big endian 
 }
 
 void Packet::OverwriteData(u8 Input, u32 Index){
@@ -178,4 +143,6 @@ void Testpacket::Test(u32 recipient,u32 sender,u32 length){
 int main(){
 Testpacket T;
 T.Test(2,3,19);
+
+int x = 0x03;
 }
