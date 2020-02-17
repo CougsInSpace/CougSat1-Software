@@ -40,3 +40,18 @@ main {
 .chart {
   flex-grow: 1;
 }
+
+.button-1 {
+  box-sizing: border-box;
+}
+
+#radio-banner:empty{
+  display: none;
+}
+
+#radio-banner {
+  font-size: 3rem;
+  height: 4rem;
+  background: #981E32;
+  background: var(--color-tertiary);
+}

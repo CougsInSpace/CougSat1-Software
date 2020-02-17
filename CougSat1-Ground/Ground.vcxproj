@@ -19,8 +19,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG;EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\spdlog\include;lib\rtl-sdr\include;..\CISLibrary;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;GROUND;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <Link>
@@ -30,8 +30,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\ehbanana\lib\FruitBowl\include;lib\spdlog\include;lib\rtl-sdr\include;</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>EB_USE_STD_STRING;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\spdlog\include;lib\rtl-sdr\include;..\CISLibrary;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GROUND;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
     </ClCompile>
     <Link>
@@ -40,19 +40,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\**\*.cpp" />
-    <ClCompile Include="lib\ehbanana\lib\FruitBowl\include\**\*.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\*.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\SymbolSink\*.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\SymbolSource\*.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\IQSource\WAV.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\IQSource\RTLSDR.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\**\*.h" />
-    <ClInclude Include="lib\ehbanana\lib\FruitBowl\include\**\*.h" />
     <ClInclude Include="lib\spdlog\include\**\*.h" />
     <ClInclude Include="lib\rtl-sdr\include\rtl-sdr.h" />
     <ClInclude Include="lib\rtl-sdr\include\rtl-sdr_export.h" />
+    <ClInclude Include="lib\AudioFile\AudioFile.h" />
+    <ClInclude Include="..\CISLibrary\tools\*.h" />
+    <ClInclude Include="..\CISLibrary\components\communications\**\*.h" />
   </ItemGroup>
   <Target Name="CopyFiles">
     <Copy SourceFiles="lib\ehbanana\include\Ehbanana.js" DestinationFiles="http\lib\Ehbanana.js"/>
-    <Copy SourceFiles="lib\ehbanana\bin\Ehbanana.dll" DestinationFiles="bin\Ehbanana.dll"/>
-    <Copy SourceFiles="$(OutDir)\Ground.exe" DestinationFiles="bin\Ground.exe"/>
+    <Copy SourceFiles="lib\ehbanana\bin\Ehbanana.dll" DestinationFiles="Ehbanana.dll"/>
+    <Copy SourceFiles="$(OutDir)\Ground.exe" DestinationFiles="Ground.exe"/>
   </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Targets" />
 </Project>

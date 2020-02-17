@@ -1,19 +1,13 @@
 #ifndef _GUI_ROOT_H_
 #define _GUI_ROOT_H_
 
-#include <ehbanana/Page.h>
-
 namespace GUI {
 
-class Root : public Ehbanana::Page {
+class Root {
 public:
-  Root(EBGUI_t gui);
-  ~Root();
+  Root() = delete;
 
-  Result onLoad();
-  Result sendUpdate();
-
-  Result handleInput(const EBMessage_t & msg);
+  static void __stdcall callback(const char * id, const char * value);
 
 private:
 };

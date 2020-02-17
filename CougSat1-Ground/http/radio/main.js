@@ -42,6 +42,8 @@ function setup() {
   var context =
       document.getElementById("constellation-diagram").getContext("2d");
   chart = new Chart(context, config);
+  document.getElementById("rx-source")
+      .addEventListener("input", rxSourceListener);
 }
 window.addEventListener("DOMContentLoaded", setup);
 
@@ -51,12 +53,25 @@ window.addEventListener("DOMContentLoaded", setup);
  * @param {DOMElement} element
  */
 function updateConstellation(element) {
-  for (var i = 0; i < 100; i++) {
-    var I = element["dataI-" + i];
-    var Q = element["dataQ-" + i];
+  for (var index = 0; index < 200; index++) {
+    var i = element[index * 2];
+    var q = element[index * 2 + 1];
 
-    config.data.datasets[0].data[i] = {x: I, y: Q};
+    config.data.datasets[0].data[index] = {x: i, y: q};
   }
-  console.log(config.data.datasets[0].data);
   chart.update();
+}
+
+/**
+ * Enables / disables the IQ file button when the source is / isn't IQ File
+ *
+ * @param {DOMElement} element
+ */
+function rxSourceListener(element) {
+  document.getElementById("iq-file-row").style.display = "none";
+  document.getElementById("iq-test-row").style.display = "none";
+  if (element.target.value == "IQ File")
+    document.getElementById("iq-file-row").style.display = "";
+  else if (element.target.value == "Test Telemetry")
+    document.getElementById("iq-test-row").style.display = "";
 }

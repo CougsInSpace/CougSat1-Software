@@ -8,12 +8,13 @@
       "name": "(Windows) Launch",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/Ground.exe",
+      "program": "${workspaceFolder}/Ground.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
-      "externalConsole": true
+      "externalConsole": true,
+      "preLaunchTask": "build"
     }
   ]
 }

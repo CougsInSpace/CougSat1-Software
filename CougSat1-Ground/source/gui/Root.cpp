@@ -1,68 +1,20 @@
 #include "Root.h"
 
+#include "Hash.h"
+
 #include <spdlog/spdlog.h>
 
 namespace GUI {
 
 /**
- * @brief Construct a new Root:: Root object
+ * @brief Process input from the GUI
  *
- * @param gui
+ * @param id of the triggering element
+ * @param value of the triggering element
  */
-Root::Root(EBGUI_t gui) : Page(gui, "") {}
-
-/**
- * @brief Destroy the Root:: Root object
- *
- */
-Root::~Root() {}
-
-/**
- * @brief Handle when the page first loads
- * Likely send initial values
- *
- * @return Result
- */
-Result Root::onLoad() {
+void __stdcall Root::callback(const char * id, const char * value) {
   try {
-    createNewEBMessage();
-
-    enqueueEBMessage();
-  } catch (const std::exception & e) {
-    return ResultCode_t::EXCEPTION_OCCURRED + e.what();
-  }
-
-  return sendUpdate();
-}
-
-/**
- * @brief Send an update to the page
- * Likely send real time values
- *
- * @return Result
- */
-Result Root::sendUpdate() {
-  try {
-    createNewEBMessage();
-
-    enqueueEBMessage();
-  } catch (const std::exception & e) {
-    return ResultCode_t::EXCEPTION_OCCURRED + e.what();
-  }
-  return ResultCode_t::SUCCESS;
-}
-
-/**
- * @brief Handle the input from the GUI
- *
- * @param msg to handle
- * @return Result
- */
-Result Root::handleInput(const EBMessage_t & msg) {
-  try {
-    createNewEBMessage();
-
-    switch (msg.id.get()) {
+    switch (Hash::calculateHash(id)) {
       case Hash::calculateHash("upload"):
       case Hash::calculateHash("name"):
       case Hash::calculateHash("lat"):
@@ -70,18 +22,18 @@ Result Root::handleInput(const EBMessage_t & msg) {
       case Hash::calculateHash("grid"):
       case Hash::calculateHash("alt"):
       case Hash::calculateHash("desc"):
-        // TODO implement settings changes
-        break;
+        return spdlog::warn("TODO implement Root settings changes");
       default:
-        spdlog::info("Unknown id for Root");
-        break;
+        return spdlog::warn("Unknown Root callback {} is {}", id, value);
     }
-
-    enqueueEBMessage();
   } catch (const std::exception & e) {
-    return ResultCode_t::EXCEPTION_OCCURRED + e.what();
+    spdlog::error("Root::callback encountered: {}", e.what());
+    try {
+      // sendUpdate();// Synchronize GUI TODO
+    } catch (const std::exception & e) {
+      spdlog::error("Root::callback backup sendUpdate failed: {}", e.what());
+    }
   }
-  return ResultCode_t::SUCCESS;
 }
 
 } // namespace GUI
