@@ -28,13 +28,28 @@ private:
   void loadPayloadData(uint8_t code);
   void loadCRC(uint8_t code);
   void loadEndOfFrame(uint8_t code);
+  inline uint8_t loadCode(uint8_t code) {
+    curCode |= (code << unusedBitsPosition) >> (8 - codeSize + bufferedBitsCount);
+  }
+
+  inline bool hasNextCode(){ return read6 && bufferedBitsCount == 6 || !read6 && bufferedBitsCount >= 4;}
+  void bufferCode(uint8_t code);
 
   uint8_t payloadData[MAX_PAYLOAD];
+
   size_t  length;
 
+
   uint8_t curCode;
-  uint8_t offset;
+
+  //counts the number of bits that already loaded into curCode
+  uint8_t bufferedBitsCount;
+
+  //references the position of the first bit that has not been loaded into the buffer
+  uint8_t unusedBitsPosition;
   bool read6;
+
+  uint8_t codeSize;
   
   /* This is a multi purpose index that can mean different things depending on the State.
    *  it usually counts the occurences of some key feature or item

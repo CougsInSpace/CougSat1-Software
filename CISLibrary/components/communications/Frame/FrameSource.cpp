@@ -37,6 +37,9 @@ void FrameSource::reset(){
  */
 void FrameSource::add(uint8_t byte) {
 
+  while(hasNextCode){
+    byte = ;
+
   switch (state)
   {
   case State_t::PREAMBLE:
@@ -59,28 +62,41 @@ void FrameSource::add(uint8_t byte) {
     loadEndOfFrame(byte);
     break;
   }
-}
 
-void FrameSource:loadPreamble(uint8_t code){
-
-}
-
-uint8_t FrameSource:loadBit(uint8_t code){
-  curCode |= code >> (offset);
-  if(read6){
-    offset = (offset + 6) % 8;
-
-  } else {
-    offset = (offset + 4) % 8;
+  bufferCode(byte);
   }
-  
+}
 
+void FrameSource::loadPreamble(uint8_t code){
+  return;
+}
 
+void FrameSource::bufferCode(uint8_t code){
+  uint8_t unbufferedBitsCount = 8 - bufferedBitsCount;
+  if(codeSize == 6){
 
+    //shift the first non used bit to the beggining of our code variable
+    if(unbufferedBitsCount == 2){
+      code = 0x00001111 & code << 2;
+    } else {
+      code = 0x00001111 & code >> (unbufferedBitsCount - 4);
+    }
+
+    bufferedBitsCount = 
+
+        
+    
+    curCode = (code >> 4);
+
+    bufferedBitsCount = 4 - bufferedBitsCount;
+
+    codeSize = 4;
+  } else {
+
+    codeSize = 6;
+  }
 
   read6 = !read6;
-
-
 }
 
 void FrameSource:matchStartOfCode(uint8_t code){}
