@@ -7,7 +7,8 @@ typedef unsigned int  u32;
 class Packet
 {
 private:
-    u8 Data[1026]; //Payload is 1024bytes max
+    const static u32 Maxsize = 1024 +2;
+    u8 Data[Maxsize]; //Payload is 1024bytes max
     u32 length;    //Length is 10bits
     u32 sender;    
     u32 recipient; //Combined Sender and recipient IDs are 3 bytes each
@@ -31,17 +32,26 @@ public:
 };
 
 Packet::Packet(u32 sender,u32 recipient,u32 length){
-    for(int i =0;i<1026;i++){
+    for(int i =0;i<Maxsize;i++){
         Data[i]=0;
     }
 }
 
 Packet::Packet()
 {
-    for(int i =0;i<1028;i++){
+    for(int i =0;i<Maxsize;i++){
         Data[i]=0;
     }
 }
+
+/*
+Packet::Packet(FrameSource F)
+{
+    for(int i=0;i<Maxsize & F.loadPayloadData(i);i++)
+    {
+        Data[i]=F.loadPayloadData(i);
+    }
+}*/
 
 Packet::~Packet()
 {
@@ -80,7 +90,7 @@ u32 Packet::GetRecipient(){
 u32 Packet::GetLength(){
 u32 Product = 0;
 Product = (Data[0]) & 0x03;//Grab lowest two bits. 
-Product <<= 8;//Push most iimportant bits up. 
+Product <<= 8;//Push most important bits up. 
 Product |= Data[1];//Grab 8 lowest bits. 
 return Product;
 }//big endian
