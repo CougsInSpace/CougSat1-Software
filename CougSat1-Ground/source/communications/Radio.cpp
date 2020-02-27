@@ -1,6 +1,6 @@
 #include "Radio.h"
 
-#include "components/communications/Frame.h"
+#include "components/communications/Frame/FrameSource.h"
 #include "components/communications/SymbolSink/QPSK.h"
 #include "components/communications/SymbolSource/QPSK.h"
 
@@ -96,7 +96,7 @@ void Radio::setTestMode(uint8_t distortionFactor) {
  */
 void Radio::loopRX() {
   try {
-    std::unique_ptr<Frame> frame = std::make_unique<Frame>();
+    std::unique_ptr<Frame::FrameSource> frame = std::make_unique<Frame::FrameSource>();
     while (running) {
       try {
         const std::lock_guard<std::mutex> lock(mutexRX);
@@ -115,7 +115,7 @@ void Radio::loopRX() {
           } else
             currentSession->add(std::move(frame));
 
-          frame = std::make_unique<Frame>();
+          frame = std::make_unique<Frame::FrameSource>();
         }
       } catch (const std::underflow_error & /*e*/) {
         spdlog::info("No RX signal");

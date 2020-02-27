@@ -21,7 +21,6 @@ FrameSource::~FrameSource() {}
 void FrameSource::reset(){
   length = 0;
   curCode = 0;
-  offset = 0;
   read6 = true;
   index = 0;
   state = State_t::PREAMBLE;
@@ -37,8 +36,8 @@ void FrameSource::reset(){
  */
 void FrameSource::add(uint8_t byte) {
 
-  while(hasNextCode){
-    byte = ;
+  while(hasNextCode()){
+    loadCode(byte);
 
   switch (state)
   {
@@ -71,6 +70,11 @@ void FrameSource::loadPreamble(uint8_t code){
   return;
 }
 
+bool FrameSource::hasNextCode(){
+  //TODO make this work
+  return true;
+}
+
 void FrameSource::bufferCode(uint8_t code){
   uint8_t unbufferedBitsCount = 8 - bufferedBitsCount;
   if(codeSize == 6){
@@ -99,13 +103,13 @@ void FrameSource::bufferCode(uint8_t code){
   read6 = !read6;
 }
 
-void FrameSource:matchStartOfCode(uint8_t code){}
+void FrameSource::matchStartOfCode(uint8_t code){}
 
-void FrameSource:loadPayloadData(uint8_t code){}
+void FrameSource::loadPayloadData(uint8_t code){}
 
-void FrameSource:loadCRC(uint8_t code){}
+void FrameSource::loadCRC(uint8_t code){}
 
-void FrameSource:loadEndOfFrame(uint8_t code){}
+void FrameSource::loadEndOfFrame(uint8_t code){}
 
 /**
  * @brief Check if the frame is complete
@@ -115,7 +119,7 @@ void FrameSource:loadEndOfFrame(uint8_t code){}
  * @return false otherwise
  */
 bool FrameSource::isDone() {
-  return stage == 5;
+  return state == State_t::DONE;
 }
 
 // /**
@@ -126,5 +130,6 @@ bool FrameSource::isDone() {
 // uint8_t FrameSource::getNextTXByte() {
 //   return -1;
 // }
-    } // namespace FrameSource
+
+} // namespace FrameSource
 } // namespace Communications

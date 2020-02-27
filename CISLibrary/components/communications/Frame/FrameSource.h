@@ -28,11 +28,31 @@ private:
   void loadPayloadData(uint8_t code);
   void loadCRC(uint8_t code);
   void loadEndOfFrame(uint8_t code);
-  inline uint8_t loadCode(uint8_t code) {
+  inline bool loadCode(uint8_t code) {
+    //Switch from reading 4 to 6 or vice versa
+    codeSize = codeSize == 6 ? 4 : 6;
+
     curCode |= (code << unusedBitsPosition) >> (8 - codeSize + bufferedBitsCount);
+
+    uint8_t oldBufferedBitsCount = bufferedBitsCount;
+    bufferedBitsCount += (8 - unusedBitsPosition);
+    unusedBitsPosition += codeSize - oldBufferedBitsCount;
+
+    //if we have fully populated the buffer, 
+    if(bufferedBitsCount >= codeSize){
+      bufferedBitsCount = codeSize;
+      return true;
+    } else {
+      unusedBitsPosition = 0;
+
+      //Return code size to previous state because the buffer was not fully loaded
+      codeSize = codeSize == 6 ? 4 : 6;
+      return false;
+    }
   }
 
-  inline bool hasNextCode(){ return read6 && bufferedBitsCount == 6 || !read6 && bufferedBitsCount >= 4;}
+  bool hasNextCode();
+
   void bufferCode(uint8_t code);
 
   uint8_t payloadData[MAX_PAYLOAD];

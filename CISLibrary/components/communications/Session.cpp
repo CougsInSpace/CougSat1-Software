@@ -19,7 +19,7 @@ Session::~Session() {}
  *
  * @param frame
  */
-void Session::add(std::unique_ptr<Frame> frame) {}
+void Session::add(std::unique_ptr<Frame::FrameSource> frame) {}
 
 /**
  * @brief Get the session ID
@@ -45,7 +45,7 @@ bool Session::isTXEmpty() {
  *
  * @return std::unique_ptr<Frame>
  */
-std::unique_ptr<Frame> Session::getNextFrame() {
+std::unique_ptr<Frame::FrameSource> Session::getNextFrame() {
   return nullptr;
 }
 

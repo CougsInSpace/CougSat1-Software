@@ -45,6 +45,8 @@
     <ClCompile Include="..\CISLibrary\components\communications\SymbolSource\*.cpp" />
     <ClCompile Include="..\CISLibrary\components\communications\IQSource\WAV.cpp" />
     <ClCompile Include="..\CISLibrary\components\communications\IQSource\RTLSDR.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\Frame\FrameSource.cpp" />
+    <ClCompile Include="..\CISLibrary\components\communications\Frame\Codes\*.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\**\*.h" />

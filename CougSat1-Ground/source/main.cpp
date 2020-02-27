@@ -8,6 +8,8 @@
 
 #include <Windows.h>
 
+#include <stdio.h>
+
 #include "communications/Radio.h"
 #include "gui/GUI.h"
 #include "gui/Radio.h"
@@ -20,6 +22,8 @@
  * @param char * string
  */
 void __stdcall logEhbanana(const EBLogLevel_t level, const char * string) {
+  printf("Hello world!");
+  
   switch (level) {
     case EBLogLevel_t::EB_DEBUG:
       // spdlog::debug(string);
