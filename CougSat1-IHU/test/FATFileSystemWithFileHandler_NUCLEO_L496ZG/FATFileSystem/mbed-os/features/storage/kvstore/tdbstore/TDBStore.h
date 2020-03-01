@@ -61,8 +61,7 @@ public:
      *        the available data and clean corrupted and erroneous records.
      *
      * @returns MBED_SUCCESS                        Success.
-     *          MBED_ERROR_READ_FAILED              Unable to read from media.
-     *          MBED_ERROR_WRITE_FAILED             Unable to write to media.
+     * @returns Negative error code on failure.
      */
     virtual int init();
 
@@ -366,8 +365,8 @@ private:
      *
      * @param[in]  area                   Area.
      * @param[in]  offset                 Offset of record in area.
-     * @param[in]  key                    Key - must not include '*' '/' '?' ':' ';' '\' '"' '|' ' ' '<' '>' '\'.
-     * @param[in]  data_buf               Data buffer.
+     * @param[out] key                    Key - must not include '*' '/' '?' ':' ';' '\' '"' '|' ' ' '<' '>' '\'.
+     * @param[out] data_buf               Data buffer.
      * @param[in]  data_buf_size          Data buffer size.
      * @param[out] actual_data_size       Actual data size.
      * @param[in]  data_offset            Offset in data.

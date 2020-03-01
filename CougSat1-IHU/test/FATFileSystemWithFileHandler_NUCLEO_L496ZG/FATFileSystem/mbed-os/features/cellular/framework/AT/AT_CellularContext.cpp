@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
 #include "AT_CellularContext.h"
 #include "AT_CellularNetwork.h"
 #include "AT_CellularStack.h"
@@ -213,14 +214,44 @@ NetworkStack *AT_CellularContext::get_stack()
     return _stack;
 }
 
+nsapi_error_t AT_CellularContext::get_netmask(SocketAddress *address)
+{
+    return NSAPI_ERROR_UNSUPPORTED;
+}
+
 const char *AT_CellularContext::get_netmask()
 {
     return NULL;
 }
 
+nsapi_error_t AT_CellularContext::get_gateway(SocketAddress *address)
+{
+    return NSAPI_ERROR_UNSUPPORTED;
+}
+
 const char *AT_CellularContext::get_gateway()
 {
     return NULL;
+}
+
+nsapi_error_t AT_CellularContext::get_ip_address(SocketAddress *address)
+{
+    if (!address) {
+        return NSAPI_ERROR_PARAMETER;
+    }
+#if NSAPI_PPP_AVAILABLE
+    address->set_ip_address(nsapi_ppp_get_ip_addr(_at.get_file_handle()));
+    return NSAPI_ERROR_OK;
+#else
+    if (!_stack) {
+        _stack = get_stack();
+    }
+    if (_stack) {
+        _stack->get_ip_address(address);
+        return NSAPI_ERROR_OK;
+    }
+    return NSAPI_ERROR_NO_CONNECTION;
+#endif
 }
 
 const char *AT_CellularContext::get_ip_address()

@@ -1,8 +1,6 @@
 #include "SatFileHandler.h"
 
 SatFileHandler::~SatFileHandler(){
-    
-    
 }
 
 bool SatFileHandler::writef(string filenameBase, const char *message){
@@ -56,19 +54,22 @@ std::ofstream &SatFileHandler::read(string &fileNameFull){
     file = new std::ofstream(fileNameFull);
 
     if(!file->is_open()){
-        
+        pc->printf("ERROR: File cannot be found");
     }
 
     return *file;
 }
 
-
-bool SatFileHandler::clean(){
-    DIR *d = opendir("/fs/");
+// 
+bool SatFileHandler::clean(/*string dir*/){
+    /*DIR *d = opendir("/fs/");
     struct dirent ent;
-    if (d->read(&ent)){}
+    if (d->read(&ent)){
+        DIR *temp = opendir("/fs/" + dir);
+        remove(temp);
+    }
 
-    this->priority++;
+    this->priority++; */
     return true;
 }
 
@@ -91,5 +92,6 @@ bool SatFileHandler::enqueueMessage(pair<string, string> message){
 
     //mute.lock();
     inputMessages.push(message);
+    return true;
     //mute.unlock();
 }

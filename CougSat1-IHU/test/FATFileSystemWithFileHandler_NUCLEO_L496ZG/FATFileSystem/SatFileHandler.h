@@ -132,7 +132,7 @@ Serial *pc;
 
 bool status;
 
-bool clean();
+bool clean(/*string dir*/);
 
 // checks for free memory
 bool check();

@@ -74,7 +74,7 @@ GPIO_TypeDef *Set_GPIO_Clock(uint32_t port_idx)
 #endif
 #if defined GPIOG_BASE
         case PortG:
-#if defined TARGET_STM32L4
+#if defined PWR_CR2_IOSV /* TARGET_STM32L4 / TARGET_STM32L5 */
             __HAL_RCC_PWR_CLK_ENABLE();
             HAL_PWREx_EnableVddIO2();
 #endif
@@ -156,8 +156,7 @@ void gpio_mode(gpio_t *obj, PinMode mode)
 inline void gpio_dir(gpio_t *obj, PinDirection direction)
 {
 #if defined(DUAL_CORE)
-    uint32_t timeout = HSEM_TIMEOUT;
-    while (LL_HSEM_1StepLock(HSEM, CFG_HW_GPIO_SEMID) && (--timeout != 0)) {
+    while (LL_HSEM_1StepLock(HSEM, CFG_HW_GPIO_SEMID)) {
     }
 #endif /* DUAL_CORE */
 

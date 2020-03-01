@@ -378,6 +378,13 @@ void CellularStateMachine::state_device_ready()
             if (device_ready()) {
                 _status = 0;
                 enter_to_state(STATE_SIM_PIN);
+            } else {
+                tr_warning("Power cycle CellularDevice and restart connecting");
+                (void) _cellularDevice.soft_power_off();
+                (void) _cellularDevice.hard_power_off();
+                _status = 0;
+                _is_retry = true;
+                enter_to_state(STATE_INIT);
             }
         }
     }

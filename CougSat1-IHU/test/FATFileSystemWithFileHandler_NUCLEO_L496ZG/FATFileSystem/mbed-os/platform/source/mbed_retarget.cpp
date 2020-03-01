@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <mstd_mutex>
 #include <time.h>
 #include "platform/platform.h"
 #include "platform/FilePath.h"
@@ -32,6 +33,7 @@
 #include "drivers/UARTSerial.h"
 #include "hal/us_ticker_api.h"
 #include "hal/lp_ticker_api.h"
+#include "hal/static_pinmap.h"
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
@@ -75,6 +77,12 @@ asm(" .global __use_full_stdio\n");
 #   define PREFIX(x)    x
 #endif
 
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+#   define RETARGET_OPEN_MAX OPEN_MAX
+#else
+#   define RETARGET_OPEN_MAX        3
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+
 #define FILE_HANDLE_RESERVED    ((FileHandle*)0xFFFFFFFF)
 
 /**
@@ -104,20 +112,25 @@ extern const char __stderr_name[] = "/stderr";
 unsigned char *mbed_heap_start = 0;
 uint32_t mbed_heap_size = 0;
 
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+
 /* newlib has the filehandle field in the FILE struct as a short, so
  * we can't just return a Filehandle* from _open and instead have to
  * put it in a filehandles array and return the index into that array
  */
-static FileHandle *filehandles[OPEN_MAX] = { FILE_HANDLE_RESERVED, FILE_HANDLE_RESERVED, FILE_HANDLE_RESERVED };
-static char stdio_in_prev[OPEN_MAX];
-static char stdio_out_prev[OPEN_MAX];
+static FileHandle *filehandles[RETARGET_OPEN_MAX] = { FILE_HANDLE_RESERVED, FILE_HANDLE_RESERVED, FILE_HANDLE_RESERVED };
 static SingletonPtr<PlatformMutex> filehandle_mutex;
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+
+static char stdio_in_prev[RETARGET_OPEN_MAX];
+static char stdio_out_prev[RETARGET_OPEN_MAX];
 
 namespace mbed {
 void mbed_set_unbuffered_stream(std::FILE *_file);
 
 void remove_filehandle(FileHandle *file)
 {
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
     filehandle_mutex->lock();
     /* Remove all open filehandles for this */
     for (unsigned int fh_i = 0; fh_i < sizeof(filehandles) / sizeof(*filehandles); fh_i++) {
@@ -126,6 +139,7 @@ void remove_filehandle(FileHandle *file)
         }
     }
     filehandle_mutex->unlock();
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 }
 }
 
@@ -141,6 +155,7 @@ extern serial_t stdio_uart;
 class DirectSerial : public FileHandle {
 public:
     DirectSerial(PinName tx, PinName rx, int baud);
+    DirectSerial(const serial_pinmap_t &static_pinmap, int baud);
     virtual ssize_t write(const void *buffer, size_t size);
     virtual ssize_t read(void *buffer, size_t size);
     virtual off_t seek(off_t offset, int whence = SEEK_SET)
@@ -167,14 +182,39 @@ DirectSerial::DirectSerial(PinName tx, PinName rx, int baud)
     if (stdio_uart_inited) {
         return;
     }
-    serial_init(&stdio_uart, tx, rx);
+    static const serial_pinmap_t console_pinmap = get_uart_pinmap(STDIO_UART_TX, STDIO_UART_RX);
+    serial_init_direct(&stdio_uart, &console_pinmap);
     serial_baud(&stdio_uart, baud);
+
 #if   CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTS
-    serial_set_flow_control(&stdio_uart, FlowControlRTS, STDIO_UART_RTS, NC);
+    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(STDIO_UART_RTS, NC);
+    serial_set_flow_control_direct(&stdio_uart, FlowControlRTS, &fc_pinmap);
 #elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_CTS
-    serial_set_flow_control(&stdio_uart, FlowControlCTS, NC, STDIO_UART_CTS);
+    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(NC, STDIO_UART_CTS);
+    serial_set_flow_control_direct(&stdio_uart, FlowControlCTS, &fc_pinmap);
 #elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTSCTS
-    serial_set_flow_control(&stdio_uart, FlowControlRTSCTS, STDIO_UART_RTS, STDIO_UART_CTS);
+    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(STDIO_UART_RTS, STDIO_UART_CTS);
+    serial_set_flow_control_direct(&stdio_uart, FlowControlRTSCTS, &fc_pinmap);
+#endif
+}
+
+DirectSerial::DirectSerial(const serial_pinmap_t &static_pinmap, int baud)
+{
+    if (stdio_uart_inited) {
+        return;
+    }
+    serial_init_direct(&stdio_uart, &static_pinmap);
+    serial_baud(&stdio_uart, baud);
+
+#if   CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTS
+    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(STDIO_UART_RTS, NC);
+    serial_set_flow_control_direct(&stdio_uart, FlowControlRTS, &fc_pinmap);
+#elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_CTS
+    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(NC, STDIO_UART_CTS);
+    serial_set_flow_control_direct(&stdio_uart, FlowControlCTS, &fc_pinmap);
+#elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTSCTS
+    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(STDIO_UART_RTS, STDIO_UART_CTS);
+    serial_set_flow_control_direct(&stdio_uart, FlowControlRTSCTS, &fc_pinmap);
 #endif
 }
 
@@ -208,7 +248,36 @@ short DirectSerial::poll(short events) const
     }
     return revents;
 }
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+#   if MBED_CONF_TARGET_CONSOLE_UART
+
+static void do_serial_init()
+{
+    if (stdio_uart_inited) {
+        return;
+    }
+
+    serial_init(&stdio_uart, STDIO_UART_TX, STDIO_UART_RX);
+    serial_baud(&stdio_uart, MBED_CONF_PLATFORM_STDIO_BAUD_RATE);
+#if   CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTS
+    serial_set_flow_control(&stdio_uart, FlowControlRTS, STDIO_UART_RTS, NC);
+#elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_CTS
+    serial_set_flow_control(&stdio_uart, FlowControlCTS, NC, STDIO_UART_CTS);
+#elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTSCTS
+    serial_set_flow_control(&stdio_uart, FlowControlRTSCTS, STDIO_UART_RTS, STDIO_UART_CTS);
 #endif
+}
+
+static void do_serial_init_once()
+{
+    static mstd::once_flag once;
+    mstd::call_once(once, do_serial_init);
+}
+
+#endif // MBED_CONF_TARGET_CONSOLE_UART
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+
+#endif // DEVICE_SERIAL
 
 class Sink : public FileHandle {
 public:
@@ -247,7 +316,7 @@ ssize_t Sink::read(void *buffer, size_t size)
     return 1;
 }
 
-
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 MBED_WEAK FileHandle *mbed::mbed_target_override_console(int fd)
 {
     return NULL;
@@ -261,17 +330,23 @@ MBED_WEAK FileHandle *mbed::mbed_override_console(int fd)
 static FileHandle *default_console()
 {
 #if MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
+
 #  if MBED_CONF_PLATFORM_STDIO_BUFFERED_SERIAL
-    static UARTSerial console(STDIO_UART_TX, STDIO_UART_RX, MBED_CONF_PLATFORM_STDIO_BAUD_RATE);
+    static const serial_pinmap_t console_pinmap = get_uart_pinmap(STDIO_UART_TX, STDIO_UART_RX);
+    static UARTSerial console(console_pinmap, MBED_CONF_PLATFORM_STDIO_BAUD_RATE);
 #   if   CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTS
-    console.set_flow_control(SerialBase::RTS, STDIO_UART_RTS, NC);
+    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(STDIO_UART_RTS, NC);
+    console.serial_set_flow_control(SerialBase::RTS, fc_pinmap);
 #   elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_CTS
-    console.set_flow_control(SerialBase::CTS, NC, STDIO_UART_CTS);
+    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(NC, STDIO_UART_CTS);
+    console.serial_set_flow_control(SerialBase::CTS, fc_pinmap);
 #   elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTSCTS
-    console.set_flow_control(SerialBase::RTSCTS, STDIO_UART_RTS, STDIO_UART_CTS);
+    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(STDIO_UART_RTS, STDIO_UART_CTS);
+    console.serial_set_flow_control(SerialBase::RTSCTS, fc_pinmap);
 #   endif
 #  else
-    static DirectSerial console(STDIO_UART_TX, STDIO_UART_RX, MBED_CONF_PLATFORM_STDIO_BAUD_RATE);
+    static const serial_pinmap_t console_pinmap = get_uart_pinmap(STDIO_UART_TX, STDIO_UART_RX);
+    static DirectSerial console(console_pinmap, MBED_CONF_PLATFORM_STDIO_BAUD_RATE);
 #  endif
 #else // MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
     static Sink console;
@@ -292,11 +367,14 @@ static FileHandle *get_console(int fd)
     }
     return default_console();
 }
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
+namespace mbed {
 /* Deal with the fact C library may not _open descriptors 0, 1, 2 - auto bind */
-FileHandle *mbed::mbed_file_handle(int fd)
+FileHandle *mbed_file_handle(int fd)
 {
-    if (fd >= OPEN_MAX) {
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+    if (fd >= RETARGET_OPEN_MAX) {
         return NULL;
     }
     FileHandle *fh = filehandles[fd];
@@ -304,8 +382,14 @@ FileHandle *mbed::mbed_file_handle(int fd)
         filehandles[fd] = fh = get_console(fd);
     }
     return fh;
+#else
+    return nullptr;
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+}
 }
 
+
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 /**
  * Sets errno when file opening fails.
  * Wipes out the filehandle too.
@@ -374,13 +458,13 @@ static int reserve_filehandle()
     // find the first empty slot in filehandles, after the slots reserved for stdin/stdout/stderr
     filehandle_mutex->lock();
     int fh_i;
-    for (fh_i = 3; fh_i < OPEN_MAX; fh_i++) {
+    for (fh_i = 3; fh_i < RETARGET_OPEN_MAX; fh_i++) {
         /* Take a next free filehandle slot available. */
         if (filehandles[fh_i] == NULL) {
             break;
         }
     }
-    if (fh_i >= OPEN_MAX) {
+    if (fh_i >= RETARGET_OPEN_MAX) {
         /* Too many file handles have been opened */
         errno = EMFILE;
         filehandle_mutex->unlock();
@@ -391,6 +475,7 @@ static int reserve_filehandle()
 
     return fh_i;
 }
+
 
 int mbed::bind_to_fd(FileHandle *fh)
 {
@@ -455,6 +540,8 @@ std::FILE *fdopen(FileHandle *fh, const char *mode)
     return stream;
 }
 }
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+
 
 /* @brief   standard c library fopen() retargeting function.
  *
@@ -508,16 +595,23 @@ extern "C" FILEHANDLE PREFIX(_open)(const char *name, int openflags)
     }
 #endif
 #ifndef __IAR_SYSTEMS_ICC__
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
     /* FILENAME: "@(integer)" gives an already-allocated descriptor */
     if (name[0] == '@') {
         int fd;
         memcpy(&fd, name + 1, sizeof fd);
         return fd;
     }
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 #endif
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
     return open(name, openflags_to_posix(openflags));
+#else
+    return -1;
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 }
 
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 extern "C" int open(const char *name, int oflag, ...)
 {
     int fildes = reserve_filehandle();
@@ -554,12 +648,18 @@ extern "C" int open(const char *name, int oflag, ...)
 
     return fildes;
 }
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
 extern "C" int PREFIX(_close)(FILEHANDLE fh)
 {
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
     return close(fh);
+#else
+    return 0;
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 }
 
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 extern "C" int close(int fildes)
 {
     FileHandle *fhc = mbed_file_handle(fildes);
@@ -577,6 +677,7 @@ extern "C" int close(int fildes)
         return 0;
     }
 }
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
 static bool convert_crlf(int fd)
 {
@@ -673,7 +774,20 @@ finish:
 
 extern "C" ssize_t write(int fildes, const void *buf, size_t length)
 {
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+    if (fildes != STDOUT_FILENO && fildes != STDERR_FILENO) {
+        errno = EBADF;
+        return -1;
+    }
 
+    const unsigned char *buffer = static_cast<const unsigned char *>(buf);
+
+    for (size_t i = 0; i < length; i++) {
+        mbed::minimal_console_putc(buffer[i]);
+    }
+
+    ssize_t ret = length;
+#else
     FileHandle *fhc = mbed_file_handle(fildes);
     if (fhc == NULL) {
         errno = EBADF;
@@ -681,6 +795,7 @@ extern "C" ssize_t write(int fildes, const void *buf, size_t length)
     }
 
     ssize_t ret = fhc->write(buf, length);
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
     if (ret < 0) {
         errno = -ret;
         return -1;
@@ -688,6 +803,18 @@ extern "C" ssize_t write(int fildes, const void *buf, size_t length)
         return ret;
     }
 }
+
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+/* Write one character to a serial interface */
+MBED_WEAK int mbed::minimal_console_putc(int c)
+{
+#if MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
+    do_serial_init_once();
+    serial_putc(&stdio_uart, c);
+#endif // MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
+    return c;
+}
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
 extern "C" void PREFIX(_exit)(int return_code)
@@ -768,6 +895,23 @@ extern "C" int PREFIX(_read)(FILEHANDLE fh, unsigned char *buffer, unsigned int 
 
 extern "C" ssize_t read(int fildes, void *buf, size_t length)
 {
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+    if (fildes != STDIN_FILENO && fildes != STDERR_FILENO) {
+        errno = EBADF;
+        return -1;
+    }
+
+    if (length == 0) {
+        return 0;
+    }
+
+    unsigned char *buffer = static_cast<unsigned char *>(buf);
+
+    buffer[0] = minimal_console_getc();
+
+    ssize_t ret = 1;
+
+#else
     FileHandle *fhc = mbed_file_handle(fildes);
     if (fhc == NULL) {
         errno = EBADF;
@@ -775,6 +919,7 @@ extern "C" ssize_t read(int fildes, void *buf, size_t length)
     }
 
     ssize_t ret = fhc->read(buf, length);
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
     if (ret < 0) {
         errno = -ret;
         return -1;
@@ -782,6 +927,19 @@ extern "C" ssize_t read(int fildes, void *buf, size_t length)
         return ret;
     }
 }
+
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+/* Read a character from the serial interface */
+MBED_WEAK int mbed::minimal_console_getc()
+{
+#if MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
+    do_serial_init_once();
+    return serial_getc(&stdio_uart);
+#else
+    return 0;
+#endif // MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
+}
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
 
 #ifdef __ARMCC_VERSION
@@ -793,8 +951,10 @@ extern "C" int _isatty(FILEHANDLE fh)
     return isatty(fh);
 }
 
+
 extern "C" int isatty(int fildes)
 {
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
     FileHandle *fhc = mbed_file_handle(fildes);
     if (fhc == NULL) {
         errno = EBADF;
@@ -808,6 +968,10 @@ extern "C" int isatty(int fildes)
     } else {
         return tty;
     }
+#else
+    // Is attached to an interactive device
+    return 1;
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 }
 
 extern "C"
@@ -819,6 +983,7 @@ long __lseek(int fh, long offset, int whence)
 int _lseek(FILEHANDLE fh, int offset, int whence)
 #endif
 {
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 #if defined(__ARMCC_VERSION)
     int whence = SEEK_SET;
 #endif
@@ -832,8 +997,13 @@ int _lseek(FILEHANDLE fh, int offset, int whence)
         return -1;
     }
     return off;
+#else
+    // Not supported
+    return -1;
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 }
 
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 extern "C" off_t lseek(int fildes, off_t offset, int whence)
 {
     FileHandle *fhc = mbed_file_handle(fildes);
@@ -873,9 +1043,11 @@ extern "C" int PREFIX(_ensure)(FILEHANDLE fh)
     return fsync(fh);
 }
 #endif
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
 extern "C" int fsync(int fildes)
 {
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
     FileHandle *fhc = mbed_file_handle(fildes);
     if (fhc == NULL) {
         errno = EBADF;
@@ -889,11 +1061,16 @@ extern "C" int fsync(int fildes)
     } else {
         return 0;
     }
+#else
+    return -1;
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 }
+
 
 #ifdef __ARMCC_VERSION
 extern "C" long PREFIX(_flen)(FILEHANDLE fh)
 {
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
     FileHandle *fhc = mbed_file_handle(fh);
     if (fhc == NULL) {
         errno = EBADF;
@@ -910,6 +1087,10 @@ extern "C" long PREFIX(_flen)(FILEHANDLE fh)
         return -1;
     }
     return size;
+#else
+    // Not supported
+    return -1;
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 }
 
 // Do not compile this code for TFM secure target
@@ -927,7 +1108,6 @@ __asm(".global __use_no_semihosting\n\t");
 // Through weak-reference, we can check if ARM_LIB_HEAP is defined at run-time.
 // If ARM_LIB_HEAP is defined, we can fix heap allocation.
 extern MBED_WEAK uint32_t   Image$$ARM_LIB_HEAP$$ZI$$Base[];
-extern MBED_WEAK uint32_t   Image$$ARM_LIB_HEAP$$ZI$$Length[];
 extern MBED_WEAK uint32_t   Image$$ARM_LIB_HEAP$$ZI$$Limit[];
 
 // Heap here is considered starting after ZI ends to Stack start
@@ -942,7 +1122,7 @@ extern "C" MBED_WEAK __value_in_regs struct __initial_stackheap _mbed_user_setup
     struct __initial_stackheap r;
 
     // Fix heap if ARM_LIB_HEAP is defined
-    if (Image$$ARM_LIB_HEAP$$ZI$$Length) {
+    if (Image$$ARM_LIB_HEAP$$ZI$$Base != Image$$ARM_LIB_HEAP$$ZI$$Limit) {
         heap_base = (uint32_t) Image$$ARM_LIB_HEAP$$ZI$$Base;
         heap_limit = (uint32_t) Image$$ARM_LIB_HEAP$$ZI$$Limit;
     }
@@ -965,7 +1145,7 @@ extern "C" __value_in_regs struct __argc_argv $Sub$$__rt_lib_init(unsigned heapb
     uint32_t heap_limit = (uint32_t)Image$$ARM_LIB_STACK$$ZI$$Base;
 
     // Fix heap if ARM_LIB_HEAP is defined
-    if (Image$$ARM_LIB_HEAP$$ZI$$Length) {
+    if (Image$$ARM_LIB_HEAP$$ZI$$Base != Image$$ARM_LIB_HEAP$$ZI$$Limit) {
         heap_base = (uint32_t) Image$$ARM_LIB_HEAP$$ZI$$Base;
         heap_limit = (uint32_t) Image$$ARM_LIB_HEAP$$ZI$$Limit;
     }
@@ -983,7 +1163,7 @@ extern "C" __value_in_regs struct __initial_stackheap __user_setup_stackheap(uin
 
 #endif
 
-
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 #if !defined(__ARMCC_VERSION) && !defined(__ICCARM__)
 extern "C" int _fstat(int fh, struct stat *st)
 {
@@ -1042,12 +1222,12 @@ extern "C" int fcntl(int fildes, int cmd, ...)
 
 extern "C" int poll(struct pollfd fds[], nfds_t nfds, int timeout)
 {
-    if (nfds > OPEN_MAX) {
+    if (nfds > RETARGET_OPEN_MAX) {
         errno = EINVAL;
         return -1;
     }
 
-    struct mbed::pollfh fhs[OPEN_MAX];
+    struct mbed::pollfh fhs[RETARGET_OPEN_MAX];
     for (nfds_t n = 0; n < nfds; n++) {
         // Underlying FileHandle poll returns POLLNVAL if given NULL, so
         // we don't need to take special action.
@@ -1060,6 +1240,7 @@ extern "C" int poll(struct pollfd fds[], nfds_t nfds, int timeout)
     }
     return ret;
 }
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
 namespace std {
 extern "C" int remove(const char *path)
@@ -1127,6 +1308,7 @@ extern "C" char *_sys_command_string(char *cmd, int len)
 }
 #endif
 
+#if !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 extern "C" DIR *opendir(const char *path)
 {
     FilePath fp(path);
@@ -1239,6 +1421,7 @@ extern "C" int statvfs(const char *path, struct statvfs *buf)
         return 0;
     }
 }
+#endif // !MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
 #if defined(TOOLCHAIN_GCC)
 /* prevents the exception handling name demangling code getting pulled in */

@@ -12,7 +12,7 @@ Serial pc(SERIAL_TX, SERIAL_RX);
 SatFileHandler testfs(D11, D12, D13, D10, true);
 
 int main() {  
-    pc.printf("Start \n\r");
+    pc.printf("Start, ,file write test \n\r");
     string testString("Hello World Big Brain\n");
     /*int a = testfs.sd.init();
     testfs.fs.format(&sd); //Uncomment if this is ghe first time running this
@@ -35,16 +35,31 @@ int main() {
         pc.printf("Fail \n");
         
         
-    pc.printf("Start 2 \n\r");
+    pc.printf("Start 2, enqueue test \n\r");
     int n = 0;
     for (int i = 0; i < 5; i += 1) {
         std::pair<string, string> p ("test1", "fuckthistest" + n);
-        testfs.enqueueMessage()
+        testfs.enqueueMessage(p);
     }
     
     if (testfs.writeStart()) {
         pc.printf("Success 2 \n");
-    } else
-        pc.printf("Fail 2 \n
+    } else {
+        pc.printf("Fail 2 \n");
+    }
+    /*
+    pc.printf("Start 3, read test \n\r");
+    if (testfs.read(std::string("fuckThisTest.txt")) != NULL) {
+        pc.printf("Success 3 \n");    
+    } else {
+        pc.printf("Fail 3 \n");    
+    }
     
+    pc.printf("Start 4, clean test \n\r");
+    if (testfs.clean("test1")) {
+        pc.printf("Success4 \n");
+    } else {
+        pc.printf("Success5 \n");
+    }
+    */
 }

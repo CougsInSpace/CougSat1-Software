@@ -38,8 +38,11 @@ using namespace mbed;
 #define DEFAULT_AT_TIMEOUT 1000 // at default timeout in milliseconds
 const int MAX_SIM_RESPONSE_LENGTH = 16;
 
-AT_CellularDevice::AT_CellularDevice(FileHandle *fh) : CellularDevice(fh), _network(0), _sms(0),
-    _information(0), _context_list(0), _default_timeout(DEFAULT_AT_TIMEOUT),
+AT_CellularDevice::AT_CellularDevice(FileHandle *fh) : CellularDevice(fh),
+#if MBED_CONF_CELLULAR_USE_SMS
+    _sms(0),
+#endif // MBED_CONF_CELLULAR_USE_SMS
+    _network(0), _information(0), _context_list(0), _default_timeout(DEFAULT_AT_TIMEOUT),
     _modem_debug_on(false)
 {
     MBED_ASSERT(fh);
@@ -58,11 +61,17 @@ AT_CellularDevice::~AT_CellularDevice()
 
     // make sure that all is deleted even if somewhere close was not called and reference counting is messed up.
     _network_ref_count = 1;
+#if MBED_CONF_CELLULAR_USE_SMS
     _sms_ref_count = 1;
+#endif // MBED_CONF_CELLULAR_USE_SMS
     _info_ref_count = 1;
 
     close_network();
+
+#if MBED_CONF_CELLULAR_USE_SMS
     close_sms();
+#endif //MBED_CONF_CELLULAR_USE_SMS
+
     close_information();
 
     AT_CellularContext *curr = _context_list;
@@ -350,15 +359,6 @@ CellularNetwork *AT_CellularDevice::open_network(FileHandle *fh)
     return _network;
 }
 
-CellularSMS *AT_CellularDevice::open_sms(FileHandle *fh)
-{
-    if (!_sms) {
-        _sms = open_sms_impl(*get_at_handler(fh));
-    }
-    _sms_ref_count++;
-    return _sms;
-}
-
 CellularInformation *AT_CellularDevice::open_information(FileHandle *fh)
 {
     if (!_information) {
@@ -373,10 +373,35 @@ AT_CellularNetwork *AT_CellularDevice::open_network_impl(ATHandler &at)
     return new AT_CellularNetwork(at);
 }
 
+#if MBED_CONF_CELLULAR_USE_SMS
+
+CellularSMS *AT_CellularDevice::open_sms(FileHandle *fh)
+{
+    if (!_sms) {
+        _sms = open_sms_impl(*get_at_handler(fh));
+    }
+    _sms_ref_count++;
+    return _sms;
+}
+
+void AT_CellularDevice::close_sms()
+{
+    if (_sms) {
+        _sms_ref_count--;
+        if (_sms_ref_count == 0) {
+            ATHandler *atHandler = &_sms->get_at_handler();
+            delete _sms;
+            _sms = NULL;
+            release_at_handler(atHandler);
+        }
+    }
+}
+
 AT_CellularSMS *AT_CellularDevice::open_sms_impl(ATHandler &at)
 {
     return new AT_CellularSMS(at);
 }
+#endif // MBED_CONF_CELLULAR_USE_SMS
 
 AT_CellularInformation *AT_CellularDevice::open_information_impl(ATHandler &at)
 {
@@ -391,19 +416,6 @@ void AT_CellularDevice::close_network()
             ATHandler *atHandler = &_network->get_at_handler();
             delete _network;
             _network = NULL;
-            release_at_handler(atHandler);
-        }
-    }
-}
-
-void AT_CellularDevice::close_sms()
-{
-    if (_sms) {
-        _sms_ref_count--;
-        if (_sms_ref_count == 0) {
-            ATHandler *atHandler = &_sms->get_at_handler();
-            delete _sms;
-            _sms = NULL;
             release_at_handler(atHandler);
         }
     }
@@ -627,4 +639,35 @@ void AT_CellularDevice::cellular_callback(nsapi_event_t ev, intptr_t ptr, Cellul
         }
     }
     CellularDevice::cellular_callback(ev, ptr, ctx);
+}
+
+nsapi_error_t AT_CellularDevice::clear()
+{
+    AT_CellularNetwork *net = static_cast<AT_CellularNetwork *>(open_network());
+    nsapi_error_t err = net->clear();
+    close_network();
+
+    return err;
+}
+
+nsapi_error_t AT_CellularDevice::set_baud_rate(int baud_rate)
+{
+    nsapi_error_t error = set_baud_rate_impl(baud_rate);
+
+    if (error) {
+        tr_warning("Baudrate was not changed to desired value: %d", baud_rate);
+        return error;
+    }
+
+    _at->set_baud(baud_rate);
+
+    // Give some time before starting using the UART with the new baud rate
+    rtos::ThisThread::sleep_for(3000);
+
+    return error;
+}
+
+nsapi_error_t AT_CellularDevice::set_baud_rate_impl(int baud_rate)
+{
+    return _at->at_cmd_discard("+IPR", "=", "%d", baud_rate);
 }

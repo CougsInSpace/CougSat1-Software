@@ -67,6 +67,13 @@
 #define LPTIM_MST_IRQ             LPTIM4_IRQn
 #define LPTIM_MST_RCC             __HAL_RCC_LPTIM4_CLK_ENABLE
 
+#define LPTIM_MST_RCC_CLKAM                  __HAL_RCC_LPTIM4_CLKAM_ENABLE
+
+/* Enable LPTIM wakeup source but only for current core, and disable it for the other core */
+#define LPTIM_MST_EXTI_LPTIM_WAKEUP_CONFIG()  {\
+                                                 HAL_EXTI_D1_EventInputConfig(EXTI_LINE52, EXTI_MODE_IT, ENABLE);\
+                                                 HAL_EXTI_D2_EventInputConfig(EXTI_LINE52, EXTI_MODE_IT, DISABLE);\
+                                               }
 #define LPTIM_MST_RESET_ON        __HAL_RCC_LPTIM4_FORCE_RESET
 #define LPTIM_MST_RESET_OFF       __HAL_RCC_LPTIM4_RELEASE_RESET
 
@@ -85,6 +92,13 @@
 #define LPTIM_MST_IRQ             LPTIM5_IRQn
 #define LPTIM_MST_RCC             __HAL_RCC_LPTIM5_CLK_ENABLE
 
+#define LPTIM_MST_RCC_CLKAM       __HAL_RCC_LPTIM5_CLKAM_ENABLE
+
+/* Enable LPTIM wakeup source but only for current core, and disable it for the other core */
+#define LPTIM_MST_EXTI_LPTIM_WAKEUP_CONFIG()  {\
+                                                 HAL_EXTI_D2_EventInputConfig(EXTI_LINE53, EXTI_MODE_IT, ENABLE);\
+                                                 HAL_EXTI_D1_EventInputConfig(EXTI_LINE53, EXTI_MODE_IT, DISABLE);\
+                                               }
 #define LPTIM_MST_RESET_ON        __HAL_RCC_LPTIM5_FORCE_RESET
 #define LPTIM_MST_RESET_OFF       __HAL_RCC_LPTIM5_RELEASE_RESET
 #else
@@ -98,7 +112,11 @@
 #define RCC_LPTIMCLKSOURCE_LSE    RCC_LPTIM1CLKSOURCE_LSE
 #define RCC_LPTIMCLKSOURCE_LSI    RCC_LPTIM1CLKSOURCE_LSI
 
+#if defined(STM32G0)
+#define LPTIM_MST_IRQ             TIM6_DAC_LPTIM1_IRQn
+#else
 #define LPTIM_MST_IRQ             LPTIM1_IRQn
+#endif
 #define LPTIM_MST_RCC             __HAL_RCC_LPTIM1_CLK_ENABLE
 
 #define LPTIM_MST_RESET_ON        __HAL_RCC_LPTIM1_FORCE_RESET
@@ -191,8 +209,7 @@ void lp_ticker_init(void)
 
 #endif /* MBED_CONF_TARGET_LSE_AVAILABLE */
 #if defined(DUAL_CORE)
-    uint32_t timeout = HSEM_TIMEOUT;
-    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID) && (--timeout != 0)) {
+    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID)) {
     }
 #endif /* DUAL_CORE */
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
@@ -209,6 +226,10 @@ void lp_ticker_init(void)
     LPTIM_MST_RESET_ON();
     LPTIM_MST_RESET_OFF();
 #if defined(DUAL_CORE)
+    /* Configure EXTI wakeup and configure autonomous mode */
+    LPTIM_MST_RCC_CLKAM();
+    LPTIM_MST_EXTI_LPTIM_WAKEUP_CONFIG();
+
     LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
 #endif /* DUAL_CORE */
 
@@ -236,13 +257,20 @@ void lp_ticker_init(void)
     LptimHandle.Init.Trigger.SampleTime = LPTIM_TRIGSAMPLETIME_DIRECTTRANSITION;
 #endif
 
+    LptimHandle.Init.UltraLowPowerClock.SampleTime = LPTIM_TRIGSAMPLETIME_DIRECTTRANSITION; // L5 ?
+
     LptimHandle.Init.OutputPolarity = LPTIM_OUTPUTPOLARITY_HIGH;
     LptimHandle.Init.UpdateMode = LPTIM_UPDATE_IMMEDIATE;
     LptimHandle.Init.CounterSource = LPTIM_COUNTERSOURCE_INTERNAL;
-#if defined (LPTIM_INPUT1SOURCE_GPIO) /* STM32L4 */
+#if defined (LPTIM_INPUT1SOURCE_GPIO) /* STM32L4 / STM32L5 */
     LptimHandle.Init.Input1Source = LPTIM_INPUT1SOURCE_GPIO;
     LptimHandle.Init.Input2Source = LPTIM_INPUT2SOURCE_GPIO;
 #endif /* LPTIM_INPUT1SOURCE_GPIO */
+
+#if defined(LPTIM_RCR_REP) /* STM32L4 / STM32L5 */
+    LptimHandle.Init.RepetitionCounter = 0;
+#endif /* LPTIM_RCR_REP */
+
 
     if (HAL_LPTIM_Init(&LptimHandle) != HAL_OK) {
         error("HAL_LPTIM_Init ERROR\n");
