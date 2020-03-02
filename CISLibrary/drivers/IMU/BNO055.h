@@ -96,28 +96,10 @@ public:
 
   ~BNO055();
 
-  mbed_error_status_t readMag(IMUValueSet_t & data, bool blocking = true); //returns magnetic feild in uT
+  mbed_error_status_t readMag(IMUValueSet_t & data,
+      bool blocking = true); // returns magnetic feild in uT
   mbed_error_status_t readGyro(IMUValueSet_t & data, bool blocking = true);
   mbed_error_status_t readAccel(IMUValueSet_t & data, bool blocking = true);
-
-private:
-  I2C &        _i2c;
-  BNO055Addr_t addr;
-  DigitalOut   _res;
-
-  char    dt[10]; // working buffer
-  uint8_t chip_addr;
-  uint8_t chip_mode;
-  uint8_t ready_flag;
-  uint8_t page_flag;
-
-  uint8_t  chip_id;
-  uint8_t  acc_id;
-  uint8_t  mag_id;
-  uint8_t  gyr_id;
-  uint8_t  bootldr_rev_id;
-  uint16_t sw_rev_id;
-
   /** Get Euler Angles
    * @param double type of 3D data address
    */
@@ -148,6 +130,26 @@ private:
    * @return none
    */
   void change_fusion_mode(uint8_t mode);
+
+private:
+  I2C &        _i2c;
+  //BNO055Addr_t addr;
+  DigitalOut   _res;
+
+  char    dt[10]; // working buffer
+  uint8_t chip_addr;
+  uint8_t chip_mode;
+  uint8_t ready_flag;
+  uint8_t page_flag;
+
+  uint8_t  chip_id;
+  uint8_t  acc_id;
+  uint8_t  mag_id;
+  uint8_t  gyr_id;
+  uint8_t  bootldr_rev_id;
+  uint16_t sw_rev_id;
+
+  
 
   /** Set Mouting position
    *  Please make sure your mounting direction of BNO055 chip

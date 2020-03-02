@@ -6,8 +6,8 @@
  * @param i2c attached to the IMU
  * @param addr of the IMU
  */
-BNO055::BNO055(I2C & i2c, PinName reset, BNO055Addr_t addr) :
-  _i2c(i2c), _res(reset), addr(addr) {
+BNO055::BNO055(I2C & i2c, PinName reset, uint8_t addr) :
+  _i2c(i2c), _res(reset) {
   chip_mode = MODE_NDOF;
   chip_addr = addr;
   initialize();
@@ -30,15 +30,17 @@ mbed_error_status_t BNO055::readMag(IMUValueSet_t & data, bool blocking) {
   int16_t x, y, z;
 
   dt[0] = BNO055_MAG_X_LSB;
-  _i2c.write(chip_addr, dt, 1, true);
-  _i2c.read(chip_addr, dt, 6, false);
-  x     = dt[1] << 8 | dt[0];
-  y     = dt[3] << 8 | dt[2];
-  z     = dt[5] << 8 | dt[4];
-  data->x = (double)x;
-  data->y = (double)y;
-  data->z = (double)z;
-  return 0;
+  DEBUG("IMU", "Write Code: %d",_i2c.write(chip_addr, dt, 1, true));
+  if (!_i2c.read(chip_addr, dt, 6, false)) {
+    x      = dt[1] << 8 | dt[0];
+    y      = dt[3] << 8 | dt[2];
+    z      = dt[5] << 8 | dt[4];
+    data.x = (double)x;
+    data.y = (double)y;
+    data.z = (double)z;
+    return 0;
+  }
+  return (mbed_error_status_t)256;
 }
 
 /**
@@ -53,14 +55,16 @@ mbed_error_status_t BNO055::readGyro(IMUValueSet_t & data, bool blocking) {
 
   dt[0] = BNO055_GYR_X_LSB;
   _i2c.write(chip_addr, dt, 1, true);
-  _i2c.read(chip_addr, dt, 6, false);
-  x     = dt[1] << 8 | dt[0];
-  y     = dt[3] << 8 | dt[2];
-  z     = dt[5] << 8 | dt[4];
-  data->x = (double)x;
-  data->y = (double)y;
-  data->z = (double)z;
-  return 0;
+  if (!_i2c.read(chip_addr, dt, 6, false)) {
+    x      = dt[1] << 8 | dt[0];
+    y      = dt[3] << 8 | dt[2];
+    z      = dt[5] << 8 | dt[4];
+    data.x = (double)x;
+    data.y = (double)y;
+    data.z = (double)z;
+    return 0;
+  }
+  return (mbed_error_status_t)256;
 }
 
 /**
@@ -71,18 +75,21 @@ mbed_error_status_t BNO055::readGyro(IMUValueSet_t & data, bool blocking) {
  * @return mbed_error_status_t
  */
 mbed_error_status_t BNO055::readAccel(IMUValueSet_t & data, bool blocking) {
-int16_t x, y, z;
+  int16_t x, y, z;
 
   dt[0] = BNO055_ACC_X_LSB;
   _i2c.write(chip_addr, dt, 1, true);
-  _i2c.read(chip_addr, dt, 6, false);
-  x     = dt[1] << 8 | dt[0];
-  y     = dt[3] << 8 | dt[2];
-  z     = dt[5] << 8 | dt[4];
-  data->x = (double)x;
-  data->y = (double)y;
-  data->z = (double)z;
-  return 0;}
+  if (!_i2c.read(chip_addr, dt, 6, false)) {
+    x      = dt[1] << 8 | dt[0];
+    y      = dt[3] << 8 | dt[2];
+    z      = dt[5] << 8 | dt[4];
+    data.x = (double)x;
+    data.y = (double)y;
+    data.z = (double)z;
+    return 0;
+  }
+  return (mbed_error_status_t)256;
+}
 
 #if MBED_MAJOR_VERSION == 2
 #define WAIT_MS(x) wait_ms(x)
@@ -244,7 +251,7 @@ void BNO055::initialize(void) {
   // Check Acc & Mag & Gyro are available of not
   check_id();
   // Set initial data
-  set_initial_dt_to_regs();
+  // set_initial_dt_to_regs();
   // Unit selection
   unit_selection();
   // Set fusion mode
