@@ -75,7 +75,7 @@ std::string SatFileHandler::read(const std::string &fileNameFull)
         std::ifstream file("/fs/" + fileNameFull);
         std::stringstream out;
         if (!file.is_open()) {
-                pc->printf("ERROR: File cannot be found\n");
+                pc->printf("ERROR: File cannot be found\r\n");
                 return "";
         }
         out << file.rdbuf();
@@ -133,19 +133,19 @@ void SatFileHandler::initFilesystem()
         fs = std::make_unique<FATFileSystem>("fs");
         int status = fs->mount(sdbd.get());
         if (status) {
-                pc->printf("Failed to mount filesystem, reformatting...\n");
+                pc->printf("Failed to mount filesystem, reformatting...\r\n");
                 reformat();
-                pc->printf("Reformat done\n");
+                pc->printf("Reformat done\r\n");
                 status = fs->mount(sdbd.get());
         }
 
-        pc->printf("FileSystem Mount: \n%s\n", strerror(-status));
+        pc->printf("FileSystem Mount: \r\n%s\r\n", strerror(-status));
         // check if the device reformatted properly if no give a
         // critical error
         // status = fs->reformat(sdbd.get());
         // if (debug && status) {
-        //         pc->printf("CRITICAL ERROR\nFAILED "
-        //                    "MOUNT\nFAILED reformat");
+        //         pc->printf("CRITICAL ERROR\r\nFAILED "
+        //                    "MOUNT\r\nFAILED reformat");
         // }
 }
 
@@ -155,8 +155,8 @@ void SatFileHandler::initBlockDevice()
                                                hwo->cs, hwo->freq, hwo->crc_on);
         int status = sdbd->init();
         if (debug) {
-                pc->printf("SD Block Device Init: \n");
-                pc->printf("%s\n", strerror(-status));
+                pc->printf("SD Block Device Init: \r\n");
+                pc->printf("%s\r\n", strerror(-status));
         }
 }
 
@@ -170,11 +170,11 @@ void SatFileHandler::reformat()
         int status = fs->reformat(sdbd.get());
         if (debug) {
                 if (status) {
-                        pc->printf("Filesystem Reformat: \n");
-                        pc->printf("Failed\n");
+                        pc->printf("Filesystem Reformat: \r\n");
+                        pc->printf("Failed\r\n");
                 } else {
-                        pc->printf("Filesystem Reformat: \n");
-                        pc->printf("Success\n");
+                        pc->printf("Filesystem Reformat: \r\n");
+                        pc->printf("Success\r\n");
                 }
         }
 }
@@ -184,11 +184,11 @@ void SatFileHandler::mount()
         int status = fs->mount(sdbd.get());
         if (debug) {
                 if (status) {
-                        pc->printf("Filesystem Mount: \n");
-                        pc->printf("Failed\n");
+                        pc->printf("Filesystem Mount: \r\n");
+                        pc->printf("Failed\r\n");
                 } else {
-                        pc->printf("Filesystem Mount: \n");
-                        pc->printf("Success\n");
+                        pc->printf("Filesystem Mount: \r\n");
+                        pc->printf("Success\r\n");
                 }
         }
 }
@@ -198,11 +198,11 @@ void SatFileHandler::unmount()
         int status = fs->unmount();
         if (debug) {
                 if (status) {
-                        pc->printf("Filesystem Unmount: \n");
-                        pc->printf("Failed\n");
+                        pc->printf("Filesystem Unmount: \r\n");
+                        pc->printf("Failed\r\n");
                 } else {
-                        pc->printf("Filesystem Unmount: \n");
-                        pc->printf("Success\n");
+                        pc->printf("Filesystem Unmount: \r\n");
+                        pc->printf("Success\r\n");
                 }
         }
 }
