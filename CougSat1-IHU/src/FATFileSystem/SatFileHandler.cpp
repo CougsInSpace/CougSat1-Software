@@ -21,6 +21,8 @@ SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
 
 SatFileHandler::~SatFileHandler()
 {
+        unmount();
+        sdbd->deinit();
 }
 
 bool SatFileHandler::writef(std::string filenameBase, const char *message)
@@ -99,13 +101,31 @@ bool SatFileHandler::clean(std::string dir)
 
 bool SatFileHandler::check()
 {
-        struct statvfs fsinfo;
-        int status = fs->statvfs("/fs/", &fsinfo);
-        if (fsinfo.f_bfree < 512 * 10 && clean("/fs/"))
-                return true;
-        else
-                return false;
-        return status == 0;
+        // struct statvfs fsinfo;
+        // int status = fs->statvfs("/fs/", &fsinfo);
+        // if (fsinfo.f_bfree < 512 * 10 && clean("/fs/"))
+        //         return true;
+        // else
+        //         return false;
+        // return status == 0;
+        uint8_t full = 0xFF;
+        uint8_t blockData, tmp;
+        bd_size_t readSize = sdbd->get_read_size();
+        bd_size_t num_blocks = sdbd->size() / readSize;
+        if (debug)
+                pc->printf("SD Block Count: %lu\r\n", num_blocks);
+
+        for (bd_size_t i = 0; i < num_blocks; i += 512) {
+                sdbd->read(&tmp, i, readSize);
+                sdbd->program(&full, i, readSize);
+                sdbd->read(&blockData, i, readSize);
+                if (blockData != full)
+                        return false;
+                sdbd->program(&tmp, i, readSize);
+                if (debug && (i / 512) % 300 == 0)
+                        pc->printf("300 Blocks done \r\n");
+        }
+        return true;
 }
 
 bool SatFileHandler::enqueueMessage(std::pair<std::string, std::string> message)
@@ -138,15 +158,8 @@ void SatFileHandler::initFilesystem()
                 pc->printf("Reformat done\r\n");
                 status = fs->mount(sdbd.get());
         }
-
-        pc->printf("FileSystem Mount: \r\n%s\r\n", strerror(-status));
-        // check if the device reformatted properly if no give a
-        // critical error
-        // status = fs->reformat(sdbd.get());
-        // if (debug && status) {
-        //         pc->printf("CRITICAL ERROR\r\nFAILED "
-        //                    "MOUNT\r\nFAILED reformat");
-        // }
+        if (debug)
+                pc->printf("FileSystem Mount: \r\n%s\r\n", strerror(-status));
 }
 
 void SatFileHandler::initBlockDevice()
@@ -157,6 +170,12 @@ void SatFileHandler::initBlockDevice()
         if (debug) {
                 pc->printf("SD Block Device Init: \r\n");
                 pc->printf("%s\r\n", strerror(-status));
+                pc->printf("SD Device Size: %lu\r\n", sdbd->size());
+                pc->printf("SD Read Size: %lu\r\n", sdbd->get_read_size());
+                pc->printf("SD Program Size: %lu\r\n",
+                           sdbd->get_program_size()); // write size, basically
+                pc->printf("SD Erase Size: %lu\r\n", sdbd->get_erase_size());
+                ;
         }
 }
 

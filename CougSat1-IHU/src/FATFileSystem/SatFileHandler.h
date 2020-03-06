@@ -35,6 +35,8 @@ class SatFileHandler
         void reformat();
         void mount();
         void unmount();
+        // checks for free memory
+        bool check();
 
         /*
         function to enqueue a message needed to stored on the SD card.
@@ -76,9 +78,6 @@ class SatFileHandler
         Serial *pc;
 
         bool clean(std::string dir);
-
-        // checks for free memory
-        bool check();
 
         void initBlockDevice();
         void initFilesystem();
