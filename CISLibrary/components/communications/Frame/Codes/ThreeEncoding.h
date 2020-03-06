@@ -16,7 +16,7 @@ public:
     inline uint8_t getFourBitEncoding(bool positive){ return positive ? getFourBitEncodingPlus() : getFourBitEncodingMinus(); }
 
 
-    inline int8_t getChangeInRunDisparity(bool mode) { return mode ? -changeInRunDisparity : changeInRunDisparity; }
+    inline int8_t getChangeInRunDisparity(uint8_t runDisparity) { return runDisparity > 0 ? -changeInRunDisparity : changeInRunDisparity; }
 protected:
     ThreeEncoding(uint8_t threeBitEncoding, uint8_t fourBitEncodingMinus);
 

@@ -19,9 +19,10 @@ FrameSource::~FrameSource() {}
 
 
 void FrameSource::reset(){
-  length = 0;
   curCode = 0;
-  read6 = true;
+  bufferedBitsCount = 0;
+  unusedBitsPosition = 0;
+  codeSize = 4;
   index = 0;
   state = State_t::PREAMBLE;
   runDisparity = -1;
@@ -39,29 +40,49 @@ void FrameSource::add(uint8_t byte) {
     switch (state)
     {
     case State_t::PREAMBLE:
-      loadPreamble(byte);
+      loadPreamble();
       break;
   
     case State_t::START_OF_FRAME:
-      matchStartOfCode(byte);
+      matchStartOfCode();
       break;
 
     case State_t::PAYLOAD:
-      loadPayloadData(byte);
+      loadPayloadData();
       break;
 
     case State_t::CRC:
-      loadCRC(byte);
+      loadCRC();
       break;
 
     case State_t::DONE:
-      loadEndOfFrame(byte);
+      loadEndOfFrame();
       break;
     }
   }
 }
 
-void FrameSource::loadPreamble(uint8_t code){
+void FrameSource::loadPreamble(){
+  EncodingSingleton *encoding = EncodingSingleton::getInstance();
+  
+  if(codeSize == 6){
+    FiveEncoding *fiveEncoding = encoding->getFiveEncodingFromSix(curCode);
+    if(fiveEncoding->getFiveBitEncoding != 0b11100){
+      reset();
+      return;
+    }
+  } else if(codeSize == 4){
+    ThreeEncoding *threeEncoding = encoding->getThreeEncodingFromFour(curCode);
+    if(threeEncoding->getThreeBitEncoding != 0b101){
+      reset();
+      return;
+    }
+
+    index++;
+    if(index == 7){
+      nextState();
+    }
+  }
   return;
 }
 
@@ -110,13 +131,17 @@ void FrameSource::loadPreamble(uint8_t code){
     }
   }
 
-void FrameSource::matchStartOfCode(uint8_t code){}
+void FrameSource::matchStartOfCode(){}
 
-void FrameSource::loadPayloadData(uint8_t code){}
+void FrameSource::loadPayloadData(){}
 
-void FrameSource::loadCRC(uint8_t code){}
+void FrameSource::loadCRC(){}
 
-void FrameSource::loadEndOfFrame(uint8_t code){}
+void FrameSource::loadEndOfFrame(){}
+
+bool FrameSource::isDone(){
+  return false;
+}
 
 } // namespace FrameSource
 } // namespace Communications

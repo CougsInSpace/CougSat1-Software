@@ -25,12 +25,13 @@ private:
 
   void reset();
 
-  void loadPreamble(uint8_t code);
-  void matchStartOfCode(uint8_t code);
-  void loadPayloadData(uint8_t code);
-  void loadCRC(uint8_t code);
-  void loadEndOfFrame(uint8_t code);
-  bool loadCode(uint8_t code);
+  void loadPreamble();
+  void matchStartOfCode();
+  void loadPayloadData();
+  void loadCRC();
+  void loadEndOfFrame();
+  bool loadCode(uint8_t byte);
+  inline void nextState(){state = (State_t) ((uint8_t) state + 1);}
 
   uint8_t payloadData[MAX_PAYLOAD];
 
