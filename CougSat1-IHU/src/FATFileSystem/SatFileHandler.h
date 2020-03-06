@@ -84,4 +84,6 @@ class SatFileHandler
         void initSerial();
 
         std::queue<std::pair<std::string, std::string>> inputMessages;
+
+        bool compareArrays(uint8_t *arr1, uint8_t *arr2, size_t size);
 };

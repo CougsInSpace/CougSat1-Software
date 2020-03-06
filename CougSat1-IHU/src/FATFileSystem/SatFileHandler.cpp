@@ -1,4 +1,5 @@
 #include "SatFileHandler.h"
+#include <algorithm>
 #include <sstream>
 
 SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
@@ -108,22 +109,21 @@ bool SatFileHandler::check()
         // else
         //         return false;
         // return status == 0;
-        uint8_t full = 0xFF;
-        uint8_t blockData, tmp;
+        uint8_t full[512];
+        std::fill_n(full, 512, 0xFF);
+        uint8_t blockData[512] = {0}, tmp[512] = {0};
         bd_size_t readSize = sdbd->get_read_size();
         bd_size_t num_blocks = sdbd->size() / readSize;
         if (debug)
                 pc->printf("SD Block Count: %lu\r\n", num_blocks);
 
         for (bd_size_t i = 0; i < num_blocks; i += 512) {
-                sdbd->read(&tmp, i, readSize);
-                sdbd->program(&full, i, readSize);
-                sdbd->read(&blockData, i, readSize);
-                if (blockData != full)
+                sdbd->read(tmp, i, readSize);
+                sdbd->program(full, i, readSize);
+                sdbd->read(blockData, i, readSize);
+                if (!compareArrays(blockData, full, 512))
                         return false;
                 sdbd->program(&tmp, i, readSize);
-                if (debug && (i / 512) % 300 == 0)
-                        pc->printf("300 Blocks done \r\n");
         }
         return true;
 }
@@ -224,4 +224,13 @@ void SatFileHandler::unmount()
                         pc->printf("Success\r\n");
                 }
         }
+}
+
+bool SatFileHandler::compareArrays(uint8_t *arr1, uint8_t *arr2, size_t size)
+{
+        for (size_t i = 0; i < size; i++) {
+                if (arr1[i] != arr2[i])
+                        return false;
+        }
+        return true;
 }
