@@ -102,13 +102,6 @@ bool SatFileHandler::clean(std::string dir)
 
 bool SatFileHandler::check()
 {
-        // struct statvfs fsinfo;
-        // int status = fs->statvfs("/fs/", &fsinfo);
-        // if (fsinfo.f_bfree < 512 * 10 && clean("/fs/"))
-        //         return true;
-        // else
-        //         return false;
-        // return status == 0;
         uint8_t full[512];
         std::fill_n(full, 512, 0xFF);
         uint8_t blockData[512] = {0}, tmp[512] = {0};
@@ -139,16 +132,18 @@ bool SatFileHandler::enqueueMessage(std::pair<std::string, std::string> message)
         // mute.unlock();
 }
 
-void SatFileHandler::init()
+mbed_error_status_t SatFileHandler::init()
 {
         if (debug)
                 initSerial();
-        initBlockDevice();
-        initFilesystem();
+        int bdStat = initBlockDevice();
+        int fsStat = initFilesystem();
         hwo.reset();
+        return (bdStat || fsStat) ? MBED_ERROR_CODE_FAILED_OPERATION
+                                  : MBED_SUCCESS;
 }
 
-void SatFileHandler::initFilesystem()
+mbed_error_status_t SatFileHandler::initFilesystem()
 {
         fs = std::make_unique<FATFileSystem>("fs");
         int status = fs->mount(sdbd.get());
@@ -160,9 +155,10 @@ void SatFileHandler::initFilesystem()
         }
         if (debug)
                 pc->printf("FileSystem Mount: \r\n%s\r\n", strerror(-status));
+        return status;
 }
 
-void SatFileHandler::initBlockDevice()
+mbed_error_status_t SatFileHandler::initBlockDevice()
 {
         sdbd = std::make_unique<SDBlockDevice>(hwo->mosi, hwo->miso, hwo->sclk,
                                                hwo->cs, hwo->freq, hwo->crc_on);
@@ -177,6 +173,7 @@ void SatFileHandler::initBlockDevice()
                 pc->printf("SD Erase Size: %lu\r\n", sdbd->get_erase_size());
                 ;
         }
+        return status;
 }
 
 void SatFileHandler::initSerial()
@@ -233,4 +230,16 @@ bool SatFileHandler::compareArrays(uint8_t *arr1, uint8_t *arr2, size_t size)
                         return false;
         }
         return true;
+}
+
+size_t SatFileHandler::getFreeSpace()
+{
+        struct statvfs fsinfo;
+        int status = fs->statvfs("/fs/", &fsinfo);
+        return fsinfo.f_bfree * fsinfo.f_bsize;
+}
+
+size_t SatFileHandler::getBlockDeviceSize()
+{
+        return sdbd->size();
 }

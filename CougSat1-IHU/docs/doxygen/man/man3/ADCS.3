@@ -1,0 +1,68 @@
+.TH "ADCS" 3 "Fri Mar 6 2020" "Version 0.0.1" "CougSat1-IHU" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+ADCS
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherits \fBSubsystem\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBADCS\fP (const \fBADCS\fP &)=delete"
+.br
+.ti -1c
+.RI "\fBADCS\fP & \fBoperator=\fP (const \fBADCS\fP &)=delete"
+.br
+.ti -1c
+.RI "\fBADCS\fP (I2C &i2c)"
+.br
+.RI "Construct a new ADCS::ADCS object\&. "
+.ti -1c
+.RI "\fB~ADCS\fP ()"
+.br
+.RI "Destroy the ADCS::ADCS object\&. "
+.ti -1c
+.RI "mbed_error_status_t \fBinitialize\fP ()"
+.br
+.RI "Initialize the \fBADCS\fP\&. "
+.in -1c
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "ADCS::ADCS (I2C & i2c)"
+
+.PP
+Construct a new ADCS::ADCS object\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIi2c\fP connected to the \fBADCS\fP 
+.RE
+.PP
+
+.SS "ADCS::~ADCS ()"
+
+.PP
+Destroy the ADCS::ADCS object\&. 
+.SH "Member Function Documentation"
+.PP 
+.SS "mbed_error_status_t ADCS::initialize ()\fC [virtual]\fP"
+
+.PP
+Initialize the \fBADCS\fP\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+mbed_error_status_t 
+.RE
+.PP
+
+.PP
+Implements \fBSubsystem\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for CougSat1-IHU from the source code\&.

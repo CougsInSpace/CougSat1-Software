@@ -1,0 +1,61 @@
+.TH "Subsystem" 3 "Fri Mar 6 2020" "Version 0.0.1" "CougSat1-IHU" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Subsystem
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherited by \fBADCS\fP, \fBComms\fP, \fBIFJR\fP, \fBPayload\fP, and \fBPMIC\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBSubsystem\fP (const \fBSubsystem\fP &)=delete"
+.br
+.ti -1c
+.RI "\fBSubsystem\fP & \fBoperator=\fP (const \fBSubsystem\fP &)=delete"
+.br
+.ti -1c
+.RI "\fBSubsystem\fP ()"
+.br
+.RI "Construct a new \fBSubsystem\fP object\&. "
+.ti -1c
+.RI "\fB~Subsystem\fP ()"
+.br
+.RI "Destroy the \fBSubsystem\fP object\&. "
+.ti -1c
+.RI "virtual mbed_error_status_t \fBinitialize\fP ()=0"
+.br
+.RI "Intializes subsystem\&. "
+.in -1c
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "Subsystem::Subsystem ()\fC [inline]\fP"
+
+.PP
+Construct a new \fBSubsystem\fP object\&. 
+.SS "Subsystem::~Subsystem ()\fC [inline]\fP"
+
+.PP
+Destroy the \fBSubsystem\fP object\&. 
+.SH "Member Function Documentation"
+.PP 
+.SS "virtual mbed_error_status_t Subsystem::initialize ()\fC [pure virtual]\fP"
+
+.PP
+Intializes subsystem\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+error code 
+.RE
+.PP
+
+.PP
+Implemented in \fBADCS\fP, \fBComms\fP, \fBIFJR\fP, \fBPayload\fP, and \fBPMIC\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for CougSat1-IHU from the source code\&.
