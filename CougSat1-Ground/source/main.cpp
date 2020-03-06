@@ -8,10 +8,12 @@
 
 #include <Windows.h>
 
+#include "Frame.h"
 #include "communications/Radio.h"
 #include "gui/GUI.h"
 #include "gui/Radio.h"
 
+//#include "IQSource.h"
 /**
  * @brief Logger callback
  * Prints the message string to the destination stream, default: stdout
@@ -86,25 +88,27 @@ void configureLogging(
 }
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-  try {
-    configureLogging("log.log", true, true);
-    spdlog::info("Cougs in Space Ground starting");
-    EBSetLogger(logEhbanana);
+  try { /*
+     configureLogging("log.log", true, true);
+     spdlog::info("Cougs in Space Ground starting");
+     EBSetLogger(logEhbanana);
 
-    GUI::GUI::init();
-    Communications::Radio::setConstellationCallback(
-        GUI::Radio::addConstellationIQ);
-    Communications::Radio::start();
+     //GUI::GUI::init();
+     Communications::Radio::setConstellationCallback(
+         GUI::Radio::addConstellationIQ);
+     Communications::Radio::start();
 
-    GUI::GUI::run();
+     GUI::GUI::run();
 
-    Communications::Radio::stop();
-    GUI::GUI::deinit();
+     Communications::Radio::stop();
+     GUI::GUI::deinit(); */
   } catch (const std::exception & e) {
     spdlog::error(e.what());
     return -1;
   }
-
+  /*
+  //Testing separate systems will occur here.
+  *///Use F5 to compile and run code.
   spdlog::info("Cougs in Space Ground complete");
   spdlog::default_logger()->flush();
   return 0;
