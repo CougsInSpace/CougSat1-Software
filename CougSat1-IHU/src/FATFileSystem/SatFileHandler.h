@@ -120,6 +120,9 @@ class SatFileHandler
         /// low on storage.
         uint16_t priority;
 
+        /// Thread for card detect light
+        Thread cardThread;
+
         /// Queue for messages.
         std::queue<std::pair<std::string, std::string>> inputMessages;
 
@@ -146,4 +149,7 @@ class SatFileHandler
         /// @return True for if they are matching, false if they are not.
         /// TODO: Update to work if sizes are different.
         bool compareArrays(uint8_t *arr1, uint8_t *arr2, size_t size);
+
+        /// Monitors the SD card detect pin and turns on LED when it detects it.
+        void checkDetectStatus();
 };

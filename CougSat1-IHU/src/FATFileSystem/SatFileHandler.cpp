@@ -124,6 +124,7 @@ mbed_error_status_t SatFileHandler::init()
         int bdStat = initBlockDevice();
         int fsStat = initFilesystem();
         hwo.reset();
+        cardThread.start(callback(this, &SatFileHandler::checkDetectStatus));
         return (bdStat || fsStat) ? MBED_ERROR_CODE_FAILED_OPERATION
                                   : MBED_SUCCESS;
 }
@@ -173,13 +174,8 @@ void SatFileHandler::reformat()
 {
         int status = fs->reformat(sdbd.get());
         if (debug) {
-                if (status) {
-                        pc->printf("Filesystem Reformat: \r\n");
-                        pc->printf("Failed\r\n");
-                } else {
-                        pc->printf("Filesystem Reformat: \r\n");
-                        pc->printf("Success\r\n");
-                }
+                pc->printf("Filesystem Reformat: \r\n");
+                pc->printf("%s\r\n", status ? "Failed" : "Success");
         }
 }
 
@@ -187,13 +183,8 @@ void SatFileHandler::mount()
 {
         int status = fs->mount(sdbd.get());
         if (debug) {
-                if (status) {
-                        pc->printf("Filesystem Mount: \r\n");
-                        pc->printf("Failed\r\n");
-                } else {
-                        pc->printf("Filesystem Mount: \r\n");
-                        pc->printf("Success\r\n");
-                }
+                pc->printf("Filesystem Mount: \r\n");
+                pc->printf("%s\r\n", status ? "Failed" : "Success");
         }
 }
 
@@ -201,13 +192,8 @@ void SatFileHandler::unmount()
 {
         int status = fs->unmount();
         if (debug) {
-                if (status) {
-                        pc->printf("Filesystem Unmount: \r\n");
-                        pc->printf("Failed\r\n");
-                } else {
-                        pc->printf("Filesystem Unmount: \r\n");
-                        pc->printf("Success\r\n");
-                }
+                pc->printf("Filesystem Unmount: \r\n");
+                pc->printf("%s\r\n", status ? "Failed" : "Success");
         }
 }
 
@@ -230,4 +216,14 @@ size_t SatFileHandler::freeSpace()
 size_t SatFileHandler::blockDeviceSize()
 {
         return sdbd->size();
+}
+
+void SatFileHandler::checkDetectStatus()
+{
+        DigitalOut sdDetect(LED2);
+        while (true) {
+                sdDetect = cardDetect->read();
+                // A small delay to prevent any flickering.
+                ThisThread::sleep_for(0.1);
+        }
 }
