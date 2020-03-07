@@ -124,7 +124,6 @@ mbed_error_status_t SatFileHandler::init()
         int bdStat = initBlockDevice();
         int fsStat = initFilesystem();
         hwo.reset();
-        cardThread.start(callback(this, &SatFileHandler::checkDetectStatus));
         return (bdStat || fsStat) ? MBED_ERROR_CODE_FAILED_OPERATION
                                   : MBED_SUCCESS;
 }
@@ -216,14 +215,4 @@ size_t SatFileHandler::freeSpace()
 size_t SatFileHandler::blockDeviceSize()
 {
         return sdbd->size();
-}
-
-void SatFileHandler::checkDetectStatus()
-{
-        DigitalOut sdDetect(LED2);
-        while (true) {
-                sdDetect = cardDetect->read();
-                // A small delay to prevent any flickering.
-                ThisThread::sleep_for(0.1);
-        }
 }

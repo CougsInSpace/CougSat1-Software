@@ -149,7 +149,4 @@ class SatFileHandler
         /// @return True for if they are matching, false if they are not.
         /// TODO: Update to work if sizes are different.
         bool compareArrays(uint8_t *arr1, uint8_t *arr2, size_t size);
-
-        /// Monitors the SD card detect pin and turns on LED when it detects it.
-        void checkDetectStatus();
 };
