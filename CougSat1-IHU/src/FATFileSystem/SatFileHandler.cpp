@@ -6,6 +6,7 @@
 SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
                                PinName cs, PinName cd, uint64_t hz, bool crc_on,
                                bool debug)
+        : debug(debug), needsReformat(false), current(0), priority(0)
 {
         hwo = std::make_unique<HardwareOptions>();
 
@@ -16,11 +17,6 @@ SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
         hwo->freq = hz;
         hwo->crc_on = crc_on;
         hwo->cd = cd;
-
-        this->debug = debug;
-        this->needsReformat = false;
-        this->current = 0;
-        this->priority = 0;
 }
 
 SatFileHandler::~SatFileHandler()
@@ -38,9 +34,9 @@ void SatFileHandler::writef(std::string filenameBase, const char *message)
         std::string currentString = "";
 
         for (int i = this->current; i; i /= 10) {
-
                 currentString = (char)((i % 10) + '0') + currentString;
         }
+
         fileName += currentString + ".txt";
         file.open(fileName, std::ios::out | std::ios::app);
 
@@ -123,8 +119,7 @@ void SatFileHandler::enqueueMessage(std::pair<std::string, std::string> message)
 
 mbed_error_status_t SatFileHandler::init()
 {
-        if (debug)
-                initSerial();
+        initSerial();
         cardDetect = std::make_unique<DigitalIn>(hwo->cd, PullUp);
         int bdStat = initBlockDevice();
         int fsStat = initFilesystem();
