@@ -15,7 +15,7 @@ Steps for Linux
 6. Use `mbed target` and `mbed toolchain` to set your board and compiler.
 7. Type `mbed compile`.
 8. Plug in board and open a serial connection.
-9. Use `sudo st-flash write BUILD/NUCLEO_L476RG/<TOOLCHAIN AND PROFILE>/CougSat1-IHU.bin 0x8000000` 
+9. Use `sudo st-flash write BUILD/<YOUR BOARD>/<TOOLCHAIN AND PROFILE>/CougSat1-IHU.bin 0x8000000` 
    to flash the board. Or you can drag and drop, but I've found this to be more reliable.
    
 Note:  
