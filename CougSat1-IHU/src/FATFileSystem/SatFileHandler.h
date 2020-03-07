@@ -1,4 +1,4 @@
-#include <FATFileSystem.h>
+#include <LittleFileSystem.h>
 #include <SDBlockDevice.h>
 #include <mbed.h>
 #include <memory>
@@ -8,6 +8,9 @@
 /// Class that will handle all file read/write operations to a given medium on
 /// the sattelite. Handles all operations related to files. Currently only
 /// operates on string data.
+/// Note: The LittleFileSystem is not compatible with PCs, however it offers
+/// enough beneifts for it to be worth it. Check the documentation for more
+/// information.
 /// TODO: Update to work with other types of data.
 class SatFileHandler
 {
@@ -99,7 +102,7 @@ class SatFileHandler
                 bool crc_on;
         };
         /// Filesystem to be mounted.
-        std::unique_ptr<FATFileSystem> fs;
+        std::unique_ptr<LittleFileSystem> fs;
         /// Block device that corresponds to the SD card.
         std::unique_ptr<SDBlockDevice> sdbd;
 

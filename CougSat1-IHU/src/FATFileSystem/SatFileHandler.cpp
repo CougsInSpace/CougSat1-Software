@@ -130,7 +130,7 @@ mbed_error_status_t SatFileHandler::init()
 
 mbed_error_status_t SatFileHandler::initFilesystem()
 {
-        fs = std::make_unique<FATFileSystem>("fs");
+        fs = std::make_unique<LittleFileSystem>("fs");
         int status = fs->mount(sdbd.get());
         if (status) {
                 pc->printf("Failed to mount filesystem, "
