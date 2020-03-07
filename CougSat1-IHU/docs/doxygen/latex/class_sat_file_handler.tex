@@ -9,6 +9,11 @@ Class that will handle all file read/write operations to a given medium on the s
 
 {\ttfamily \#include $<$Sat\+File\+Handler.\+h$>$}
 
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_sat_file_handler_1_1_hardware_options}{Hardware\+Options}}
+\begin{DoxyCompactList}\small\item\em Contains all pin names for S\+PI as well as operatiing frequency and crc. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -35,7 +40,7 @@ void \mbox{\hyperlink{class_sat_file_handler_a3281befca1d7df2e4035cec885c161ae}{
 \begin{DoxyCompactList}\small\item\em Unmounts the filesystem. \end{DoxyCompactList}\item 
 \mbox{\Hypertarget{class_sat_file_handler_ad404c0cfc5ee0fea8d19b6be6627954d}\label{class_sat_file_handler_ad404c0cfc5ee0fea8d19b6be6627954d}} 
 bool \mbox{\hyperlink{class_sat_file_handler_ad404c0cfc5ee0fea8d19b6be6627954d}{check}} ()
-\begin{DoxyCompactList}\small\item\em checks for bad blocks. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Checks for bad blocks. \end{DoxyCompactList}\item 
 size\+\_\+t \mbox{\hyperlink{class_sat_file_handler_ae4b0b4244befa3a3d1fdfc451ae248f0}{get\+Free\+Space}} ()
 \begin{DoxyCompactList}\small\item\em Get amount of free space in bytes of the filesystem. \end{DoxyCompactList}\item 
 size\+\_\+t \mbox{\hyperlink{class_sat_file_handler_a1a01017636190f9c3e14633564468882}{get\+Block\+Device\+Size}} ()
@@ -44,12 +49,56 @@ bool \mbox{\hyperlink{class_sat_file_handler_a9f5a3c0ee440bf5a45f49add4dd2f04d}{
 \begin{DoxyCompactList}\small\item\em Function to enqueue a message to store on the SD card. \end{DoxyCompactList}\item 
 std\+::string \mbox{\hyperlink{class_sat_file_handler_a5529b9e3f7ec6ae60db4c9c83fbe6ea8}{read}} (const std\+::string \&file\+Name\+Full)
 \begin{DoxyCompactList}\small\item\em Read a file from the filesystem. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_sat_file_handler_a61cd259dd830e9ee5044f22e127982a4}{clean}} (std\+::string dir)
+\begin{DoxyCompactList}\small\item\em Cleans the file system...somehow. \end{DoxyCompactList}\item 
+mbed\+\_\+error\+\_\+status\+\_\+t \mbox{\hyperlink{class_sat_file_handler_a6c31918d174a3161389665ef6c32c064}{init\+Block\+Device}} ()
+\begin{DoxyCompactList}\small\item\em Creates the connection to the block device. \end{DoxyCompactList}\item 
+mbed\+\_\+error\+\_\+status\+\_\+t \mbox{\hyperlink{class_sat_file_handler_a627ea649602f208a18a7248b3c1c966a}{init\+Filesystem}} ()
+\begin{DoxyCompactList}\small\item\em Mounts the file system. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_sat_file_handler_a1e2e5da44ae0b6287b93ceee43878f18}\label{class_sat_file_handler_a1e2e5da44ae0b6287b93ceee43878f18}} 
+void \mbox{\hyperlink{class_sat_file_handler_a1e2e5da44ae0b6287b93ceee43878f18}{init\+Serial}} ()
+\begin{DoxyCompactList}\small\item\em Create a serial connection to the host computer. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_sat_file_handler_ac65b0803b09b8ad0ab172e0db3fddd21}{compare\+Arrays}} (uint8\+\_\+t $\ast$arr1, uint8\+\_\+t $\ast$arr2, size\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Compares the values in two array. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_sat_file_handler_adf32ed5ceacb6338730bace392c7707c}\label{class_sat_file_handler_adf32ed5ceacb6338730bace392c7707c}} 
+bool {\bfseries debug}
+\item 
+bool \mbox{\hyperlink{class_sat_file_handler_a871dee72893c3b9452a1f181b33103df}{needs\+Reformat}}
+\begin{DoxyCompactList}\small\item\em Currently unused. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_sat_file_handler_a911ab736da22eed7a1afdd5344c6c305}\label{class_sat_file_handler_a911ab736da22eed7a1afdd5344c6c305}} 
+std\+::unique\+\_\+ptr$<$ F\+A\+T\+File\+System $>$ \mbox{\hyperlink{class_sat_file_handler_a911ab736da22eed7a1afdd5344c6c305}{fs}}
+\begin{DoxyCompactList}\small\item\em Filesystem to be mounted. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_sat_file_handler_a02b8703f737315438b2e7d2c35819eb7}\label{class_sat_file_handler_a02b8703f737315438b2e7d2c35819eb7}} 
+std\+::unique\+\_\+ptr$<$ S\+D\+Block\+Device $>$ \mbox{\hyperlink{class_sat_file_handler_a02b8703f737315438b2e7d2c35819eb7}{sdbd}}
+\begin{DoxyCompactList}\small\item\em Block device that corresponds to the SD card. \end{DoxyCompactList}\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{struct_sat_file_handler_1_1_hardware_options}{Hardware\+Options}} $>$ \mbox{\hyperlink{class_sat_file_handler_a26220c492649c0424010e21de171259e}{hwo}}
+\begin{DoxyCompactList}\small\item\em Struct containing all the hardware options. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{class_sat_file_handler_ac61d216e89063d7c2a62071a6d89ad34}{current}}
+\begin{DoxyCompactList}\small\item\em Holds the current day of the satelite will increment after each day. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{class_sat_file_handler_ab7d2d4891d2de2fd472afab6af45dcba}{priority}}
+\begin{DoxyCompactList}\small\item\em Hold the day that takes priority in removal if the device is running low on storage. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_sat_file_handler_a4bd885daea92333ad616498731cd8232}\label{class_sat_file_handler_a4bd885daea92333ad616498731cd8232}} 
+Serial $\ast$ \mbox{\hyperlink{class_sat_file_handler_a4bd885daea92333ad616498731cd8232}{pc}}
+\begin{DoxyCompactList}\small\item\em Serial out for testing purposes. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_sat_file_handler_a49a2391c78c0cca9ad796344dd7b33a6}\label{class_sat_file_handler_a49a2391c78c0cca9ad796344dd7b33a6}} 
+std\+::queue$<$ std\+::pair$<$ std\+::string, std\+::string $>$ $>$ \mbox{\hyperlink{class_sat_file_handler_a49a2391c78c0cca9ad796344dd7b33a6}{input\+Messages}}
+\begin{DoxyCompactList}\small\item\em Queue for messages. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
 Class that will handle all file read/write operations to a given medium on the sattelite. 
 
 Handles all operations related to files. Currently only operates on string data. T\+O\+DO\+: Update to work with other types of data. 
+
+Definition at line 16 of file Sat\+File\+Handler.\+h.
+
+
 
 \subsection{Constructor \& Destructor Documentation}
 \mbox{\Hypertarget{class_sat_file_handler_a077c457c3daa568f5415b3d03d01a2a2}\label{class_sat_file_handler_a077c457c3daa568f5415b3d03d01a2a2}} 
@@ -74,11 +123,15 @@ Create a \mbox{\hyperlink{class_sat_file_handler}{Sat\+File\+Handler}} where the
 \hline
 {\em hz} & Operating frequency of the S\+PI bus. \\
 \hline
-{\em crc\+\_\+on} & Decides whether or not to use cyclic redundancy check \\
+{\em crc\+\_\+on} & Decides whether or not to use cyclic redundancy check. \\
 \hline
 {\em debug} & Decides whether or not debug data should be outputted. \\
 \hline
 \end{DoxyParams}
+
+
+Definition at line 5 of file Sat\+File\+Handler.\+cpp.
+
 \mbox{\Hypertarget{class_sat_file_handler_ac16f6dbdc038a207f3fd3e572f2df496}\label{class_sat_file_handler_ac16f6dbdc038a207f3fd3e572f2df496}} 
 \index{SatFileHandler@{SatFileHandler}!````~SatFileHandler@{$\sim$SatFileHandler}}
 \index{````~SatFileHandler@{$\sim$SatFileHandler}!SatFileHandler@{SatFileHandler}}
@@ -91,7 +144,59 @@ Destructor.
 
 Unmounts the filesystem and deinits the block device for a clean disconnect. 
 
+Definition at line 23 of file Sat\+File\+Handler.\+cpp.
+
+
+
 \subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_sat_file_handler_a61cd259dd830e9ee5044f22e127982a4}\label{class_sat_file_handler_a61cd259dd830e9ee5044f22e127982a4}} 
+\index{SatFileHandler@{SatFileHandler}!clean@{clean}}
+\index{clean@{clean}!SatFileHandler@{SatFileHandler}}
+\subsubsection{\texorpdfstring{clean()}{clean()}}
+{\footnotesize\ttfamily bool Sat\+File\+Handler\+::clean (\begin{DoxyParamCaption}\item[{std\+::string}]{dir }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Cleans the file system...somehow. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir} & Name of directory to...clean? \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True for success, otherwise false. 
+\end{DoxyReturn}
+
+
+Definition at line 89 of file Sat\+File\+Handler.\+cpp.
+
+\mbox{\Hypertarget{class_sat_file_handler_ac65b0803b09b8ad0ab172e0db3fddd21}\label{class_sat_file_handler_ac65b0803b09b8ad0ab172e0db3fddd21}} 
+\index{SatFileHandler@{SatFileHandler}!compareArrays@{compareArrays}}
+\index{compareArrays@{compareArrays}!SatFileHandler@{SatFileHandler}}
+\subsubsection{\texorpdfstring{compareArrays()}{compareArrays()}}
+{\footnotesize\ttfamily bool Sat\+File\+Handler\+::compare\+Arrays (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{arr1,  }\item[{uint8\+\_\+t $\ast$}]{arr2,  }\item[{size\+\_\+t}]{size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Compares the values in two array. 
+
+Used in check function. 
+\begin{DoxyParams}{Parameters}
+{\em arr1} & Pointer to first element of first array. \\
+\hline
+{\em arr2} & Pointer to first element of second array. \\
+\hline
+{\em size} & Size of both arrays. Note\+: Function only works if arrays are same size. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True for if they are matching, false if they are not. T\+O\+DO\+: Update to work if sizes are different. 
+\end{DoxyReturn}
+
+
+Definition at line 226 of file Sat\+File\+Handler.\+cpp.
+
 \mbox{\Hypertarget{class_sat_file_handler_a9f5a3c0ee440bf5a45f49add4dd2f04d}\label{class_sat_file_handler_a9f5a3c0ee440bf5a45f49add4dd2f04d}} 
 \index{SatFileHandler@{SatFileHandler}!enqueueMessage@{enqueueMessage}}
 \index{enqueueMessage@{enqueueMessage}!SatFileHandler@{SatFileHandler}}
@@ -110,7 +215,11 @@ Function to enqueue a message to store on the SD card.
 \begin{DoxyReturn}{Returns}
 True if enqueued; false if the queue is full.
 \end{DoxyReturn}
-U\+SE F\+OR T\+H\+R\+E\+AD S\+A\+F\+E\+TY \mbox{\Hypertarget{class_sat_file_handler_a1a01017636190f9c3e14633564468882}\label{class_sat_file_handler_a1a01017636190f9c3e14633564468882}} 
+U\+SE F\+OR T\+H\+R\+E\+AD S\+A\+F\+E\+TY 
+
+Definition at line 124 of file Sat\+File\+Handler.\+cpp.
+
+\mbox{\Hypertarget{class_sat_file_handler_a1a01017636190f9c3e14633564468882}\label{class_sat_file_handler_a1a01017636190f9c3e14633564468882}} 
 \index{SatFileHandler@{SatFileHandler}!getBlockDeviceSize@{getBlockDeviceSize}}
 \index{getBlockDeviceSize@{getBlockDeviceSize}!SatFileHandler@{SatFileHandler}}
 \subsubsection{\texorpdfstring{getBlockDeviceSize()}{getBlockDeviceSize()}}
@@ -123,6 +232,10 @@ Get the number of bytes in the block device.
 \begin{DoxyReturn}{Returns}
 Size of block device in bytes. 
 \end{DoxyReturn}
+
+
+Definition at line 242 of file Sat\+File\+Handler.\+cpp.
+
 \mbox{\Hypertarget{class_sat_file_handler_ae4b0b4244befa3a3d1fdfc451ae248f0}\label{class_sat_file_handler_ae4b0b4244befa3a3d1fdfc451ae248f0}} 
 \index{SatFileHandler@{SatFileHandler}!getFreeSpace@{getFreeSpace}}
 \index{getFreeSpace@{getFreeSpace}!SatFileHandler@{SatFileHandler}}
@@ -136,6 +249,10 @@ Get amount of free space in bytes of the filesystem.
 \begin{DoxyReturn}{Returns}
 Amount of free space in bytes. 
 \end{DoxyReturn}
+
+
+Definition at line 235 of file Sat\+File\+Handler.\+cpp.
+
 \mbox{\Hypertarget{class_sat_file_handler_aacd220dabbabf695b7ee32e526baeb5e}\label{class_sat_file_handler_aacd220dabbabf695b7ee32e526baeb5e}} 
 \index{SatFileHandler@{SatFileHandler}!init@{init}}
 \index{init@{init}!SatFileHandler@{SatFileHandler}}
@@ -149,6 +266,44 @@ Initialize the block device, filesystem and serial connection.
 \begin{DoxyReturn}{Returns}
 Return 0 for success, negative error code for failure. 
 \end{DoxyReturn}
+
+
+Definition at line 135 of file Sat\+File\+Handler.\+cpp.
+
+\mbox{\Hypertarget{class_sat_file_handler_a6c31918d174a3161389665ef6c32c064}\label{class_sat_file_handler_a6c31918d174a3161389665ef6c32c064}} 
+\index{SatFileHandler@{SatFileHandler}!initBlockDevice@{initBlockDevice}}
+\index{initBlockDevice@{initBlockDevice}!SatFileHandler@{SatFileHandler}}
+\subsubsection{\texorpdfstring{initBlockDevice()}{initBlockDevice()}}
+{\footnotesize\ttfamily mbed\+\_\+error\+\_\+status\+\_\+t Sat\+File\+Handler\+::init\+Block\+Device (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Creates the connection to the block device. 
+
+\begin{DoxyReturn}{Returns}
+Return 0 for success, negative error code for failure. 
+\end{DoxyReturn}
+
+
+Definition at line 161 of file Sat\+File\+Handler.\+cpp.
+
+\mbox{\Hypertarget{class_sat_file_handler_a627ea649602f208a18a7248b3c1c966a}\label{class_sat_file_handler_a627ea649602f208a18a7248b3c1c966a}} 
+\index{SatFileHandler@{SatFileHandler}!initFilesystem@{initFilesystem}}
+\index{initFilesystem@{initFilesystem}!SatFileHandler@{SatFileHandler}}
+\subsubsection{\texorpdfstring{initFilesystem()}{initFilesystem()}}
+{\footnotesize\ttfamily mbed\+\_\+error\+\_\+status\+\_\+t Sat\+File\+Handler\+::init\+Filesystem (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Mounts the file system. 
+
+If the mount fails, will reformat. \begin{DoxyReturn}{Returns}
+Return 0 for success, negative error code for failure. 
+\end{DoxyReturn}
+
+
+Definition at line 146 of file Sat\+File\+Handler.\+cpp.
+
 \mbox{\Hypertarget{class_sat_file_handler_a5529b9e3f7ec6ae60db4c9c83fbe6ea8}\label{class_sat_file_handler_a5529b9e3f7ec6ae60db4c9c83fbe6ea8}} 
 \index{SatFileHandler@{SatFileHandler}!read@{read}}
 \index{read@{read}!SatFileHandler@{SatFileHandler}}
@@ -167,6 +322,10 @@ Read a file from the filesystem.
 \begin{DoxyReturn}{Returns}
 String of data in file. 
 \end{DoxyReturn}
+
+
+Definition at line 76 of file Sat\+File\+Handler.\+cpp.
+
 \mbox{\Hypertarget{class_sat_file_handler_a54f30111dd898bc6ce1e0c0ce6a82350}\label{class_sat_file_handler_a54f30111dd898bc6ce1e0c0ce6a82350}} 
 \index{SatFileHandler@{SatFileHandler}!write@{write}}
 \index{write@{write}!SatFileHandler@{SatFileHandler}}
@@ -187,6 +346,10 @@ Calls writef?
 \begin{DoxyReturn}{Returns}
 True for success, otherwise false. 
 \end{DoxyReturn}
+
+
+Definition at line 60 of file Sat\+File\+Handler.\+cpp.
+
 \mbox{\Hypertarget{class_sat_file_handler_a355361c4ec4692c5b533740121976eb2}\label{class_sat_file_handler_a355361c4ec4692c5b533740121976eb2}} 
 \index{SatFileHandler@{SatFileHandler}!writef@{writef}}
 \index{writef@{writef}!SatFileHandler@{SatFileHandler}}
@@ -207,6 +370,10 @@ Writes a string to a file.
 \begin{DoxyReturn}{Returns}
 True for success, otherwise false. 
 \end{DoxyReturn}
+
+
+Definition at line 29 of file Sat\+File\+Handler.\+cpp.
+
 \mbox{\Hypertarget{class_sat_file_handler_a458d6cf20f9384c4ef1c0ce3f57d1ab1}\label{class_sat_file_handler_a458d6cf20f9384c4ef1c0ce3f57d1ab1}} 
 \index{SatFileHandler@{SatFileHandler}!writeStart@{writeStart}}
 \index{writeStart@{writeStart}!SatFileHandler@{SatFileHandler}}
@@ -220,6 +387,69 @@ Writes whatever is in the queue.
 \begin{DoxyReturn}{Returns}
 True for success, otherwise false. 
 \end{DoxyReturn}
+
+
+Definition at line 65 of file Sat\+File\+Handler.\+cpp.
+
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_sat_file_handler_ac61d216e89063d7c2a62071a6d89ad34}\label{class_sat_file_handler_ac61d216e89063d7c2a62071a6d89ad34}} 
+\index{SatFileHandler@{SatFileHandler}!current@{current}}
+\index{current@{current}!SatFileHandler@{SatFileHandler}}
+\subsubsection{\texorpdfstring{current}{current}}
+{\footnotesize\ttfamily uint16\+\_\+t Sat\+File\+Handler\+::current\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Holds the current day of the satelite will increment after each day. 
+
+
+
+Definition at line 120 of file Sat\+File\+Handler.\+h.
+
+\mbox{\Hypertarget{class_sat_file_handler_a26220c492649c0424010e21de171259e}\label{class_sat_file_handler_a26220c492649c0424010e21de171259e}} 
+\index{SatFileHandler@{SatFileHandler}!hwo@{hwo}}
+\index{hwo@{hwo}!SatFileHandler@{SatFileHandler}}
+\subsubsection{\texorpdfstring{hwo}{hwo}}
+{\footnotesize\ttfamily std\+::unique\+\_\+ptr$<$\mbox{\hyperlink{struct_sat_file_handler_1_1_hardware_options}{Hardware\+Options}}$>$ Sat\+File\+Handler\+::hwo\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Struct containing all the hardware options. 
+
+Is deleted when init finishes. 
+
+Definition at line 116 of file Sat\+File\+Handler.\+h.
+
+\mbox{\Hypertarget{class_sat_file_handler_a871dee72893c3b9452a1f181b33103df}\label{class_sat_file_handler_a871dee72893c3b9452a1f181b33103df}} 
+\index{SatFileHandler@{SatFileHandler}!needsReformat@{needsReformat}}
+\index{needsReformat@{needsReformat}!SatFileHandler@{SatFileHandler}}
+\subsubsection{\texorpdfstring{needsReformat}{needsReformat}}
+{\footnotesize\ttfamily bool Sat\+File\+Handler\+::needs\+Reformat\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Currently unused. 
+
+Will be used to set if we need a reformat of filesystem. 
+
+Definition at line 97 of file Sat\+File\+Handler.\+h.
+
+\mbox{\Hypertarget{class_sat_file_handler_ab7d2d4891d2de2fd472afab6af45dcba}\label{class_sat_file_handler_ab7d2d4891d2de2fd472afab6af45dcba}} 
+\index{SatFileHandler@{SatFileHandler}!priority@{priority}}
+\index{priority@{priority}!SatFileHandler@{SatFileHandler}}
+\subsubsection{\texorpdfstring{priority}{priority}}
+{\footnotesize\ttfamily uint16\+\_\+t Sat\+File\+Handler\+::priority\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Hold the day that takes priority in removal if the device is running low on storage. 
+
+
+
+Definition at line 124 of file Sat\+File\+Handler.\+h.
+
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}

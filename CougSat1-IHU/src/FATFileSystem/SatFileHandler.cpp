@@ -1,9 +1,11 @@
 #include "SatFileHandler.h"
 #include <algorithm>
+#include <fstream>
 #include <sstream>
 
 SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
-                               PinName cs, uint64_t hz, bool crc_on, bool debug)
+                               PinName cs, PinName cd, uint64_t hz, bool crc_on,
+                               bool debug)
 {
         hwo = std::make_unique<HardwareOptions>();
 
@@ -13,6 +15,7 @@ SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
         hwo->cs = cs;
         hwo->freq = hz;
         hwo->crc_on = crc_on;
+        hwo->cd = cd;
 
         this->debug = debug;
         this->needsReformat = false;
@@ -26,7 +29,7 @@ SatFileHandler::~SatFileHandler()
         sdbd->deinit();
 }
 
-bool SatFileHandler::writef(std::string filenameBase, const char *message)
+void SatFileHandler::writef(std::string filenameBase, const char *message)
 {
 
         std::fstream file;
@@ -42,35 +45,27 @@ bool SatFileHandler::writef(std::string filenameBase, const char *message)
         file.open(fileName, std::ios::out | std::ios::app);
 
         if (!file.is_open()) {
-                if (debug) {
-                        pc->printf("ERROR failed to open file");
-                }
-                return false;
+                pc->printf("WRITE_ERROR: Failed to open file\r\n");
+                return;
         }
 
-        file << message << std::endl;
-        file.flush();
-
-        file.close();
+        file << message << "\n";
 
         this->current++;
-        return true;
 }
 
-bool SatFileHandler::write(std::string filenameBase, std::string &message)
+void SatFileHandler::write(std::string filenameBase, const std::string &message)
 {
-        return this->writef(filenameBase, message.c_str());
+        this->writef(filenameBase, message.c_str());
 }
 
-bool SatFileHandler::writeStart()
+void SatFileHandler::writeStart()
 {
-        bool t = false;
         while (!inputMessages.empty()) {
                 std::pair<std::string, std::string> p = inputMessages.front();
-                t = write(get<0>(p), get<1>(p));
+                write(get<0>(p), get<1>(p));
                 inputMessages.pop();
         }
-        return t;
 }
 
 std::string SatFileHandler::read(const std::string &fileNameFull)
@@ -78,15 +73,14 @@ std::string SatFileHandler::read(const std::string &fileNameFull)
         std::ifstream file("/fs/" + fileNameFull);
         std::stringstream out;
         if (!file.is_open()) {
-                pc->printf("ERROR: File cannot be found\r\n");
+                pc->printf("READ_ERROR: File cannot be found\r\n");
                 return "";
         }
         out << file.rdbuf();
         return out.str();
 }
 
-//
-bool SatFileHandler::clean(std::string dir)
+void SatFileHandler::clean(std::string dir)
 {
         DIR *d = opendir("/fs/");
         struct dirent ent;
@@ -97,45 +91,41 @@ bool SatFileHandler::clean(std::string dir)
         }
 
         this->priority++;
-        return true;
 }
 
-bool SatFileHandler::check()
+void SatFileHandler::check()
 {
         uint8_t full[512];
         std::fill_n(full, 512, 0xFF);
         uint8_t blockData[512] = {0}, tmp[512] = {0};
         bd_size_t readSize = sdbd->get_read_size();
         bd_size_t num_blocks = sdbd->size() / readSize;
+        uint32_t numBad = 0;
         if (debug)
                 pc->printf("SD Block Count: %lu\r\n", num_blocks);
-
         for (bd_size_t i = 0; i < num_blocks; i += 512) {
                 sdbd->read(tmp, i, readSize);
                 sdbd->program(full, i, readSize);
                 sdbd->read(blockData, i, readSize);
-                if (!compareArrays(blockData, full, 512))
-                        return false;
+                if (!compareArrays(blockData, full, 512)) {
+                        numBad++;
+                }
                 sdbd->program(&tmp, i, readSize);
         }
-        return true;
+        pc->printf("Block device check: Done\r\n");
+        pc->printf("Number of bad blocks: %lu\r\n", numBad);
 }
 
-bool SatFileHandler::enqueueMessage(std::pair<std::string, std::string> message)
+void SatFileHandler::enqueueMessage(std::pair<std::string, std::string> message)
 {
-
-        // Mutex mute;
-
-        // mute.lock();
         inputMessages.push(message);
-        return true;
-        // mute.unlock();
 }
 
 mbed_error_status_t SatFileHandler::init()
 {
         if (debug)
                 initSerial();
+        cardDetect = std::make_unique<DigitalIn>(hwo->cd, PullUp);
         int bdStat = initBlockDevice();
         int fsStat = initFilesystem();
         hwo.reset();
@@ -148,7 +138,8 @@ mbed_error_status_t SatFileHandler::initFilesystem()
         fs = std::make_unique<FATFileSystem>("fs");
         int status = fs->mount(sdbd.get());
         if (status) {
-                pc->printf("Failed to mount filesystem, reformatting...\r\n");
+                pc->printf("Failed to mount filesystem, "
+                           "reformatting...\r\n");
                 reformat();
                 pc->printf("Reformat done\r\n");
                 status = fs->mount(sdbd.get());
@@ -164,12 +155,14 @@ mbed_error_status_t SatFileHandler::initBlockDevice()
                                                hwo->cs, hwo->freq, hwo->crc_on);
         int status = sdbd->init();
         if (debug) {
-                pc->printf("SD Block Device Init: \r\n");
-                pc->printf("%s\r\n", strerror(-status));
+                int cardDetected = cardDetect->read();
+                pc->printf("SD Card Detected: \r\n");
+                pc->printf("%s\r\n", cardDetected ? "True" : "False");
                 pc->printf("SD Device Size: %lu\r\n", sdbd->size());
                 pc->printf("SD Read Size: %lu\r\n", sdbd->get_read_size());
                 pc->printf("SD Program Size: %lu\r\n",
-                           sdbd->get_program_size()); // write size, basically
+                           sdbd->get_program_size()); // write size,
+                                                      // basically
                 pc->printf("SD Erase Size: %lu\r\n", sdbd->get_erase_size());
                 ;
         }
@@ -178,7 +171,7 @@ mbed_error_status_t SatFileHandler::initBlockDevice()
 
 void SatFileHandler::initSerial()
 {
-        pc = new Serial(SERIAL_TX, SERIAL_RX);
+        pc = std::make_unique<Serial>(SERIAL_TX, SERIAL_RX);
 }
 
 void SatFileHandler::reformat()
@@ -232,14 +225,14 @@ bool SatFileHandler::compareArrays(uint8_t *arr1, uint8_t *arr2, size_t size)
         return true;
 }
 
-size_t SatFileHandler::getFreeSpace()
+size_t SatFileHandler::freeSpace()
 {
         struct statvfs fsinfo;
-        int status = fs->statvfs("/fs/", &fsinfo);
+        fs->statvfs("/fs/", &fsinfo);
         return fsinfo.f_bfree * fsinfo.f_bsize;
 }
 
-size_t SatFileHandler::getBlockDeviceSize()
+size_t SatFileHandler::blockDeviceSize()
 {
         return sdbd->size();
 }

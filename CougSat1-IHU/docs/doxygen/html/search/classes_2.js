@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ifjr',['IFJR',['../class_i_f_j_r.html',1,'']]]
+  ['hardwareoptions',['HardwareOptions',['../struct_sat_file_handler_1_1_hardware_options.html',1,'SatFileHandler']]]
 ];

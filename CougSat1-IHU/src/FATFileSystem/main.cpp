@@ -13,10 +13,9 @@
 int main()
 {
         Serial pc(SERIAL_TX, SERIAL_RX);
-        SatFileHandler testfs(D11, D12, D13, D10, 1000000, false, true);
+        SatFileHandler testfs(D11, D12, D13, D10, D2, 1000000, false, true);
         testfs.init();
-        pc.printf("Start file write test \r\n");
-        string testString("Hello World Big Brain\r\n");
+        string testString = "Hello World Big Brain\r\n";
         /*int a = testfs.sd.init();
         testfs.fs.format(&sd); //Uncomment if this is ghe first time running
         this testfs.fs.mount(&sd); pc.printf("%X \r\n", a);*/
@@ -24,42 +23,24 @@ int main()
            run but not the first run. The file system must be mounted and the
            file must be written first */
 
-        if (testfs.write(std::string("fuckThisTest"), testString)) {
-                pc.printf("Halfway there WHOA\r\n");
+        pc.printf("Start write test.\r\n");
+        testfs.write("fuckThisTest", testString);
 
-                testString = "this is appended\r\n";
-                if (testfs.write(std::string("fuckThisTest"), testString)) {
-                        pc.printf("LIVIN ON A PRAYER\r\n");
-                }
-        }
+        pc.printf("Start append test.\r\n");
+        testString = "this is appended\r\n";
+        testfs.write("fuckThisTest", testString);
 
-        else
-                pc.printf("Fail \r\n");
-
-        pc.printf("Start 2, enqueue test \r\n");
+        pc.printf("Start queue test.\r\n");
         int n = 0;
         for (int i = 0; i < 5; i += 1) {
                 std::pair<string, string> p("test1", "fuckthistest" + n);
                 testfs.enqueueMessage(p);
         }
+        testfs.writeStart();
 
-        if (testfs.writeStart()) {
-                pc.printf("Success 2 \r\n");
-        } else {
-                pc.printf("Fail 2 \r\n");
-        }
+        pc.printf("Start read test.\r\n");
+        testfs.read(std::string("fuckThisTest.txt"));
 
-        pc.printf("Start 3, read test \n\r");
-        if (testfs.read(std::string("fuckThisTest.txt")) != "") {
-                pc.printf("Success 3 \r\n");
-        } else {
-                pc.printf("Fail 3 \r\n");
-        }
-
-        // pc.printf("Start 4, check test \n\r");
-        // if (testfs.check()) {
-        //         pc.printf("Success 4 \r\n");
-        // } else {
-        //         pc.printf("Fail 4 \r\n");
-        // }
+        pc.printf("Start test check.\r\n");
+        testfs.check();
 }
