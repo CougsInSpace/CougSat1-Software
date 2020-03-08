@@ -66,7 +66,7 @@ void SatFileHandler::writeStart()
         }
 }
 
-std::string SatFileHandler::read(const std::string &fileNameFull) const
+std::string SatFileHandler::read(const std::string &fileNameFull)
 {
         std::ifstream file(rootDirectory + fileNameFull);
         std::stringstream out;
@@ -229,4 +229,19 @@ size_t SatFileHandler::freeSpace() const
 size_t SatFileHandler::blockDeviceSize() const
 {
         return sdbd->size();
+}
+
+void SatFileHandler::writeBin(const char *fileName)
+{
+        std::fstream binToWrite(filePath, std::ios::in | std::ios::binary);
+        std::fstream binOut(rootDirectory + filename,
+                            std::ios::out | std::ios::binary);
+
+        binOut.write(binToWrite.rdbuf(), sizeof(binToWrite));
+        binOut.flash();
+}
+
+std::fstream SatFileHandler::readBin(const char *fileName)
+{
+        return std::fstream(fileName, std::ios::out | std::ios::binary);
 }

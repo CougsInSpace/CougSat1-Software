@@ -87,7 +87,11 @@ class SatFileHandler
         /// Read a file from the filesystem.
         /// @param fileNameFull Name of the file with extension to read.
         /// @return String of data in file.
-        std::string read(const std::string &fileNameFull) const;
+        std::string read(const std::string &fileNameFull);
+
+        void writeBin(const char *fileName);
+
+        std::fstream readBin(const char *filePath);
 
     private:
         bool debug;
