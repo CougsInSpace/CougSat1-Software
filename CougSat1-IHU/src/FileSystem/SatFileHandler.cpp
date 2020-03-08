@@ -56,13 +56,10 @@ void SatFileHandler::write(const std::string &filenameBase,
 void SatFileHandler::write(const std::string &filenameBase,
                            std::iostream &stream, std::ios::openmode mode)
 {
+        std::fstream file(rootDirectory + filenameBase, mode);
+        file << stream.rdbuf();
+        file.flush();
 }
-
-/*void SatFileHandler::write(std::string filenameBase, const std::string
-&message, std::ios_base::openmode mode)
-{
-        this->writef(filenameBase, message.c_str(), mode);
-}*/
 
 void SatFileHandler::writeStart()
 {
