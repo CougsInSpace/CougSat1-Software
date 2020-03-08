@@ -148,7 +148,7 @@ mbed_error_status_t SatFileHandler::init()
 
 mbed_error_status_t SatFileHandler::initFilesystem()
 {
-        fs = std::make_unique<LittleFileSystem>("fs");
+        fs = std::make_unique<FATFileSystem>("fs");
         int status = fs->mount(sdbd.get());
         if (status) {
                 pc->printf("Failed to mount filesystem, "
@@ -231,17 +231,24 @@ size_t SatFileHandler::blockDeviceSize() const
         return sdbd->size();
 }
 
-void SatFileHandler::writeBin(const char *fileName)
+void SatFileHandler::writeBin(const std::string &fileName)
 {
-        std::fstream binToWrite(filePath, std::ios::in | std::ios::binary);
-        std::fstream binOut(rootDirectory + filename,
+        std::fstream binToWrite(fileName, std::ios::in | std::ios::binary);
+        std::fstream binOut(rootDirectory + fileName,
                             std::ios::out | std::ios::binary);
+        binToWrite.seekg(0, binToWrite.end);
+        size_t fileSize = binToWrite.tellg();
+        binToWrite.seekg(0);
 
-        binOut.write(binToWrite.rdbuf(), sizeof(binToWrite));
-        binOut.flash();
+        char *buffer = new char[fileSize];
+        binToWrite.read(buffer, fileSize);
+        binOut.write(buffer, fileSize);
+
+        delete[] buffer;
+        binOut.flush();
 }
 
-std::fstream SatFileHandler::readBin(const char *fileName)
+std::fstream SatFileHandler::readBin(const std::string &fileName)
 {
         return std::fstream(fileName, std::ios::out | std::ios::binary);
 }

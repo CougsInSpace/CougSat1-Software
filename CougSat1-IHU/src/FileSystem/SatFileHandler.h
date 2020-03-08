@@ -86,9 +86,9 @@ class SatFileHandler
         /// @return String of data in file.
         std::string read(const std::string &fileNameFull);
 
-        void writeBin(const char *fileName);
+        void writeBin(const std::string &fileName);
 
-        std::fstream readBin(const char *filePath);
+        std::fstream readBin(const std::string &fileName);
 
     private:
         bool debug;
