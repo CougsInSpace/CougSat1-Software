@@ -26,7 +26,8 @@ SatFileHandler::~SatFileHandler()
         sdbd->deinit();
 }
 
-void SatFileHandler::writef(std::string filenameBase, const char *message)
+void SatFileHandler::writef(std::string filenameBase, const char *message,
+                            std::ios_base::openmode mode)
 {
 
         std::fstream file;
@@ -52,9 +53,9 @@ void SatFileHandler::writef(std::string filenameBase, const char *message)
 }
 
 void SatFileHandler::write(std::string filenameBase, const std::string &message,
-                           std::ios::fmtflags flags = std::ios::out)
+                           std::ios_base::openmode mode)
 {
-        this->writef(filenameBase, message.c_str(), flags);
+        this->writef(filenameBase, message.c_str(), mode);
 }
 
 void SatFileHandler::writeStart()
@@ -67,12 +68,11 @@ void SatFileHandler::writeStart()
 }
 
 std::fstream SatFileHandler::read(const std::string &fileNameFull,
-                                  std::ios::fmtflags flags = std::ios::in)
+                                  std::ios_base::openmode mode)
 {
-        std::ifstream file(rootDirectory + fileNameFull, flags);
+        std::fstream file(rootDirectory + fileNameFull, mode);
         if (!file.is_open()) {
                 pc->printf("READ_ERROR: File cannot be found\r\n");
-                return "";
         }
         return file;
 }

@@ -40,13 +40,13 @@ class SatFileHandler
         /// @param string Name of the file.
         /// @param message C-String Message to write.
         void writef(std::string filenameBase, const char *message,
-                    std::ios::fmtflags flags = std::ios::out);
+                    std::ios::openmode mode = std::ios::out);
 
         /// Calls writef?
         /// @param name Name of file.
         /// @param reference Reference to message.
         void write(std::string filenameBase, const std::string &message,
-                   std::ios::fmtflags flags = std::ios::out);
+                   std::ios_base::openmode mode = std::ios::out);
 
         /// Writes whatever is in the queue.
         void writeStart();
@@ -88,7 +88,7 @@ class SatFileHandler
         /// @param fileNameFull Name of the file with extension to read.
         /// @return String of data in file.
         std::fstream read(const std::string &fileNameFull,
-                         std::ios::fmtflags flags = std::ios::in);
+                          std::ios_base::openmode mode = std::ios::in);
 
     private:
         bool debug;
