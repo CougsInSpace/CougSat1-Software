@@ -1,10 +1,9 @@
 #include "SatFileHandler.h"
 #include <algorithm>
 #include <chrono>
-#include <fstream>
 #include <sstream>
 
-constexpr char SatFileHandler::rootDirectory[];
+const std::string SatFileHandler::rootDirectory = {"/fs/"};
 constexpr uint64_t SatFileHandler::frequency;
 
 SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
@@ -52,9 +51,10 @@ void SatFileHandler::writef(std::string filenameBase, const char *message)
         this->current++;
 }
 
-void SatFileHandler::write(std::string filenameBase, const std::string &message)
+void SatFileHandler::write(std::string filenameBase, const std::string &message,
+                           std::ios::fmtflags flags = std::ios::out)
 {
-        this->writef(filenameBase, message.c_str());
+        this->writef(filenameBase, message.c_str(), flags);
 }
 
 void SatFileHandler::writeStart()
@@ -66,9 +66,10 @@ void SatFileHandler::writeStart()
         }
 }
 
-std::string SatFileHandler::read(const std::string &fileNameFull)
+std::string SatFileHandler::read(const std::string &fileNameFull,
+                                 std::ios::fmtflags flags = std::ios::in)
 {
-        std::ifstream file(rootDirectory + fileNameFull);
+        std::ifstream file(rootDirectory + fileNameFull, flags);
         std::stringstream out;
         if (!file.is_open()) {
                 pc->printf("READ_ERROR: File cannot be found\r\n");
@@ -80,7 +81,7 @@ std::string SatFileHandler::read(const std::string &fileNameFull)
 
 void SatFileHandler::clean(std::string dir)
 {
-        DIR *d = opendir(rootDirectory);
+        DIR *d = opendir(rootDirectory.c_str());
         struct dirent ent;
         std::string directory = rootDirectory + dir;
         if (d->read(&ent)) {
@@ -222,33 +223,11 @@ bool SatFileHandler::compareArrays(uint8_t *arr1, uint8_t *arr2, size_t size)
 size_t SatFileHandler::freeSpace() const
 {
         struct statvfs fsinfo;
-        fs->statvfs(rootDirectory, &fsinfo);
+        fs->statvfs(rootDirectory.c_str(), &fsinfo);
         return fsinfo.f_bfree * fsinfo.f_bsize;
 }
 
 size_t SatFileHandler::blockDeviceSize() const
 {
         return sdbd->size();
-}
-
-void SatFileHandler::writeBin(const std::string &fileName)
-{
-        std::fstream binToWrite(fileName, std::ios::in | std::ios::binary);
-        std::fstream binOut(rootDirectory + fileName,
-                            std::ios::out | std::ios::binary);
-        binToWrite.seekg(0, binToWrite.end);
-        size_t fileSize = binToWrite.tellg();
-        binToWrite.seekg(0);
-
-        char *buffer = new char[fileSize];
-        binToWrite.read(buffer, fileSize);
-        binOut.write(buffer, fileSize);
-
-        delete[] buffer;
-        binOut.flush();
-}
-
-std::fstream SatFileHandler::readBin(const std::string &fileName)
-{
-        return std::fstream(fileName, std::ios::out | std::ios::binary);
 }

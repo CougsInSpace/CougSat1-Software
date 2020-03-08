@@ -16,6 +16,7 @@ int main()
         // MOSI(DI), MISO(DO), SCLK(SCK), ChipSelect(CS), CardDetect(CD), crc,
         // debug
         SatFileHandler testfs(D11, D12, D13, D10, D2, true, true);
+        SatFileHandler test1fs(PC_12, PC_11, PC_10, PA_14, PA_13, true, true);
         testfs.init();
         string testString = "Hello World Big Brain\r\n";
         /*int a = testfs.sd.init();
@@ -43,6 +44,6 @@ int main()
         pc.printf("Start read test.\r\n");
         testfs.read(std::string("fuckThisTest.txt"));
 
-        pc.printf("Start test check.\r\n");
-        testfs.check();
+        // pc.printf("Start test check.\r\n");
+        // testfs.check();
 }

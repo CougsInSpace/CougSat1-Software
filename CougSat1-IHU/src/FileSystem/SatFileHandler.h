@@ -1,5 +1,6 @@
 #include <FATFileSystem.h>
 #include <SDBlockDevice.h>
+#include <fstream>
 #include <mbed.h>
 #include <memory>
 #include <queue>
@@ -13,7 +14,7 @@ class SatFileHandler
 {
     public:
         /// Root file path.
-        static constexpr char rootDirectory[] = "/fs/";
+        static const std::string rootDirectory;
 
         /// SPI Bus frequency: 25MHz.
         /// 25Mhz is the max frequency.
@@ -38,12 +39,14 @@ class SatFileHandler
         /// Writes a string to a file
         /// @param string Name of the file.
         /// @param message C-String Message to write.
-        void writef(std::string filenameBase, const char *message);
+        void writef(std::string filenameBase, const char *message,
+                    std::ios::fmtflags flags = std::ios::out);
 
         /// Calls writef?
         /// @param name Name of file.
         /// @param reference Reference to message.
-        void write(std::string filenameBase, const std::string &message);
+        void write(std::string filenameBase, const std::string &message,
+                   std::ios::fmtflags flags = std::ios::out);
 
         /// Writes whatever is in the queue.
         void writeStart();
@@ -84,11 +87,8 @@ class SatFileHandler
         /// Read a file from the filesystem.
         /// @param fileNameFull Name of the file with extension to read.
         /// @return String of data in file.
-        std::string read(const std::string &fileNameFull);
-
-        void writeBin(const std::string &fileName);
-
-        std::fstream readBin(const std::string &fileName);
+        std::string read(const std::string &fileNameFull,
+                         std::ios::fmtflags flags = std::ios::in);
 
     private:
         bool debug;
