@@ -66,17 +66,15 @@ void SatFileHandler::writeStart()
         }
 }
 
-std::string SatFileHandler::read(const std::string &fileNameFull,
-                                 std::ios::fmtflags flags = std::ios::in)
+std::fstream SatFileHandler::read(const std::string &fileNameFull,
+                                  std::ios::fmtflags flags = std::ios::in)
 {
         std::ifstream file(rootDirectory + fileNameFull, flags);
-        std::stringstream out;
         if (!file.is_open()) {
                 pc->printf("READ_ERROR: File cannot be found\r\n");
                 return "";
         }
-        out << file.rdbuf();
-        return out.str();
+        return file;
 }
 
 void SatFileHandler::clean(std::string dir)
