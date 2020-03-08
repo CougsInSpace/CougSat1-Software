@@ -17,7 +17,7 @@ SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
         hwo->miso = miso;
         hwo->sclk = sclk;
         hwo->cs = cs;
-        hwo->crc_on = false;
+        hwo->crc_on = crc_on;
         hwo->cd = cd;
 }
 
@@ -166,6 +166,7 @@ mbed_error_status_t SatFileHandler::initBlockDevice()
 {
         sdbd = std::make_unique<SDBlockDevice>(hwo->mosi, hwo->miso, hwo->sclk,
                                                hwo->cs, frequency, hwo->crc_on);
+        ThisThread::sleep_for(0.2); // a small wait for when using crc.
         int status = sdbd->init();
         if (debug) {
                 int cardDetected = cardDetect->read();

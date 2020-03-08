@@ -7,8 +7,7 @@
 
 /// Class that will handle all file read/write operations to a given medium on
 /// the sattelite. Handles all operations related to files. Currently only
-/// operates on string data. As of now(03/07/20) crc for some reason makes
-/// sdbd->init return -5005. So the constructor will just set crc to false.
+/// operates on string data.
 /// Note: The LittleFileSystem is not compatible with PCs, however it offers
 /// enough beneifts for it to be worth it. Check the documentation for more
 /// information.
