@@ -57,8 +57,10 @@ void SatFileHandler::write(const std::string &filenameBase,
                            std::iostream &stream, std::ios::openmode mode)
 {
         std::fstream file(rootDirectory + filenameBase, mode);
+        pc->printf("Writing to file\r\n");
         file << stream.rdbuf();
         file.flush();
+        pc->printf("Flushing file\r\n");
 }
 
 void SatFileHandler::writeStart()

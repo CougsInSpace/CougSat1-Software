@@ -3,6 +3,7 @@
 #include "mbed.h"
 #include <FATFileSystem.h>
 #include <cstdio>
+#include <sstream>
 
 // SDBlockDevice sd(D11, D12, D13, D10);
 // FATFileSystem fs("sd");
@@ -13,11 +14,9 @@
 int main()
 {
         Serial pc(SERIAL_TX, SERIAL_RX);
-        mbed_stats_heap_t heap_info;
         // MOSI(DI), MISO(DO), SCLK(SCK), ChipSelect(CS), CardDetect(CD), crc,
         // debug
         SatFileHandler testfs(D11, D12, D13, D10, D2, true, true);
-        SatFileHandler test1fs(PC_12, PC_11, PC_10, PA_14, PA_13, true, true);
         testfs.init();
         string testString = "Hello World Big Brain\r\n";
         /*int a = testfs.sd.init();
@@ -45,8 +44,11 @@ int main()
         pc.printf("Start read test.\r\n");
         testfs.read(std::string("fuckThisTest.txt"));
 
-        mbed_stats_heap_get(&heap_info);
-        pc.printf("\n\tBytes allocated currently: %d", heap_info.current_size);
+        std::stringstream stream;
+        stream << "Hello!" << std::endl;
+
+        testfs.write("hello.txt", stream);
+        pc.printf("Write stream test\r\n");
 
         // pc.printf("Start test check.\r\n");
         // testfs.check();
