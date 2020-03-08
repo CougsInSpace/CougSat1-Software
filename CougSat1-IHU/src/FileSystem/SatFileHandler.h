@@ -7,7 +7,8 @@
 
 /// Class that will handle all file read/write operations to a given medium on
 /// the sattelite. Handles all operations related to files. Currently only
-/// operates on string data.
+/// operates on string data. As of now(03/07/20) crc for some reason makes
+/// sdbd->init return -5005. So the constructor will just set crc to false.
 /// Note: The LittleFileSystem is not compatible with PCs, however it offers
 /// enough beneifts for it to be worth it. Check the documentation for more
 /// information.
@@ -19,7 +20,7 @@ class SatFileHandler
         static constexpr char rootDirectory[] = "/fs/";
 
         /// SPI Bus frequency: 80.1MHz
-        static constexpr uint64_t frequency = 80100000;
+        static constexpr uint64_t frequency = 25000000;
 
         /// Create a SatFileHandler where the debug state can be enabled or
         /// disabled.

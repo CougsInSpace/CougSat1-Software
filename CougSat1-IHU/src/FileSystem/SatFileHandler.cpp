@@ -17,7 +17,7 @@ SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
         hwo->miso = miso;
         hwo->sclk = sclk;
         hwo->cs = cs;
-        hwo->crc_on = crc_on;
+        hwo->crc_on = false;
         hwo->cd = cd;
 }
 
@@ -172,7 +172,7 @@ mbed_error_status_t SatFileHandler::initBlockDevice()
                 pc->printf("SD Card Detected: \r\n%s\r\n",
                            cardDetected ? "True" : "False");
                 pc->printf("SD Block Device Init: \r\n%s\r\n",
-                           (!status) ? "Success" : "Failure");
+                           (status == 0) ? "Success" : "Failure");
         }
         return status;
 }
