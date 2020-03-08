@@ -26,8 +26,9 @@ SatFileHandler::~SatFileHandler()
         sdbd->deinit();
 }
 
-void SatFileHandler::writef(std::string filenameBase, const char *message,
-                            std::ios_base::openmode mode)
+void SatFileHandler::write(const std::string &filenameBase,
+                           const std::string &message,
+                           std::ios_base::openmode mode)
 {
 
         std::fstream file;
@@ -52,18 +53,20 @@ void SatFileHandler::writef(std::string filenameBase, const char *message,
         this->current++;
 }
 
-void SatFileHandler::write(std::string filenameBase, const std::string &message,
-                           std::ios_base::openmode mode)
+void SatFileHandler::write(const std::string &filenameBase,
+                           std::iostream &stream, std::ios::openmode mode)
+{
+}
+
+/*void SatFileHandler::write(std::string filenameBase, const std::string
+&message, std::ios_base::openmode mode)
 {
         this->writef(filenameBase, message.c_str(), mode);
-}
+}*/
 
 void SatFileHandler::writeStart()
 {
         while (!inputMessages.empty()) {
-                std::pair<std::string, std::string> p = inputMessages.front();
-                write(get<0>(p), get<1>(p));
-                inputMessages.pop();
         }
 }
 
@@ -131,7 +134,7 @@ void SatFileHandler::check()
 
 void SatFileHandler::enqueueMessage(std::pair<std::string, std::string> message)
 {
-        inputMessages.push(message);
+        // inputMessages.push(message);
 }
 
 mbed_error_status_t SatFileHandler::init()

@@ -13,6 +13,7 @@
 int main()
 {
         Serial pc(SERIAL_TX, SERIAL_RX);
+        mbed_stats_heap_t heap_info;
         // MOSI(DI), MISO(DO), SCLK(SCK), ChipSelect(CS), CardDetect(CD), crc,
         // debug
         SatFileHandler testfs(D11, D12, D13, D10, D2, true, true);
@@ -37,12 +38,15 @@ int main()
         int n = 0;
         for (int i = 0; i < 5; i += 1) {
                 std::pair<string, string> p("test1", "fuckthistest" + n);
-                testfs.enqueueMessage(p);
+                // testfs.enqueueMessage(p);
         }
         testfs.writeStart();
 
         pc.printf("Start read test.\r\n");
         testfs.read(std::string("fuckThisTest.txt"));
+
+        mbed_stats_heap_get(&heap_info);
+        pc.printf("\n\tBytes allocated currently: %d", heap_info.current_size);
 
         // pc.printf("Start test check.\r\n");
         // testfs.check();

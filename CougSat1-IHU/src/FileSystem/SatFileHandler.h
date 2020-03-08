@@ -39,14 +39,17 @@ class SatFileHandler
         /// Writes a string to a file
         /// @param string Name of the file.
         /// @param message C-String Message to write.
-        void writef(std::string filenameBase, const char *message,
-                    std::ios::openmode mode = std::ios::out);
+        void write(const std::string &filenameBase, const std::string &message,
+                   std::ios::openmode mode = std::ios::out);
 
-        /// Calls writef?
-        /// @param name Name of file.
-        /// @param reference Reference to message.
-        void write(std::string filenameBase, const std::string &message,
-                   std::ios_base::openmode mode = std::ios::out);
+        void write(const std::string &filenameBase, std::iostream &stream,
+                   std::ios::openmode mode = std::ios::out);
+
+        // /// Calls writef?
+        // /// @param name Name of file.
+        // /// @param reference Reference to message.
+        // void write(std::string filenameBase, const std::string &message,
+        //            std::ios_base::openmode mode = std::ios::out);
 
         /// Writes whatever is in the queue.
         void writeStart();
@@ -132,7 +135,7 @@ class SatFileHandler
         Thread cardThread;
 
         /// Queue for messages.
-        std::queue<std::pair<std::string, std::string>> inputMessages;
+        std::queue<std::fstream> inputMessages;
 
         /// Cleans the file system...somehow.
         /// @param dir Name of directory to...clean?
