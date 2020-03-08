@@ -15,6 +15,12 @@
 class SatFileHandler
 {
     public:
+        /// Root file path.
+        static constexpr char rootDirectory[] = "/fs/";
+
+        /// SPI Bus frequency: 80.1MHz
+        static constexpr uint64_t frequency = 80100000;
+
         /// Create a SatFileHandler where the debug state can be enabled or
         /// disabled.
         /// @param mosi PinName of SPI Master in Slave out.
@@ -26,8 +32,7 @@ class SatFileHandler
         /// @param debug Decides whether or not debug data should be outputted.
 
         SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs,
-                       PinName cd, uint64_t hz = 1000000, bool crc_on = true,
-                       bool debug = false);
+                       PinName cd, bool crc_on = true, bool debug = false);
 
         /// Destructor. Unmounts the filesystem and deinits the block device for
         /// a clean disconnect.
@@ -64,11 +69,11 @@ class SatFileHandler
 
         /// Get amount of free space in bytes of the filesystem.
         /// @return Amount of free space in bytes.
-        size_t freeSpace();
+        size_t freeSpace() const;
 
         /// Get the number of bytes in the block device.
         /// @return Size of block device in bytes.
-        size_t blockDeviceSize();
+        size_t blockDeviceSize() const;
 
         /*!
         \brief Function to enqueue a message to store on the SD card.
@@ -82,7 +87,7 @@ class SatFileHandler
         /// Read a file from the filesystem.
         /// @param fileNameFull Name of the file with extension to read.
         /// @return String of data in file.
-        std::string read(const std::string &fileNameFull);
+        std::string read(const std::string &fileNameFull) const;
 
     private:
         bool debug;
@@ -98,7 +103,6 @@ class SatFileHandler
                 PinName sclk;
                 PinName cs;
                 PinName cd;
-                uint64_t freq;
                 bool crc_on;
         };
         /// Filesystem to be mounted.

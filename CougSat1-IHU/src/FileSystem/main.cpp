@@ -13,7 +13,7 @@
 int main()
 {
         Serial pc(SERIAL_TX, SERIAL_RX);
-        SatFileHandler testfs(D11, D12, D13, D10, D2, 1000000, false, true);
+        SatFileHandler testfs(D11, D12, D13, D10, D2, false, true);
         testfs.init();
         string testString = "Hello World Big Brain\r\n";
         /*int a = testfs.sd.init();
