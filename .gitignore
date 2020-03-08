@@ -6,3 +6,6 @@
 
 # Microsoft Office Lock Files
 *~$*
+
+mbed-os/
+BUILD/

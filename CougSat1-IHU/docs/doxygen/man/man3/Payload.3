@@ -1,0 +1,61 @@
+.TH "Payload" 3 "Fri Mar 6 2020" "Version 0.0.1" "CougSat1-IHU" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Payload
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherits \fBSubsystem\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBPayload\fP (const \fBPayload\fP &)=delete"
+.br
+.ti -1c
+.RI "\fBPayload\fP & \fBoperator=\fP (const \fBPayload\fP &)=delete"
+.br
+.ti -1c
+.RI "\fBPayload\fP ()"
+.br
+.RI "Construct a new Payload::Payload object\&. "
+.ti -1c
+.RI "\fB~Payload\fP ()"
+.br
+.RI "Destroy the Payload::Payload object\&. "
+.ti -1c
+.RI "mbed_error_status_t \fBinitialize\fP ()"
+.br
+.RI "Initialize the \fBPayload\fP\&. "
+.in -1c
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "Payload::Payload ()"
+
+.PP
+Construct a new Payload::Payload object\&. 
+.SS "Payload::~Payload ()"
+
+.PP
+Destroy the Payload::Payload object\&. 
+.SH "Member Function Documentation"
+.PP 
+.SS "mbed_error_status_t Payload::initialize ()\fC [virtual]\fP"
+
+.PP
+Initialize the \fBPayload\fP\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+mbed_error_status_t 
+.RE
+.PP
+
+.PP
+Implements \fBSubsystem\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for CougSat1-IHU from the source code\&.
