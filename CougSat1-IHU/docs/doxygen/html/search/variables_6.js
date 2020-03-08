@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sdbd',['sdbd',['../class_sat_file_handler.html#a02b8703f737315438b2e7d2c35819eb7',1,'SatFileHandler']]]
+  ['rootdirectory',['rootDirectory',['../class_sat_file_handler.html#aad7a2b2e87915a8a82b3261a987256dd',1,'SatFileHandler']]]
 ];

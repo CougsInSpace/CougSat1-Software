@@ -9,6 +9,14 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(initResizable);
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -47,6 +55,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('class_sat_file_handler.html','');});
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -61,11 +86,11 @@ $(function() {
 </iframe>
 </div>
 
-</div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="class_sat_file_handler-members.html">List of all members</a>  </div>
@@ -87,21 +112,22 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a077c457c3daa568f5415b3d03d01a2a2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a077c457c3daa568f5415b3d03d01a2a2">SatFileHandler</a> (PinName mosi, PinName miso, PinName sclk, PinName cs, uint64_t hz=1000000, bool crc_on=true, bool debug=false)</td></tr>
-<tr class="memdesc:a077c457c3daa568f5415b3d03d01a2a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="class_sat_file_handler.html" title="Class that will handle all file read/write operations to a given medium on the sattelite.">SatFileHandler</a> where the debug state can be enabled or disabled.  <a href="#a077c457c3daa568f5415b3d03d01a2a2">More...</a><br /></td></tr>
-<tr class="separator:a077c457c3daa568f5415b3d03d01a2a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dec42d155fb67a6673b4870b6a29e83"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a5dec42d155fb67a6673b4870b6a29e83">SatFileHandler</a> (PinName mosi, PinName miso, PinName sclk, PinName cs, PinName cd, bool crc_on=true, bool debug=false)</td></tr>
+<tr class="memdesc:a5dec42d155fb67a6673b4870b6a29e83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a <a class="el" href="class_sat_file_handler.html" title="Class that will handle all file read/write operations to a given medium on the sattelite.">SatFileHandler</a> where the debug state can be enabled or disabled.  <a href="#a5dec42d155fb67a6673b4870b6a29e83">More...</a><br /></td></tr>
+<tr class="separator:a5dec42d155fb67a6673b4870b6a29e83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac16f6dbdc038a207f3fd3e572f2df496"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#ac16f6dbdc038a207f3fd3e572f2df496">~SatFileHandler</a> ()</td></tr>
 <tr class="memdesc:ac16f6dbdc038a207f3fd3e572f2df496"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="#ac16f6dbdc038a207f3fd3e572f2df496">More...</a><br /></td></tr>
 <tr class="separator:ac16f6dbdc038a207f3fd3e572f2df496"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a355361c4ec4692c5b533740121976eb2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a355361c4ec4692c5b533740121976eb2">writef</a> (std::string filenameBase, const char *message)</td></tr>
-<tr class="memdesc:a355361c4ec4692c5b533740121976eb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a string to a file.  <a href="#a355361c4ec4692c5b533740121976eb2">More...</a><br /></td></tr>
-<tr class="separator:a355361c4ec4692c5b533740121976eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54f30111dd898bc6ce1e0c0ce6a82350"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a54f30111dd898bc6ce1e0c0ce6a82350">write</a> (std::string filenameBase, const std::string &amp;message)</td></tr>
-<tr class="memdesc:a54f30111dd898bc6ce1e0c0ce6a82350"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls writef?  <a href="#a54f30111dd898bc6ce1e0c0ce6a82350">More...</a><br /></td></tr>
-<tr class="separator:a54f30111dd898bc6ce1e0c0ce6a82350"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a458d6cf20f9384c4ef1c0ce3f57d1ab1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a458d6cf20f9384c4ef1c0ce3f57d1ab1">writeStart</a> ()</td></tr>
-<tr class="memdesc:a458d6cf20f9384c4ef1c0ce3f57d1ab1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes whatever is in the queue.  <a href="#a458d6cf20f9384c4ef1c0ce3f57d1ab1">More...</a><br /></td></tr>
-<tr class="separator:a458d6cf20f9384c4ef1c0ce3f57d1ab1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af114efa940cf8d6f3a5ff4b4b72d31a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#af114efa940cf8d6f3a5ff4b4b72d31a2">writef</a> (std::string filenameBase, const char *message)</td></tr>
+<tr class="memdesc:af114efa940cf8d6f3a5ff4b4b72d31a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a string to a file.  <a href="#af114efa940cf8d6f3a5ff4b4b72d31a2">More...</a><br /></td></tr>
+<tr class="separator:af114efa940cf8d6f3a5ff4b4b72d31a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3967cc4ce7531708c9e9a358a1a2236"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#aa3967cc4ce7531708c9e9a358a1a2236">write</a> (std::string filenameBase, const std::string &amp;message)</td></tr>
+<tr class="memdesc:aa3967cc4ce7531708c9e9a358a1a2236"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls writef?  <a href="#aa3967cc4ce7531708c9e9a358a1a2236">More...</a><br /></td></tr>
+<tr class="separator:aa3967cc4ce7531708c9e9a358a1a2236"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa966a53f4294a787585bcfb45756304"><td class="memItemLeft" align="right" valign="top"><a id="afa966a53f4294a787585bcfb45756304"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#afa966a53f4294a787585bcfb45756304">writeStart</a> ()</td></tr>
+<tr class="memdesc:afa966a53f4294a787585bcfb45756304"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes whatever is in the queue. <br /></td></tr>
+<tr class="separator:afa966a53f4294a787585bcfb45756304"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacd220dabbabf695b7ee32e526baeb5e"><td class="memItemLeft" align="right" valign="top">mbed_error_status_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#aacd220dabbabf695b7ee32e526baeb5e">init</a> ()</td></tr>
 <tr class="memdesc:aacd220dabbabf695b7ee32e526baeb5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the block device, filesystem and serial connection.  <a href="#aacd220dabbabf695b7ee32e526baeb5e">More...</a><br /></td></tr>
 <tr class="separator:aacd220dabbabf695b7ee32e526baeb5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -117,28 +143,38 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a3281befca1d7df2e4035cec885c161ae">unmount</a> ()</td></tr>
 <tr class="memdesc:a3281befca1d7df2e4035cec885c161ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unmounts the filesystem. <br /></td></tr>
 <tr class="separator:a3281befca1d7df2e4035cec885c161ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad404c0cfc5ee0fea8d19b6be6627954d"><td class="memItemLeft" align="right" valign="top"><a id="ad404c0cfc5ee0fea8d19b6be6627954d"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#ad404c0cfc5ee0fea8d19b6be6627954d">check</a> ()</td></tr>
-<tr class="memdesc:ad404c0cfc5ee0fea8d19b6be6627954d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks for bad blocks. <br /></td></tr>
-<tr class="separator:ad404c0cfc5ee0fea8d19b6be6627954d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4b0b4244befa3a3d1fdfc451ae248f0"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#ae4b0b4244befa3a3d1fdfc451ae248f0">getFreeSpace</a> ()</td></tr>
-<tr class="memdesc:ae4b0b4244befa3a3d1fdfc451ae248f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get amount of free space in bytes of the filesystem.  <a href="#ae4b0b4244befa3a3d1fdfc451ae248f0">More...</a><br /></td></tr>
-<tr class="separator:ae4b0b4244befa3a3d1fdfc451ae248f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a01017636190f9c3e14633564468882"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a1a01017636190f9c3e14633564468882">getBlockDeviceSize</a> ()</td></tr>
-<tr class="memdesc:a1a01017636190f9c3e14633564468882"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of bytes in the block device.  <a href="#a1a01017636190f9c3e14633564468882">More...</a><br /></td></tr>
-<tr class="separator:a1a01017636190f9c3e14633564468882"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f5a3c0ee440bf5a45f49add4dd2f04d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a9f5a3c0ee440bf5a45f49add4dd2f04d">enqueueMessage</a> (pair&lt; std::string, std::string &gt; message)</td></tr>
-<tr class="memdesc:a9f5a3c0ee440bf5a45f49add4dd2f04d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to enqueue a message to store on the SD card.  <a href="#a9f5a3c0ee440bf5a45f49add4dd2f04d">More...</a><br /></td></tr>
-<tr class="separator:a9f5a3c0ee440bf5a45f49add4dd2f04d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5529b9e3f7ec6ae60db4c9c83fbe6ea8"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a5529b9e3f7ec6ae60db4c9c83fbe6ea8">read</a> (const std::string &amp;fileNameFull)</td></tr>
-<tr class="memdesc:a5529b9e3f7ec6ae60db4c9c83fbe6ea8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a file from the filesystem.  <a href="#a5529b9e3f7ec6ae60db4c9c83fbe6ea8">More...</a><br /></td></tr>
-<tr class="separator:a5529b9e3f7ec6ae60db4c9c83fbe6ea8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bb76640fb778bbf122a7d088e039e37"><td class="memItemLeft" align="right" valign="top"><a id="a7bb76640fb778bbf122a7d088e039e37"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a7bb76640fb778bbf122a7d088e039e37">check</a> ()</td></tr>
+<tr class="memdesc:a7bb76640fb778bbf122a7d088e039e37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks for bad blocks. <br /></td></tr>
+<tr class="separator:a7bb76640fb778bbf122a7d088e039e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bad90fd80826326ddfeea59305e2824"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a3bad90fd80826326ddfeea59305e2824">freeSpace</a> () const</td></tr>
+<tr class="memdesc:a3bad90fd80826326ddfeea59305e2824"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get amount of free space in bytes of the filesystem.  <a href="#a3bad90fd80826326ddfeea59305e2824">More...</a><br /></td></tr>
+<tr class="separator:a3bad90fd80826326ddfeea59305e2824"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a071675043e10d3b698784a62acd4911d"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a071675043e10d3b698784a62acd4911d">blockDeviceSize</a> () const</td></tr>
+<tr class="memdesc:a071675043e10d3b698784a62acd4911d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of bytes in the block device.  <a href="#a071675043e10d3b698784a62acd4911d">More...</a><br /></td></tr>
+<tr class="separator:a071675043e10d3b698784a62acd4911d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7273e6e7e52aade40b64f9509d401a66"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a7273e6e7e52aade40b64f9509d401a66">enqueueMessage</a> (pair&lt; std::string, std::string &gt; message)</td></tr>
+<tr class="memdesc:a7273e6e7e52aade40b64f9509d401a66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to enqueue a message to store on the SD card.  <a href="#a7273e6e7e52aade40b64f9509d401a66">More...</a><br /></td></tr>
+<tr class="separator:a7273e6e7e52aade40b64f9509d401a66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90e7276d78b77509e1ff2f2089df1448"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a90e7276d78b77509e1ff2f2089df1448">read</a> (const std::string &amp;fileNameFull) const</td></tr>
+<tr class="memdesc:a90e7276d78b77509e1ff2f2089df1448"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a file from the filesystem.  <a href="#a90e7276d78b77509e1ff2f2089df1448">More...</a><br /></td></tr>
+<tr class="separator:a90e7276d78b77509e1ff2f2089df1448"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:aad7a2b2e87915a8a82b3261a987256dd"><td class="memItemLeft" align="right" valign="top"><a id="aad7a2b2e87915a8a82b3261a987256dd"></a>
+static constexpr char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#aad7a2b2e87915a8a82b3261a987256dd">rootDirectory</a> [] = &quot;/fs/&quot;</td></tr>
+<tr class="memdesc:aad7a2b2e87915a8a82b3261a987256dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Root file path. <br /></td></tr>
+<tr class="separator:aad7a2b2e87915a8a82b3261a987256dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1de4d536df05bd7eda6d39310f4137bd"><td class="memItemLeft" align="right" valign="top">static constexpr uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a1de4d536df05bd7eda6d39310f4137bd">frequency</a> = 25000000</td></tr>
+<tr class="memdesc:a1de4d536df05bd7eda6d39310f4137bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">SPI Bus frequency: 25MHz.  <a href="#a1de4d536df05bd7eda6d39310f4137bd">More...</a><br /></td></tr>
+<tr class="separator:a1de4d536df05bd7eda6d39310f4137bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:a61cd259dd830e9ee5044f22e127982a4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a61cd259dd830e9ee5044f22e127982a4">clean</a> (std::string dir)</td></tr>
-<tr class="memdesc:a61cd259dd830e9ee5044f22e127982a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans the file system...somehow.  <a href="#a61cd259dd830e9ee5044f22e127982a4">More...</a><br /></td></tr>
-<tr class="separator:a61cd259dd830e9ee5044f22e127982a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a799b3a1d95cabe1301fc26a872d06036"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a799b3a1d95cabe1301fc26a872d06036">clean</a> (std::string dir)</td></tr>
+<tr class="memdesc:a799b3a1d95cabe1301fc26a872d06036"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleans the file system...somehow.  <a href="#a799b3a1d95cabe1301fc26a872d06036">More...</a><br /></td></tr>
+<tr class="separator:a799b3a1d95cabe1301fc26a872d06036"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c31918d174a3161389665ef6c32c064"><td class="memItemLeft" align="right" valign="top">mbed_error_status_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a6c31918d174a3161389665ef6c32c064">initBlockDevice</a> ()</td></tr>
 <tr class="memdesc:a6c31918d174a3161389665ef6c32c064"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates the connection to the block device.  <a href="#a6c31918d174a3161389665ef6c32c064">More...</a><br /></td></tr>
 <tr class="separator:a6c31918d174a3161389665ef6c32c064"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -161,27 +197,34 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>debug</b></td></tr>
 <tr class="memitem:a871dee72893c3b9452a1f181b33103df"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a871dee72893c3b9452a1f181b33103df">needsReformat</a></td></tr>
 <tr class="memdesc:a871dee72893c3b9452a1f181b33103df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Currently unused.  <a href="#a871dee72893c3b9452a1f181b33103df">More...</a><br /></td></tr>
 <tr class="separator:a871dee72893c3b9452a1f181b33103df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a911ab736da22eed7a1afdd5344c6c305"><td class="memItemLeft" align="right" valign="top"><a id="a911ab736da22eed7a1afdd5344c6c305"></a>
-std::unique_ptr&lt; FATFileSystem &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a911ab736da22eed7a1afdd5344c6c305">fs</a></td></tr>
-<tr class="memdesc:a911ab736da22eed7a1afdd5344c6c305"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filesystem to be mounted. <br /></td></tr>
-<tr class="separator:a911ab736da22eed7a1afdd5344c6c305"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8455c2bd4edbcc58c63b316ecd23f818"><td class="memItemLeft" align="right" valign="top"><a id="a8455c2bd4edbcc58c63b316ecd23f818"></a>
+std::unique_ptr&lt; LittleFileSystem &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a8455c2bd4edbcc58c63b316ecd23f818">fs</a></td></tr>
+<tr class="memdesc:a8455c2bd4edbcc58c63b316ecd23f818"><td class="mdescLeft">&#160;</td><td class="mdescRight">Filesystem to be mounted. <br /></td></tr>
+<tr class="separator:a8455c2bd4edbcc58c63b316ecd23f818"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02b8703f737315438b2e7d2c35819eb7"><td class="memItemLeft" align="right" valign="top"><a id="a02b8703f737315438b2e7d2c35819eb7"></a>
 std::unique_ptr&lt; SDBlockDevice &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a02b8703f737315438b2e7d2c35819eb7">sdbd</a></td></tr>
 <tr class="memdesc:a02b8703f737315438b2e7d2c35819eb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block device that corresponds to the SD card. <br /></td></tr>
 <tr class="separator:a02b8703f737315438b2e7d2c35819eb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9f1c516e421bb21195abf54bbe5a5ea"><td class="memItemLeft" align="right" valign="top"><a id="aa9f1c516e421bb21195abf54bbe5a5ea"></a>
+std::unique_ptr&lt; DigitalIn &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>cardDetect</b></td></tr>
+<tr class="separator:aa9f1c516e421bb21195abf54bbe5a5ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26220c492649c0424010e21de171259e"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="struct_sat_file_handler_1_1_hardware_options.html">HardwareOptions</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a26220c492649c0424010e21de171259e">hwo</a></td></tr>
 <tr class="memdesc:a26220c492649c0424010e21de171259e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Struct containing all the hardware options.  <a href="#a26220c492649c0424010e21de171259e">More...</a><br /></td></tr>
 <tr class="separator:a26220c492649c0424010e21de171259e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a048455470f8665b4468c1f96d4211541"><td class="memItemLeft" align="right" valign="top"><a id="a048455470f8665b4468c1f96d4211541"></a>
+std::unique_ptr&lt; Serial &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a048455470f8665b4468c1f96d4211541">pc</a></td></tr>
+<tr class="memdesc:a048455470f8665b4468c1f96d4211541"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serial out for testing purposes. <br /></td></tr>
+<tr class="separator:a048455470f8665b4468c1f96d4211541"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac61d216e89063d7c2a62071a6d89ad34"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#ac61d216e89063d7c2a62071a6d89ad34">current</a></td></tr>
 <tr class="memdesc:ac61d216e89063d7c2a62071a6d89ad34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds the current day of the satelite will increment after each day.  <a href="#ac61d216e89063d7c2a62071a6d89ad34">More...</a><br /></td></tr>
 <tr class="separator:ac61d216e89063d7c2a62071a6d89ad34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7d2d4891d2de2fd472afab6af45dcba"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#ab7d2d4891d2de2fd472afab6af45dcba">priority</a></td></tr>
 <tr class="memdesc:ab7d2d4891d2de2fd472afab6af45dcba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hold the day that takes priority in removal if the device is running low on storage.  <a href="#ab7d2d4891d2de2fd472afab6af45dcba">More...</a><br /></td></tr>
 <tr class="separator:ab7d2d4891d2de2fd472afab6af45dcba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bd885daea92333ad616498731cd8232"><td class="memItemLeft" align="right" valign="top"><a id="a4bd885daea92333ad616498731cd8232"></a>
-Serial *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a4bd885daea92333ad616498731cd8232">pc</a></td></tr>
-<tr class="memdesc:a4bd885daea92333ad616498731cd8232"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serial out for testing purposes. <br /></td></tr>
-<tr class="separator:a4bd885daea92333ad616498731cd8232"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8b3c8b1c0f9227e90a945f54edebbd0"><td class="memItemLeft" align="right" valign="top"><a id="ac8b3c8b1c0f9227e90a945f54edebbd0"></a>
+Thread&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#ac8b3c8b1c0f9227e90a945f54edebbd0">cardThread</a></td></tr>
+<tr class="memdesc:ac8b3c8b1c0f9227e90a945f54edebbd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread for card detect light. <br /></td></tr>
+<tr class="separator:ac8b3c8b1c0f9227e90a945f54edebbd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49a2391c78c0cca9ad796344dd7b33a6"><td class="memItemLeft" align="right" valign="top"><a id="a49a2391c78c0cca9ad796344dd7b33a6"></a>
 std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sat_file_handler.html#a49a2391c78c0cca9ad796344dd7b33a6">inputMessages</a></td></tr>
 <tr class="memdesc:a49a2391c78c0cca9ad796344dd7b33a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queue for messages. <br /></td></tr>
@@ -189,12 +232,12 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class that will handle all file read/write operations to a given medium on the sattelite. </p>
-<p>Handles all operations related to files. Currently only operates on string data. TODO: Update to work with other types of data. </p>
+<p>Handles all operations related to files. Currently only operates on string data. Note: The LittleFileSystem is not compatible with PCs, however it offers enough beneifts for it to be worth it. Check the documentation for more information. TODO: Update to work with other types of data. </p>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00016">16</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00015">15</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a077c457c3daa568f5415b3d03d01a2a2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a077c457c3daa568f5415b3d03d01a2a2">&#9670;&nbsp;</a></span>SatFileHandler()</h2>
+<a id="a5dec42d155fb67a6673b4870b6a29e83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dec42d155fb67a6673b4870b6a29e83">&#9670;&nbsp;</a></span>SatFileHandler()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -226,8 +269,8 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint64_t&#160;</td>
-          <td class="paramname"><em>hz</em> = <code>1000000</code>, </td>
+          <td class="paramtype">PinName&#160;</td>
+          <td class="paramname"><em>cd</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -256,14 +299,13 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
     <tr><td class="paramname">miso</td><td>PinName of SPI Master out Slave in. </td></tr>
     <tr><td class="paramname">sclk</td><td>PinName of Serial Clock for SPI. </td></tr>
     <tr><td class="paramname">cs</td><td>PinName of Chip Select pin on SD breakout. </td></tr>
-    <tr><td class="paramname">hz</td><td>Operating frequency of the SPI bus. </td></tr>
     <tr><td class="paramname">crc_on</td><td>Decides whether or not to use cyclic redundancy check. </td></tr>
     <tr><td class="paramname">debug</td><td>Decides whether or not debug data should be outputted. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00005">5</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00010">10</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
@@ -285,13 +327,35 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 <p>Destructor. </p>
 <p>Unmounts the filesystem and deinits the block device for a clean disconnect. </p>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00023">23</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00024">24</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a61cd259dd830e9ee5044f22e127982a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a61cd259dd830e9ee5044f22e127982a4">&#9670;&nbsp;</a></span>clean()</h2>
+<a id="a071675043e10d3b698784a62acd4911d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a071675043e10d3b698784a62acd4911d">&#9670;&nbsp;</a></span>blockDeviceSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t SatFileHandler::blockDeviceSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the number of bytes in the block device. </p>
+<dl class="section return"><dt>Returns</dt><dd>Size of block device in bytes. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00229">229</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a799b3a1d95cabe1301fc26a872d06036"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a799b3a1d95cabe1301fc26a872d06036">&#9670;&nbsp;</a></span>clean()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,7 +364,7 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool SatFileHandler::clean </td>
+          <td class="memname">void SatFileHandler::clean </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>dir</em></td><td>)</td>
@@ -321,9 +385,8 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True for success, otherwise false. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00089">89</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00081">81</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
@@ -378,18 +441,18 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True for if they are matching, false if they are not. TODO: Update to work if sizes are different. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00226">226</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00213">213</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a9f5a3c0ee440bf5a45f49add4dd2f04d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f5a3c0ee440bf5a45f49add4dd2f04d">&#9670;&nbsp;</a></span>enqueueMessage()</h2>
+<a id="a7273e6e7e52aade40b64f9509d401a66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7273e6e7e52aade40b64f9509d401a66">&#9670;&nbsp;</a></span>enqueueMessage()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool SatFileHandler::enqueueMessage </td>
+          <td class="memname">void SatFileHandler::enqueueMessage </td>
           <td>(</td>
           <td class="paramtype">pair&lt; std::string, std::string &gt;&#160;</td>
           <td class="paramname"><em>message</em></td><td>)</td>
@@ -405,46 +468,23 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True if enqueued; false if the queue is full.</dd></dl>
 <p>USE FOR THREAD SAFETY </p>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00124">124</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00133">133</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a1a01017636190f9c3e14633564468882"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a01017636190f9c3e14633564468882">&#9670;&nbsp;</a></span>getBlockDeviceSize()</h2>
+<a id="a3bad90fd80826326ddfeea59305e2824"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bad90fd80826326ddfeea59305e2824">&#9670;&nbsp;</a></span>freeSpace()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t SatFileHandler::getBlockDeviceSize </td>
+          <td class="memname">size_t SatFileHandler::freeSpace </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the number of bytes in the block device. </p>
-<dl class="section return"><dt>Returns</dt><dd>Size of block device in bytes. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00242">242</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
-
-</div>
-</div>
-<a id="ae4b0b4244befa3a3d1fdfc451ae248f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae4b0b4244befa3a3d1fdfc451ae248f0">&#9670;&nbsp;</a></span>getFreeSpace()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t SatFileHandler::getFreeSpace </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -452,7 +492,7 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 <p>Get amount of free space in bytes of the filesystem. </p>
 <dl class="section return"><dt>Returns</dt><dd>Amount of free space in bytes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00235">235</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00222">222</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
@@ -474,7 +514,7 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 <p>Initialize the block device, filesystem and serial connection. </p>
 <dl class="section return"><dt>Returns</dt><dd>Return 0 for success, negative error code for failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00135">135</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00138">138</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
@@ -504,7 +544,7 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 <p>Creates the connection to the block device. </p>
 <dl class="section return"><dt>Returns</dt><dd>Return 0 for success, negative error code for failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00161">161</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00165">165</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
@@ -534,12 +574,12 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 <p>Mounts the file system. </p>
 <p>If the mount fails, will reformat. </p><dl class="section return"><dt>Returns</dt><dd>Return 0 for success, negative error code for failure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00146">146</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00149">149</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a5529b9e3f7ec6ae60db4c9c83fbe6ea8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5529b9e3f7ec6ae60db4c9c83fbe6ea8">&#9670;&nbsp;</a></span>read()</h2>
+<a id="a90e7276d78b77509e1ff2f2089df1448"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90e7276d78b77509e1ff2f2089df1448">&#9670;&nbsp;</a></span>read()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -549,7 +589,7 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>fileNameFull</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -563,18 +603,18 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>String of data in file. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00076">76</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00069">69</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a54f30111dd898bc6ce1e0c0ce6a82350"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54f30111dd898bc6ce1e0c0ce6a82350">&#9670;&nbsp;</a></span>write()</h2>
+<a id="aa3967cc4ce7531708c9e9a358a1a2236"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3967cc4ce7531708c9e9a358a1a2236">&#9670;&nbsp;</a></span>write()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool SatFileHandler::write </td>
+          <td class="memname">void SatFileHandler::write </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>filenameBase</em>, </td>
@@ -601,20 +641,19 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True for success, otherwise false. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00060">60</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00055">55</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a355361c4ec4692c5b533740121976eb2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a355361c4ec4692c5b533740121976eb2">&#9670;&nbsp;</a></span>writef()</h2>
+<a id="af114efa940cf8d6f3a5ff4b4b72d31a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af114efa940cf8d6f3a5ff4b4b72d31a2">&#9670;&nbsp;</a></span>writef()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool SatFileHandler::writef </td>
+          <td class="memname">void SatFileHandler::writef </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>filenameBase</em>, </td>
@@ -641,31 +680,8 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True for success, otherwise false. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00029">29</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a458d6cf20f9384c4ef1c0ce3f57d1ab1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a458d6cf20f9384c4ef1c0ce3f57d1ab1">&#9670;&nbsp;</a></span>writeStart()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool SatFileHandler::writeStart </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Writes whatever is in the queue. </p>
-<dl class="section return"><dt>Returns</dt><dd>True for success, otherwise false. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00065">65</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8cpp_source.html#l00030">30</a> of file <a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a>.</p>
 
 </div>
 </div>
@@ -692,7 +708,34 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 
 <p>Holds the current day of the satelite will increment after each day. </p>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00120">120</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00124">124</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
+
+</div>
+</div>
+<a id="a1de4d536df05bd7eda6d39310f4137bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1de4d536df05bd7eda6d39310f4137bd">&#9670;&nbsp;</a></span>frequency</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr uint64_t SatFileHandler::frequency = 25000000</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SPI Bus frequency: 25MHz. </p>
+<p>25Mhz is the max frequency. </p>
+
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00023">23</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
 
 </div>
 </div>
@@ -719,7 +762,7 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 <p>Struct containing all the hardware options. </p>
 <p>Is deleted when init finishes. </p>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00116">116</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00117">117</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
 
 </div>
 </div>
@@ -746,7 +789,7 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 <p>Currently unused. </p>
 <p>Will be used to set if we need a reformat of filesystem. </p>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00097">97</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00096">96</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
 
 </div>
 </div>
@@ -772,20 +815,24 @@ std::queue&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td cl
 
 <p>Hold the day that takes priority in removal if the device is running low on storage. </p>
 
-<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00124">124</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_sat_file_handler_8h_source.html#l00128">128</a> of file <a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>FATFileSystem/<a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a></li>
-<li>FATFileSystem/<a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a></li>
+<li>FileSystem/<a class="el" href="_sat_file_handler_8h_source.html">SatFileHandler.h</a></li>
+<li>FileSystem/<a class="el" href="_sat_file_handler_8cpp_source.html">SatFileHandler.cpp</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.15
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="class_sat_file_handler.html">SatFileHandler</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
+  </ul>
+</div>
 </body>
 </html>

@@ -18,7 +18,8 @@ class SatFileHandler
         /// Root file path.
         static constexpr char rootDirectory[] = "/fs/";
 
-        /// SPI Bus frequency: 80.1MHz
+        /// SPI Bus frequency: 25MHz.
+        /// 25Mhz is the max frequency.
         static constexpr uint64_t frequency = 25000000;
 
         /// Create a SatFileHandler where the debug state can be enabled or
@@ -27,7 +28,6 @@ class SatFileHandler
         /// @param miso PinName of SPI Master out Slave in.
         /// @param sclk PinName of Serial Clock for SPI.
         /// @param cs PinName of Chip Select pin on SD breakout.
-        /// @param hz Operating frequency of the SPI bus.
         /// @param crc_on Decides whether or not to use cyclic redundancy check.
         /// @param debug Decides whether or not debug data should be outputted.
 
