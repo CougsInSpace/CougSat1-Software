@@ -7,10 +7,8 @@
  * @param rev pin
  * @param sleep pin
  */
-DRV8837::DRV8837(PinName fwd, PinName rev, PinName nSleep,
-    uint8_t period = DRV8837_PWM_PERIOD_US) :
-  fwd(fwd),
-  rev(rev), nSleep(nSleep, 0) {
+DRV8837::DRV8837(PinName fwd, PinName rev, PinName nSleep, uint8_t period) :
+  fwd(fwd), rev(rev), nSleep(nSleep, 0) {
   // set the pwm periods
   this->fwd.period_us(period);
   this->rev.period_us(period);

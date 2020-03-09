@@ -7,8 +7,6 @@ typedef struct imuValueSet_t {
   double x          = nan("");
   double y          = nan("");
   double z          = nan("");
-  double w          = nan("");
-  bool   quaternion = true;
 }IMUValueSet_t;
 
 typedef struct imuData_t{

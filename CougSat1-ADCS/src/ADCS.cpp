@@ -1,5 +1,7 @@
 #include "ADCS.h"
 #include "../../CISLibrary/drivers/IMU/BNO055.h"
+#include "../../CISLibrary/drivers/HBridge/DRV8837.h"
+
 
 /**
  * @brief Function for cdh communication thread
@@ -37,12 +39,15 @@ ADCS::ADCS() : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL) {
  */
 void ADCS::startThread() {
   DigitalOut led1(PinName(5));
-  I2C        imuI2C = I2C(PinName(PB_9), PinName(PB_8));
+  I2C        imuI2C = I2C(PinName(30), PinName(29));
   BNO055     imu1(imuI2C, PinName(NULL), (0x28 << 1));
   imuData_t  imuData;
   BNO055_EULER_TypeDef angle;
+  DRV8837 mag1(PinName(62),PinName(61),PinName(56));
 
   while (true) { 
+
+    mag1.set(.5);
     printf("Process Main!\r\n");
     led1 = !led1;
     imu1.get_Euler_Angles(&angle);
