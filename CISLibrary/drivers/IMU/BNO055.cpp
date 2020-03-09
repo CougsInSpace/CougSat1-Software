@@ -30,7 +30,7 @@ mbed_error_status_t BNO055::readMag(IMUValueSet_t & data, bool blocking) {
   int16_t x, y, z;
 
   dt[0] = BNO055_MAG_X_LSB;
-  _i2c.write(chip_addr, dt, 1, true);
+  DEBUG("IMU", "Write Code: %d",_i2c.write(chip_addr, dt, 1, true));
   if (!_i2c.read(chip_addr, dt, 6, false)) {
     x      = dt[1] << 8 | dt[0];
     y      = dt[3] << 8 | dt[2];
