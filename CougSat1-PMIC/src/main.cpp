@@ -1,6 +1,6 @@
 #include <mbed.h>
 
-#include <ADC/AD7291.h>
+#include <ADC/AD7689.h>
 #include <CISConsole.h>
 
 #include "Configuration.h"
@@ -15,111 +15,96 @@
  */
 mbed_error_status_t initialize() {
   LOG("Init", "Initialization starting");
-  mbed_error_status_t result = MBED_SUCCESS;
+  mbed_error_status_t error = MBED_SUCCESS;
 
-  I2C    i2c(PB_9, PB_8);
-  ADC *  adc = new AD7291(i2c, AD7291Addr_t::FF);
-  double value;
-  result = adc->readVoltage(ADCChannel_t::CM_03, value);
-  if (result) {
-    ERROR("Init", "Failed to read voltage from ADC");
-    return result;
+  ((AD7689 *)adcEPSs[0])->selfTest();
+  ((AD7689 *)adcEPSs[1])->selfTest();
+  ((AD7689 *)adcEPSs[2])->selfTest();
+
+  bool inputAOn = true;
+  bool inputBOn = true;
+  inputSwitching[0]->write(inputAOn);
+  inputSwitching[1]->write(inputBOn);
+  inputSwitching[2]->write(inputAOn);
+  inputSwitching[3]->write(inputBOn);
+
+  bool outputsOn = true;
+  bool heatersOn = false;
+  for (uint8_t i = 0; i < COUNT_PR_3V3; i++)
+    nodesPR3V3[i]->setSwitch(outputsOn);
+  for (uint8_t i = 0; i < COUNT_PR_BATT; i++)
+    nodesPRBatt[i]->setSwitch(outputsOn);
+  for (uint8_t i = 0; i < COUNT_DEPLOY; i++)
+    nodesDeployables[i]->setSwitch(outputsOn);
+  for (uint8_t i = 0; i < COUNT_BH; i++)
+    nodesBatteryHeaters[i]->setSwitch(heatersOn);
+
+  double vbattA = 0.0;
+  double vbattB = 0.0;
+  double value  = 0.0;
+  while (true) {
+    statusLED = !statusLED;
+    error     = nodeBattInA.updateCurrent();
+    if (error) {
+      ERROR("Init", "Failed to read in A, 0x%08X", error);
+      return error;
+    }
+
+    error = nodeBattInB.updateCurrent();
+    if (error) {
+      ERROR("Init", "Failed to read in B, 0x%08X", error);
+      return error;
+    }
+
+    error = nodeBattOutA.updateCurrent();
+    if (error) {
+      ERROR("Init", "Failed to read out A, 0x%08X", error);
+      return error;
+    }
+
+    error = nodeBattOutB.updateCurrent();
+    if (error) {
+      ERROR("Init", "Failed to read out B, 0x%08X", error);
+      return error;
+    }
+
+    error = node3V3OutA.updateCurrent();
+    if (error) {
+      ERROR("Init", "Failed to read out A, 0x%08X", error);
+      return error;
+    }
+
+    error = adcEPSs[2]->readVoltage(ADCChannel_t::CM_00, vbattA);
+    if (error) {
+      ERROR("Init", "Failed to read VbattA, 0x%08X", error);
+      return error;
+    }
+    vbattA =
+        2 * vbattA * (nodeBattOutA.getCurrent() - nodeBattInA.getCurrent());
+
+    error = adcEPSs[2]->readVoltage(ADCChannel_t::CM_07, vbattB);
+    if (error) {
+      ERROR("Init", "Failed to read VbattB, 0x%08X", error);
+      return error;
+    }
+    vbattB =
+        2 * vbattB * (nodeBattOutB.getCurrent() - nodeBattInB.getCurrent());
+
+    LOG("Test", "A: %9.5fW\tB: %9.5fW\tA+B: %9.5fW", vbattA, vbattB,
+        vbattA + vbattB);
+    // double temp;
+
+    // error = thermistorRegA.getTemperature(temp);
+    // if (error) {
+    //   ERROR("Init", "Failed to read VbattA, 0x%08X", error);
+    //   return error;
+    // }
+    // value = value * 0.875 + temp * 0.125;
+    // LOG("Test", "%9.5fA", value);
   }
-  LOG("Init", "Read %f V", value);
-
-  result = adc->readTemp(value);
-  if (result) {
-    ERROR("Init", "Failed to read temperature from ADC");
-    return result;
-  }
-  LOG("Init", "Read %f C", value);
-
-  // statusLED = 1;
-
-  // result = gpioEPS0.configureAll(false, false, true);
-  // if (result != ERROR_SUCCESS) {
-  //   ERROR("Init", "Failed to configure gpioEPS0: 0x%02X", result);
-  //   return result;
-  // }
-
-  // result = gpioEPS1.configureAll(false, false, true);
-  // if (result != ERROR_SUCCESS) {
-  //   ERROR("Init", "Failed to configure gpioEPS1: 0x%02X", result);
-  //   return result;
-  // }
-  // bool pathA = false;
-  // bool pathB = false;
-  // LOG("Init", "All power nodes are A: %s, B %s", pathA ? "on" : "off",
-  //     pathB ? "on" : "off");
-  // for (int i = 0; i < COUNT_PV; i++) {
-  //   result = nodesPVOut[i]->setSwitch(pathA, pathB);
-  //   if (result != ERROR_SUCCESS) {
-  //     ERROR("Init", "Failed to switch nodesPVOut[%d]: 0x%02X", i, result);
-  //     return result;
-  //   }
-  //   DEBUG("Init", "Set switch nodesPVOut[%d]: 0x%02X", i, result);
-  // }
-  // LOG("Init", "nodesPVOut were set successfully");
-  // for (int i = 0; i < COUNT_PR_3V3; i++) {
-  //   result = nodesPR3V3[i]->setSwitch(pathA, pathB);
-  //   if (result != ERROR_SUCCESS) {
-  //     ERROR("Init", "Failed to switch nodesPR3V3[%d]: 0x%02X", i, result);
-  //     return result;
-  //   }
-  //   DEBUG("Init", "Set switch nodesPR3V3[%d]: 0x%02X", i, result);
-  // }
-  // LOG("Init", "nodesPR3V3 were set successfully");
-  // for (int i = 0; i < COUNT_PR_BATT; i++) {
-  //   result = nodesPRBatt[i]->setSwitch(pathA, pathB);
-  //   if (result != ERROR_SUCCESS) {
-  //     ERROR("Init", "Failed to switch nodesPRBatt[%d]: 0x%02X", i, result);
-  //     return result;
-  //   }
-  //   DEBUG("Init", "Set switch nodesPRBatt[%d]: 0x%02X", i, result);
-  // }
-  // LOG("Init", "nodesPRBatt were set successfully");
-  // for (int i = 0; i < COUNT_PV_3V3; i++) {
-  //   result = nodesPV3V3[i]->setSwitch(pathA, pathB);
-  //   if (result != ERROR_SUCCESS) {
-  //     ERROR("Init", "Failed to switch nodesPV3V3[%d]: 0x%02X", i, result);
-  //     return result;
-  //   }
-  // }
-  // LOG("Init", "nodesPV3V3 were set successfully");
-  // for (int i = 0; i < COUNT_BH; i++) {
-  //   result = nodesBatteryHeaters[i]->setSwitch(pathA, pathB);
-  //   if (result != ERROR_SUCCESS) {
-  //     ERROR("Init", "Failed to switch nodesBH[%d]: 0x%02X ", i, result);
-  //     return result;
-  //   }
-  // }
-  // LOG("Init", "nodesBatteryHeaters were set successfully");
-  // result = nodeDeployables.setSwitch(pathA, pathB);
-  // if (result != ERROR_SUCCESS) {
-  //   ERROR("Init", "Failed to switch nodeDeployable: 0x%02X", result);
-  //   return result;
-  // }
-  // LOG("Init", "nodeDeployable was set successfully");
-
-  // double value = 0.0;
-  // result       = adcEPS5.readVoltage(PIN_ADC_EJECT_TIMER, &value);
-  // if (result != ERROR_SUCCESS) {
-  //   ERROR("Init", "Failed to read eject timer voltage: 0x%02X", result);
-  //   return result;
-  // }
-  // if (value < THRES_EJECT_TIMER) {
-  //   LOG("Init", "First boot detected: %5.3fV", value);
-  //   result = eventFirstBoot();
-  //   if (result != ERROR_SUCCESS) {
-  //     ERROR("Init", "Failed to perform first boot: 0x%02X", result);
-  //     return result;
-  //   }
-  // } else {
-  //   LOG("Init", "First boot not detected: %5.3fV", value);
-  // }
 
   LOG("Init", "Initialization complete");
-  return result;
+  return error;
 }
 
 /**
@@ -131,22 +116,23 @@ mbed_error_status_t run() {
   uint32_t now               = HAL_GetTick();
   uint32_t nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
 
-  mbed_error_status_t result = MBED_SUCCESS;
+  mbed_error_status_t error = MBED_SUCCESS;
   while (true) {
     now = HAL_GetTick();
     if (now >= nextPeriodicEvent && (nextPeriodicEvent >= PERIOD_MS_PERIODIC ||
                                         now <= PERIOD_MS_PERIODIC)) {
-      result = eventPeriodic();
-      if (result) {
-        ERROR("Run", "Failed to perform periodic event: 0x%02X", result);
-        return result;
+      statusLED = !statusLED;
+      error     = eventPeriodic();
+      if (error) {
+        ERROR("Run", "Failed to perform periodic event: 0x%02X", error);
+        return error;
       }
       nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
       // } else if (cdh.hasMessage()) {
-      //   result = cdh.processMessage();
-      //   if (result) {
+      //   error = cdh.processMessage();
+      //   if (error) {
       //     ERROR("Run", "Failed to process message from the bus: 0x%02X",
-      //     result); return result;
+      //     error); return error;
       //   }
     } else {
       wait_ms(PERIOD_MS_IDLE_SLEEP);
@@ -159,13 +145,15 @@ mbed_error_status_t run() {
  * @return error code
  */
 int main(void) {
-  mbed_error_status_t result = initialize();
-  if (result) {
-    ERROR("PMIC", "Failed to initialize: 0x%02X", result);
+  mbed_error_status_t error = initialize();
+  if (error) {
+    ERROR("PMIC", "Failed to initialize: 0x%02X", error);
+    return error;
   }
-  result = run();
-  if (result) {
-    ERROR("PMIC", "Failed to run: 0x%02X", result);
+  error = run();
+  if (error) {
+    ERROR("PMIC", "Failed to run: 0x%02X", error);
+    return error;
   }
   return MBED_SUCCESS;
 }

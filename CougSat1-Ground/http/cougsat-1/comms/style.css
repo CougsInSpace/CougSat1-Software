@@ -1,0 +1,13 @@
+.main-text table {
+  margin: 0 auto;
+  min-width: 300px;
+}
+
+.main-text table td:nth-child(1) {
+  text-align: right;
+}
+
+.main-text table td:nth-child(2) {
+  width: 50%;
+  padding: 0 0.25rem;
+}

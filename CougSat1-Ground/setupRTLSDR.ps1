@@ -3,7 +3,7 @@
 # Extracts "rtlsdr.dll" and "libusb-1.0.dll", puts them in "bin/"
 # Downloads http://github.com/pbatard/libwdi/releases/download/b721/zadig-2.4.exe to "bin/"
 
-$OutPath = './bin'
+$OutPath = './'
 # ensure the output folder exists
 $exists = Test-Path -Path $OutPath
 if ($exists -eq $false)
@@ -29,11 +29,11 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 # open ZIP archive for reading
 $zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
 $zip.Entries | where {$_.FullName -like 'rtl-sdr-release/x32/rtlsdr.lib'} | foreach {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, "./lib/rtlsdr.lib", $true)}
-$zip.Entries | where {$_.FullName -like 'rtl-sdr-release/x32/rtlsdr.dll'} | foreach {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, "./bin/rtlsdr.dll", $true)}
-$zip.Entries | where {$_.FullName -like 'rtl-sdr-release/x32/libusb-1.0.dll'} | foreach {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, "./bin/libusb-1.0.dll", $true)}
+$zip.Entries | where {$_.FullName -like 'rtl-sdr-release/x32/rtlsdr.dll'} | foreach {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, "./rtlsdr.dll", $true)}
+$zip.Entries | where {$_.FullName -like 'rtl-sdr-release/x32/libusb-1.0.dll'} | foreach {[System.IO.Compression.ZipFileExtensions]::ExtractToFile($_, "./libusb-1.0.dll", $true)}
 
 $zip.Dispose()
 
 Remove-Item $Path
 
-./bin/zadig.exe
+./zadig.exe

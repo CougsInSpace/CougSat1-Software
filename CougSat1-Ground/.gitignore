@@ -6,11 +6,13 @@
 
 # Build Executable
 debug
+CISLibrary
 release
-bin
-http/Ehbanana.js
+http/lib/Ehbanana.js
 *.lib
 *.zip
+*.dll
+*.exe
 
 # Log files
 *.log
