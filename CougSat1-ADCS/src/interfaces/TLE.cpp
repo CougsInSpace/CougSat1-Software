@@ -8,14 +8,14 @@
  * @return true
  * @return false if the string is too short or the checksum fails
  */
-bool parseData(char * element, TLEData * data) {
+int parseData(char * element, TLEData * data) {
   int  line1Checksum = 0;
   int  line2Checksum = 0;
   char temp[16]      = "";
   char exponent[16]  = "";
 
   if (strlen(element) != 138) {
-    return false;
+    return 1;
   }
 
   for (int i = 0; i < 68; i++) {
@@ -44,7 +44,7 @@ bool parseData(char * element, TLEData * data) {
 
   if (line1Checksum != int(element[68] - '0') ||
       line2Checksum != int(element[137] - '0')) {
-    return false;
+    return 2;
   }
   // Line 1
   // Satellite catalog number
@@ -161,5 +161,5 @@ bool parseData(char * element, TLEData * data) {
   temp[5]           = '\0';
   data->revolutions = atoi(temp);
 
-  return true;
+  return 0;
 }

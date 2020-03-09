@@ -26,5 +26,5 @@ struct TLEData {
   int    revolutions;
 };
 
-bool parseData(char * element, TLEData * data);
+int parseData(char * element, TLEData * data);
 #endif /*TLE_H*/
