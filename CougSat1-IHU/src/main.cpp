@@ -1,19 +1,50 @@
 // #include "HeapBlockDevice.h"
 #include "SatFileHandler.h"
 #include "mbed.h"
+#include "mbed_events.h"
 #include <FATFileSystem.h>
 #include <cstdio>
 #include <sstream>
 
-// SDBlockDevice sd(D11, D12, D13, D10);
-// FATFileSystem fs("sd");
+EventQueue *eventQueue;
+DigitalOut led1(LED1);
+DigitalOut led2(LED2);
+Serial pc(SERIAL_TX, SERIAL_RX);
+void foo()
+{
+        led1 = !led1;
+        pc.printf("LED1!\r\n");
+}
 
-// HeapBlockDevice sd(2048, 256);
+void bar()
+{
+        led2 = !led2;
+        pc.printf("LED2!\r\n");
+}
+
+void timer()
+{
+        Timer t1, t2;
+        t1.start();
+        t2.start();
+        while (true) {
+                if (t1.read_ms() >= 2500) {
+                        eventQueue->call(foo);
+                        t1.reset();
+                }
+                if (t2.read_ms() >= 5000) {
+                        eventQueue->call(bar);
+                        t2.reset();
+                }
+                eventQueue->dispatch(1000);
+        }
+}
 
 // All tests passed 03/06/20
 int main()
 {
-        Serial pc(SERIAL_TX, SERIAL_RX);
+        eventQueue = mbed_event_queue();
+
         // MOSI(DI), MISO(DO), SCLK(SCK), ChipSelect(CS), CardDetect(CD), crc,
         // debug
         SatFileHandler testfs(D11, D12, D13, D10, D2, true, true);
@@ -49,7 +80,9 @@ int main()
 
         testfs.write("hello.txt", stream);
         pc.printf("Write stream test\r\n");
+        timer();
 
         // pc.printf("Start test check.\r\n");
         // testfs.check();
+        // eventQueue->dispatch(10000);
 }
