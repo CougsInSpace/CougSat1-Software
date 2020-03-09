@@ -1,17 +1,16 @@
 #include "SatFileHandler.h"
 #include <algorithm>
 #include <chrono>
-#include <sstream>
 
 const std::string SatFileHandler::rootDirectory = {"/fs/"};
 constexpr uint64_t SatFileHandler::frequency;
 
 SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
                                PinName cs, PinName cd, bool crc_on, bool debug)
-        : debug(debug), needsReformat(false), current(0), priority(0)
+        : debug(debug), needsReformat(false), fs(nullptr), sdbd(nullptr),
+          cardDetect(nullptr), pc(nullptr), current(0), priority(0)
 {
-        hwo = std::make_unique<HardwareOptions>();
-
+        hwo = new HardwareOptions();
         hwo->mosi = mosi;
         hwo->miso = miso;
         hwo->sclk = sclk;
@@ -24,6 +23,10 @@ SatFileHandler::~SatFileHandler()
 {
         unmount();
         sdbd->deinit();
+        delete sdbd;
+        delete fs;
+        delete cardDetect;
+        delete pc;
 }
 
 void SatFileHandler::write(const std::string &filenameBase,
@@ -88,7 +91,7 @@ void SatFileHandler::clean(std::string dir)
                 // DIR *temp = opendir(directory.c_str());
                 fs->remove(directory.c_str());
         }
-
+        delete d;
         this->priority++;
 }
 
@@ -139,24 +142,24 @@ void SatFileHandler::enqueueMessage(std::pair<std::string, std::string> message)
 mbed_error_status_t SatFileHandler::init()
 {
         initSerial();
-        cardDetect = std::make_unique<DigitalIn>(hwo->cd, PullUp);
+        cardDetect = new DigitalIn(hwo->cd, PullUp);
         int bdStat = initBlockDevice();
         int fsStat = initFilesystem();
-        hwo.reset();
+        delete hwo;
         return (bdStat || fsStat) ? MBED_ERROR_CODE_FAILED_OPERATION
                                   : MBED_SUCCESS;
 }
 
 mbed_error_status_t SatFileHandler::initFilesystem()
 {
-        fs = std::make_unique<FATFileSystem>("fs");
-        int status = fs->mount(sdbd.get());
+        fs = new FATFileSystem("fs");
+        int status = fs->mount(sdbd);
         if (status) {
                 pc->printf("Failed to mount filesystem, "
                            "reformatting...\r\n");
                 reformat();
                 pc->printf("Reformat done\r\n");
-                status = fs->mount(sdbd.get());
+                status = fs->mount(sdbd);
         }
         if (debug)
                 pc->printf("FileSystem Mount: \r\n%s\r\n", strerror(-status));
@@ -165,8 +168,8 @@ mbed_error_status_t SatFileHandler::initFilesystem()
 
 mbed_error_status_t SatFileHandler::initBlockDevice()
 {
-        sdbd = std::make_unique<SDBlockDevice>(hwo->mosi, hwo->miso, hwo->sclk,
-                                               hwo->cs, frequency, hwo->crc_on);
+        sdbd = new SDBlockDevice(hwo->mosi, hwo->miso, hwo->sclk, hwo->cs,
+                                 frequency, hwo->crc_on);
         ThisThread::sleep_for(0.2); // a small wait for when using crc.
         int status = sdbd->init();
         if (debug) {
@@ -181,12 +184,12 @@ mbed_error_status_t SatFileHandler::initBlockDevice()
 
 void SatFileHandler::initSerial()
 {
-        pc = std::make_unique<Serial>(SERIAL_TX, SERIAL_RX);
+        pc = new Serial(SERIAL_TX, SERIAL_RX);
 }
 
 void SatFileHandler::reformat()
 {
-        int status = fs->reformat(sdbd.get());
+        int status = fs->reformat(sdbd);
         if (debug) {
                 pc->printf("Filesystem Reformat: \r\n%s\r\n",
                            status ? "Failed" : "Success");
@@ -195,7 +198,7 @@ void SatFileHandler::reformat()
 
 void SatFileHandler::mount()
 {
-        int status = fs->mount(sdbd.get());
+        int status = fs->mount(sdbd);
         if (debug) {
                 pc->printf("Filesystem Mount: \r\n%s\r\n",
                            status ? "Failed" : "Success");

@@ -7,18 +7,14 @@
 #include <sstream>
 
 EventQueue *eventQueue;
-DigitalOut led1(LED1);
-DigitalOut led2(LED2);
 Serial pc(SERIAL_TX, SERIAL_RX);
 void foo()
 {
-        led1 = !led1;
         pc.printf("LED1!\r\n");
 }
 
 void bar()
 {
-        led2 = !led2;
         pc.printf("LED2!\r\n");
 }
 
@@ -44,6 +40,8 @@ void timer()
 int main()
 {
         eventQueue = mbed_event_queue();
+        Thread t;
+        t.start(callback(timer));
 
         // MOSI(DI), MISO(DO), SCLK(SCK), ChipSelect(CS), CardDetect(CD), crc,
         // debug
@@ -80,6 +78,22 @@ int main()
 
         testfs.write("hello.txt", stream);
         pc.printf("Write stream test\r\n");
+        mbed_stats_heap_t heap_stats;
+        mbed_stats_heap_get(&heap_stats);
+        printf("Heap size: %lu / %lu bytes\r\n", heap_stats.current_size,
+               heap_stats.reserved_size);
+        int cnt = osThreadGetCount();
+        mbed_stats_stack_t *stats = (mbed_stats_stack_t *)malloc(
+                cnt * sizeof(mbed_stats_stack_t));
+
+        cnt = mbed_stats_stack_get_each(stats, cnt);
+        for (int i = 0; i < cnt; i++) {
+                printf("Thread: 0x%lX, Stack size: %lu / %lu\r\n",
+                       stats[i].thread_id, stats[i].max_size,
+                       stats[i].reserved_size);
+        }
+        free(stats);
+
         timer();
 
         // pc.printf("Start test check.\r\n");

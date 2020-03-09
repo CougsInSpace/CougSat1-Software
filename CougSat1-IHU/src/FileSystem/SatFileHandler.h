@@ -2,7 +2,6 @@
 #include <SDBlockDevice.h>
 #include <fstream>
 #include <mbed.h>
-#include <memory>
 #include <queue>
 #include <string>
 
@@ -31,6 +30,11 @@ class SatFileHandler
 
         SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs,
                        PinName cd, bool crc_on = true, bool debug = false);
+
+        SatFileHandler(const SatFileHandler &) = delete;
+        SatFileHandler &operator=(const SatFileHandler &) = delete;
+        SatFileHandler(SatFileHandler &&sfh) = default;
+        SatFileHandler &operator=(SatFileHandler &&sfh) = default;
 
         /// Destructor. Unmounts the filesystem and deinits the block device for
         /// a clean disconnect.
@@ -110,18 +114,19 @@ class SatFileHandler
                 bool crc_on;
         };
         /// Filesystem to be mounted.
-        std::unique_ptr<FATFileSystem> fs;
+        FATFileSystem *fs;
         /// Block device that corresponds to the SD card.
-        std::unique_ptr<SDBlockDevice> sdbd;
+        SDBlockDevice *sdbd;
 
-        std::unique_ptr<DigitalIn> cardDetect;
+        /// Signal pin for if the SD card is detected.
+        DigitalIn *cardDetect;
 
         /// Struct containing all the hardware options. Is deleted when init
         /// finishes.
-        std::unique_ptr<HardwareOptions> hwo;
+        HardwareOptions *hwo;
 
         /// Serial out for testing purposes.
-        std::unique_ptr<Serial> pc;
+        Serial *pc;
 
         /// Holds the current day of the satelite will increment after each
         /// day.
@@ -130,9 +135,6 @@ class SatFileHandler
         /// Hold the day that takes priority in removal if the device is running
         /// low on storage.
         uint16_t priority;
-
-        /// Thread for card detect light
-        Thread cardThread;
 
         /// Queue for messages.
         std::queue<std::fstream> inputMessages;
