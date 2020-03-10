@@ -5,6 +5,9 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <algorithm>
+#include <chrono>
+#include <sstream>
 
 /// Class that will handle all file read/write operations to a given medium on
 /// the sattelite. Handles all operations related to files. Currently only
