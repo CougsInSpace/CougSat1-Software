@@ -15,7 +15,6 @@ void IHU::startQueueThread(IHUObjects *objs)
 void IHU::deleteIHUObjects(IHUObjects &objs)
 {
         delete objs.sfh;
-        delete objs.queue;
         objs.queueThread->join();
         delete objs.queueThread;
 }

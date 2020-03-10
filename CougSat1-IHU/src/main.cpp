@@ -43,6 +43,7 @@ int main()
         IHU::initObjects(ihu);
         IHU::addEvent(ihu, foo);
         IHU::startQueueThread(&ihu);
+        IHU::deleteIHUObjects(ihu);
         // MOSI(DI), MISO(DO), SCLK(SCK), ChipSelect(CS), CardDetect(CD), crc,
         // debug
         // SatFileHandler testfs(D11, D12, D13, D10, D2, true, true);
