@@ -1,42 +1,36 @@
 #ifndef IHU_H
 #define IHU_H
+#include "FileSystem/SatFileHandler.h"
 #include "mbed.h"
 
-class SatFileHandler;
-class IHU
+namespace IHU
 {
-    private:
-        /// This will point at the mbed_event_queue which is available device
-        /// wide.
-        static EventQueue *eventQueue;
-
-        /// The thread the event loop will execute in.
-        static Thread *eventThread;
-
-        /// Event Data
-        ///
-        /// Stores a function pointer and a time in milliseconds.
-        struct Event {
-                void (*func)();
-                int ms = -1;
+        struct IHUObjects {
+                SatFileHandler *sfh;
+                EventQueue *queue;
+                Thread *queueThread;
         };
 
-    public:
-        /// Add an event to eventQueue.
-        /// @param event A reference to the event to push to the queue;
-        static void addtoQueue(Event &event);
+        void initObjects(IHUObjects &objs);
 
-        /// Initialise the IHU.
-        static void init();
+        void startQueueThread(IHUObjects *objs);
 
-        static void run();
+        void deleteIHUObjects(IHUObjects &objs);
 
-        /// Static pointer to the File Handler. SatFileHandler cannot be copied.
-        /// This is public to facilitate simple usage of the filesystem.
-        static SatFileHandler *sfh;
+        void runEventQueue(IHUObjects *objs);
 
-        IHU();
-        ~IHU();
-};
+        template <typename... Args>
+        inline void addEvent(IHUObjects &objs, void (*func)(), Args &&... args)
+        {
+                objs.queue->call(func, std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        inline void addEvent(IHUObjects &objs, void (*func)(), Args &&... args,
+                             int ms)
+        {
+                objs.queue->call(ms, func, std::forward<Args>(args)...);
+        }
+} // namespace IHU
 
 #endif // IHU_H

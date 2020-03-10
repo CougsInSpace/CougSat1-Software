@@ -1,22 +1,28 @@
 #include "IHU.h"
-#include "SatFileHandler.h"
 
-SatFileHandler *IHU::sfh = nullptr;
-EventQueue *IHU::eventQueue = mbed_event_queue();
-Thread *IHU::eventThread = nullptr;
-
-IHU::IHU()
+void IHU::initObjects(IHUObjects &objs)
 {
+        objs.sfh = new SatFileHandler(D11, D12, D13, D10, D2, false, true);
+        objs.queue = mbed_event_queue();
+        objs.queueThread = new Thread();
 }
 
-IHU::~IHU()
+void IHU::startQueueThread(IHUObjects *objs)
 {
-        delete eventQueue;
-        delete sfh;
-        delete eventThread;
+        objs->queueThread->start(callback(runEventQueue, objs));
 }
 
-void IHU::addtoQueue(Event &event)
+void IHU::deleteIHUObjects(IHUObjects &objs)
 {
-        eventQueue->call_every(event.ms, event.func);
+        delete objs.sfh;
+        delete objs.queue;
+        objs.queueThread->join();
+        delete objs.queueThread;
+}
+
+void IHU::runEventQueue(IHUObjects *objs)
+{
+        while (true) {
+                objs->queue->dispatch();
+        }
 }
