@@ -25,3 +25,9 @@ void IHU::runEventQueue(IHUObjects *objs)
                 objs->queue->dispatch();
         }
 }
+
+void IHU::startWatchdog(int timeout_ms)
+{
+        auto kick = [&]() { Watchdog::get_instance().kick(); };
+        mbed_event_queue()->call_every(timeout_ms, kick);
+}

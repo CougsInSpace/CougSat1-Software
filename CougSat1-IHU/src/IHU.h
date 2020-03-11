@@ -35,6 +35,12 @@ namespace IHU
         /// @param objs Objects to use in function.
         void runEventQueue(IHUObjects *objs);
 
+        /// Adds a watchdog kick function to the events queue to be executed in
+        /// timeout_ms.
+        /// @param timeout_ms How long to wait before kicking the watchdog.
+        /// TODO: Implement.
+        void startWatchdog(int timeout_ms = 300'000);
+
         /// Adds a one off event to the queue.
         /// @param objs Objects to use for the function call.
         /// @param func Function pointer of function to call. NOTE: This will
