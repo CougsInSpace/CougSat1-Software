@@ -87,7 +87,7 @@ namespace IHU
         /// @param args Variatic arguments to be forwarded to the call function.
         /// @return ID of event in queue.
         template <typename T, typename U, typename... Args>
-        int addEventrecurring(int ms, IHUObjects &objs, T *obj,
+        int addEventRecurring(int ms, IHUObjects &objs, T *obj,
                               U (T::*method)(Args...), Args &&... args)
         {
                 return objs.queue->call_every(ms, obj, method,
