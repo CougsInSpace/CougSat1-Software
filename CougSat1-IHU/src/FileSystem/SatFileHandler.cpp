@@ -1,6 +1,10 @@
 #include "SatFileHandler.h"
+<<<<<<< HEAD
 #include <algorithm>
 #include <chrono>
+=======
+
+>>>>>>> upstream/FILESYS
 
 const std::string SatFileHandler::rootDirectory = {"/fs/"};
 constexpr uint64_t SatFileHandler::frequency;
