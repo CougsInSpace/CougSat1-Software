@@ -1,3 +1,5 @@
+#ifndef SATFILEHANDLER_H
+#define SATFILEHANDLER_H
 #include <FATFileSystem.h>
 #include <SDBlockDevice.h>
 #include <fstream>
@@ -12,6 +14,16 @@
 class SatFileHandler
 {
     public:
+        /// This effectively makes this a singleton class. It is not possible to
+        /// create or copy this object. This will protect the filesystem from
+        /// potential errors. This will also ensure it gets properly deleted
+        /// since it is allocated on the stack.
+        static SatFileHandler &getInstance()
+        {
+                static SatFileHandler handler(D11, D12, D13, D10, D2, false,
+                                              true);
+                return handler;
+        }
         /// Root file path.
         static const std::string rootDirectory;
 
@@ -27,14 +39,6 @@ class SatFileHandler
         /// @param cs PinName of Chip Select pin on SD breakout.
         /// @param crc_on Decides whether or not to use cyclic redundancy check.
         /// @param debug Decides whether or not debug data should be outputted.
-
-        SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs,
-                       PinName cd, bool crc_on = true, bool debug = false);
-
-        SatFileHandler(const SatFileHandler &) = delete;
-        SatFileHandler &operator=(const SatFileHandler &) = delete;
-        SatFileHandler(SatFileHandler &&sfh) = default;
-        SatFileHandler &operator=(SatFileHandler &&sfh) = default;
 
         /// Destructor. Unmounts the filesystem and deinits the block device for
         /// a clean disconnect.
@@ -98,6 +102,15 @@ class SatFileHandler
                           std::ios_base::openmode mode = std::ios::in);
 
     private:
+        SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs,
+                       PinName cd, bool crc_on = true, bool debug = false);
+        SatFileHandler()
+        {
+        }
+        SatFileHandler(const SatFileHandler &) = delete;
+        SatFileHandler &operator=(const SatFileHandler &) = delete;
+        SatFileHandler(SatFileHandler &&sfh) = default;
+        SatFileHandler &operator=(SatFileHandler &&sfh) = default;
         bool debug;
         /// Currently unused. Will be used to set if we need a reformat of
         /// filesystem.
@@ -163,3 +176,5 @@ class SatFileHandler
         /// TODO: Update to work if sizes are different.
         bool compareArrays(uint8_t *arr1, uint8_t *arr2, size_t size);
 };
+
+#endif // SATFILEHANDLER_H

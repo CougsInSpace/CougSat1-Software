@@ -2,21 +2,20 @@
 
 void IHU::initObjects(IHUObjects &objs)
 {
-        objs.sfh = new SatFileHandler(D11, D12, D13, D10, D2, false, true);
+        objs.sfh = &SatFileHandler::getInstance();
         objs.queue = mbed_event_queue();
         objs.queueThread = new Thread();
 }
 
 void IHU::startQueueThread(IHUObjects *objs)
 {
-        objs->queueThread->start(callback(runEventQueue, objs));
+        auto dispatchQueue = [&]() { objs->queue->dispatch_forever(); };
+        objs->queueThread->start(dispatchQueue);
 }
 
-void IHU::runEventQueue(IHUObjects *objs)
+void IHU::runEventQueue(IHUObjects *objs, int ms)
 {
-        while (true) {
-                objs->queue->dispatch();
-        }
+        objs->queue->dispatch(ms);
 }
 
 void IHU::startWatchdog(int timeout_ms)

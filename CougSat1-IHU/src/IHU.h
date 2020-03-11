@@ -19,7 +19,7 @@ namespace IHU
         };
 
         /// Delete pointers inside IHUObjects.
-        /// @param IHUObjects to clear.
+        /// @param objs IHUObjects to clear.
         void clearIHUObject(IHUObjects &objs);
 
         /// Allocates the IHU objects.
@@ -33,7 +33,8 @@ namespace IHU
         /// Does the same as startQueueThread, but without the thread. This
         /// function *will* block.
         /// @param objs IHUObjects to use in function.
-        void runEventQueue(IHUObjects *objs);
+        /// @param ms Time in milliseconds to run. -1 == run forever.
+        void runEventQueue(IHUObjects *objs, int ms = -1);
 
         /// Adds a watchdog kick function to the events queue to be executed in
         /// timeout_ms.
