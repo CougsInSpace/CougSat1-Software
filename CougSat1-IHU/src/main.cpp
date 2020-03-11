@@ -4,6 +4,7 @@
 
 EventQueue *eventQueue;
 Serial pc(SERIAL_TX, SERIAL_RX);
+
 void foo()
 {
         pc.printf("LED1!\r\n");
