@@ -38,8 +38,8 @@ namespace IHU
         /// Adds a watchdog kick function to the events queue to be executed in
         /// timeout_ms.
         /// @param timeout_ms How long to wait before kicking the watchdog.
-        /// TODO: Implement.
-        void startWatchdog(int timeout_ms = 300'000);
+        /// The max is 32760.
+        void startWatchdog(int timeout_ms = 32760);
 
         /// Adds a one off event to the queue.
         /// @param objs IHUObjects to use for the function call.
