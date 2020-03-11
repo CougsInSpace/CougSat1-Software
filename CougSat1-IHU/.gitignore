@@ -10,7 +10,7 @@
 mbed-os/
 BUILD/
 .mbed
-mbed-os.lib
-mbed_config.h
-mbed_settings.py
-mbed_settings.pyc
+mbed-os.lib*
+mbed_config.h*
+mbed_settings.py*
+mbed_settings.pyc*
