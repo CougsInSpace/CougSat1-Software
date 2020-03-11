@@ -13,12 +13,12 @@ void IHU::startQueueThread(IHUObjects *objs)
         objs->queueThread->start(dispatchQueue);
 }
 
-void IHU::runEventQueue(IHUObjects *objs, int ms)
+void IHU::runEventQueue(IHUObjects *objs, int32_t ms)
 {
         objs->queue->dispatch(ms);
 }
 
-void IHU::startWatchdog(int timeout_ms)
+void IHU::startWatchdog(int32_t timeout_ms)
 {
         Watchdog::get_instance().start(timeout_ms);
         auto kick = [&]() { Watchdog::get_instance().kick(); };
