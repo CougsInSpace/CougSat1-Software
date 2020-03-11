@@ -1,10 +1,6 @@
-// #include "HeapBlockDevice.h"
 #include "IHU.h"
 #include "mbed.h"
 #include "mbed_events.h"
-#include <FATFileSystem.h>
-#include <cstdio>
-#include <sstream>
 
 EventQueue *eventQueue;
 Serial pc(SERIAL_TX, SERIAL_RX);

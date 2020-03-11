@@ -1,5 +1,11 @@
 #include "IHU.h"
 
+IHU::IHUObjects::~IHUObjects()
+{
+        delete sfh;
+        delete queueThread;
+}
+
 void IHU::initObjects(IHUObjects &objs)
 {
         objs.sfh = new SatFileHandler(D11, D12, D13, D10, D2, false, true);
@@ -10,13 +16,6 @@ void IHU::initObjects(IHUObjects &objs)
 void IHU::startQueueThread(IHUObjects *objs)
 {
         objs->queueThread->start(callback(runEventQueue, objs));
-}
-
-void IHU::deleteIHUObjects(IHUObjects &objs)
-{
-        delete objs.sfh;
-        objs.queueThread->join();
-        delete objs.queueThread;
 }
 
 void IHU::runEventQueue(IHUObjects *objs)
