@@ -1,11 +1,5 @@
 #include "IHU.h"
 
-IHU::IHUObjects::~IHUObjects()
-{
-        delete sfh;
-        delete queueThread;
-}
-
 void IHU::initObjects(IHUObjects &objs)
 {
         objs.sfh = new SatFileHandler(D11, D12, D13, D10, D2, false, true);
@@ -29,4 +23,10 @@ void IHU::startWatchdog(int timeout_ms)
 {
         auto kick = [&]() { Watchdog::get_instance().kick(); };
         mbed_event_queue()->call_every(timeout_ms, kick);
+}
+
+void IHU::clearIHUObject(IHUObjects &objs)
+{
+        delete objs.sfh;
+        delete objs.queueThread;
 }
