@@ -1,0 +1,13 @@
+{
+        "macros": [
+        "MBED_HEAP_STATS_ENABLED=1",
+        "MBED_STACK_STATS_ENABLED=1",
+        "MBE"
+        ],
+    "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate": 115200,
+            "platform.stdio-convert-newlines":true
+        }
+    }
+}

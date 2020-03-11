@@ -16,8 +16,8 @@ extern SPI spi2;
 extern DigitalIn i2cIRQ0;
 extern DigitalIn i2cIRQ1;
 
-extern DigitalIn  sdSW0;
-extern DigitalIn  sdSW1;
+extern DigitalIn sdSW0;
+extern DigitalIn sdSW1;
 extern DigitalOut sdCS0;
 extern DigitalOut sdCS1;
 
