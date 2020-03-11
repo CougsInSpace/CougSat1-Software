@@ -44,4 +44,5 @@ int main()
         auto breakDispatch = [&]() { ihu.queue->break_dispatch(); };
         IHU::addEvent(ihu, breakDispatch);
         IHU::startQueueThread(&ihu);
+        IHU::clearIHUObject(ihu);
 }
