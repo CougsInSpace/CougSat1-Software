@@ -58,4 +58,5 @@ bool test()
         // pc.printf("Start test check.\r\n");
         // testfs.check();
         // eventQueue->dispatch(10000);
+        return true;
 }
