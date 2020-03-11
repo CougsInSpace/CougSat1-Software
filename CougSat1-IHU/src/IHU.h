@@ -18,7 +18,7 @@ namespace IHU
                 Thread *queueThread;
         };
 
-        /// Delete poitners inside IHUObjects.
+        /// Delete pointers inside IHUObjects.
         /// @param IHUObjects to clear.
         void clearIHUObject(IHUObjects &objs);
 
@@ -43,8 +43,7 @@ namespace IHU
 
         /// Adds a one off event to the queue.
         /// @param objs IHUObjects to use for the function call.
-        /// @param func Function pointer of function to call. NOTE: This will
-        /// only work with functions that *are not* a part of another object.
+        /// @param f Function pointer of function to call.
         /// @param args Variatic arguments to be forwarded to the call function.
         /// @return ID of event in queue.
         template <typename F, typename... Args>
@@ -53,10 +52,23 @@ namespace IHU
                 return objs.queue->call(f, std::forward<Args>(args)...);
         }
 
+        /// Adds a one off event to the queue.
+        /// @param objs IHUObjects to use for the function call.
+        /// @param obj The object who's function you want to call.
+        /// @param method Function pointer of function to call.
+        /// @param args Variatic arguments to be forwarded to the call function.
+        /// @return ID of event in queue.
+        template <typename T, typename U, typename... Args>
+        int addEvent(IHUObjects &objs, T *obj, U (T::*method)(Args...),
+                     Args &&... args)
+        {
+                return objs.queue->call(obj, method,
+                                        std::forward<Args>(args)...);
+        }
+
         /// Adds a recurring event to the queue.
         /// @param objs IHUObjects to use for the function call.
-        /// @param func Function pointer of function to call. NOTE: This will
-        /// only work with functions that *are not* a part of another object.
+        /// @param f Function pointer of function to call.
         /// @param args Variatic arguments to be forwarded to the call function.
         /// @param ms Number of milliseconds to wait before executing function
         /// call.
@@ -65,6 +77,20 @@ namespace IHU
         int addEventRecurring(int ms, IHUObjects &objs, F f, Args &&... args)
         {
                 return objs.queue->call_every(ms, f,
+                                              std::forward<Args>(args)...);
+        }
+
+        /// Adds a one off event to the queue.
+        /// @param objs IHUObjects to use for the function call.
+        /// @param obj The object who's function you want to call.
+        /// @param method Function pointer of function to call.
+        /// @param args Variatic arguments to be forwarded to the call function.
+        /// @return ID of event in queue.
+        template <typename T, typename U, typename... Args>
+        int addEventrecurring(int ms, IHUObjects &objs, T *obj,
+                              U (T::*method)(Args...), Args &&... args)
+        {
+                return objs.queue->call_every(ms, obj, method,
                                               std::forward<Args>(args)...);
         }
 

@@ -23,7 +23,7 @@ void IHU::startWatchdog(int timeout_ms)
 {
         Watchdog::get_instance().start(timeout_ms);
         auto kick = [&]() { Watchdog::get_instance().kick(); };
-        mbed_event_queue()->call_every(timeout_ms - 1, kick);
+        mbed_event_queue()->call_every(timeout_ms - 1000, kick);
 }
 
 void IHU::clearIHUObject(IHUObjects &objs)
