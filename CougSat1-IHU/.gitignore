@@ -14,3 +14,4 @@ mbed-os.lib*
 mbed_config.h*
 mbed_settings.py*
 mbed_settings.pyc*
+.pio/*
