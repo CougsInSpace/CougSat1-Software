@@ -14,7 +14,7 @@ ThreeEncoding::ThreeEncoding(uint8_t threeBitEncoding, uint8_t fourBitEncodingMi
     int zeroes_count = 0;
 
     for(uint_fast8_t i = 0; i < 4; i++){
-        if((fourBitEncodingPlus ^ (1 << i)) > 0){
+        if((fourBitEncodingPlus & (1 << i)) > 0){
             ones_count++;
         } else {
             zeroes_count++;

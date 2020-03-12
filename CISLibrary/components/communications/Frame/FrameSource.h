@@ -25,12 +25,12 @@ private:
 
   void reset();
 
-  void loadPreamble();
-  void matchStartOfCode();
-  void loadPayloadData();
-  void loadCRC();
-  void loadEndOfFrame();
-  bool loadCode(uint8_t byte);
+  __declspec(noinline) void loadPreamble();
+  __declspec(noinline) void matchStartOfCode();
+  __declspec(noinline) void loadPayloadData();
+  __declspec(noinline) void loadCRC();
+  __declspec(noinline) void loadEndOfFrame();
+  __declspec(noinline) bool loadCode(uint8_t byte);
   inline void nextState(){state = (State_t) ((uint8_t) state + 1);}
 
   uint8_t payloadData[MAX_PAYLOAD];
@@ -44,6 +44,8 @@ private:
   uint8_t unusedBitsPosition;
 
   uint8_t codeSize;
+
+  bool wasReset;
   
   /* This is a multi purpose index that can mean different things depending on the State.
    *  it usually counts the occurrences of some key feature or item

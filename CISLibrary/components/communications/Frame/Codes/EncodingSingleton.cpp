@@ -58,7 +58,7 @@ FiveEncoding* EncodingSingleton::getFiveEncoding(uint8_t _fiveEncoding) {
  *      that points to the corresponding ThreeEncoding object.
  */
 ThreeEncoding* EncodingSingleton::getThreeEncoding(uint8_t  _threeEncoding) {
-    if(_threeEncoding >= threeSize){
+    if(_threeEncoding >= threeSize || _threeEncoding < 0){
         return nullptr;
     }
 
@@ -118,6 +118,7 @@ void EncodingSingleton::makeFives() {
 }
 
 EncodingSingleton::EncodingSingleton() {
+    printf("Making encoding singleton");
     makeFives();
     makeThrees();
     makeControlFive();
@@ -177,8 +178,60 @@ void EncodingSingleton::makeControlThree() {
     controlCodeThreeEncoding[1] = new ThreeEncoding(0b001, 0b0110);
     controlCodeThreeEncoding[2] = new ThreeEncoding(0b010, 0b1010);
     controlCodeThreeEncoding[3] = new ThreeEncoding(0b011, 0b1100);
-    controlCodeThreeEncoding[4] = new ThreeEncoding(0,0);
-    controlCodeThreeEncoding[5] = new ThreeEncoding(0,0);
-    controlCodeThreeEncoding[6] = new ThreeEncoding(0,0);
-    controlCodeThreeEncoding[7] = new ThreeEncoding(0,0);
+    controlCodeThreeEncoding[4] = new ThreeEncoding(0b100, 0b1101);
+    controlCodeThreeEncoding[5] = new ThreeEncoding(0b101, 0b0101);
+    controlCodeThreeEncoding[6] = new ThreeEncoding(0b110, 0b1001);
+    controlCodeThreeEncoding[7] = new ThreeEncoding(0b111, 0b1000);
+
+    for(auto &i : controlCodeFourEncodingPositive){
+        i = nullptr;
+    }
+
+    for(auto & i : controlCodeThreeEncoding){
+        if(i != nullptr){
+            controlCodeFourEncodingNegative[i->getFourBitEncodingMinus()] = i;
+            controlCodeFourEncodingPositive[i->getFourBitEncodingPlus()] = i;
+        }
+    }
+}
+
+FiveEncoding* EncodingSingleton::getControlCodeFiveEncoding(uint8_t _fiveEncoding){
+    if(_fiveEncoding < 0 || _fiveEncoding >= controlFiveSize){
+        return nullptr;
+    }
+
+    return controlCodeFiveEncoding[_fiveEncoding];
+}
+
+FiveEncoding* EncodingSingleton::getControlCodeFiveEncodingFromSix(uint8_t _sixEncoding){
+    if(_sixEncoding < 0){
+        return nullptr;
+    }
+
+    if(_sixEncoding >= controlSixSize){
+        _sixEncoding ^= 0b00111111;
+        if(_sixEncoding >= controlSixSize){
+            return nullptr;
+        }
+    }
+
+    return controlCodeSixEncoding[_sixEncoding];
+}
+ThreeEncoding* EncodingSingleton::getControlCodeThreeEncoding(uint8_t _threeEncoding){
+    if(_threeEncoding < 0 || _threeEncoding >= controlThreeSize){
+        return nullptr; 
+    }
+
+    return controlCodeThreeEncoding[_threeEncoding];
+}
+ThreeEncoding* EncodingSingleton::getControlCodeThreeEncodingFromFour(uint8_t _fourEncoding, int8_t runDisparity){
+    if(_fourEncoding < 0 || _fourEncoding >= controlFourSize){
+        return nullptr; 
+    }
+
+    if(runDisparity < 0){
+        return controlCodeFourEncodingNegative[_fourEncoding]; 
+    }
+
+    return controlCodeFourEncodingPositive[_fourEncoding];
 }

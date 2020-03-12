@@ -7,6 +7,7 @@
 
 
 #include <cstdint>
+#include <stdio.h>
 
 class FiveEncoding {
     friend class EncodingSingleton;

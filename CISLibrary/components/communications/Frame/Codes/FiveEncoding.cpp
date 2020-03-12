@@ -11,7 +11,7 @@ FiveEncoding::FiveEncoding(uint8_t fiveBitEncoding, uint8_t sixBitEncodingMinus)
     int ones_count = 0;
     int zeroes_count = 0;
     for(uint_fast8_t i = 0; i < 6; i++){
-            if((sixBitEncodingMinus ^ (1 << i)) > 0){
+            if((sixBitEncodingMinus & (1 << i)) > 0){
                ones_count++;
             } else {
                 zeroes_count++;

@@ -19,6 +19,7 @@ FrameSource::~FrameSource() {}
 
 
 void FrameSource::reset(){
+  printf("Reset code %d\n", curCode);
   curCode = 0;
   bufferedBitsCount = 0;
   unusedBitsPosition = 0;
@@ -26,6 +27,7 @@ void FrameSource::reset(){
   index = 0;
   state = State_t::PREAMBLE;
   runDisparity = -1;
+  wasReset = true;
 }
 
 
@@ -36,7 +38,8 @@ void FrameSource::reset(){
  * @param byte
  */
 void FrameSource::add(uint8_t byte) {
-  while(loadCode(byte)){
+  wasReset = false;
+  while(loadCode(byte) && !wasReset){
     switch (state)
     {
     case State_t::PREAMBLE:
@@ -66,28 +69,47 @@ void FrameSource::loadPreamble(){
   EncodingSingleton *encoding = EncodingSingleton::getInstance();
   
   if(codeSize == 6){
-    FiveEncoding *fiveEncoding = encoding->getFiveEncodingFromSix(curCode);
-    if(fiveEncoding->getFiveBitEncoding != 0b11100){
-      reset();
-      return;
-    }
-  } else if(codeSize == 4){
-    ThreeEncoding *threeEncoding = encoding->getThreeEncodingFromFour(curCode);
-    if(threeEncoding->getThreeBitEncoding != 0b101){
+    FiveEncoding *fiveEncoding = encoding->getControlCodeFiveEncodingFromSix(curCode);
+    if(fiveEncoding == nullptr || fiveEncoding->getFiveBitEncoding() != 0b11100){
+      printf("Resetting on 3 encoding with index %d and ptr %d\n", index, fiveEncoding);
       reset();
       return;
     }
 
+    int8_t change = fiveEncoding->getRunDisparitychange(runDisparity);
+    printf("Change %d\n", change);
+    runDisparity += change;
+
+  } else if(codeSize == 4){
+    ThreeEncoding *threeEncoding = encoding->getControlCodeThreeEncodingFromFour(curCode, runDisparity);
+    if(threeEncoding == nullptr || threeEncoding->getThreeBitEncoding() != 0b101){
+      printf("Resetting on 3 encoding with index %d and ptr %d\n", index, threeEncoding);
+      reset();
+      return;
+    }
+
+    int8_t change = threeEncoding->getChangeInRunDisparity(runDisparity);
+    printf("Change %d\n", change);
+    runDisparity += change;
+
     index++;
     if(index == 7){
+      printf("Loaded the preamble");
       nextState();
     }
   }
+
+  //TODO check run disparity
   return;
 }
 
   bool FrameSource::loadCode(uint8_t code) {
     //Switch from reading 4 to 6 or vice versa
+    if(unusedBitsPosition >= 8){
+      unusedBitsPosition = 0;
+      return false;
+    }
+
     codeSize = codeSize == 6 ? 4 : 6;
 
     if(bufferedBitsCount == 0){
@@ -117,7 +139,7 @@ void FrameSource::loadPreamble(){
       //Set up buffered bits count for next loadCode on new code
       bufferedBitsCount = 0;
 
-      printf("Full buffer\n\n");
+      printf("Full buffer with %d\n\n", curCode);
 
       return true;
     } else {
