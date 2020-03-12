@@ -8,9 +8,7 @@
 #include <string>
 
 /// Class that will handle all file read/write operations to a given medium on
-/// the sattelite. Handles all operations related to files. Currently only
-/// operates on string data.
-/// TODO: Update to work with other types of data.
+/// the sattelite. Handles all operations related to files.
 class SatFileHandler
 {
     public:
