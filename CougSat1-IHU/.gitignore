@@ -9,7 +9,7 @@
 
 mbed-os/
 BUILD/
-.mbed
+*.mbed*
 mbed-os.lib*
 mbed_config.h*
 mbed_settings.py*
