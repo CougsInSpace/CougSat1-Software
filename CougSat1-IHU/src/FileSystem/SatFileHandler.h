@@ -2,12 +2,10 @@
 #define SATFILEHANDLER_H
 
 #include "FATFileSystem.h"
-#include "FlashIAPBlockDevice.h"
+#include "SDBlockDevice.h"
 #include "mbed.h"
-#include <SDBlockDevice.h>
 #include <fstream>
 #include <queue>
-#include <streambuf>
 #include <string>
 
 /// Class that will handle all file read/write operations to a given medium on
