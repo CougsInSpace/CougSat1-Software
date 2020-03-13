@@ -5,18 +5,32 @@
 
 #include <mbed.h>
 
-class IFJR : public Subsystem {
-public:
-  IFJR(const IFJR &) = delete;
-  IFJR & operator=(const IFJR &) = delete;
+/// Singleton class to manage IFJR.
+/// use IFJR::getInstance() to access it.
+class IFJR : public Subsystem
+{
+    public:
+        /// Retrieves the static instance of the IFJR object
+        /// @return IFJR object reference.
+        static IFJR &getInstance();
 
-  IFJR(I2C & i2c);
-  ~IFJR();
+        /// Destroy the IFJR::IFJR object.
+        ~IFJR();
 
-  mbed_error_status_t initialize();
+        /// Initialize the IFJR.
+        /// @return mbed_error_status_t.
+        mbed_error_status_t initialize();
 
-private:
-  I2C & i2c;
+        void setI2C(I2C &i2c);
+
+    private:
+        IFJR() = default;
+        IFJR(IFJR &&) = delete;
+        IFJR &operator=(IFJR &&) = delete;
+        IFJR(const IFJR &) = delete;
+        IFJR &operator=(const IFJR &) = delete;
+
+        I2C *i2c;
 };
 
 #endif /* SRC_SUBSYSTEMS_IFJR_H_ */

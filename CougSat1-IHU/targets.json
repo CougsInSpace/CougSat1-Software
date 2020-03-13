@@ -2524,6 +2524,8 @@
                   "NUCLEO_L476RG" : {
                           "components_add" : ["SD"],
                           "components" : ["SD"],
+						   "components_add" : ["FLASHIAP"],
+							"components" : ["FLASHIAP"],
                           "target.features_add" : ["STORAGE"],
 
                           "inherits" : ["FAMILY_STM32"],

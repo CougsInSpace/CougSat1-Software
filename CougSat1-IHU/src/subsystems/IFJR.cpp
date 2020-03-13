@@ -1,23 +1,22 @@
 #include "IFJR.h"
 
-/**
- * @brief Construct a new IFJR::IFJR object
- *
- * @param i2c connected to the IFJR
- */
-IFJR::IFJR(I2C & i2c) : i2c(i2c) {}
+IFJR &IFJR::getInstance()
+{
+        static IFJR ifjr;
+        return ifjr;
+}
 
-/**
- * @brief Destroy the IFJR::IFJR object
- *
- */
-IFJR::~IFJR() {}
+IFJR::~IFJR()
+{
+        delete i2c;
+}
 
-/**
- * @brief Initialize the IFJR
- *
- * @return mbed_error_status_t
- */
-mbed_error_status_t IFJR::initialize() {
-  return MBED_ERROR_UNSUPPORTED;
+mbed_error_status_t IFJR::initialize()
+{
+        return MBED_SUCCESS;
+}
+
+void IFJR::setI2C(I2C &i2c)
+{
+        IFJR::getInstance().i2c = &i2c;
 }

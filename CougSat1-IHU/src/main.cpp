@@ -39,10 +39,6 @@ int main()
         IHU::IHUObjects ihu;
         IHU::startWatchdog();
         IHU::initObjects(ihu);
-        IHU::addEvent(ihu, foo);
-        ThisThread::sleep_for(2);
-        auto breakDispatch = [&]() { ihu.queue->break_dispatch(); };
-        IHU::addEvent(ihu, breakDispatch);
         IHU::startQueueThread(&ihu);
         IHU::clearIHUObject(ihu);
 }

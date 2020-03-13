@@ -27,6 +27,5 @@ void IHU::startWatchdog(int32_t timeout_ms)
 
 void IHU::clearIHUObject(IHUObjects &objs)
 {
-        delete objs.sfh;
         delete objs.queueThread;
 }

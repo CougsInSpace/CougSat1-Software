@@ -1,14 +1,18 @@
 #ifndef SATFILEHANDLER_H
 #define SATFILEHANDLER_H
-#include <FATFileSystem.h>
+
+#include "FATFileSystem.h"
+#include "FlashIAPBlockDevice.h"
+#include "mbed.h"
 #include <SDBlockDevice.h>
 #include <fstream>
-#include <mbed.h>
 #include <queue>
+#include <streambuf>
 #include <string>
 
 /// Class that will handle all file read/write operations to a given medium on
 /// the sattelite. Handles all operations related to files.
+/// Use SatFileHandler::getInstance() to use it.
 class SatFileHandler
 {
     public:
@@ -16,12 +20,7 @@ class SatFileHandler
         /// create or copy this object. This will protect the filesystem from
         /// potential errors. This will also ensure it gets properly deleted
         /// since it is allocated on the stack.
-        static SatFileHandler &getInstance()
-        {
-                static SatFileHandler handler(D11, D12, D13, D10, D2, false,
-                                              true);
-                return handler;
-        }
+        static SatFileHandler &getInstance();
         /// Root file path.
         static const std::string rootDirectory;
 

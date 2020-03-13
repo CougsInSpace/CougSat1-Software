@@ -5,6 +5,12 @@
 const std::string SatFileHandler::rootDirectory = {"/fs/"};
 constexpr uint64_t SatFileHandler::frequency;
 
+SatFileHandler &SatFileHandler::getInstance()
+{
+        static SatFileHandler handler(D11, D12, D13, D10, D2, false, true);
+        return handler;
+}
+
 SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
                                PinName cs, PinName cd, bool crc_on, bool debug)
         : debug(debug), needsReformat(false), fs(nullptr), sdbd(nullptr),

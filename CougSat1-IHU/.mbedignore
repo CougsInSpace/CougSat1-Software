@@ -4,11 +4,9 @@ mbed-os/components/testing/*
 mbed-os/components/wifi/*
 mbed-os/components/storage/blockdevice/COMPONENT_RSPIF/*
 mbed-os/components/storage/blockdevice/COMPONENT_DATAFLASH/*
-mbed-os/components/storage/blockdevice/COMPONENT_FLASHIAP/*
 mbed-os/components/storage/blockdevice/COMPONENT_I2CEE/*
 mbed-os/components/storage/blockdevice/COMPONENT_QSPIF/*
 mbed-os/components/storage/blockdevice/COMPONENT_SPIF/*
-mbed-os/features/system_storage/*
 mbed-os/features/storage/kvstore/*
 mbed-os/features/storage/nvstore/*
 mbed-os/features/storage/TESTS/*
