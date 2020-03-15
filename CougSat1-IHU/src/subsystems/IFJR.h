@@ -2,7 +2,6 @@
 #define SRC_SUBSYSTEMS_IFJR_H_
 
 #include "Subsystem.h"
-
 #include <mbed.h>
 
 /// Singleton class to manage IFJR.
@@ -24,7 +23,11 @@ class IFJR : public Subsystem
         void setI2C(I2C &i2c);
 
     private:
-        IFJR() = default;
+        Serial *pc;
+        IFJR()
+        {
+                pc = new Serial(SERIAL_TX, SERIAL_RX);
+        }
         IFJR(IFJR &&) = delete;
         IFJR &operator=(IFJR &&) = delete;
         IFJR(const IFJR &) = delete;

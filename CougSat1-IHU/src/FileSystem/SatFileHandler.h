@@ -26,15 +26,6 @@ class SatFileHandler
         /// 25Mhz is the max frequency.
         static constexpr uint64_t frequency = 25000000;
 
-        /// Create a SatFileHandler where the debug state can be enabled or
-        /// disabled.
-        /// @param mosi PinName of SPI Master in Slave out.
-        /// @param miso PinName of SPI Master out Slave in.
-        /// @param sclk PinName of Serial Clock for SPI.
-        /// @param cs PinName of Chip Select pin on SD breakout.
-        /// @param crc_on Decides whether or not to use cyclic redundancy check.
-        /// @param debug Decides whether or not debug data should be outputted.
-
         /// Destructor. Unmounts the filesystem and deinits the block device for
         /// a clean disconnect.
         ~SatFileHandler();
@@ -97,6 +88,14 @@ class SatFileHandler
                           std::ios_base::openmode mode = std::ios::in);
 
     private:
+        /// Create a SatFileHandler where the debug state can be enabled or
+        /// disabled.
+        /// @param mosi PinName of SPI Master in Slave out.
+        /// @param miso PinName of SPI Master out Slave in.
+        /// @param sclk PinName of Serial Clock for SPI.
+        /// @param cs PinName of Chip Select pin on SD breakout.
+        /// @param crc_on Decides whether or not to use cyclic redundancy check.
+        /// @param debug Decides whether or not debug data should be outputted.
         SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs,
                        PinName cd, bool crc_on = true, bool debug = false);
         SatFileHandler()

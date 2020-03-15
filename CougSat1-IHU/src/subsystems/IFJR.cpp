@@ -9,6 +9,7 @@ IFJR &IFJR::getInstance()
 IFJR::~IFJR()
 {
         delete i2c;
+        delete pc;
 }
 
 mbed_error_status_t IFJR::initialize()
