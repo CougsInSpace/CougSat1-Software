@@ -72,12 +72,6 @@ void SatFileHandler::write(const std::string &filenameBase,
         pc->printf("Flushing file\r\n");
 }
 
-void SatFileHandler::writeStart()
-{
-        while (!inputMessages.empty()) {
-        }
-}
-
 std::fstream SatFileHandler::read(const std::string &fileNameFull,
                                   std::ios_base::openmode mode)
 {
@@ -138,11 +132,6 @@ void SatFileHandler::check()
         pc->printf("Check took %ld seconds\r\n", seconds);
         pc->printf("Block device check: Done\r\n");
         pc->printf("Number of bad blocks: %lu\r\n", numBad);
-}
-
-void SatFileHandler::enqueueMessage(std::pair<std::string, std::string> message)
-{
-        // inputMessages.push(message);
 }
 
 mbed_error_status_t SatFileHandler::init()

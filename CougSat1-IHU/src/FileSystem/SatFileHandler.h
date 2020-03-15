@@ -5,7 +5,6 @@
 #include "SDBlockDevice.h"
 #include "mbed.h"
 #include <fstream>
-#include <queue>
 #include <string>
 
 /// Class that will handle all file read/write operations to a given medium on
@@ -45,9 +44,6 @@ class SatFileHandler
         void write(const std::string &filenameBase, std::iostream &stream,
                    std::ios::openmode mode = std::ios::out | std::ios::in);
 
-        /// Writes whatever is in the queue.
-        void writeStart();
-
         /// Initialize the block device, filesystem and serial connection.
         /// @return Return 0 for success, negative error code for failure.
         mbed_error_status_t init();
@@ -71,15 +67,6 @@ class SatFileHandler
         /// Get the number of bytes in the block device.
         /// @return Size of block device in bytes.
         size_t blockDeviceSize() const;
-
-        /*!
-        \brief Function to enqueue a message to store on the SD card.
-
-        @param message Input std::pair<fileBase, message>.
-
-        USE FOR THREAD SAFETY
-        */
-        void enqueueMessage(pair<std::string, std::string> message);
 
         /// Read a file from the filesystem.
         /// @param fileNameFull Name of the file with extension to read.
@@ -142,9 +129,6 @@ class SatFileHandler
         /// Hold the day that takes priority in removal if the device is running
         /// low on storage.
         uint16_t priority;
-
-        /// Queue for messages.
-        std::queue<std::fstream> inputMessages;
 
         /// Cleans the file system...somehow.
         /// @param dir Name of directory to...clean?
