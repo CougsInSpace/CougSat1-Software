@@ -54,22 +54,9 @@ public:
   mbed_error_status_t readPPM(uint16_t & outValue);
 
 private:
-  /**
-   * @brief The sensor's default I2C slave address
-   *
-   */
-  static const uint8_t T6713_SLAVE_ADDRESS = 0x15 << 1;
-
-  /**
-   * @brief Same command found in the sensor's documentation, see pg. 29
-   *
-   */
+  static const uint8_t  T6713_SLAVE_ADDRESS = 0x15 << 1;
   static constexpr char READ_CO2_COMMAND[5] = {0x04, 0x13, 0x8B, 0x00, 0x01};
 
-  /**
-   * @brief The I2C with which the driver works to read the CO2 concentration
-   *
-   */
   I2C & i2c;
 };
 
