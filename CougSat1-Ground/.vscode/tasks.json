@@ -22,6 +22,7 @@
       "args": [
         "/property:GenerateFullPaths=true",
         "/t:build,copyfiles",
+        "/p:Configuration=Debug",
         "-m"
       ],
       "group": {

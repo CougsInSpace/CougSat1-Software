@@ -22,6 +22,7 @@
       <AdditionalIncludeDirectories>source;lib\ehbanana\include;lib\spdlog\include;lib\rtl-sdr\include;..\CISLibrary;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG;GROUND;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <AdditionalDependencies>lib\ehbanana\include\Ehbanana.lib;lib\rtlsdr.lib;%(AdditionalDependencies)</AdditionalDependencies>
