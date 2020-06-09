@@ -1,7 +1,10 @@
 #include "IFJR.h"
 #include "IHU.h"
+#include "SPI.h"
 #include "mbed.h"
 #include "mbed_events.h"
+#include "transfer.h"
+#include <limits>
 
 EventQueue *eventQueue;
 Serial pc(SERIAL_TX, SERIAL_RX);
@@ -41,5 +44,16 @@ int main()
         IHU::startWatchdog();
         IHU::initObjects(ihu);
         IHU::startQueueThread(&ihu);
+        ihu.sfh->init();
+        SPI spi(PB_15, PB_14, PB_13, PB_12);
+        spi.lock();
+
+        init_spi_connection(spi);
+
+        std::fstream file = ihu.sfh->read("firmware.bin",
+                                          std::fstream::in | std::fstream::out
+                                                  | std::fstream::binary);
+        transfer_file(file, spi);
+        spi.unlock();
         IHU::clearIHUObject(ihu);
 }
