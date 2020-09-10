@@ -1,0 +1,11 @@
+send the NASA Matt eqns of motion he sent you
+
+Newtons law of motion
+eqns of motion are for the rotation about each axis
+Forces derived from torques
+
+-position
+-velocity
+-acceleration
+
+state space represention from that^^^
