@@ -4,7 +4,15 @@
 #include "Subsystem.h"
 
 #include <mbed.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <ctime>
 #include <BME280/BME280.h>
+#include <ArduCAM.h>
+
+
+extern Timer timer;
 
 /** 
  * The Payload class is a Subsystem serving the purpose of collecting
@@ -93,6 +101,14 @@ public:
    */
   bool isEnvironmentReady() const;
 
+
+  /**
+   * 
+   * 
+   * 
+   */
+  void runTest();
+
   /** 
    * Sets the state of the LED to on when passed a 1 and off when
    * passed a 0
@@ -139,6 +155,14 @@ private:
    * needs to be internalized, so that no systems may accidentally
    * break the processes of this class.
    */
+  float baseClockTime;
+  float lastRun;
+  float interval;
+  string writeFileName;
+
+  int fileSize;
+  
+
 };
 
 #endif /* SRC_SUBSYSTEMS_PAYLOAD_H_ */
