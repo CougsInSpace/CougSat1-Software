@@ -5,8 +5,7 @@
  *
  * @param i2c connected to the C&DH
  */
-CDH::CDH(uint8_t addr, PinName sda, PinName scl) : i2c(sda, scl) 
-{
+CDH::CDH(uint8_t addr, PinName sda, PinName scl) : i2c(sda, scl) {
   i2c.address(addr);
 }
 
@@ -17,7 +16,7 @@ CDH::CDH(uint8_t addr, PinName sda, PinName scl) : i2c(sda, scl)
  */
 bool CDH::messageReceived() {
   int state = i2c.receive();
-  return state == mbed::I2CSlave::WriteAddressed ;
+  return state == mbed::I2CSlave::WriteAddressed;
 }
 
 /**
@@ -27,40 +26,39 @@ bool CDH::messageReceived() {
  */
 bool CDH::messageRequested() {
   int state = i2c.receive();
-  return state == mbed::I2CSlave::ReadAddressed ;
+  return state == mbed::I2CSlave::ReadAddressed;
 }
 
 /**
  * @brief Reads message from I2CSlave buffer into var message
- * 
+ *
  */
-void CDH::readCDH()
-{
+void CDH::readCDH() {
   printf("Reading i2c buffer\n Messsage = ");
   i2c.read(message, MESSAGELENGTH);
-  for (uint8_t i = 0; message[i] != NULL; i++)
-  {
-      printf("%c,", message[i]);
+  for (uint8_t i = 0; i < 9; i++) {
+    printf("%c,", message[i]);
   }
   printf("\n");
 }
 
 /**
  * @brief Getter for private message array
- * 
+ *
  */
-char* CDH::getMessage()
-{
+char * CDH::getMessage() {
   return message;
 }
 
-void CDH::writeCDH()
-{
+void CDH::setReply(char * input) {
+  strncpy(reply, input, 9);
+}
+
+void CDH::writeCDH() {
   printf("Writing i2c buffer\n Messsage = ");
-  i2c.write(message, MESSAGELENGTH);
-  for (uint8_t i = 0; message[i] != NULL; i++)
-  {
-      printf("%c,", message[i]);
+  i2c.write(reply, MESSAGELENGTH);
+  for (uint8_t i = 0; i < 9; i++) {
+    printf("%c,", reply[i]);
   }
   printf("\n");
 }

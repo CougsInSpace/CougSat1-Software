@@ -1,6 +1,6 @@
 //#include <CISConsole.h>
-#include <mbed.h>
 #include "ADCSObjects.h"
+#include <mbed.h>
 
 /**
  * @brief Initializes the all of the subclasses of the ADCS
@@ -14,5 +14,5 @@
  */
 int main(void) {
   ADCS adcs;
-  adcs.initThread();  
+  adcs.initThread();
 }

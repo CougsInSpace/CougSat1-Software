@@ -8,8 +8,16 @@
 ; Please visit documentation for the other options and examples
 ; https://docs.platformio.org/page/projectconf.html
 
-[env:nucleo_l476rg]
+[platformio]
+lib_dir = .\..\CISLibrary
+
+[env:cis_board]
 platform = ststm32
-board = nucleo_l476rg
+board = cis_board
 framework = mbed
-build_flags = -DPIO_FRAMEWORK_MBED_RTOS_PRESENT
+build_flags =
+  -Wall
+  -std=gnu++11
+  -I$PROJECTSRC_DIR/CISBoard
+  -DPIO_FRAMEWORK_MBED_RTOS_PRESENT
+build_unflags = -std=gnu++98
