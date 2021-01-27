@@ -5,6 +5,12 @@
 const std::string SatFileHandler::rootDirectory = {"/fs/"};
 constexpr uint64_t SatFileHandler::frequency;
 
+SatFileHandler &SatFileHandler::getInstance()
+{
+        static SatFileHandler handler(D11, D12, D13, D10, D2, false, true);
+        return handler;
+}
+
 SatFileHandler::SatFileHandler(PinName mosi, PinName miso, PinName sclk,
                                PinName cs, PinName cd, bool crc_on, bool debug)
         : debug(debug), needsReformat(false), fs(nullptr), sdbd(nullptr),
@@ -64,12 +70,6 @@ void SatFileHandler::write(const std::string &filenameBase,
         file << stream.rdbuf();
         file.flush();
         pc->printf("Flushing file\r\n");
-}
-
-void SatFileHandler::writeStart()
-{
-        while (!inputMessages.empty()) {
-        }
 }
 
 std::fstream SatFileHandler::read(const std::string &fileNameFull,
@@ -132,11 +132,6 @@ void SatFileHandler::check()
         pc->printf("Check took %ld seconds\r\n", seconds);
         pc->printf("Block device check: Done\r\n");
         pc->printf("Number of bad blocks: %lu\r\n", numBad);
-}
-
-void SatFileHandler::enqueueMessage(std::pair<std::string, std::string> message)
-{
-        // inputMessages.push(message);
 }
 
 mbed_error_status_t SatFileHandler::init()

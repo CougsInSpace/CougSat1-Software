@@ -1,7 +1,7 @@
 #ifndef SRC_TOOLS_CISCONSOLE_H_
 #define SRC_TOOLS_CISCONSOLE_H_
 
-#include "swo.h"
+#include "SWO.h"
 #include <mbed.h>
 
 // #define NDEBUG

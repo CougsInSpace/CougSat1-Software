@@ -1,40 +1,29 @@
-#include <FATFileSystem.h>
-#include <SDBlockDevice.h>
+#ifndef SATFILEHANDLER_H
+#define SATFILEHANDLER_H
+
+#include "FATFileSystem.h"
+#include "SDBlockDevice.h"
+#include "mbed.h"
 #include <fstream>
-#include <mbed.h>
-#include <queue>
 #include <string>
 
 /// Class that will handle all file read/write operations to a given medium on
-/// the sattelite. Handles all operations related to files. Currently only
-/// operates on string data.
-/// TODO: Update to work with other types of data.
+/// the sattelite. Handles all operations related to files.
+/// Use SatFileHandler::getInstance() to use it.
 class SatFileHandler
 {
     public:
+        /// This effectively makes this a singleton class. It is not possible to
+        /// create or copy this object. This will protect the filesystem from
+        /// potential errors. This will also ensure it gets properly deleted
+        /// since it is allocated on the stack.
+        static SatFileHandler &getInstance();
         /// Root file path.
         static const std::string rootDirectory;
 
         /// SPI Bus frequency: 25MHz.
         /// 25Mhz is the max frequency.
         static constexpr uint64_t frequency = 25000000;
-
-        /// Create a SatFileHandler where the debug state can be enabled or
-        /// disabled.
-        /// @param mosi PinName of SPI Master in Slave out.
-        /// @param miso PinName of SPI Master out Slave in.
-        /// @param sclk PinName of Serial Clock for SPI.
-        /// @param cs PinName of Chip Select pin on SD breakout.
-        /// @param crc_on Decides whether or not to use cyclic redundancy check.
-        /// @param debug Decides whether or not debug data should be outputted.
-
-        SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs,
-                       PinName cd, bool crc_on = true, bool debug = false);
-
-        SatFileHandler(const SatFileHandler &) = delete;
-        SatFileHandler &operator=(const SatFileHandler &) = delete;
-        SatFileHandler(SatFileHandler &&sfh) = default;
-        SatFileHandler &operator=(SatFileHandler &&sfh) = default;
 
         /// Destructor. Unmounts the filesystem and deinits the block device for
         /// a clean disconnect.
@@ -54,9 +43,6 @@ class SatFileHandler
 
         void write(const std::string &filenameBase, std::iostream &stream,
                    std::ios::openmode mode = std::ios::out | std::ios::in);
-
-        /// Writes whatever is in the queue.
-        void writeStart();
 
         /// Initialize the block device, filesystem and serial connection.
         /// @return Return 0 for success, negative error code for failure.
@@ -82,15 +68,6 @@ class SatFileHandler
         /// @return Size of block device in bytes.
         size_t blockDeviceSize() const;
 
-        /*!
-        \brief Function to enqueue a message to store on the SD card.
-
-        @param message Input std::pair<fileBase, message>.
-
-        USE FOR THREAD SAFETY
-        */
-        void enqueueMessage(pair<std::string, std::string> message);
-
         /// Read a file from the filesystem.
         /// @param fileNameFull Name of the file with extension to read.
         /// @return String of data in file.
@@ -98,6 +75,23 @@ class SatFileHandler
                           std::ios_base::openmode mode = std::ios::in);
 
     private:
+        /// Create a SatFileHandler where the debug state can be enabled or
+        /// disabled.
+        /// @param mosi PinName of SPI Master in Slave out.
+        /// @param miso PinName of SPI Master out Slave in.
+        /// @param sclk PinName of Serial Clock for SPI.
+        /// @param cs PinName of Chip Select pin on SD breakout.
+        /// @param crc_on Decides whether or not to use cyclic redundancy check.
+        /// @param debug Decides whether or not debug data should be outputted.
+        SatFileHandler(PinName mosi, PinName miso, PinName sclk, PinName cs,
+                       PinName cd, bool crc_on = true, bool debug = false);
+        SatFileHandler()
+        {
+        }
+        SatFileHandler(const SatFileHandler &) = delete;
+        SatFileHandler &operator=(const SatFileHandler &) = delete;
+        SatFileHandler(SatFileHandler &&sfh) = default;
+        SatFileHandler &operator=(SatFileHandler &&sfh) = default;
         bool debug;
         /// Currently unused. Will be used to set if we need a reformat of
         /// filesystem.
@@ -136,9 +130,6 @@ class SatFileHandler
         /// low on storage.
         uint16_t priority;
 
-        /// Queue for messages.
-        std::queue<std::fstream> inputMessages;
-
         /// Cleans the file system...somehow.
         /// @param dir Name of directory to...clean?
         void clean(std::string dir);
@@ -163,3 +154,5 @@ class SatFileHandler
         /// TODO: Update to work if sizes are different.
         bool compareArrays(uint8_t *arr1, uint8_t *arr2, size_t size);
 };
+
+#endif // SATFILEHANDLER_H
