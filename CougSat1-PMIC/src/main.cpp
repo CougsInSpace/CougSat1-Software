@@ -1,5 +1,6 @@
 #include <mbed.h>
 
+#include <ADC/AD7291.h>
 #include <ADC/AD7689.h>
 #include <CISConsole.h>
 
@@ -17,9 +18,31 @@ mbed_error_status_t initialize() {
   LOG("Init", "Initialization starting");
   mbed_error_status_t error = MBED_SUCCESS;
 
-  ((AD7689 *)adcEPSs[0])->selfTest();
-  ((AD7689 *)adcEPSs[1])->selfTest();
-  ((AD7689 *)adcEPSs[2])->selfTest();
+  double value = 0.0;
+  error        = adcEPSs[3]->readTemp(value);
+  if (error) {
+    ERROR("Init", "Failed to read temp ADC 3, 0x%08X", error);
+    return error;
+  }
+  LOG("Init", "ADC 3 temp: %5.2f", value);
+
+  error = ((AD7689 *)adcEPSs[0])->selfTest();
+  if (error) {
+    ERROR("Init", "Failed to self test ADC 0, 0x%08X", error);
+    return error;
+  }
+
+  error = ((AD7689 *)adcEPSs[1])->selfTest();
+  if (error) {
+    ERROR("Init", "Failed to self test ADC 1, 0x%08X", error);
+    return error;
+  }
+
+  error = ((AD7689 *)adcEPSs[2])->selfTest();
+  if (error) {
+    ERROR("Init", "Failed to self test ADC 2, 0x%08X", error);
+    return error;
+  }
 
   bool inputAOn = true;
   bool inputBOn = true;
@@ -28,7 +51,7 @@ mbed_error_status_t initialize() {
   inputSwitching[2]->write(inputAOn);
   inputSwitching[3]->write(inputBOn);
 
-  bool outputsOn = true;
+  bool outputsOn = false;
   bool heatersOn = false;
   for (uint8_t i = 0; i < COUNT_PR_3V3; i++)
     nodesPR3V3[i]->setSwitch(outputsOn);
@@ -39,68 +62,23 @@ mbed_error_status_t initialize() {
   for (uint8_t i = 0; i < COUNT_BH; i++)
     nodesBatteryHeaters[i]->setSwitch(heatersOn);
 
-  double vbattA = 0.0;
-  double vbattB = 0.0;
-  double value  = 0.0;
-  while (true) {
-    statusLED = !statusLED;
-    error     = nodeBattInA.updateCurrent();
+  double ejectTimer = 0.0;
+  // TODO Make VoltageNode and PowerNode classes
+  error = adcEPSs[2]->readVoltage(ADCChannel_t::CM_02, ejectTimer);
+  if (error) {
+    ERROR("Init", "Failed to read eject timer, 0x%08X", error);
+    return error;
+  }
+  bool ejected = ejectTimer < THRES_EJECT_TIMER;
+  LOG("Init", "Eject timer: %9.5fV\tEjected: %s", ejectTimer,
+      ejectTimer ? "true" : "false");
+
+  if (ejected) {
+    error = eventFirstBoot();
     if (error) {
-      ERROR("Init", "Failed to read in A, 0x%08X", error);
+      ERROR("Init", "Failed to perform first bool event: 0x%02X", error);
       return error;
     }
-
-    error = nodeBattInB.updateCurrent();
-    if (error) {
-      ERROR("Init", "Failed to read in B, 0x%08X", error);
-      return error;
-    }
-
-    error = nodeBattOutA.updateCurrent();
-    if (error) {
-      ERROR("Init", "Failed to read out A, 0x%08X", error);
-      return error;
-    }
-
-    error = nodeBattOutB.updateCurrent();
-    if (error) {
-      ERROR("Init", "Failed to read out B, 0x%08X", error);
-      return error;
-    }
-
-    error = node3V3OutA.updateCurrent();
-    if (error) {
-      ERROR("Init", "Failed to read out A, 0x%08X", error);
-      return error;
-    }
-
-    error = adcEPSs[2]->readVoltage(ADCChannel_t::CM_00, vbattA);
-    if (error) {
-      ERROR("Init", "Failed to read VbattA, 0x%08X", error);
-      return error;
-    }
-    vbattA =
-        2 * vbattA * (nodeBattOutA.getCurrent() - nodeBattInA.getCurrent());
-
-    error = adcEPSs[2]->readVoltage(ADCChannel_t::CM_07, vbattB);
-    if (error) {
-      ERROR("Init", "Failed to read VbattB, 0x%08X", error);
-      return error;
-    }
-    vbattB =
-        2 * vbattB * (nodeBattOutB.getCurrent() - nodeBattInB.getCurrent());
-
-    LOG("Test", "A: %9.5fW\tB: %9.5fW\tA+B: %9.5fW", vbattA, vbattB,
-        vbattA + vbattB);
-    // double temp;
-
-    // error = thermistorRegA.getTemperature(temp);
-    // if (error) {
-    //   ERROR("Init", "Failed to read VbattA, 0x%08X", error);
-    //   return error;
-    // }
-    // value = value * 0.875 + temp * 0.125;
-    // LOG("Test", "%9.5fA", value);
   }
 
   LOG("Init", "Initialization complete");
@@ -116,17 +94,17 @@ mbed_error_status_t run() {
   uint32_t now               = HAL_GetTick();
   uint32_t nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
 
-  mbed_error_status_t error = MBED_SUCCESS;
+  // mbed_error_status_t error = MBED_SUCCESS;
   while (true) {
     now = HAL_GetTick();
     if (now >= nextPeriodicEvent && (nextPeriodicEvent >= PERIOD_MS_PERIODIC ||
                                         now <= PERIOD_MS_PERIODIC)) {
       statusLED = !statusLED;
-      error     = eventPeriodic();
-      if (error) {
-        ERROR("Run", "Failed to perform periodic event: 0x%02X", error);
-        return error;
-      }
+      // error     = eventPeriodic();
+      // if (error) {
+      //   ERROR("Run", "Failed to perform periodic event: 0x%02X", error);
+      //   return error;
+      // }
       nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
       // } else if (cdh.hasMessage()) {
       //   error = cdh.processMessage();
@@ -135,7 +113,7 @@ mbed_error_status_t run() {
       //     error); return error;
       //   }
     } else {
-      wait_ms(PERIOD_MS_IDLE_SLEEP);
+      wait_us(PERIOD_US_IDLE_SLEEP);
     }
   }
 }
@@ -148,12 +126,12 @@ int main(void) {
   mbed_error_status_t error = initialize();
   if (error) {
     ERROR("PMIC", "Failed to initialize: 0x%02X", error);
-    return error;
+    mbed_die();
   }
   error = run();
   if (error) {
     ERROR("PMIC", "Failed to run: 0x%02X", error);
-    return error;
+    mbed_die();
   }
   return MBED_SUCCESS;
 }

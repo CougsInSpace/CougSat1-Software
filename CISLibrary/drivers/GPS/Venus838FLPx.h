@@ -10,13 +10,13 @@ public:
   Venus838FLPx(const Venus838FLPx &) = delete;
   Venus838FLPx & operator=(const Venus838FLPx &) = delete;
 
-  Venus838FLPx(Serial & serial, PinName reset, PinName pulse);
+  Venus838FLPx(BufferedSerial & serial, PinName reset, PinName pulse);
   ~Venus838FLPx();
 
   mbed_error_status_t read(GPSData_t & data, bool blocking = true);
 
 private:
-  Serial &   serial;
+  BufferedSerial &   serial;
   DigitalOut reset;
   DigitalIn  pulse;
 };

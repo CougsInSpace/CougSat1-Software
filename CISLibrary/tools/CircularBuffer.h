@@ -2,7 +2,7 @@
 #define _LIBRARY_TOOLS_CIRCULAR_BUFFER_H_
 
 #include <stdexcept>
-#include <stdint.h>
+#include <cstdint>
 
 struct PairDouble_t {
   double a;

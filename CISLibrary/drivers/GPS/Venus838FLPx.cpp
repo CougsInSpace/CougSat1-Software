@@ -7,7 +7,7 @@
  * @param reset pin of the GPS
  * @param pulse pin of the GPS
  */
-Venus838FLPx::Venus838FLPx(Serial & serial, PinName reset, PinName pulse) :
+Venus838FLPx::Venus838FLPx(BufferedSerial & serial, PinName reset, PinName pulse) :
   serial(serial), reset(reset), pulse(pulse) {}
 
 /**

@@ -4,7 +4,7 @@
 #include "Frame.h"
 
 #include <memory>
-#include <stdint.h>
+#include <cstdint>
 
 namespace Communications {
 

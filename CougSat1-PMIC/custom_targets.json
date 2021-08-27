@@ -1,19 +1,17 @@
 {
   "CIS_BOARD": {
     "inherits": [
-      "FAMILY_STM32"
+      "MCU_STM32"
     ],
-    "supported_form_factors": [],
     "core": "Cortex-M4F",
     "extra_labels_add": [
       "STM32L4",
-      "STM32L476RG",
       "STM32L476xG"
     ],
     "config": {
       "clock_source": {
-        "help": "Mask value : USE_PLL_HSE_XTAL | USE_PLL_HSI | USE_PLL_MSI",
-        "value": "USE_PLL_HSE_XTAL",
+        "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
+        "value": "USE_PLL_MSI",
         "macro_name": "CLOCK_SOURCE"
       },
       "lpticker_lptim": {
@@ -22,25 +20,27 @@
       }
     },
     "macros_add": [
-      "MBED_TICKLESS"
+      "MBED_TICKLESS",
+      "EXTRA_IDLE_STACK_REQUIRED",
+      "STM32L476xx",
+      "MBED_SPLIT_HEAP"
     ],
     "overrides": {
-      "lpticker_delay_ticks": 4
+      "lpticker_delay_ticks": 0,
+      "lpuart_clock_source": "USE_LPUART_CLK_HSI"
     },
     "detect_code": [
-      "0823"
+      "1234"
     ],
     "device_has_add": [
       "ANALOGOUT",
+      "CAN",
       "CRC",
+      "FLASH",
+      "MPU",
       "SERIAL_ASYNCH",
       "TRNG",
-      "FLASH",
-      "MPU"
-    ],
-    "release_versions": [
-      "2",
-      "5"
+      "FLASHIAP"
     ],
     "device_name": "STM32L476RG",
     "bootloader_supported": true

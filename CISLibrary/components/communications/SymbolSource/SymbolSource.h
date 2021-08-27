@@ -2,9 +2,9 @@
 #define _LIBRARY_COMPONENT_COMMUNICATIONS_SYMBOL_SOURCE_H_
 
 #include "../IQSource/IQSource.h"
-#include "tools/CircularBuffer.h"
+#include "../tools/CircularBuffer.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace Communications {
 namespace SymbolSource {

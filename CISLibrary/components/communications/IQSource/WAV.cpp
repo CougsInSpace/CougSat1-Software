@@ -11,7 +11,7 @@ namespace IQSource {
  *
  * @param file to read, should point to start of file
  */
-WAV::WAV(FILE * file) : file(file), IQSource(0) {
+WAV::WAV(FILE * file) : IQSource(0), file(file) {
   // // Header chunk
   // char buf[5];
   // if (fgets(buf, 5, file) == nullptr)
@@ -108,7 +108,7 @@ WAV::~WAV() {}
  */
 void WAV::getIQ(int16_t & dataI, int16_t & dataQ) {
   if (iqBuffer.size() == 0) {
-    int32_t buf;
+    // int32_t buf;
     while (iqBuffer.size() < 255) {
       PairInt16_t pair;
       // read(pair.a, 2);

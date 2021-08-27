@@ -3,7 +3,7 @@
 
 #include "../IQSink/IQSink.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace Communications {
 namespace SymbolSink {

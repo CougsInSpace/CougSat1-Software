@@ -94,19 +94,21 @@ mbed_error_status_t AD7689::selfTest() {
   }
 
   // Discard second byte
-  error = transfer(0, (uint16_t *)nullptr);
+  error = transfer(0, &bufRX);
   if (error) {
     ERROR("AD7689", "Failed to skip second byte");
     return error;
   }
+  DEBUG("AD7689", "2nd Byte: 0x%04lX", bufRX);
 
   error = transfer(0, &bufRX);
   if (error) {
     ERROR("AD7689", "Failed to read data");
     return error;
   }
+  DEBUG("AD7689", "3rd Byte: 0x%04lX", bufRX);
 
-  DEBUG("AD7689", "Read back: 0x%04X vs 0x%04X", (bufRX & 0xFFFF), config);
+  DEBUG("AD7689", "Read back: 0x%04lX vs 0x%04X", (bufRX & 0xFFFF), config);
   if ((bufRX & 0xFFFF) == config)
     return MBED_SUCCESS;
 

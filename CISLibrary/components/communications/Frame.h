@@ -1,7 +1,8 @@
 #ifndef _LIBRARY_COMPONENT_COMMUNICATIONS_FRAME_H_
 #define _LIBRARY_COMPONENT_COMMUNICATIONS_FRAME_H_
 
-#include <stdint.h>
+#include <cstdint>
+#include <cstddef>
 
 namespace Communications {
 

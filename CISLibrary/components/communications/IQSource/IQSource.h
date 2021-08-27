@@ -1,8 +1,8 @@
 #ifndef _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_H_
 #define _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_H_
 
-#include "tools/CircularBuffer.h"
-#include <stdint.h>
+#include "../tools/CircularBuffer.h"
+#include <cstdint>
 
 namespace Communications {
 namespace IQSource {

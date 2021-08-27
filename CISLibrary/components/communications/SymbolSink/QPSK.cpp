@@ -22,9 +22,6 @@ QPSK::~QPSK() {}
  * @param byte buffer
  */
 void QPSK::add(uint8_t byte) {
-  if (iqSink == nullptr)
-    throw std::exception("QPSK iqSink is nullptr");
-
   for (int8_t i = 6; i >= 0; i -= 2) {
     uint8_t symbol = (byte >> i) & 0x03;
     // Differential QPSK, the symbol rotates from the current

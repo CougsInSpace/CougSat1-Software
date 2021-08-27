@@ -2,7 +2,7 @@
 #define _SRC_CONFIGURATION_H_
 
 /*********************************** Timing ***********************************/
-#define PERIOD_MS_IDLE_SLEEP (10) // Sleep time during idle
+#define PERIOD_US_IDLE_SLEEP (10) // Sleep time during idle
 #define PERIOD_MS_PERIODIC (5000) // The periodic event
 
 /************************************ ADCs ************************************/

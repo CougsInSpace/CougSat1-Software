@@ -3,7 +3,7 @@
 
 #include "SymbolSource.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace Communications {
 namespace SymbolSource {

@@ -1,5 +1,7 @@
 #include "RTLSDR.h"
 
+#ifdef WIN32
+
 namespace Communications {
 namespace IQSource {
 
@@ -102,3 +104,5 @@ void RTLSDR::stop() {
 
 } // namespace IQSource
 } // namespace Communications
+
+#endif /* WIN32 */

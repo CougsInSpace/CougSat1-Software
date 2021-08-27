@@ -1,6 +1,8 @@
 #ifndef _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_RTL_SDR_H_
 #define _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_RTL_SDR_H_
 
+#ifdef WIN32
+
 #include "IQSource.h"
 
 #include <rtl-sdr.h>
@@ -33,5 +35,7 @@ private:
 
 } // namespace IQSource
 } // namespace Communications
+
+#endif /* WIN32 */
 
 #endif /* _LIBRARY_COMPONENT_COMMUNICATIONS_IQ_SOURCE_RTL_SDR_H_ */

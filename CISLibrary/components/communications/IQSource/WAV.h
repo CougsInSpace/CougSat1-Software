@@ -30,7 +30,7 @@ private:
 
   template <typename T> void read(T & number, const uint8_t bytes);
 
-  FILE * file;
+  FILE * file = nullptr;
 
   uint16_t channels;
   uint16_t bitsPerSample;

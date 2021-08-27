@@ -102,7 +102,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
   error = write(Register_t::CONTROL);
   if (error)
     return error;
-  wait_ms(10);
+  ThisThread::sleep_for(10ms);
   error = write(Register_t::COUNTER_N);
   if (error)
     return error;

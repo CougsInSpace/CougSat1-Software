@@ -1,13 +1,14 @@
 {
   "build": {
+    "core": "stm32",
     "cpu": "cortex-m4",
     "extra_flags": "-DSTM32L476xx",
     "f_cpu": "80000000L",
     "mcu": "stm32l476rgt6",
-    "variant": "NUCLEO_L476RG"
+    "product_line": "STM32L476xx",
+    "variant": "STM32L4xx/L475R(C-E-G)T_L476R(C-E-G)T_L486RGT"
   },
   "connectivity": [
-    "can"
   ],
   "debug": {
     "default_tools": [
@@ -18,19 +19,25 @@
       "stlink"
     ],
     "openocd_board": "st_nucleo_l4",
-    "svd_path": "STM32L4x6.svd"
+    "openocd_target": "stm32l4x",
+    "svd_path": "STM32L476.svd"
   },
   "frameworks": [
+    "arduino",
+    "cmsis",
     "mbed",
-    "stm32cube"
+    "stm32cube",
+    "libopencm3",
+    "zephyr"
   ],
-  "name": "Coug in Space L476RG",
+  "name": "Cougs in Space L476RG",
   "upload": {
-    "maximum_ram_size": 131072,
+    "maximum_ram_size": 98304,
     "maximum_size": 1048576,
     "protocol": "stlink",
     "protocols": [
       "jlink",
+      "cmsis-dap",
       "stlink",
       "blackmagic",
       "mbed"
