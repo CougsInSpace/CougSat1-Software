@@ -1,4 +1,5 @@
 #include "Events.h"
+#include "PMICObjects.h"
 
 #include <CISConsole.h>
 
@@ -8,5 +9,11 @@
  * @return mbed_error_status_t error code
  */
 mbed_error_status_t eventFirstBoot() {
-  return MBED_ERROR_UNSUPPORTED;
+  // eventDeploy handled in loop
+
+  // Turn off Comms for now
+  nodesPR3V3[NODES_3V3_COMMS]->setSwitch(false);
+  nodesPRBatt[NODES_BATT_COMMS]->setSwitch(false);
+
+  return MBED_SUCCESS;
 }

@@ -62,4 +62,10 @@ extern Thermistor thermistorPCB4;
 extern Thermistor thermistorsMPPT[COUNT_PV];
 extern Thermistor thermistorsPVBoard[COUNT_PV];
 
+/****************************** Internal Sensors ******************************/
+
+extern AnalogIn internalTemp;
+extern AnalogIn internalVref;
+extern AnalogIn internalVbat;
+
 #endif /* _SRC_PMIC_OBJECTS_H_ */

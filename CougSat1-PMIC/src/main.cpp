@@ -10,78 +10,82 @@
 #include "interfaces/CDH.h"
 
 /**
+ * @brief Convert reset reason to string for console printing
+ *
+ * @param reason
+ * @return const char*
+ */
+const char * resetReason(const reset_reason_t reason) {
+  switch (reason) {
+    case RESET_REASON_POWER_ON:
+      return "Power On";
+    case RESET_REASON_PIN_RESET:
+      return "Hardware Pin";
+    case RESET_REASON_SOFTWARE:
+      return "Software Reset";
+    case RESET_REASON_WATCHDOG:
+      return "Watchdog";
+    default:
+      return "Other Reason";
+  }
+}
+
+/**
  * @brief Initializes the all of the subclasses of the PMIC
  *
  * @return mbed_error_status_t
  */
 mbed_error_status_t initialize() {
   LOG("Init", "Initialization starting");
+  Watchdog & watchdog = Watchdog::get_instance();
+  watchdog.start(PERIOD_MS_WATCHDOG);
+
   mbed_error_status_t error = MBED_SUCCESS;
 
-  double value = 0.0;
-  error        = adcEPSs[3]->readTemp(value);
+  reset_reason_t reason = ResetReason::get();
+  LOG("Init", "Last reset was due to %s", resetReason(reason));
+
+  // No need for absolute time
+  set_time(0);
+
+  error = eventPOST();
   if (error) {
-    ERROR("Init", "Failed to read temp ADC 3, 0x%08X", error);
+    ERROR("Init", "Failed to perform POST, 0x%08X", error);
     return error;
   }
-  LOG("Init", "ADC 3 temp: %5.2f", value);
-
-  error = ((AD7689 *)adcEPSs[0])->selfTest();
-  if (error) {
-    ERROR("Init", "Failed to self test ADC 0, 0x%08X", error);
-    return error;
-  }
-
-  error = ((AD7689 *)adcEPSs[1])->selfTest();
-  if (error) {
-    ERROR("Init", "Failed to self test ADC 1, 0x%08X", error);
-    return error;
-  }
-
-  error = ((AD7689 *)adcEPSs[2])->selfTest();
-  if (error) {
-    ERROR("Init", "Failed to self test ADC 2, 0x%08X", error);
-    return error;
-  }
-
-  bool inputAOn = true;
-  bool inputBOn = true;
-  inputSwitching[0]->write(inputAOn);
-  inputSwitching[1]->write(inputBOn);
-  inputSwitching[2]->write(inputAOn);
-  inputSwitching[3]->write(inputBOn);
-
-  bool outputsOn = false;
-  bool heatersOn = false;
-  for (uint8_t i = 0; i < COUNT_PR_3V3; i++)
-    nodesPR3V3[i]->setSwitch(outputsOn);
-  for (uint8_t i = 0; i < COUNT_PR_BATT; i++)
-    nodesPRBatt[i]->setSwitch(outputsOn);
-  for (uint8_t i = 0; i < COUNT_DEPLOY; i++)
-    nodesDeployables[i]->setSwitch(outputsOn);
-  for (uint8_t i = 0; i < COUNT_BH; i++)
-    nodesBatteryHeaters[i]->setSwitch(heatersOn);
 
   double ejectTimer = 0.0;
-  // TODO Make VoltageNode and PowerNode classes
+  // TODO Make VoltageNode and PowerNode classes with gain
   error = adcEPSs[2]->readVoltage(ADCChannel_t::CM_02, ejectTimer);
   if (error) {
     ERROR("Init", "Failed to read eject timer, 0x%08X", error);
     return error;
   }
-  bool ejected = ejectTimer < THRES_EJECT_TIMER;
-  LOG("Init", "Eject timer: %9.5fV\tEjected: %s", ejectTimer,
-      ejectTimer ? "true" : "false");
+  ejectTimer *= 2;
+  bool firstBoot = ejectTimer < THRES_EJECT_TIMER;
+  LOG("Init", "Eject timer: %9.5fV\tFirst boot: %s", ejectTimer,
+      firstBoot ? "true" : "false");
 
-  if (ejected) {
+  if (firstBoot) {
     error = eventFirstBoot();
     if (error) {
-      ERROR("Init", "Failed to perform first bool event: 0x%02X", error);
+      ERROR("Init", "Failed to perform first bool event: 0x%08X", error);
+      return error;
+    }
+  } else {
+    error = eventDeploy();
+    if (error) {
+      ERROR("Init", "Failed to perform deploy event: 0x%08X", error);
       return error;
     }
   }
 
+  LOG("Init", "Turning C&DH on");
+  nodesPR3V3[NODES_3V3_CDH]->setSwitch(true);
+
   LOG("Init", "Initialization complete");
+  // Init needs to get to this point quicker than the watchdog period
+  watchdog.kick();
   return error;
 }
 
@@ -94,24 +98,36 @@ mbed_error_status_t run() {
   uint32_t now               = HAL_GetTick();
   uint32_t nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
 
-  // mbed_error_status_t error = MBED_SUCCESS;
+  bool deployWaiting = true;
+
+  Watchdog & watchdog = Watchdog::get_instance();
+
+  mbed_error_status_t error = MBED_SUCCESS;
   while (true) {
     now = HAL_GetTick();
     if (now >= nextPeriodicEvent && (nextPeriodicEvent >= PERIOD_MS_PERIODIC ||
                                         now <= PERIOD_MS_PERIODIC)) {
       statusLED = !statusLED;
-      // error     = eventPeriodic();
-      // if (error) {
-      //   ERROR("Run", "Failed to perform periodic event: 0x%02X", error);
-      //   return error;
-      // }
+      watchdog.kick();
+      error = eventPeriodic();
+      if (error) {
+        ERROR("Run", "Failed to perform periodic event: 0x%08X", error);
+        return error;
+      }
       nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
-      // } else if (cdh.hasMessage()) {
-      //   error = cdh.processMessage();
-      //   if (error) {
-      //     ERROR("Run", "Failed to process message from the bus: 0x%02X",
-      //     error); return error;
-      //   }
+    } else if (cdh.hasMessage()) {
+      error = cdh.processMessage();
+      if (error) {
+        ERROR("Run", "Failed to process message from the bus: 0x%08X", error);
+        return error;
+      }
+    } else if (deployWaiting && (uint64_t)time(NULL) > DURATION_S_DEPLOY) {
+      error = eventDeploy();
+      if (error) {
+        ERROR("Init", "Failed to perform deploy event: 0x%08X", error);
+        return error;
+      }
+      deployWaiting = false;
     } else {
       wait_us(PERIOD_US_IDLE_SLEEP);
     }
@@ -125,12 +141,12 @@ mbed_error_status_t run() {
 int main(void) {
   mbed_error_status_t error = initialize();
   if (error) {
-    ERROR("PMIC", "Failed to initialize: 0x%02X", error);
+    ERROR("PMIC", "Failed to initialize: 0x%08X", error);
     mbed_die();
   }
   error = run();
   if (error) {
-    ERROR("PMIC", "Failed to run: 0x%02X", error);
+    ERROR("PMIC", "Failed to run: 0x%08X", error);
     mbed_die();
   }
   return MBED_SUCCESS;

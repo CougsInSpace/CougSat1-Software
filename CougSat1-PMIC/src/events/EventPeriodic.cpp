@@ -49,6 +49,9 @@ mbed_error_status_t shedLoad(
  * @return mbed_error_status_t error code
  */
 mbed_error_status_t eventPeriodic() {
+  // TODO update for EPS V3.1
+  return MBED_SUCCESS;
+
   // Check 3.3V rails first as reducing their load reduces VBatt load
   // Update current for 3.3V nodes
   mbed_error_status_t error = MBED_SUCCESS;

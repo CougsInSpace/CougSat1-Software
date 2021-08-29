@@ -3,7 +3,9 @@
 
 /*********************************** Timing ***********************************/
 #define PERIOD_US_IDLE_SLEEP (10) // Sleep time during idle
-#define PERIOD_MS_PERIODIC (5000) // The periodic event
+#define PERIOD_MS_PERIODIC (5 * 1000) // The periodic event
+#define PERIOD_MS_WATCHDOG (10 * 1000) // Watchdog timeout
+#define DURATION_S_DEPLOY (40 * 60) // Duration to wait before eventDeploy
 
 /************************************ ADCs ************************************/
 #define ADC_AVREF_0 (2.4996)
@@ -114,6 +116,40 @@
 #define RANK_PR_BATT_4 (255)
 #define RANK_PR_BATT_5 (2)
 #define RANK_PR_BATT_6 (1)
+
+#define INITIAL_PR_3V3_0 (false)
+#define INITIAL_PR_3V3_1 (false)
+#define INITIAL_PR_3V3_2 (false)
+#define INITIAL_PR_3V3_3 (false)
+#define INITIAL_PR_3V3_4 (false)
+#define INITIAL_PR_3V3_5 (false)
+#define INITIAL_PR_3V3_6 (true) // Comms
+#define INITIAL_PR_3V3_7 (false)
+#define INITIAL_PR_3V3_8 (false)
+#define INITIAL_PR_3V3_9 (false)
+#define INITIAL_PR_3V3_10 (false)
+#define INITIAL_PR_3V3_11 (false)
+#define INITIAL_PR_3V3_12 (false)
+#define INITIAL_PR_3V3_PV (false)
+
+#define INITIAL_PR_BATT_0 (false)
+#define INITIAL_PR_BATT_1 (false)
+#define INITIAL_PR_BATT_2 (false)
+#define INITIAL_PR_BATT_3 (false)
+#define INITIAL_PR_BATT_4 (false)
+#define INITIAL_PR_BATT_5 (false)
+#define INITIAL_PR_BATT_6 (true) // Comms
+
+#define INITIAL_BH_0 (false)
+#define INITIAL_BH_1 (false)
+
+#define INITIAL_DEPLOY_0 (false)
+#define INITIAL_DEPLOY_1 (false)
+
+#define NODES_3V3_CDH (0)
+#define NODES_3V3_COMMS (6)
+
+#define NODES_BATT_COMMS (6)
 
 /******************************** Power Chain *********************************/
 #define GAIN_BATT_IN_A (0.01 / 0.012)

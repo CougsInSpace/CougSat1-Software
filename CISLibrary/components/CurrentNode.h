@@ -7,7 +7,8 @@
 class CurrentNode {
 public:
   CurrentNode(ADC & adc, ADCChannel_t channel, double gain,
-      PinName switchOut = NC, bool inverted = false, uint8_t rank = 0);
+      PinName switchOut = NC, bool inverted = false, bool initialState = false,
+      uint8_t rank = 0);
 
   double              getCurrent();
   mbed_error_status_t updateCurrent();

@@ -9,11 +9,12 @@
  * @param gain to multiply adc voltage by to get amps
  * @param switchOut pin for enabling
  * @param inverted if set will invert the switchOut
+ * @param initialState switch state to set on creation
  * @param rank of the node: Largest (rank * current) is first to be shed
  */
 CurrentNode::CurrentNode(ADC & adc, ADCChannel_t channel, double gain,
-    PinName switchOut, bool inverted, uint8_t rank) :
-  switchOut(switchOut, inverted ? 1 : 0),
+    PinName switchOut, bool inverted, bool initialState, uint8_t rank) :
+  switchOut(switchOut, inverted ^ initialState),
   adc(adc) {
   this->channel  = channel;
   this->gain     = gain;
