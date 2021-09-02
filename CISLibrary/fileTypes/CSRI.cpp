@@ -18,12 +18,12 @@
 //     bool compressData) {
 //   FILE *src = fopen(srcPath, "r");
 //   if (src == NULL) {
-//     DEBUG("rawToCSRI", "Unable to open source file");
+//     LOGD("rawToCSRI", "Unable to open source file");
 //     return ERROR_OPEN_FAILED;
 //   }
 //   FILE *dst = fopen(dstPath, "w");
 //   if (dst == NULL) {
-//     DEBUG("rawToCSRI", "Unable to open destination file");
+//     LOGD("rawToCSRI", "Unable to open destination file");
 //     fclose(src);
 //     return ERROR_OPEN_FAILED;
 //   }
@@ -60,7 +60,7 @@
 //       dataLength = dataLength * 2 / 3; //(6bytes -> 4 bytes)
 //       break;
 //     default:
-//       DEBUG("rawToCSRI", "Invalid bit depth input");
+//       LOGD("rawToCSRI", "Invalid bit depth input");
 //       fclose(src);
 //       fclose(dst);
 //       return ERROR_INVALID_ARGS;
@@ -71,7 +71,7 @@
 //     //close src file
 //     //point src to temp file
 //     //adjust data length arguument
-//     DEBUG("rawToCSRI", "Compression not implemented");
+//     LOGD("rawToCSRI", "Compression not implemented");
 //     fclose(src);
 //     fclose(dst);
 //     return ERROR_NOT_SUPPORTED;
@@ -93,14 +93,14 @@
 //   if (compressData || resolution == 8) {
 //     while ((buf = getc(src)) != EOF) {
 //       if (ferror(src) != ERROR_SUCCESS) {
-//         DEBUG("rawToCSRI", "Failed to read source file");
+//         LOGD("rawToCSRI", "Failed to read source file");
 //         fclose(src);
 //         fclose(dst);
 //         return ERROR_READ;
 //       }
 //       putc(buf, dst);
 //       if (ferror(dst) != ERROR_SUCCESS) {
-//         DEBUG("rawToCSRI", "Failed to write to destination file");
+//         LOGD("rawToCSRI", "Failed to write to destination file");
 //         fclose(src);
 //         fclose(dst);
 //         return ERROR_WRITE;
@@ -116,7 +116,7 @@
 //     //data[3] = byte[5]
 //   }
 //   if (dataLength != 0) {
-//     DEBUG("rawToCSRI", "Data length was incorrect");
+//     LOGD("rawToCSRI", "Data length was incorrect");
 //     fclose(src);
 //     fclose(dst);
 //     return ERROR_INVALID_ARGS;
@@ -139,7 +139,7 @@
 //     PixelLocation firstPixel, BayerFormat bayerFormat, uint8_t bitDepth) {
 
 //   if (file == NULL) {
-//     DEBUG("rawToCSRI", "File pointer is NULL");
+//     LOGD("rawToCSRI", "File pointer is NULL");
 //     return ERROR_INVALID_ARGS;
 //   }
 
@@ -179,7 +179,7 @@
 //       dataLength = dataLength / 3; //(1 dword / 3 pixels)
 //       break;
 //     default:
-//       DEBUG("rawToCSRI", "Invalid bit depth");
+//       LOGD("rawToCSRI", "Invalid bit depth");
 //       fclose(file);
 //       return ERROR_INVALID_ARGS;
 //   }

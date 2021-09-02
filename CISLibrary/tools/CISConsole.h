@@ -57,7 +57,7 @@ private:
  * @param args... standard printf arguments
  */
 #ifndef NDEBUG
-#define DEBUG(o, args...)                                                      \
+#define LOGD(o, args...)                                                       \
   {                                                                            \
     SWO_Channel * swo = SWOSingleton::Instance()->get();                       \
     swo->printf("[%07lu][Debug] %-10s: ", HAL_GetTick(), o);                   \
@@ -65,7 +65,7 @@ private:
     swo->putc('\n');                                                           \
   }
 #else
-#define DEBUG(o, ...)                                                          \
+#define LOGD(o, ...)                                                           \
   {}
 #endif
 
@@ -95,7 +95,7 @@ private:
  * @param args... standard printf arguments
  */
 #ifndef NERROR
-#define ERROR(o, args...)                                                      \
+#define LOGE(o, args...)                                                       \
   {                                                                            \
     SWO_Channel * swo = SWOSingleton::Instance()->get();                       \
     swo->printf("[%07lu][Error] %-10s: ", HAL_GetTick(), o);                   \
@@ -103,7 +103,7 @@ private:
     swo->putc('\n');                                                           \
   }
 #else
-#define ERROR(o, ...)                                                          \
+#define LOGE(o, ...)                                                           \
   {}
 #endif
 

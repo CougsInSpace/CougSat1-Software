@@ -10,8 +10,9 @@ public:
       PinName switchOut = NC, bool inverted = false, bool initialState = false,
       uint8_t rank = 0);
 
-  double              getCurrent();
-  mbed_error_status_t updateCurrent();
+  double              get();
+  mbed_error_status_t update();
+  mbed_error_status_t updateAndGet(double & value);
 
   double getAggregateRank();
 

@@ -34,7 +34,7 @@ mbed_error_status_t shedLoad(
       }
     }
     // Turn off the max node and remove its current
-    currentToShed -= maxNode->getCurrent();
+    currentToShed -= maxNode->get();
     maxNode->setSwitch(false);
 
     if (count == 0)
@@ -59,24 +59,24 @@ mbed_error_status_t eventPeriodic() {
 
   // Update the current by reading the ADC's value and doing some math
   for (uint8_t i = 0; i < COUNT_PR_3V3; ++i) {
-    error = nodesPR3V3[i]->updateCurrent();
+    error = iNodesPR3V3[i]->update();
 
     if (error) {
-      ERROR("eventPeriodic",
+      LOGE("eventPeriodic",
           "Failed to update current for nodesPR3V3[%d]: 0x%08X", i, error);
       return error;
     }
   }
-  error = node3V3OutA.updateCurrent();
+  error = iNode3V3OutA.update();
   if (error) {
-    ERROR("eventPeriodic", "Failed to update current for node3V3OutA: 0x%08X",
+    LOGE("eventPeriodic", "Failed to update current for node3V3OutA: 0x%08X",
         error);
     return error;
   }
 
-  error = node3V3OutB.updateCurrent();
+  error = iNode3V3OutB.update();
   if (error) {
-    ERROR("eventPeriodic", "Failed to update current for node3V3OutB: 0x%08X",
+    LOGE("eventPeriodic", "Failed to update current for node3V3OutB: 0x%08X",
         error);
     return error;
   }
@@ -84,76 +84,76 @@ mbed_error_status_t eventPeriodic() {
   // Find the current to shed if regulator > its maximum
   double toShed = 0.0;
 
-  buf = node3V3OutA.getCurrent() - THRES_CURRENT_REG_MAX;
+  buf = iNode3V3OutA.get() - THRES_CURRENT_REG_MAX;
   if (buf > toShed)
     toShed = buf;
 
-  buf = node3V3OutB.getCurrent() - THRES_CURRENT_REG_MAX;
+  buf = iNode3V3OutB.get() - THRES_CURRENT_REG_MAX;
   if (buf > toShed)
     toShed = buf;
 
   // Check the regulators' temperature
   bool regulatorsOvertemp = false;
 
-  error = thermistorRegA.getTemperature(buf);
+  error = thermistorRegA.get(buf);
   if (error) {
-    ERROR("eventPeriodic", "Failed to get temp for regulator A: 0x%08X", error);
+    LOGE("eventPeriodic", "Failed to get temp for regulator A: 0x%08X", error);
     return error;
   }
 
   if (buf > (THRES_REG_HOT + THRES_OVERHEATED)) {
     for (uint8_t i = 0; i < COUNT_PR_3V3; ++i)
-      nodesPR3V3[i]->setSwitch(false);
+      iNodesPR3V3[i]->setSwitch(false);
   } else if (buf > THRES_REG_HOT) {
     regulatorsOvertemp = true;
   }
 
-  error = thermistorRegB.getTemperature(buf);
+  error = thermistorRegB.get(buf);
   if (error) {
-    ERROR("eventPeriodic", "Failed to get temp for regulator B: 0x%08X", error);
+    LOGE("eventPeriodic", "Failed to get temp for regulator B: 0x%08X", error);
     return error;
   }
 
   if (buf > (THRES_REG_HOT + THRES_OVERHEATED)) {
     // Switch off all loads
     for (uint8_t i = 0; i < COUNT_PR_3V3; ++i)
-      nodesPR3V3[i]->setSwitch(false);
+      iNodesPR3V3[i]->setSwitch(false);
   } else if (buf > THRES_REG_HOT) {
     regulatorsOvertemp = true;
   }
 
   if (toShed < 0 && regulatorsOvertemp) {
     // If overtemp, reduce load by 25%
-    toShed = node3V3OutA.getCurrent() * 0.25 + node3V3OutB.getCurrent() * 0.25;
+    toShed = iNode3V3OutA.get() * 0.25 + iNode3V3OutB.get() * 0.25;
   }
 
-  error = shedLoad(nodesPR3V3, COUNT_PR_3V3, toShed);
+  error = shedLoad(iNodesPR3V3, COUNT_PR_3V3, toShed);
   if (error) {
-    ERROR("eventPeriodic", "Failed to shed load from 3.3V: 0x%08X", error);
+    LOGE("eventPeriodic", "Failed to shed load from 3.3V: 0x%08X", error);
     return error;
   }
 
   // Check battery rails
   // Update current readings for battery rails
   for (uint8_t i = 0; i < COUNT_PR_3V3; ++i) {
-    error = nodesPRBatt[i]->updateCurrent();
+    error = iNodesPRBatt[i]->update();
     if (error) {
-      ERROR("eventPeriodic",
+      LOGE("eventPeriodic",
           "Failed to update current for nodesPRBatt[%d]: 0x%08X", i, error);
       return error;
     }
   }
 
-  error = nodeBattOutA.updateCurrent();
+  error = iNodeBattOutA.update();
   if (error) {
-    ERROR("eventPeriodic", "Failed to update current for nodeBattOutA: 0x%08X",
+    LOGE("eventPeriodic", "Failed to update current for nodeBattOutA: 0x%08X",
         error);
     return error;
   }
 
-  error = nodeBattOutB.updateCurrent();
+  error = iNodeBattOutB.update();
   if (error) {
-    ERROR("eventPeriodic", "Failed to update current for nodeBattOutB: 0x%08X",
+    LOGE("eventPeriodic", "Failed to update current for nodeBattOutB: 0x%08X",
         error);
     return error;
   }
@@ -161,60 +161,59 @@ mbed_error_status_t eventPeriodic() {
   // Find the current to shed if regulator > its maximum
   toShed = 0.0;
 
-  buf = nodeBattOutA.getCurrent() - THRES_CURRENT_BATT_MAX;
+  buf = iNodeBattOutA.get() - THRES_CURRENT_BATT_MAX;
   if (buf > toShed)
     toShed = buf;
 
-  buf = nodeBattOutB.getCurrent() - THRES_CURRENT_BATT_MAX;
+  buf = iNodeBattOutB.get() - THRES_CURRENT_BATT_MAX;
   if (buf > toShed)
     toShed = buf;
 
   // Check the battery temperature
   bool batteriesOvertemp = false;
 
-  error = thermistorBattA.getTemperature(buf);
+  error = thermistorBattA.get(buf);
   if (error) {
-    ERROR("eventPeriodic", "Failed to get temp for battery A: 0x%08X", error);
+    LOGE("eventPeriodic", "Failed to get temp for battery A: 0x%08X", error);
     return error;
   }
 
   if (buf > (THRES_BATT_HOT + THRES_OVERHEATED)) {
     // turn off all loads
     for (uint8_t i = 0; i < COUNT_PR_BATT; ++i)
-      nodesPRBatt[i]->setSwitch(false);
+      iNodesPRBatt[i]->setSwitch(false);
   } else if (buf > THRES_BATT_HOT) {
     batteriesOvertemp = true;
   } else if (buf < THRES_BATT_COLD) {
     // Turn on heater for cold battery
-    nodesBatteryHeaters[0]->setSwitch(true);
+    iNodesBatteryHeaters[0]->setSwitch(true);
   }
 
-  error = thermistorBattB.getTemperature(buf);
+  error = thermistorBattB.get(buf);
   if (error) {
-    ERROR("eventPeriodic", "Failed to get temp for battery B: 0x%08X", error);
+    LOGE("eventPeriodic", "Failed to get temp for battery B: 0x%08X", error);
     return error;
   }
 
   if (buf > (THRES_BATT_HOT + THRES_OVERHEATED)) {
     // turn off all loads:
     for (uint8_t i = 0; i < COUNT_PR_BATT; ++i)
-      nodesPRBatt[i]->setSwitch(false);
+      iNodesPRBatt[i]->setSwitch(false);
   } else if (buf > THRES_BATT_HOT) {
     batteriesOvertemp = true;
   } else if (buf < THRES_BATT_COLD) {
     // Turn on heater for cold battery
-    nodesBatteryHeaters[1]->setSwitch(true);
+    iNodesBatteryHeaters[1]->setSwitch(true);
   }
 
   if (toShed < 0 && batteriesOvertemp) {
     // If overtemp, shed 25%
-    toShed =
-        nodeBattOutA.getCurrent() * 0.25 + nodeBattOutB.getCurrent() * 0.25;
+    toShed = iNodeBattOutA.get() * 0.25 + iNodeBattOutB.get() * 0.25;
   }
 
-  error = shedLoad(nodesPRBatt, COUNT_PR_BATT, toShed);
+  error = shedLoad(iNodesPRBatt, COUNT_PR_BATT, toShed);
   if (error) {
-    ERROR("eventPeriodic", "Failed to shed load from VBatt: 0x%08X", error);
+    LOGE("eventPeriodic", "Failed to shed load from VBatt: 0x%08X", error);
     return error;
   }
 

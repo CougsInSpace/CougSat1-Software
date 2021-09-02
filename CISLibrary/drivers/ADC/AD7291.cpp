@@ -37,12 +37,12 @@ mbed_error_status_t AD7291::readRaw(ADCChannel_t channel, int32_t & value) {
   if (channel == ADCChannel_t::TEMP) {
     error = read(Register_t::RESULT_TEMP, raw);
     if (error) {
-      ERROR("AD7291", "Failed to read RESULT_TEMP: 0x%08X", error);
+      LOGE("AD7291", "Failed to read RESULT_TEMP: 0x%08X", error);
       return error;
     }
 
     if ((raw >> 12) != 0x8) {
-      ERROR("AD7291", "Read result is not temp channel");
+      LOGE("AD7291", "Read result is not temp channel");
       return MBED_ERROR_INVALID_DATA_DETECTED;
     }
 
@@ -57,27 +57,37 @@ mbed_error_status_t AD7291::readRaw(ADCChannel_t channel, int32_t & value) {
     channels = ((uint8_t)0x80) >> static_cast<uint8_t>(channel);
     error    = writeControlRegister();
     if (error) {
-      ERROR("AD7291", "Failed to write control register: 0x%08X", error);
+      LOGE("AD7291", "Failed to write control register: 0x%08X", error);
       return error;
     }
 
     error = read(Register_t::RESULT_VOLTAGE, raw);
     if (error) {
-      ERROR("AD7291", "Failed to read RESULT_VOLTAGE: 0x%08X", error);
+      LOGE("AD7291", "Failed to read RESULT_VOLTAGE: 0x%08X", error);
       return error;
     }
 
     if ((raw >> 12) != static_cast<uint8_t>(channel)) {
-      ERROR("AD7291", "Read result is not selected channel");
+      LOGE("AD7291", "Read result is not selected channel");
       return MBED_ERROR_INVALID_DATA_DETECTED;
     }
 
     value = raw & 0x00000FFF;
   } else {
-    ERROR("AD7291", "Selected channel is not available to read");
+    LOGE("AD7291", "Selected channel is not available to read");
     return MBED_ERROR_INVALID_ARGUMENT;
   }
   return MBED_SUCCESS;
+}
+
+/**
+ * @brief Tests the I2C interface to the IC by writing the config register
+ * (checks for ACK)
+ *
+ * @return mbed_error_status_t
+ */
+mbed_error_status_t AD7291::selfTest() {
+  return writeControlRegister();
 }
 
 /**
@@ -88,7 +98,7 @@ mbed_error_status_t AD7291::readRaw(ADCChannel_t channel, int32_t & value) {
 mbed_error_status_t AD7291::reset() {
   mbed_error_status_t error = write(Register_t::CONTROL, 2);
   if (error) {
-    ERROR("AD7291", "Failed to write CONTROL: 0x%08X", error);
+    LOGE("AD7291", "Failed to write CONTROL: 0x%08X", error);
     return error;
   }
   channels          = 0;
@@ -101,7 +111,7 @@ mbed_error_status_t AD7291::reset() {
 
   error = writeControlRegister();
   if (error) {
-    ERROR("AD7291", "Failed to write CONTROL register: 0x%08X", error);
+    LOGE("AD7291", "Failed to write CONTROL register: 0x%08X", error);
     return error;
   }
   return MBED_SUCCESS;

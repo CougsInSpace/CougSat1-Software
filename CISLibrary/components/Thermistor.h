@@ -9,7 +9,7 @@ public:
   Thermistor(ADC & adc, ADCChannel_t channel, double voltageFraction300K,
       double voltageFraction340K);
 
-  mbed_error_status_t getTemperature(double & temp);
+  mbed_error_status_t get(double & temp);
 
 private:
   ADC & adc;
@@ -18,6 +18,17 @@ private:
 
   double resistance300K;
   double beta;
+};
+
+class InternalTemp {
+public:
+  InternalTemp();
+
+  mbed_error_status_t get(double & temp);
+
+private:
+  AnalogIn adc;
+  AnalogIn ref;
 };
 
 #endif /* _LIBRARY_COMPONENT_THERMISTOR_H_ */

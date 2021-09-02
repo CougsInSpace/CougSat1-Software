@@ -7,6 +7,7 @@
 #include <ADC/ADC.h>
 #include <CurrentNode.h>
 #include <Thermistor.h>
+#include <VoltageNode.h>
 #include <mbed.h>
 
 /*************************** Interfaces and Drivers ***************************/
@@ -15,8 +16,8 @@ extern I2CSlave i2cBus;
 
 extern CDH cdh;
 
-extern ADC * adcEPSs[COUNT_ADC_EPS];
-extern ADC * adcPVs[COUNT_ADC_PV];
+extern ADC * adcsEPS[COUNT_ADC_EPS];
+extern ADC * adcsPV[COUNT_ADC_PV];
 
 extern DigitalOut statusLED;
 
@@ -24,24 +25,36 @@ extern InterruptIn interruptCtrlSync;
 extern InterruptIn interruptBusI2CIRQ;
 
 /******************************** Power Nodes *********************************/
-extern CurrentNode * nodesPVIn[COUNT_PV];
-extern CurrentNode * nodesPVOut[COUNT_PV];
-extern CurrentNode * nodesPR3V3[COUNT_PR_3V3];
-extern CurrentNode * nodesPRBatt[COUNT_PR_BATT];
-extern CurrentNode * nodesBatteryHeaters[COUNT_BH];
-extern CurrentNode * nodesDeployables[COUNT_DEPLOY];
+extern CurrentNode * iNodesPV[COUNT_PV];
+extern CurrentNode * iNodesPVIn[COUNT_PV];
+extern CurrentNode * iNodesPR3V3[COUNT_PR_3V3];
+extern CurrentNode * iNodesPRBatt[COUNT_PR_BATT];
+extern CurrentNode * iNodesBatteryHeaters[COUNT_BH];
+extern CurrentNode * iNodesDeployables[COUNT_DEPLOY];
+
+extern VoltageNode * vNodesPV[COUNT_PV];
+extern VoltageNode * vNodesPVIn[COUNT_PV];
+
+extern VoltageNode * vSenseDeployables[COUNT_DEPLOY];
 
 extern DigitalOut * inputSwitching[COUNT_INPUT_SW];
 
-extern CurrentNode nodeBattInA;
-extern CurrentNode nodeBattInB;
-extern CurrentNode nodeBattOutA;
-extern CurrentNode nodeBattOutB;
-extern CurrentNode node3V3InA;
-extern CurrentNode node3V3InB;
-extern CurrentNode node3V3OutA;
-extern CurrentNode node3V3OutB;
-extern CurrentNode nodePR3V3_EPS;
+extern CurrentNode iNodeBattInA;
+extern CurrentNode iNodeBattInB;
+extern CurrentNode iNodeBattOutA;
+extern CurrentNode iNodeBattOutB;
+extern CurrentNode iNode3V3InA;
+extern CurrentNode iNode3V3InB;
+extern CurrentNode iNode3V3OutA;
+extern CurrentNode iNode3V3OutB;
+extern CurrentNode iNodePR3V3_EPS;
+
+extern VoltageNode vNodeBattA;
+extern VoltageNode vNodeBattB;
+extern VoltageNode vNode3V3A;
+extern VoltageNode vNode3V3B;
+extern VoltageNode vNodeUmbilical;
+extern VoltageNode vSenseEjectTimer;
 
 /******************************** Thermistors *********************************/
 extern Thermistor thermistorBattA;
@@ -59,13 +72,12 @@ extern Thermistor thermistorPCB2;
 extern Thermistor thermistorPCB3;
 extern Thermistor thermistorPCB4;
 
-extern Thermistor thermistorsMPPT[COUNT_PV];
-extern Thermistor thermistorsPVBoard[COUNT_PV];
+extern Thermistor * thermistorsEPS[COUNT_THERM_BOARD];
+
+extern Thermistor * thermistorsMPPT[COUNT_PV];
 
 /****************************** Internal Sensors ******************************/
 
-extern AnalogIn internalTemp;
-extern AnalogIn internalVref;
-extern AnalogIn internalVbat;
+extern InternalTemp internalTemp;
 
 #endif /* _SRC_PMIC_OBJECTS_H_ */

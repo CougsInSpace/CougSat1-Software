@@ -2,10 +2,10 @@
 #define _SRC_CONFIGURATION_H_
 
 /*********************************** Timing ***********************************/
-#define PERIOD_US_IDLE_SLEEP (10) // Sleep time during idle
-#define PERIOD_MS_PERIODIC (5 * 1000) // The periodic event
+#define PERIOD_US_IDLE_SLEEP (10)      // Sleep time during idle
+#define PERIOD_MS_PERIODIC (5 * 1000)  // The periodic event
 #define PERIOD_MS_WATCHDOG (10 * 1000) // Watchdog timeout
-#define DURATION_S_DEPLOY (40 * 60) // Duration to wait before eventDeploy
+#define DURATION_S_DEPLOY (40 * 60)    // Duration to wait before eventDeploy
 
 /************************************ ADCs ************************************/
 #define ADC_AVREF_0 (2.4996)
@@ -44,23 +44,41 @@
 #define THRES_OVERHEATED (10.0) // 10 Degrees above the hot cases, critical temp
 
 /******************************** Solar Panel *********************************/
-#define GAIN_PVIN_0A (0.05)
-#define GAIN_PVIN_0B (0.05)
-#define GAIN_PVIN_1A (0.05)
-#define GAIN_PVIN_1B (0.05)
-#define GAIN_PVIN_2A (0.05)
-#define GAIN_PVIN_2B (0.05)
-#define GAIN_PVIN_3A (0.05)
-#define GAIN_PVIN_3B (0.05)
+#define GAIN_PV_0A (0.01 / 0.012)
+#define GAIN_PV_0B (0.01 / 0.012)
+#define GAIN_PV_1A (0.01 / 0.012)
+#define GAIN_PV_1B (0.01 / 0.012)
+#define GAIN_PV_2A (0.01 / 0.012)
+#define GAIN_PV_2B (0.01 / 0.012)
+#define GAIN_PV_3A (0.01 / 0.012)
+#define GAIN_PV_3B (0.01 / 0.012)
 
-#define GAIN_PVOUT_0A (0.10)
-#define GAIN_PVOUT_0B (0.10)
-#define GAIN_PVOUT_1A (0.10)
-#define GAIN_PVOUT_1B (0.10)
-#define GAIN_PVOUT_2A (0.10)
-#define GAIN_PVOUT_2B (0.10)
-#define GAIN_PVOUT_3A (0.10)
-#define GAIN_PVOUT_3B (0.10)
+#define GAIN_V_PV_0A (1.0 + 50000.0 / 50000.0)
+#define GAIN_V_PV_0B (1.0 + 50000.0 / 50000.0)
+#define GAIN_V_PV_1A (1.0 + 50000.0 / 50000.0)
+#define GAIN_V_PV_1B (1.0 + 50000.0 / 50000.0)
+#define GAIN_V_PV_2A (1.0 + 50000.0 / 50000.0)
+#define GAIN_V_PV_2B (1.0 + 50000.0 / 50000.0)
+#define GAIN_V_PV_3A (1.0 + 50000.0 / 50000.0)
+#define GAIN_V_PV_3B (1.0 + 50000.0 / 50000.0)
+
+#define GAIN_PVIN_0A (0.01 / 0.005)
+#define GAIN_PVIN_0B (0.01 / 0.005)
+#define GAIN_PVIN_1A (0.01 / 0.005)
+#define GAIN_PVIN_1B (0.01 / 0.005)
+#define GAIN_PVIN_2A (0.01 / 0.005)
+#define GAIN_PVIN_2B (0.01 / 0.005)
+#define GAIN_PVIN_3A (0.01 / 0.005)
+#define GAIN_PVIN_3B (0.01 / 0.005)
+
+#define GAIN_V_PVIN_0A (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_PVIN_0B (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_PVIN_1A (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_PVIN_1B (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_PVIN_2A (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_PVIN_2B (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_PVIN_3A (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_PVIN_3B (1.0 + 5000.0 / 5000.0)
 
 /******************************** Power Rails *********************************/
 #define GAIN_PR_3V3_0 (1000.0 / 2160.0)
@@ -92,6 +110,9 @@
 
 #define GAIN_DEPLOY_0 (1000.0 / 467.0)
 #define GAIN_DEPLOY_1 (1000.0 / 466.0)
+
+#define GAIN_V_DEPLOY_0 (1.0)
+#define GAIN_V_DEPLOY_1 (1.0)
 
 // Largest (rank * current) is first to be shed
 #define RANK_PR_3V3_0 (2)
@@ -148,6 +169,7 @@
 
 #define NODES_3V3_CDH (0)
 #define NODES_3V3_COMMS (6)
+#define NODES_3V3_PV (13)
 
 #define NODES_BATT_COMMS (6)
 
@@ -160,6 +182,14 @@
 #define GAIN_3V3_IN_B (0.02 / 0.012)
 #define GAIN_3V3_OUT_A (0.02 / 0.012)
 #define GAIN_3V3_OUT_B (0.02 / 0.012)
+
+#define GAIN_V_BATT_A (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_BATT_B (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_3V3_A (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_3V3_B (1.0 + 5000.0 / 5000.0)
+
+#define GAIN_V_UMB (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_EJECT (1.0 + 5000.0 / 5000.0)
 
 /******************************** Thermistors *********************************/
 #define THERM_BATT_A_300K (0.480)
@@ -196,44 +226,56 @@
 #define THERM_PV0_MPPT_A_340K (0.162)
 #define THERM_PV0_MPPT_B_300K (0.480)
 #define THERM_PV0_MPPT_B_340K (0.162)
-#define THERM_PV0_BACK_300K (0.480)
-#define THERM_PV0_BACK_340K (0.162)
-#define THERM_PV0_FRONT_TOP_300K (0.480)
-#define THERM_PV0_FRONT_TOP_340K (0.162)
-#define THERM_PV0_FRONT_BOTTOM_300K (0.480)
-#define THERM_PV0_FRONT_BOTTOM_340K (0.162)
-
 #define THERM_PV1_MPPT_A_300K (0.480)
 #define THERM_PV1_MPPT_A_340K (0.162)
 #define THERM_PV1_MPPT_B_300K (0.480)
 #define THERM_PV1_MPPT_B_340K (0.162)
-#define THERM_PV1_BACK_300K (0.480)
-#define THERM_PV1_BACK_340K (0.162)
-#define THERM_PV1_FRONT_TOP_300K (0.480)
-#define THERM_PV1_FRONT_TOP_340K (0.162)
-#define THERM_PV1_FRONT_BOTTOM_300K (0.480)
-#define THERM_PV1_FRONT_BOTTOM_340K (0.162)
-
 #define THERM_PV2_MPPT_A_300K (0.480)
 #define THERM_PV2_MPPT_A_340K (0.162)
 #define THERM_PV2_MPPT_B_300K (0.480)
 #define THERM_PV2_MPPT_B_340K (0.162)
-#define THERM_PV2_BACK_300K (0.480)
-#define THERM_PV2_BACK_340K (0.162)
-#define THERM_PV2_FRONT_TOP_300K (0.480)
-#define THERM_PV2_FRONT_TOP_340K (0.162)
-#define THERM_PV2_FRONT_BOTTOM_300K (0.480)
-#define THERM_PV2_FRONT_BOTTOM_340K (0.162)
-
 #define THERM_PV3_MPPT_A_300K (0.480)
 #define THERM_PV3_MPPT_A_340K (0.162)
 #define THERM_PV3_MPPT_B_300K (0.480)
 #define THERM_PV3_MPPT_B_340K (0.162)
-#define THERM_PV3_BACK_300K (0.480)
-#define THERM_PV3_BACK_340K (0.162)
-#define THERM_PV3_FRONT_TOP_300K (0.480)
-#define THERM_PV3_FRONT_TOP_340K (0.162)
-#define THERM_PV3_FRONT_BOTTOM_300K (0.480)
-#define THERM_PV3_FRONT_BOTTOM_340K (0.162)
+
+/******************************** POST Values *********************************/
+#define POST_INTERNAL_TEMP_K_LOW (240.0)
+#define POST_INTERNAL_TEMP_K_HIGH (360.0)
+
+#define POST_THERM_BOARD_TEMP_K_LOW (240.0)
+#define POST_THERM_BOARD_TEMP_K_HIGH (360.0)
+#define POST_THERM_MPPT_TEMP_K_LOW (240.0)
+#define POST_THERM_MPPT_TEMP_K_HIGH (360.0)
+
+#define POST_BATT_V_LOW (3.0)
+#define POST_BATT_V_HIGH (4.5)
+#define POST_BATT_IN_I_LOW (0.0)
+#define POST_BATT_IN_I_HIGH (1.0)
+#define POST_BATT_OUT_I_LOW (0.0)
+#define POST_BATT_OUT_I_HIGH (4.0)
+
+#define POST_3V3_V_LOW (3.0)
+#define POST_3V3_V_HIGH (3.6)
+#define POST_3V3_IN_I_LOW (0.0)
+#define POST_3V3_IN_I_HIGH (3.0)
+#define POST_3V3_OUT_I_LOW (0.0)
+#define POST_3V3_OUT_I_HIGH (3.0)
+#define POST_3V3_EPS_I_LOW (0.0)
+#define POST_3V3_EPS_I_HIGH (0.1)
+#define POST_3V3_PV_ON_I_LOW (0.001)
+#define POST_3V3_PV_ON_I_HIGH (0.050)
+
+#define POST_PV_V_LOW (0.0)
+#define POST_PV_V_HIGH (3.0)
+#define POST_PV_I_LOW (0.0)
+#define POST_PV_I_HIGH (0.75)
+#define POST_PV_IN_V_LOW (0.0)
+#define POST_PV_IN_V_HIGH (4.5)
+#define POST_PV_IN_I_LOW (0.0)
+#define POST_PV_IN_I_HIGH (0.5)
+
+#define POST_LOAD_I_LOW (0.0)
+#define POST_LOAD_I_HIGH (0.1)
 
 #endif /* _SRC_CONFIGURATION_H_ */

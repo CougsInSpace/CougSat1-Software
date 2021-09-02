@@ -50,15 +50,15 @@ mbed_error_status_t initialize() {
 
   error = eventPOST();
   if (error) {
-    ERROR("Init", "Failed to perform POST, 0x%08X", error);
+    LOGE("Init", "Failed to perform POST, 0x%08X", error);
     return error;
   }
 
   double ejectTimer = 0.0;
   // TODO Make VoltageNode and PowerNode classes with gain
-  error = adcEPSs[2]->readVoltage(ADCChannel_t::CM_02, ejectTimer);
+  error = adcsEPS[2]->readVoltage(ADCChannel_t::CM_02, ejectTimer);
   if (error) {
-    ERROR("Init", "Failed to read eject timer, 0x%08X", error);
+    LOGE("Init", "Failed to read eject timer, 0x%08X", error);
     return error;
   }
   ejectTimer *= 2;
@@ -69,19 +69,19 @@ mbed_error_status_t initialize() {
   if (firstBoot) {
     error = eventFirstBoot();
     if (error) {
-      ERROR("Init", "Failed to perform first bool event: 0x%08X", error);
+      LOGE("Init", "Failed to perform first bool event: 0x%08X", error);
       return error;
     }
   } else {
     error = eventDeploy();
     if (error) {
-      ERROR("Init", "Failed to perform deploy event: 0x%08X", error);
+      LOGE("Init", "Failed to perform deploy event: 0x%08X", error);
       return error;
     }
   }
 
   LOG("Init", "Turning C&DH on");
-  nodesPR3V3[NODES_3V3_CDH]->setSwitch(true);
+  iNodesPR3V3[NODES_3V3_CDH]->setSwitch(true);
 
   LOG("Init", "Initialization complete");
   // Init needs to get to this point quicker than the watchdog period
@@ -111,20 +111,20 @@ mbed_error_status_t run() {
       watchdog.kick();
       error = eventPeriodic();
       if (error) {
-        ERROR("Run", "Failed to perform periodic event: 0x%08X", error);
+        LOGE("Run", "Failed to perform periodic event: 0x%08X", error);
         return error;
       }
       nextPeriodicEvent = now + PERIOD_MS_PERIODIC;
     } else if (cdh.hasMessage()) {
       error = cdh.processMessage();
       if (error) {
-        ERROR("Run", "Failed to process message from the bus: 0x%08X", error);
+        LOGE("Run", "Failed to process message from the bus: 0x%08X", error);
         return error;
       }
     } else if (deployWaiting && (uint64_t)time(NULL) > DURATION_S_DEPLOY) {
       error = eventDeploy();
       if (error) {
-        ERROR("Init", "Failed to perform deploy event: 0x%08X", error);
+        LOGE("Init", "Failed to perform deploy event: 0x%08X", error);
         return error;
       }
       deployWaiting = false;
@@ -141,12 +141,12 @@ mbed_error_status_t run() {
 int main(void) {
   mbed_error_status_t error = initialize();
   if (error) {
-    ERROR("PMIC", "Failed to initialize: 0x%08X", error);
+    LOGE("PMIC", "Failed to initialize: 0x%08X", error);
     mbed_die();
   }
   error = run();
   if (error) {
-    ERROR("PMIC", "Failed to run: 0x%08X", error);
+    LOGE("PMIC", "Failed to run: 0x%08X", error);
     mbed_die();
   }
   return MBED_SUCCESS;

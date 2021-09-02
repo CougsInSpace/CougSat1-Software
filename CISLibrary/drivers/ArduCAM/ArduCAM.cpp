@@ -22,37 +22,37 @@ ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
 
 //   result = readReg16(CAMERA_ID_ADDR, &data);
 //   if (result != ERROR_SUCCESS) {
-//     DEBUG("ArduCAM", "Cannot I2C read from camera");
+//     LOGD("ArduCAM", "Cannot I2C read from camera");
 //     return result;
 //   }
 
 //   if (data != CAMERA_ID) {
-//     DEBUG("ArduCAM", "Camera id wrong: 0x%04x", data);
+//     LOGD("ArduCAM", "Camera id wrong: 0x%04x", data);
 //     return ERROR_INVALID_DATA;
 //   }
 
 //   writeArduCAM(ARDUCHIP_TEST1, ARDUCHIP_TEST_VAL);
 //   data = readArduCAM(ARDUCHIP_TEST1);
 //   if (data != ARDUCHIP_TEST_VAL) {
-//     DEBUG("ArduCAM", "ArduChip test value failed: 0x%02x", data);
+//     LOGD("ArduCAM", "ArduChip test value failed: 0x%02x", data);
 //     return ERROR_INVALID_DATA;
 //   }
 
 //   data = readArduCAM(ARDUCAM_VER_ADDR);
-//   DEBUG("ArduCAM", "ArduChip Version %d.%d", data >> 4, data & 0xF);
+//   LOGD("ArduCAM", "ArduChip Version %d.%d", data >> 4, data & 0xF);
 
 //   //Initialize settings
 //   result = writeReg(0x3008, 0x80);
 //   result |= writeRegList(OV5642_1280x960_RAW);
 //   result |= writeRegList(OV5642_640x480_RAW);
 //   if (result != ERROR_SUCCESS) {
-//     DEBUG("ArduCAM", "Writing sensor registers failed");
+//     LOGD("ArduCAM", "Writing sensor registers failed");
 //     return result;
 //   }
 
 //   setBit(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);
 
-//   DEBUG("ArduCAM", "Initialization complete");
+//   LOGD("ArduCAM", "Initialization complete");
 //   return ERROR_SUCCESS;
 // }
 
@@ -127,7 +127,7 @@ ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
 // //  result |= writeReg(0x503e, 0x1a);
 // //  result |= writeReg(0x4741, 0x4);//Test pattern: DLI
 //   if (result) {
-//     DEBUG("ArduCAM", "Writing sensor registers failed");
+//     LOGD("ArduCAM", "Writing sensor registers failed");
 //     return result;
 //   }
 //   return ERROR_SUCCESS;
@@ -154,13 +154,13 @@ ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
 //   { (char) (addr >> 8), (char) (addr & 0xFF) };
 //   result = i2c.write(CAMERA_I2C_ADDR, buf, 2);
 //   if (result != ERROR_SUCCESS) {
-//     DEBUG("ArduCAM", "Error commanding reg 0x%x", addr);
+//     LOGD("ArduCAM", "Error commanding reg 0x%x", addr);
 //     return ERROR_NACK;
 //   }
 
 //   result = i2c.read(CAMERA_I2C_ADDR, buf, 1);
 //   if (result != ERROR_SUCCESS) {
-//     DEBUG("ArduCAM", "Error requesting reg 0x%x", addr);
+//     LOGD("ArduCAM", "Error requesting reg 0x%x", addr);
 //     return ERROR_NACK;
 //   }
 
@@ -179,11 +179,11 @@ ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
 //   uint8_t buf[2] =
 //   { 0, 0 };
 //   if (readReg(addr, &buf[0])) {
-//     DEBUG("ArduCAM", "Error reading reg 0x%x", addr);
+//     LOGD("ArduCAM", "Error reading reg 0x%x", addr);
 //     return ERROR_READ;
 //   }
 //   if (readReg(addr + 1, &buf[1])) {
-//     DEBUG("ArduCAM", "Error reading reg 0x%x", addr + 1);
+//     LOGD("ArduCAM", "Error reading reg 0x%x", addr + 1);
 //     return ERROR_READ;
 //   }
 
@@ -203,7 +203,7 @@ ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
 //   { (char) (addr >> 8), (char) (addr & 0xFF), (char) data };
 //   result = i2c.write(CAMERA_I2C_ADDR, buf, 3);
 //   if (result != ERROR_SUCCESS) {
-//     DEBUG("ArduCAM", "Error writing reg 0x%x", addr);
+//     LOGD("ArduCAM", "Error writing reg 0x%x", addr);
 //     return ERROR_NACK;
 //   }
 
@@ -218,11 +218,11 @@ ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
 //  */
 // mbed_error_status_t ArduCAM::writeReg16(uint16_t addr, uint16_t data) {
 //   if (writeReg(addr, (data >> 8))) {
-//     DEBUG("ArduCAM", "Error writing reg 0x%x", addr);
+//     LOGD("ArduCAM", "Error writing reg 0x%x", addr);
 //     return ERROR_WRITE;
 //   }
 //   if (writeReg(addr + 1, (data & 0xFF))) {
-//     DEBUG("ArduCAM", "Error writing reg 0x%x", addr + 1);
+//     LOGD("ArduCAM", "Error writing reg 0x%x", addr + 1);
 //     return ERROR_WRITE;
 //   }
 //   return ERROR_SUCCESS;
@@ -236,13 +236,13 @@ ArduCAM::ArduCAM(SPI & spi, I2C & i2c, PinName pinSelect) :
 // uint8_t ArduCAM::writeRegList(const struct CameraReg *regList) {
 //   while (regList->regAddr != REGISTER_END_ADDR) {
 //     if (writeReg(regList->regAddr, regList->regVal) != ERROR_SUCCESS) {
-//       DEBUG("ArduCAM", "Error writing reg 0x%x", regList->regAddr);
+//       LOGD("ArduCAM", "Error writing reg 0x%x", regList->regAddr);
 //       return ERROR_WRITE;
 //     }
 //     regList++;
 //     wait_ms(2);
 //   }
-//   DEBUG("ArduCAM", "Register list loaded");
+//   LOGD("ArduCAM", "Register list loaded");
 
 //   return ERROR_SUCCESS;
 // }

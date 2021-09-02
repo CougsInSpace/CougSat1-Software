@@ -30,6 +30,8 @@ public:
 
   mbed_error_status_t readRaw(ADCChannel_t channel, int32_t & value);
 
+  mbed_error_status_t selfTest();
+
   mbed_error_status_t reset();
 
 private:

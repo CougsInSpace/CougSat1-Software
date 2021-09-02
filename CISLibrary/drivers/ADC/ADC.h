@@ -50,7 +50,8 @@ public:
    * @param refVoltage at full counts
    * @param bitDepth of the conversion
    */
-  ADC(double refVoltage, uint8_t bitDepth) {
+  ADC(double refVoltage, uint8_t bitDepth) :
+    MAX_RAW((1 << bitDepth) - 1), CONVERSION_FLOAT(1.0 / (1 << bitDepth)) {
     setReferenceVoltage(refVoltage, bitDepth);
   }
 
@@ -71,6 +72,13 @@ public:
       ADCChannel_t channel, int32_t & value) = 0;
 
   /**
+   * @brief Tests the ADC is connected and operating properly
+   *
+   * @return mbed_error_status_t
+   */
+  virtual mbed_error_status_t selfTest() = 0;
+
+  /**
    * @brief Set the reference voltage given the number of bits and vRef
    *
    * @param refVoltage at full counts
@@ -78,7 +86,7 @@ public:
    */
   void setReferenceVoltage(double refVoltage, uint8_t bitDepth) {
     this->refVoltage = refVoltage;
-    conversionFactor = refVoltage / (1 << bitDepth);
+    conversionFactor = refVoltage * CONVERSION_FLOAT;
   }
 
   /**
@@ -139,6 +147,11 @@ public:
     value = (value - tempOffset) * tempSlope;
     return result;
   }
+
+public:
+  // Aka bit depth related info
+  const int32_t MAX_RAW;
+  const double  CONVERSION_FLOAT;
 
 protected:
   double refVoltage       = 0.0; // Volts

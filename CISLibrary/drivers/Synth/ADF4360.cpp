@@ -51,7 +51,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
            (freq / prescaler) > ADF4360Variants[variant].countersMaxFreq) {
       prescaler *= 2;
     }
-    DEBUG("setFreq", "prescaler: %u", prescaler);
+    LOGD("setFreq", "prescaler: %u", prescaler);
 
     uint32_t frequencyRatio;
 
@@ -65,10 +65,10 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
       // freq = ((prescaler * B) + A) * frequencyPFD;
     } while ((counterA > counterB) && counterB < 3);
 
-    DEBUG("setFreq", "A %u, b%u r%u", counterA, counterB, counterR);
+    LOGD("setFreq", "A %u, b%u r%u", counterA, counterB, counterR);
   }
   frequency = ((prescaler * counterB) + counterA) * frequencyPFD;
-  DEBUG("setFreq", "freq: %lu", frequency);
+  LOGD("setFreq", "freq: %lu", frequency);
 
   // Adjust the band select until divided counterR is less than 1MHz
   uint8_t  bandSelectRaw   = 1;
@@ -77,7 +77,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
     bandSelectRaw *= 2;
     dividedCounterR = frequencyPFD / bandSelectRaw;
   }
-  DEBUG("setFreq", "band %u", bandSelectRaw);
+  LOGD("setFreq", "band %u", bandSelectRaw);
   switch (bandSelectRaw) {
     case 1:
       bandSelect = BandSelect_t::ONE;

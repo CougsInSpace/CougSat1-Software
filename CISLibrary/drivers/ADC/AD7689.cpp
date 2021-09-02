@@ -47,26 +47,26 @@ mbed_error_status_t AD7689::readRaw(ADCChannel_t channel, int32_t & value) {
     else
       inputConfig = InputConfig_t::BIPOLAR_DIFF;
   } else {
-    ERROR("AD7291", "Selected channel is not available to read");
+    LOGE("AD7291", "Selected channel is not available to read");
     return MBED_ERROR_INVALID_ARGUMENT;
   }
 
   error = transfer(getConfigRegister(), (uint16_t *)nullptr);
   if (error) {
-    ERROR("AD7689", "Failed to transfer config");
+    LOGE("AD7689", "Failed to transfer config");
     return error;
   }
 
   // Discard second byte
   error = transfer(0, (uint16_t *)nullptr);
   if (error) {
-    ERROR("AD7689", "Failed to skip second byte");
+    LOGE("AD7689", "Failed to skip second byte");
     return error;
   }
 
   error = transfer(0, &raw);
   if (error) {
-    ERROR("AD7689", "Failed to read data");
+    LOGE("AD7689", "Failed to read data");
     return error;
   }
 
@@ -89,30 +89,30 @@ mbed_error_status_t AD7689::selfTest() {
   uint32_t            bufRX  = 0;
   mbed_error_status_t error  = transfer(config, (uint16_t *)nullptr);
   if (error) {
-    ERROR("AD7689", "Failed to transfer config");
+    LOGE("AD7689", "Failed to transfer config");
     return error;
   }
 
   // Discard second byte
   error = transfer(0, &bufRX);
   if (error) {
-    ERROR("AD7689", "Failed to skip second byte");
+    LOGE("AD7689", "Failed to skip second byte");
     return error;
   }
-  DEBUG("AD7689", "2nd Byte: 0x%04lX", bufRX);
+  // LOGD("AD7689", "2nd Byte: 0x%04lX", bufRX);
 
   error = transfer(0, &bufRX);
   if (error) {
-    ERROR("AD7689", "Failed to read data");
+    LOGE("AD7689", "Failed to read data");
     return error;
   }
-  DEBUG("AD7689", "3rd Byte: 0x%04lX", bufRX);
+  // LOGD("AD7689", "3rd Byte: 0x%04lX", bufRX);
 
-  DEBUG("AD7689", "Read back: 0x%04lX vs 0x%04X", (bufRX & 0xFFFF), config);
+  // LOGD("AD7689", "Read back: 0x%04lX vs 0x%04X", (bufRX & 0xFFFF), config);
   if ((bufRX & 0xFFFF) == config)
     return MBED_SUCCESS;
 
-  ERROR("AD7689", "Readback did not match");
+  LOGE("AD7689", "Readback did not match");
   return MBED_ERROR_INVALID_DATA_DETECTED;
 }
 

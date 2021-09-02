@@ -40,7 +40,7 @@ bool CurrentNode::getSwitch() {
  * @return double (current * rank)
  */
 double CurrentNode::getAggregateRank() {
-  return (getCurrent() * rank);
+  return (get() * rank);
 }
 
 /**
@@ -48,7 +48,7 @@ double CurrentNode::getAggregateRank() {
  *
  * @return double current in amps
  */
-double CurrentNode::getCurrent() {
+double CurrentNode::get() {
   return lastCurrent;
 }
 
@@ -58,14 +58,27 @@ double CurrentNode::getCurrent() {
  *
  * @return mbed_error_status_t
  */
-mbed_error_status_t CurrentNode::updateCurrent() {
+mbed_error_status_t CurrentNode::update() {
   double              volts = 0.0;
   mbed_error_status_t error = adc.readVoltage(channel, volts);
   if (error) {
-    ERROR("CurrentNode", "Failed to read Voltage from ADC: 0x%08X", error);
+    LOGE("CurrentNode", "Failed to read Voltage from ADC: 0x%08X", error);
     return error;
   }
   lastCurrent = volts * gain;
+  return error;
+}
+
+/**
+ * @brief Update the current by reading the ADC's value and doing maths
+ * Sets lastCurrent field and returns value
+ *
+ * @param value to read into in volts
+ * @return mbed_error_status_t
+ */
+mbed_error_status_t CurrentNode::updateAndGet(double & value) {
+  mbed_error_status_t error = update();
+  value                     = get();
   return error;
 }
 
