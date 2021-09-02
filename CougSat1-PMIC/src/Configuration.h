@@ -43,6 +43,9 @@
 #define THRES_REG_HOT (100.0)
 #define THRES_OVERHEATED (10.0) // 10 Degrees above the hot cases, critical temp
 
+#define THRES_DEPLOY_SENSE_LOW (2.5)
+#define THRES_DEPLOY_SENSE_HIGH (3.5)
+
 /******************************** Solar Panel *********************************/
 #define GAIN_PV_0A (0.01 / 0.012)
 #define GAIN_PV_0B (0.01 / 0.012)
@@ -111,8 +114,8 @@
 #define GAIN_DEPLOY_0 (1000.0 / 467.0)
 #define GAIN_DEPLOY_1 (1000.0 / 466.0)
 
-#define GAIN_V_DEPLOY_0 (1.0)
-#define GAIN_V_DEPLOY_1 (1.0)
+#define GAIN_V_DEPLOY_0 (1.0 + 5000.0 / 5000.0)
+#define GAIN_V_DEPLOY_1 (1.0 + 5000.0 / 5000.0)
 
 // Largest (rank * current) is first to be shed
 #define RANK_PR_3V3_0 (2)
@@ -166,6 +169,8 @@
 
 #define INITIAL_DEPLOY_0 (false)
 #define INITIAL_DEPLOY_1 (false)
+
+#define DEPLOYABLE_ANTENNA (0)
 
 #define NODES_3V3_CDH (0)
 #define NODES_3V3_COMMS (6)

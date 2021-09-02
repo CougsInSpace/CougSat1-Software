@@ -73,7 +73,7 @@ mbed_error_status_t initialize() {
       return error;
     }
   } else {
-    error = eventDeploy();
+    error = eventDeploy(DEPLOYABLE_ANTENNA, false);
     if (error) {
       LOGE("Init", "Failed to perform deploy event: 0x%08X", error);
       return error;
@@ -122,7 +122,7 @@ mbed_error_status_t run() {
         return error;
       }
     } else if (deployWaiting && (uint64_t)time(NULL) > DURATION_S_DEPLOY) {
-      error = eventDeploy();
+      error = eventDeploy(DEPLOYABLE_ANTENNA, true);
       if (error) {
         LOGE("Init", "Failed to perform deploy event: 0x%08X", error);
         return error;
