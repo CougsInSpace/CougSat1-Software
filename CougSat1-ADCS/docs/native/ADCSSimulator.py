@@ -92,6 +92,9 @@ class Satellite:
     self.omegaList = []
     self.qList = []
     self.rList = []
+    self.rInvList = []
+    self.mList = []
+    self.torqueList = []
     self.cameraList = []
     self.angleErrorList = []
     self.iCoilList = []
@@ -112,6 +115,16 @@ class Satellite:
     self.angleThreshold = np.deg2rad(1)
     self.currentThreshold = 1e-3
 
+    # Loop algorithm
+    self.lastMagFieldLocal = None
+    self.lastT = None
+
+    self.kDot = np.array([
+      [1, 0, 0],
+      [0, 1, 0],
+      [0, 0, 1]
+    ]) * 1e3
+
     self.converged = False
 
   def __solveODE(self, duration: float) -> float:
@@ -127,15 +140,13 @@ class Satellite:
 
     self.magFieldLocal = rInv @ self.magField
 
-    tCoil = np.zeros((3, 3))
-    b = self.magFieldLocal.reshape(3)
-    tCoil[0] = np.cross(self.coilN * self.iCoil[0] *
-                        np.array([self.coilA, 0, 0]), b)
-    tCoil[1] = np.cross(self.coilN * self.iCoil[1] *
-                        np.array([0, self.coilA, 0]), b)
-    tCoil[2] = np.cross(self.coilN * self.iCoil[2] *
-                        np.array([0, 0, self.coilA]), b)
-    torque = tCoil.T @ np.array([[1, 1, 1]]).T
+    mLocal = np.zeros(3)
+    mLocal += self.coilN * self.iCoil[0] * np.array([self.coilA, 0, 0])
+    mLocal += self.coilN * self.iCoil[1] * np.array([0, self.coilA, 0])
+    mLocal += self.coilN * self.iCoil[2] * np.array([0, 0, self.coilA])
+    m = r @ mLocal
+    torque = np.cross(m, self.magField.reshape(3)).reshape((3, 1))
+    m = m.reshape((3, 1))
 
     pCoil = sum(self.vCoil * self.iCoil)
 
@@ -184,6 +195,9 @@ class Satellite:
     self.omegaList.append(omega)
     self.qList.append(self.q)
     self.rList.append(r)
+    self.rInvList.append(rInv)
+    self.mList.append(m)
+    self.torqueList.append(torque)
     self.iCoilList.append(self.iCoil)
     self.vCoilList.append(self.vCoil)
     self.pCoilList.append(pCoil)
@@ -221,7 +235,7 @@ class Satellite:
     self.tStepList.append(t)
     n = int(np.ceil(durationMax / tStep))
 
-    for i in range(n):
+    for i in range(1, n):
       tTarget = tStep * i
       tRemaining = tTarget - t
       while t < tTarget and tRemaining > self.minTStep:  # TODO add a keyboardinterrupt
@@ -231,7 +245,7 @@ class Satellite:
         self.tStepList.append(dt)
         tRemaining = tTarget - t
 
-      self.controlLoop()
+      self.controlLoop(t)
       if self.converged:
         break
 
@@ -246,13 +260,23 @@ class Satellite:
   def plot(self) -> None:
     '''!@brief Plot simulation
     '''
+    # Global coordinates
     ax = pyplot.figure().add_subplot(projection='3d')
 
     rList = np.array(self.rList)
+    rInvList = np.array(self.rInvList)
+    m = np.array(self.mList)
+    torque = np.array(self.torqueList)
     camera = np.array(self.cameraList)
     omega = np.array(self.omegaList)
     iCoil = np.array(self.iCoilList)
     vCoil = np.array(self.vCoilList)
+
+    maxM = np.max(np.linalg.norm(m, axis=1))
+    m = m / maxM
+
+    maxTorque = np.max(np.linalg.norm(torque, axis=1))
+    torque = torque / maxTorque
 
     ax.quiver(
         [0], [0], [0], [
@@ -273,6 +297,20 @@ class Satellite:
               [z[-1]], colors='m', label='Camera')
     ax.plot3D(x, y, z, 'm')
 
+    x = m[:, 0, 0]
+    y = m[:, 1, 0]
+    z = m[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='orange', label='Magnetic Dipole')
+    ax.plot3D(x, y, z, 'orange', alpha=0.5)
+
+    x = torque[:, 0, 0]
+    y = torque[:, 1, 0]
+    z = torque[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='c', label='Torque')
+    ax.plot3D(x, y, z, 'c', alpha=0.5)
+
     labels = ['x', 'y', 'z']
     colors = ['r', 'g', 'b']
     for i in range(3):
@@ -281,7 +319,7 @@ class Satellite:
       z = rList[:, 2, i]
       ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]],
                 colors=colors[i], label=labels[i])
-      ax.plot3D(x, y, z, colors[i], alpha=0.1)
+      ax.plot3D(x, y, z, colors[i], alpha=0.2)
 
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
@@ -290,7 +328,100 @@ class Satellite:
     ax.set_ylabel('y')
     ax.set_zlabel('z')
     ax.legend()
+    ax.set_title('Global')
 
+    # Local coordinates
+    ax = pyplot.figure().add_subplot(projection='3d')
+
+    targetLocal = []
+    magFieldULocal = []
+    mLocal = []
+    torqueLocal = []
+    for i in range(len(rInvList)):
+      targetLocal.append(rInvList[i] @ self.target)
+      magFieldULocal.append(rInvList[i] @ self.magFieldU)
+      mLocal.append(rInvList[i] @ m[i])
+      torqueLocal.append(rInvList[i] @ torque[i])
+    targetLocal = np.array(targetLocal)
+    magFieldULocal = np.array(magFieldULocal)
+    mLocal = np.array(mLocal)
+    torqueLocal = np.array(torqueLocal)
+
+    x = targetLocal[:, 0, 0]
+    y = targetLocal[:, 1, 0]
+    z = targetLocal[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='y', label='Target')
+    ax.plot3D(x, y, z, 'y')
+
+    x = magFieldULocal[:, 0, 0]
+    y = magFieldULocal[:, 1, 0]
+    z = magFieldULocal[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='k', label='Magnetic Field')
+    ax.plot3D(x, y, z, 'k', alpha=0.5)
+
+    ax.quiver(
+        [0], [0], [0], [
+            self.rCamera[0]], [
+            self.rCamera[1]], [
+            self.rCamera[2]], colors='m', label='Camera')
+
+    x = mLocal[:, 0, 0]
+    y = mLocal[:, 1, 0]
+    z = mLocal[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='orange', label='Magnetic Dipole')
+    ax.plot3D(x, y, z, 'orange', alpha=0.5)
+
+    x = torqueLocal[:, 0, 0]
+    y = torqueLocal[:, 1, 0]
+    z = torqueLocal[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='c', label='Torque')
+    ax.plot3D(x, y, z, 'c', alpha=0.5)
+
+    ax.quiver(
+        [0],
+        [0],
+        [0],
+        [1],
+        [0],
+        [0],
+        colors=colors[0],
+        label=labels[0],
+        alpha=0.2)
+    ax.quiver(
+        [0],
+        [0],
+        [0],
+        [0],
+        [1],
+        [0],
+        colors=colors[1],
+        label=labels[1],
+        alpha=0.2)
+    ax.quiver(
+        [0],
+        [0],
+        [0],
+        [0],
+        [0],
+        [1],
+        colors=colors[2],
+        label=labels[2],
+        alpha=0.2)
+
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    ax.set_zlim(-1, 1)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.legend()
+    ax.set_title('Local')
+
+    # Time domain
     _, subplots = pyplot.subplots(6, 1, sharex=True)
 
     x = omega[:, 0, 0]
@@ -334,10 +465,29 @@ class Satellite:
 
     pyplot.show()
 
-  def controlLoop(self) -> None:
+  def controlLoop(self, t: float) -> None:
     '''!@brief Do ADCS control loop taking in sensor inputs and outputing desired currents
+
+    @param t Time of execution in seconds
     '''
-    self.vCoil = np.array([1, 0, 0]) * self.batteryVoltage
+    if self.lastMagFieldLocal is None:
+      self.lastMagFieldLocal = self.magFieldLocal
+      self.lastT = t
+      return
+    if t == self.lastT:
+      print(f'Encountered no time delta')
+      return
+
+    # bDot = (self.magFieldLocal - self.lastMagFieldLocal) / (t - self.lastT)
+    # bApplied = self.kDot @ bDot
+
+    if t < 5:
+      self.vCoil = np.array([1, 1, 1]) * self.batteryVoltage
+    else:
+      self.vCoil = np.array([0, 0, 0])
+
+    self.lastMagFieldLocal = self.magFieldLocal
+    self.lastT = t
 
 def _runnerSim(*args, **kwargs) -> dict:
   '''!@brief Multithreaded runner to execute simulation and return results
