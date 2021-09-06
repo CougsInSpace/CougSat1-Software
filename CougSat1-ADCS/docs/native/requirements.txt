@@ -1,0 +1,6 @@
+colorama
+matplotlib
+numpy
+numpy_quaternion
+numba
+scipy

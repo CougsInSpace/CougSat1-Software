@@ -12,8 +12,58 @@ import sys
 
 colorama.init(autoreset=True)
 
-def magnetorquer(N, cog: np.array, center: np.array,
-                 edge1: np.array, edge2: np.array) -> Tuple[np.array, np.array]:
+# kg mm^2
+Ixx = 1754.776
+Ixy = 4.906
+Ixz = 8.896
+Iyy = 1788.534
+Iyz = 10.155
+Izz = 1758.399
+# Ixx = 1754
+# Ixy = 0.0
+# Ixz = 0.0
+# Iyy = Ixx
+# Iyz = 0.0
+# Izz = Ixx
+iBody = np.array([[Ixx, Ixy, Ixz],
+                  [Ixy, Iyy, Iyz],
+                  [Ixz, Iyz, Izz]]) / 1e6
+iBodyInv = np.linalg.inv(iBody)
+
+magFieldStrength = 3.5e-5
+
+coilR = 17.808406
+coilL = 0.0112
+coilN = 200
+coilA = 68e-3 * 62e-3
+
+rCamera = np.array([[0, 0, -1]]).T
+
+debugVectorLocal = True
+
+class ADCS:
+  def __init__(self, t: float) -> None:
+    '''!@brief Initialize ADCS control algorithm
+    '''
+    self.lastT = t
+
+  def compute(self, t: float) -> Tuple[np.ndarray, np.ndarray]:
+    '''!@brief Compute ADCS loop given input from sensors
+
+    @param t Current time
+    @return tuple[np.ndarray, np.ndarray] Coil duty cycle, debug vector
+      Coil duty cycle, shape=(3) Duty cycle written to PWM output
+      Debug vector, shape=(3, 1) Vector to plot for debug purposes, None will not plot
+        debugVectorLocal: True assumes vector is in local reference frame, False is global
+    '''
+    dCoil = np.array([1.0, 0.0, 0.0])
+
+    debugVector = np.array([[0.5, 0, 0]]).T
+
+    return dCoil, debugVector
+
+def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
+                 edge1: np.ndarray, edge2: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
   '''!@brief Create a magnetorquer for number of loops and geometry
 
   @param N Number of wire loops
@@ -33,19 +83,12 @@ def magnetorquer(N, cog: np.array, center: np.array,
 
 class Satellite:
 
-  def __init__(self, detumble: float) -> None:
+  def __init__(self, initialOmega: float) -> None:
     '''!@brief Create a Satellite simulation
 
-    @param detumble Initial angular momentum with magnitude gaussian(mu=detumble, sigma=detumble)
+    @param initialOmega Initial angular momentum with magnitude gaussian(mu=initialOmega, sigma=initialOmega)
     '''
     self.batteryVoltage = np.random.uniform(3.3, 4.2)
-
-    self.rCamera = np.array([[0, 0, -1]]).T
-
-    self.coilR = 17.808406
-    self.coilL = 0.0112
-    self.coilN = 200
-    self.coilA = 68e-3 * 62e-3
 
     self.vCoil = np.zeros(3)
     self.iCoil = np.zeros(3)
@@ -53,28 +96,11 @@ class Satellite:
     self.target = np.random.uniform(-1, 1, size=(3, 1))
     self.target = self.target / np.linalg.norm(self.target)
 
-    self.magFieldStrength = 3.5e-5
     self.magFieldU = np.random.uniform(-1, 1, size=(3, 1))
     self.magFieldU = self.magFieldU / np.linalg.norm(self.magFieldU)
-    self.magField = self.magFieldU * self.magFieldStrength
+    self.magField = self.magFieldU * magFieldStrength
 
-    # kg mm^2
-    Ixx = 1754.776
-    Ixy = 4.906
-    Ixz = 8.896
-    Iyy = 1788.534
-    Iyz = 10.155
-    Izz = 1758.399
-    # Ixx = 1754
-    # Ixy = 0.0
-    # Ixz = 0.0
-    # Iyy = Ixx
-    # Iyz = 0.0
-    # Izz = Ixx
-    self.iBody = np.array([[Ixx, Ixy, Ixz],
-                           [Ixy, Iyy, Iyz],
-                           [Ixz, Iyz, Izz]]) / 1e6
-    self.iBodyInv = np.linalg.inv(self.iBody)
+    self.debugVector = np.zeros((3, 1))
 
     # State variables
     self.q = quaternion.from_float_array(np.random.uniform(-1, 1, 4))
@@ -82,8 +108,8 @@ class Satellite:
 
     omega = np.random.uniform(-1, 1, size=(3, 1))
     omega = omega / np.linalg.norm(omega)
-    omega = omega * np.random.normal(detumble, detumble)
-    self.l = self.iBody @ omega
+    omega = omega * np.random.normal(initialOmega, initialOmega)
+    self.l = iBody @ omega
 
     self.loopFreq = 10
 
@@ -101,12 +127,13 @@ class Satellite:
     self.vCoilList = []
     self.pCoilList = []
     self.wCoilList = []
+    self.debugVectorList = []
 
     self.minTStep = 1 / (self.loopFreq * 100)
     self.maxOmega = 100
     self.maxAcceleration = np.deg2rad(50) / 1
     self.maxTorque = np.max(
-      self.iBody @ np.repeat([[self.maxAcceleration]], 3, axis=0))
+      iBody @ np.repeat([[self.maxAcceleration]], 3, axis=0))
     self.maxAngleStep = self.maxOmega * self.minTStep
     self.maxLStep = self.maxTorque * self.minTStep
     self.minTStepReached = False
@@ -114,16 +141,6 @@ class Satellite:
     self.omegaThreshold = np.deg2rad(1) / 1
     self.angleThreshold = np.deg2rad(1)
     self.currentThreshold = 1e-3
-
-    # Loop algorithm
-    self.lastMagFieldLocal = None
-    self.lastT = None
-
-    self.kDot = np.array([
-      [1, 0, 0],
-      [0, 1, 0],
-      [0, 0, 1]
-    ]) * 1e3
 
     self.converged = False
 
@@ -136,14 +153,14 @@ class Satellite:
     # Calculate state vector and derivative
     r = quaternion.as_rotation_matrix(self.q)
     rInv = np.linalg.inv(r)
-    iInv = r @ self.iBodyInv @ r.T
+    iInv = r @ iBodyInv @ r.T
 
     self.magFieldLocal = rInv @ self.magField
 
     mLocal = np.zeros(3)
-    mLocal += self.coilN * self.iCoil[0] * np.array([self.coilA, 0, 0])
-    mLocal += self.coilN * self.iCoil[1] * np.array([0, self.coilA, 0])
-    mLocal += self.coilN * self.iCoil[2] * np.array([0, 0, self.coilA])
+    mLocal += coilN * self.iCoil[0] * np.array([coilA, 0, 0])
+    mLocal += coilN * self.iCoil[1] * np.array([0, coilA, 0])
+    mLocal += coilN * self.iCoil[2] * np.array([0, 0, coilA])
     m = r @ mLocal
     torque = np.cross(m, self.magField.reshape(3)).reshape((3, 1))
     m = m.reshape((3, 1))
@@ -188,8 +205,8 @@ class Satellite:
     self.q = self.q / abs(self.q)
 
     # Replace with exp
-    iCoilLimit = self.vCoil / self.coilR
-    expFactor = np.exp(-tStep * self.coilR / self.coilL)
+    iCoilLimit = self.vCoil / coilR
+    expFactor = np.exp(-tStep * coilR / coilL)
     self.iCoil = self.iCoil * expFactor + iCoilLimit * (1 - expFactor)
 
     self.omegaList.append(omega)
@@ -202,9 +219,10 @@ class Satellite:
     self.vCoilList.append(self.vCoil)
     self.pCoilList.append(pCoil)
     self.wCoilList.append(pCoil * tStep)
+    self.debugVectorList.append(self.debugVector)
 
     # Calculate residuals
-    camera = r @ self.rCamera
+    camera = r @ rCamera
     self.cameraList.append(camera)
 
     cameraNorm = camera / np.linalg.norm(camera)
@@ -233,6 +251,9 @@ class Satellite:
     t = self.__solveODE(tStep)
     self.t.append(t)
     self.tStepList.append(t)
+    
+    adcs = ADCS(t)
+
     n = int(np.ceil(durationMax / tStep))
 
     for i in range(1, n):
@@ -245,7 +266,8 @@ class Satellite:
         self.tStepList.append(dt)
         tRemaining = tTarget - t
 
-      self.controlLoop(t)
+      dCoil, self.debugVector = adcs.compute(t)
+      self.vCoil = dCoil * self.batteryVoltage
       if self.converged:
         break
 
@@ -271,12 +293,29 @@ class Satellite:
     omega = np.array(self.omegaList)
     iCoil = np.array(self.iCoilList)
     vCoil = np.array(self.vCoilList)
+    debugV = np.array(self.debugVectorList)
 
     maxM = np.max(np.linalg.norm(m, axis=1))
     m = m / maxM
 
     maxTorque = np.max(np.linalg.norm(torque, axis=1))
     torque = torque / maxTorque
+
+    maxDebug = np.max(np.linalg.norm(debugV, axis=1))
+    debugV = debugV / maxDebug
+
+    if debugVectorLocal:
+      debugVLocal = debugV
+      debugVGlobal = []
+      for i in range(len(rList)):
+        debugVGlobal.append(rList[i] @ debugV[i])
+      debugVGlobal = np.array(debugVGlobal)
+    else:
+      debugVLocal = []
+      debugVGlobal = debugV
+      for i in range(len(rInvList)):
+        debugVLocal.append(rInvList[i] @ debugV[i])
+      debugVLocal = np.array(debugVLocal)
 
     ax.quiver(
         [0], [0], [0], [
@@ -311,12 +350,20 @@ class Satellite:
               [z[-1]], colors='c', label='Torque')
     ax.plot3D(x, y, z, 'c', alpha=0.5)
 
+    x = debugVGlobal[:, 0, 0]
+    y = debugVGlobal[:, 1, 0]
+    z = debugVGlobal[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='violet', label='Debug Vector')
+    ax.plot3D(x, y, z, 'violet', alpha=0.5)
+
+
     labels = ['x', 'y', 'z']
     colors = ['r', 'g', 'b']
     for i in range(3):
-      x = rList[:, 0, i]
-      y = rList[:, 1, i]
-      z = rList[:, 2, i]
+      x = rList[:, 0, i] * 0.5
+      y = rList[:, 1, i] * 0.5
+      z = rList[:, 2, i] * 0.5
       ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]],
                 colors=colors[i], label=labels[i])
       ax.plot3D(x, y, z, colors[i], alpha=0.2)
@@ -363,9 +410,9 @@ class Satellite:
 
     ax.quiver(
         [0], [0], [0], [
-            self.rCamera[0]], [
-            self.rCamera[1]], [
-            self.rCamera[2]], colors='m', label='Camera')
+            rCamera[0]], [
+            rCamera[1]], [
+            rCamera[2]], colors='m', label='Camera')
 
     x = mLocal[:, 0, 0]
     y = mLocal[:, 1, 0]
@@ -381,11 +428,18 @@ class Satellite:
               [z[-1]], colors='c', label='Torque')
     ax.plot3D(x, y, z, 'c', alpha=0.5)
 
+    x = debugVLocal[:, 0, 0]
+    y = debugVLocal[:, 1, 0]
+    z = debugVLocal[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='violet', label='Debug Vector')
+    ax.plot3D(x, y, z, 'violet', alpha=0.5)
+
     ax.quiver(
         [0],
         [0],
         [0],
-        [1],
+        [0.5],
         [0],
         [0],
         colors=colors[0],
@@ -396,7 +450,7 @@ class Satellite:
         [0],
         [0],
         [0],
-        [1],
+        [0.5],
         [0],
         colors=colors[1],
         label=labels[1],
@@ -407,7 +461,7 @@ class Satellite:
         [0],
         [0],
         [0],
-        [1],
+        [0.5],
         colors=colors[2],
         label=labels[2],
         alpha=0.2)
@@ -465,30 +519,6 @@ class Satellite:
 
     pyplot.show()
 
-  def controlLoop(self, t: float) -> None:
-    '''!@brief Do ADCS control loop taking in sensor inputs and outputing desired currents
-
-    @param t Time of execution in seconds
-    '''
-    if self.lastMagFieldLocal is None:
-      self.lastMagFieldLocal = self.magFieldLocal
-      self.lastT = t
-      return
-    if t == self.lastT:
-      print(f'Encountered no time delta')
-      return
-
-    # bDot = (self.magFieldLocal - self.lastMagFieldLocal) / (t - self.lastT)
-    # bApplied = self.kDot @ bDot
-
-    if t < 5:
-      self.vCoil = np.array([1, 1, 1]) * self.batteryVoltage
-    else:
-      self.vCoil = np.array([0, 0, 0])
-
-    self.lastMagFieldLocal = self.magFieldLocal
-    self.lastT = t
-
 def _runnerSim(*args, **kwargs) -> dict:
   '''!@brief Multithreaded runner to execute simulation and return results
 
@@ -513,22 +543,22 @@ def main():
       help='Number of threads to use for monte carlo simulation',
       default=cpu_count())
   parser.add_argument(
-      '--detumble',
+      '--initial_omega', '-w',
       default=0,
-      help='Initialize angular momentum with random value up to --detumble rad/s')
+      help='Initialize angular momentum with random value up to --initial_omega rad/s')
 
   args = parser.parse_args(sys.argv[1:])
 
-  args.detumble = float(args.detumble)
+  args.initial_omega = float(args.initial_omega)
   args.j = max(1, int(args.j))
+
+  kwargs = {
+    'initialOmega': args.initial_omega
+  }
 
   if args.monte_carlo:
     args.n = int(args.n)
     digits = int(np.ceil(np.log10(args.n)))
-
-    kwargs = {
-      'detumble': args.detumble
-    }
 
     converged = []
     timeToConvergence = []
@@ -574,7 +604,7 @@ def main():
 
   else:
     start = datetime.datetime.now()
-    sim = Satellite(detumble=args.detumble)
+    sim = Satellite(**kwargs)
     results = sim.run()
     if results['converged']:
       print(
