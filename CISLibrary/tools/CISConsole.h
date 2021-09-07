@@ -59,10 +59,13 @@ private:
 #ifndef NDEBUG
 #define LOGD(o, args...)                                                       \
   {                                                                            \
+    core_util_critical_section_enter();                                        \
     SWO_Channel * swo = SWOSingleton::Instance()->get();                       \
     swo->printf("[%07lu][Debug] %-10s: ", HAL_GetTick(), o);                   \
     swo->printf(args);                                                         \
     swo->putc('\n');                                                           \
+    wait_us(1000);                                                             \
+    core_util_critical_section_exit();                                         \
   }
 #else
 #define LOGD(o, ...)                                                           \
@@ -78,10 +81,13 @@ private:
 #ifndef NLOG
 #define LOG(o, args...)                                                        \
   {                                                                            \
+    core_util_critical_section_enter();                                        \
     SWO_Channel * swo = SWOSingleton::Instance()->get();                       \
     swo->printf("[%07lu][ Log ] %-10s: ", HAL_GetTick(), o);                   \
     swo->printf(args);                                                         \
     swo->putc('\n');                                                           \
+    wait_us(1000);                                                             \
+    core_util_critical_section_exit();                                         \
   }
 #else
 #define LOG(o, ...)                                                            \
@@ -97,10 +103,13 @@ private:
 #ifndef NERROR
 #define LOGE(o, args...)                                                       \
   {                                                                            \
+    core_util_critical_section_enter();                                        \
     SWO_Channel * swo = SWOSingleton::Instance()->get();                       \
     swo->printf("[%07lu][Error] %-10s: ", HAL_GetTick(), o);                   \
     swo->printf(args);                                                         \
     swo->putc('\n');                                                           \
+    wait_us(1000);                                                             \
+    core_util_critical_section_exit();                                         \
   }
 #else
 #define LOGE(o, ...)                                                           \

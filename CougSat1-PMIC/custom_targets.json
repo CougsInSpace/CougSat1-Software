@@ -11,8 +11,12 @@
     "config": {
       "clock_source": {
         "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
-        "value": "USE_PLL_MSI",
+        "value": "USE_PLL_HSE_XTAL | USE_PLL_HSI | USE_PLL_MSI",
         "macro_name": "CLOCK_SOURCE"
+      },
+      "hse_value": {
+        "value": "8000000",
+        "macro_name": "HSE_VALUE"
       },
       "lpticker_lptim": {
         "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
