@@ -68,7 +68,7 @@ def earthRadius(latitude: float) -> float:
   R2 = EARTH_B
 
   return np.sqrt(((R1**2 * np.cos(rad))**2 + (R2**2 * np.sin(rad))
-                 ** 2) / ((R1 * np.cos(rad))**2 + (R2 * np.sin(rad))**2))
+                  ** 2) / ((R1 * np.cos(rad))**2 + (R2 * np.sin(rad))**2))
 
 def geo2ECEF(longitude: float, latitude: float, altitude: float) -> np.ndarray:
   '''!@brief Convert geodetic coordinates to Earth-Centered, Earth-Fixed coordinates (XYZ)
@@ -204,6 +204,94 @@ def interpolateWMM(long: float, lat: float) -> np.ndarray:
   f = (1 - rLat) * fLat0 + rLat * fLat1
   return f
 
+def crossProductMatrix(vector: np.ndarray) -> np.ndarray:
+  '''!@brief Return the skew-symmetric cross-product matrix
+
+  v = [x, y, z]
+  m = [[ 0, -z,  y],
+       [ z,  0, -x],
+       [-y,  x,  0]]
+
+  @param vector Input vector
+  @param np.ndarray Matrix in the form described above
+  '''
+  vector = vector.flatten()
+  return np.array([[0, -vector[2], vector[1]],
+                   [vector[2], 0, -vector[0]],
+                   [-vector[1], vector[0], 0]])
+
+def rotMatrix1(a: np.ndarray, aT: np.ndarray) -> np.ndarray:
+  '''!@brief Determine the rotation matrix that satisfies the transformation from a to aT
+
+  Assumes rotation vector is perpendicular to a and aT and rotation is positive
+
+  @param a Input vector initial state
+  @param aT Input vector transformed state
+  @return np.ndarray Transformation matrix from vFrom to vTo
+  '''
+  a = a.flatten() / np.linalg.norm(a)
+  aT = aT.flatten() / np.linalg.norm(aT)
+
+  v = np.cross(a, aT)
+  vm = crossProductMatrix(v)
+  # s = np.linspace.norm(v) # sine of angle
+  c = np.dot(a, aT)  # cosine of angle
+
+  return np.identity(3) + vm + vm @ vm / (1 + c)
+
+def rotMatrix2(a: np.ndarray, aT: np.ndarray, b: np.ndarray, bT: np.ndarray):
+  '''!@brief Determine the rotation matrix that satisfies the transformation from a to aT and b to bT
+
+  Assumes rotation is unconstrained
+
+  @param a Vector A initial state
+  @param aT Vector A transformed state
+  @param b Vector B initial state
+  @param bT Vector B transformed state
+  @return np.ndarray Transformation matrix
+  '''
+  a = a.flatten()
+  aT = aT.flatten()
+  b = b.flatten()
+  bT = bT.flatten()
+
+  # The rotation axis lies on the plane with normal = delta
+  aDelta = aT - a
+  bDelta = bT - b
+
+  # Intersection of planes is perpendicular to both normals
+  k = np.cross(aDelta, bDelta)
+
+  return rotMatrix3(a, aT, b, bT, k, k)
+
+def rotMatrix3(a: np.ndarray, aT: np.ndarray, b: np.ndarray,
+               bT: np.ndarray, c: np.ndarray, cT: np.ndarray):
+  '''!@brief Determine the rotation matrix that satisfies the transformation from a to aT, b to bT, and c to cT
+
+  @param a Vector A initial state
+  @param aT Vector A transformed state
+  @param b Vector B initial state
+  @param bT Vector B transformed state
+  @param c Vector C initial state
+  @param cT Vector C transformed state
+  @return np.ndarray Transformation matrix
+  '''
+  a = a.flatten()
+  aT = aT.flatten()
+  b = b.flatten()
+  bT = bT.flatten()
+  c = c.flatten()
+  cT = cT.flatten()
+
+  # Solve aT = R @ a, bT = R @ a, cT = R @ c
+  out = np.array([aT, bT, cT]).T
+  vectorInv = np.linalg.inv([a, b, c])
+  r = np.zeros((3, 3))
+  r[0] = (vectorInv @ out[0].reshape((3, 1))).reshape(3)
+  r[1] = (vectorInv @ out[1].reshape((3, 1))).reshape(3)
+  r[2] = (vectorInv @ out[2].reshape((3, 1))).reshape(3)
+  return r
+
 
 orb = Orbital(
   "ISS",
@@ -221,6 +309,9 @@ class ADCS:
     @param mag Sensor output of magnetometer, vector of mag field
     @param gravity Sensor output of accelerometer, vector of gravity field (normalized)
     '''
+    mag = mag / np.linalg.norm(mag)
+    gravity = gravity / np.linalg.norm(gravity)
+
     if geoTarget is not None:
       self.ecefTarget = geo2ECEF(geoTarget[0], geoTarget[1], geoTarget[2])
     else:
@@ -244,14 +335,26 @@ class ADCS:
     @param t Current time
     @param gps Geodetic coordinates from GPS (long, lat, alt)
     @param mag Sensor output of magnetometer, vector of mag field
-    @param gravity Sensor output of accelerometer, vector of gravity field (normalized)
+    @param gravity Sensor output of accelerometer, vector of gravity field
     @return tuple[np.ndarray, np.ndarray] Coil duty cycle, debug vector
       Coil duty cycle, shape=(3) Duty cycle written to PWM output
       Debug vector, shape=(3, 1) Vector to plot for debug purposes, None will not plot
         debugVectorLocal: True assumes vector is in local reference frame, False is global
     '''
+    mag = mag / np.linalg.norm(mag)
+    gravity = gravity / np.linalg.norm(gravity)
+    tStep = t - self.lastT
+
     # Step 1: Determine attitude from gps, magnetometer, and accelerometer
-    # TODO
+    gravityG = geo2ECEF(gps[0], gps[1], gps[2])
+    gravityG = -gravityG / np.linalg.norm(gravityG)
+
+    magG = interpolateWMM(gps[0], gps[1])
+    magG = magG / np.linalg.norm(magG)
+
+    rInv = rotMatrix2(magG, mag, gravityG, gravity)
+    # local = rInv @ global
+    debugVector = rInv @ gravityG
 
     # Step 2: Determine current angular velocity
     # TODO
@@ -266,7 +369,6 @@ class ADCS:
     # TODO
 
     dCoil = np.array([0.0, 0.0, 0.0])
-    debugVector = mag
 
     self.lastT = t
     self.lastGPS = gps
@@ -381,6 +483,7 @@ class Satellite:
     self.cameraList = []
     self.debugVectorList = []
     self.angleErrorList = []
+    self.targetOmegaList = []
 
     # ODE Euler's method limits
     self.minTStep = 1 / (self.loopFreq * 100)
@@ -391,6 +494,9 @@ class Satellite:
       self.realIBody @ np.repeat([[self.maxAcceleration]], 3, axis=0))
     self.maxLStep = self.maxTorque * self.minTStep
     self.minTStepReached = False
+
+    self.lastAngleError = None
+    self.lastTStep = None
 
     # Convergence thresholds
     self.omegaThreshold = np.deg2rad(1) / 1
@@ -459,7 +565,6 @@ class Satellite:
       cameraNorm = camera / np.linalg.norm(camera)
       dotP = np.sum(cameraNorm * targetDelta)
       angleError = np.arccos(np.clip(dotP, -1.0, 1.0))
-      self.angleErrorList.append(angleError)
     else:
       angleError = 0
 
@@ -470,6 +575,7 @@ class Satellite:
 
     # Save derivatives
     self.omegaList.append(omega)
+    self.angleErrorList.append(angleError)
 
     # Determine appropriate tStep
     tStep = duration
@@ -507,8 +613,16 @@ class Satellite:
 
     currentAbs = np.linalg.norm(self.iCoil)
 
+    if (self.ecefTarget is not None) and (self.lastAngleError is not None):
+      targetOmega = (angleError - self.lastAngleError) / self.lastTStep
+    else:
+      targetOmega = omegaQAbs
+    self.targetOmegaList.append(targetOmega)
+    self.lastAngleError = angleError
+    self.lastTStep = tStep
+
     self.converged = True
-    if omegaQAbs > self.omegaThreshold:
+    if targetOmega > self.omegaThreshold:
       self.converged = False
     if angleError > self.angleThreshold:
       self.converged = False
@@ -536,7 +650,6 @@ class Satellite:
         np.random.normal(1, self.sigma, size=(3, 1))
     accelerometer = self.gravityLocal * \
         np.random.normal(1, self.sigma, size=(3, 1))
-    accelerometer = accelerometer / np.linalg.norm(accelerometer)
     adcs = ADCS(self.geoTarget, t, gps, magnetometer, accelerometer)
 
     n = int(np.ceil(durationMax / tStep))
@@ -560,7 +673,6 @@ class Satellite:
           np.random.normal(1, self.sigma, size=(3, 1))
       accelerometer = self.gravityLocal * \
           np.random.normal(1, self.sigma, size=(3, 1))
-      accelerometer = accelerometer / np.linalg.norm(accelerometer)
       dCoil, self.debugVector = adcs.compute(
         t, gps, magnetometer, accelerometer)
       dCoil = np.clip(dCoil, -1, 1)
@@ -581,6 +693,7 @@ class Satellite:
     self.pCoilList = np.array(self.pCoilList)
     self.cameraList = np.array(self.cameraList)
     self.angleErrorList = np.array(self.angleErrorList)
+    self.targetOmegaList = np.array(self.targetOmegaList)
 
     totalEnergy = sum(self.pCoilList * self.tStepList)
 
@@ -928,6 +1041,7 @@ class Satellite:
     subplots[3].set_ylabel('W')
 
     subplots[4].plot(self.t, self.angleErrorList, 'b')
+    subplots[4].plot(self.t, self.targetOmegaList, 'm')
     subplots[4].set_title('Target Error')
     subplots[4].axhline(y=0, color='k')
     subplots[4].set_ylabel('rad')
@@ -952,7 +1066,7 @@ class Satellite:
 
     norm = np.max(np.linalg.norm(self.torqueList, axis=1))
     if norm != 0:
-      self.torqueList =  self.torqueList / norm
+      self.torqueList = self.torqueList / norm
 
     self.__plotOrbit()
     self.__plotGlobal()
