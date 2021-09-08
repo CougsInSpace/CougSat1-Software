@@ -39,8 +39,6 @@ iBody = np.array([[Ixx, Ixy, Ixz],
                   [Ixz, Iyz, Izz]]) / 1e6
 iBodyInv = np.linalg.inv(iBody)
 
-magFieldStrength = 3.5e-5
-
 coilR = 17.808406
 coilL = 0.0112
 coilN = 200
@@ -54,7 +52,7 @@ debugVectorNorm = True
 EARTH_A = 6378.137
 EARTH_B = 6356.752
 
-GEO_FACTOR = 1e3
+GEO_FACTOR = 1e-3
 ALT_FACTOR = 1e4
 
 def earthRadius(latitude: float) -> float:
@@ -233,16 +231,15 @@ def rotMatrix1(a: np.ndarray, aT: np.ndarray) -> np.ndarray:
   aT = aT.flatten() / np.linalg.norm(aT)
 
   v = np.cross(a, aT)
+  s = np.linalg.norm(v)  # sine of angle
+  v = v / s
   vm = crossProductMatrix(v)
-  # s = np.linspace.norm(v) # sine of angle
   c = np.dot(a, aT)  # cosine of angle
 
-  return np.identity(3) + vm + vm @ vm / (1 + c)
+  return np.identity(3) + s * vm + (1 - c) * vm @ vm
 
 def rotMatrix2(a: np.ndarray, aT: np.ndarray, b: np.ndarray, bT: np.ndarray):
   '''!@brief Determine the rotation matrix that satisfies the transformation from a to aT and b to bT
-
-  Assumes rotation is unconstrained
 
   @param a Vector A initial state
   @param aT Vector A transformed state
@@ -261,6 +258,8 @@ def rotMatrix2(a: np.ndarray, aT: np.ndarray, b: np.ndarray, bT: np.ndarray):
 
   # Intersection of planes is perpendicular to both normals
   k = np.cross(aDelta, bDelta)
+  if k.all() == 0:
+    return None
 
   return rotMatrix3(a, aT, b, bT, k, k)
 
@@ -353,6 +352,11 @@ class ADCS:
     magG = magG / np.linalg.norm(magG)
 
     rInv = rotMatrix2(magG, mag, gravityG, gravity)
+    if rInv is None:
+      # Cannot determine attitude, don't act
+      dCoil = np.array([0.0, 0.0, 0.0])
+      return dCoil, np.zeros((3, 1))
+
     # local = rInv @ global
     debugVector = rInv @ gravityG
 
@@ -476,6 +480,7 @@ class Satellite:
     self.mList = []
     self.torqueList = []
     self.targetList = []
+    self.targetOmegaList = []
     self.iCoilList = []
     self.vCoilList = []
     self.pCoilList = []
@@ -483,7 +488,7 @@ class Satellite:
     self.cameraList = []
     self.debugVectorList = []
     self.angleErrorList = []
-    self.targetOmegaList = []
+    self.omegaErrorList = []
 
     # ODE Euler's method limits
     self.minTStep = 1 / (self.loopFreq * 100)
@@ -495,7 +500,7 @@ class Satellite:
     self.maxLStep = self.maxTorque * self.minTStep
     self.minTStepReached = False
 
-    self.lastAngleError = None
+    self.lastDeltaTarget = None
     self.lastTStep = None
 
     # Convergence thresholds
@@ -553,25 +558,41 @@ class Satellite:
     self.pCoilList.append(pCoil)
     self.debugVectorList.append(self.debugVector)
 
+    # Calculate derivatives
+    omega = iInv @ self.l
+    omegaQ = quaternion.from_vector_part(omega, 0)[0]
+    qDot = 0.5 * omegaQ * self.q
+
     if self.ecefTarget is not None:
       ecef = geo2ECEF(self.geo[0], self.geo[1], self.geo[2])
-      targetDelta = self.ecefTarget - ecef
-      targetDelta = targetDelta / np.linalg.norm(targetDelta)
-      self.targetList.append(targetDelta)
+      deltaTarget = self.ecefTarget - ecef
+      deltaTarget = deltaTarget / np.linalg.norm(deltaTarget)
+      self.targetList.append(deltaTarget)
+
+      if self.lastDeltaTarget is not None:
+        targetOmegaV = np.cross(self.lastDeltaTarget, deltaTarget.reshape(3))
+        norm = np.linalg.norm(targetOmegaV)
+        targetOmega = np.arcsin(norm) / self.lastTStep
+        targetOmegaV = targetOmegaV.reshape((3, 1)) / norm * targetOmega
+        omegaError = np.linalg.norm(omega - targetOmegaV)
+        self.targetOmegaList.append(targetOmegaV)
+      else:
+        targetOmega = None
+        targetOmegaV = None
+        omegaError = None
+        self.targetOmegaList.append(np.zeros((3, 1)))
 
       camera = r @ rCamera
       self.cameraList.append(camera)
 
       cameraNorm = camera / np.linalg.norm(camera)
-      dotP = np.sum(cameraNorm * targetDelta)
+      dotP = np.sum(cameraNorm * deltaTarget)
       angleError = np.arccos(np.clip(dotP, -1.0, 1.0))
-    else:
-      angleError = 0
 
-    # Calculate derivatives
-    omega = iInv @ self.l
-    omegaQ = quaternion.from_vector_part(omega, 0)[0]
-    qDot = 0.5 * omegaQ * self.q
+      self.lastDeltaTarget = deltaTarget.reshape(3)
+    else:
+      omegaError = None
+      angleError = 0
 
     # Save derivatives
     self.omegaList.append(omega)
@@ -590,7 +611,7 @@ class Satellite:
           print(
             f'{Fore.RED} tStep has reached minimum value with torque = {torqueAbs} Nm')
           self.minTStepReached = True
-    omegaQAbs = abs(omegaQ)
+    omegaQAbs = abs(omegaQ.w)
     if omegaQAbs != 0:
       suggestTStep = self.maxAngleStep / omegaQAbs
       tStep = min(tStep, suggestTStep)
@@ -613,16 +634,14 @@ class Satellite:
 
     currentAbs = np.linalg.norm(self.iCoil)
 
-    if (self.ecefTarget is not None) and (self.lastAngleError is not None):
-      targetOmega = (angleError - self.lastAngleError) / self.lastTStep
-    else:
-      targetOmega = omegaQAbs
-    self.targetOmegaList.append(targetOmega)
-    self.lastAngleError = angleError
+    if omegaError is None:
+      omegaError = omegaQAbs
+
+    self.omegaErrorList.append(omegaError)
     self.lastTStep = tStep
 
     self.converged = True
-    if targetOmega > self.omegaThreshold:
+    if omegaError > self.omegaThreshold:
       self.converged = False
     if angleError > self.angleThreshold:
       self.converged = False
@@ -687,13 +706,14 @@ class Satellite:
     self.mList = np.array(self.mList)
     self.torqueList = np.array(self.torqueList)
     self.targetList = np.array(self.targetList)
+    self.targetOmegaList = np.array(self.targetOmegaList)
     self.omegaList = np.array(self.omegaList)
     self.iCoilList = np.array(self.iCoilList)
     self.vCoilList = np.array(self.vCoilList)
     self.pCoilList = np.array(self.pCoilList)
     self.cameraList = np.array(self.cameraList)
     self.angleErrorList = np.array(self.angleErrorList)
-    self.targetOmegaList = np.array(self.targetOmegaList)
+    self.omegaErrorList = np.array(self.omegaErrorList)
 
     totalEnergy = sum(self.pCoilList * self.tStepList)
 
@@ -847,6 +867,13 @@ class Satellite:
               [z[-1]], colors='grey', label='Omega')
     ax.plot3D(x, y, z, 'grey', alpha=0.5)
 
+    x = self.targetOmegaList[:, 0, 0]
+    y = self.targetOmegaList[:, 1, 0]
+    z = self.targetOmegaList[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='deeppink', label='Target Omega')
+    ax.plot3D(x, y, z, 'deeppink', alpha=0.5)
+
     if self.geoTarget is not None:
       x = self.targetList[:, 0, 0]
       y = self.targetList[:, 1, 0]
@@ -906,17 +933,20 @@ class Satellite:
     torque = []
     gravity = []
     omega = []
+    targetOmega = []
     for i in range(len(self.rList)):
       magFieldU.append(self.rInvList[i] @ self.magFieldUList[i])
       magDipole.append(self.rInvList[i] @ self.mList[i])
       torque.append(self.rInvList[i] @ self.torqueList[i])
       gravity.append(self.rInvList[i] @ self.gravityList[i])
       omega.append(self.rInvList[i] @ self.omegaList[i])
+      targetOmega.append(self.rInvList[i] @ self.targetOmegaList[i])
     magFieldU = np.array(magFieldU)
     magDipole = np.array(magDipole)
     torque = np.array(torque)
     gravity = np.array(gravity)
     omega = np.array(omega)
+    targetOmega = np.array(targetOmega)
 
     norm = np.max(np.linalg.norm(omega, axis=1))
     if norm != 0:
@@ -949,6 +979,13 @@ class Satellite:
     ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
               [z[-1]], colors='grey', label='Omega')
     ax.plot3D(x, y, z, 'grey', alpha=0.5)
+
+    x = targetOmega[:, 0, 0]
+    y = targetOmega[:, 1, 0]
+    z = targetOmega[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='deeppink', label='Target Omega')
+    ax.plot3D(x, y, z, 'deeppink', alpha=0.5)
 
     if self.geoTarget is not None:
       targetList = []
@@ -1041,10 +1078,12 @@ class Satellite:
     subplots[3].set_ylabel('W')
 
     subplots[4].plot(self.t, self.angleErrorList, 'b')
-    subplots[4].plot(self.t, self.targetOmegaList, 'm')
+    secAx = subplots[4].twinx()
+    secAx.plot(self.t, self.omegaErrorList, 'm')
     subplots[4].set_title('Target Error')
     subplots[4].axhline(y=0, color='k')
     subplots[4].set_ylabel('rad')
+    secAx.set_ylabel('rad/s')
 
     subplots[5].plot(self.t, self.tStepList, 'b')
     subplots[5].set_title('tStep')
@@ -1067,6 +1106,10 @@ class Satellite:
     norm = np.max(np.linalg.norm(self.torqueList, axis=1))
     if norm != 0:
       self.torqueList = self.torqueList / norm
+
+    norm = np.max(np.linalg.norm(self.targetOmegaList, axis=1))
+    if norm != 0:
+      self.targetOmegaList = self.targetOmegaList / norm
 
     self.__plotOrbit()
     self.__plotGlobal()
