@@ -1,3 +1,12 @@
+import sys
+if sys.version_info[0] < 3:
+  raise Exception('Min python version 3.8')
+if sys.version_info[1] < 8:
+  raise Exception('Min python version 3.8')
+if sys.version_info[1] < 9:
+  from typing import Tuple
+  tuple = Tuple
+
 from argparse import ArgumentParser
 import colorama
 from colorama import Fore
@@ -9,7 +18,6 @@ import numpy as np
 import os
 from pyorbital.orbital import Orbital
 import quaternion
-import sys
 
 colorama.init(autoreset=True)
 
@@ -46,6 +54,9 @@ debugVectorNorm = True
 EARTH_A = 6378.137
 EARTH_B = 6356.752
 
+GEO_FACTOR = 1e3
+ALT_FACTOR = 1e4
+
 def earthRadius(latitude: float) -> float:
   '''!@brief Calculate the radius of Earth for a given latitude (at sea level)
 
@@ -79,7 +90,7 @@ def geo2ECEF(longitude: float, latitude: float, altitude: float) -> np.ndarray:
   z = (EARTH_B**2 / EARTH_A**2 * N + altitude) * np.sin(latitude)
   return np.array([[x], [y], [z]])
 
-def loadWMM(plot: bool = False) -> tuple[np.ndarray, float]:
+def loadWMM(plot: bool = False) -> np.ndarray:
   '''!@brief Load World Magnetic Model from files in folder WMM
 
   Data downloaded from https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml#igrfgrid
@@ -89,8 +100,13 @@ def loadWMM(plot: bool = False) -> tuple[np.ndarray, float]:
     np.ndarray(long, lat) = field vector in global XYZ coordinates
     altitude of model in km
   '''
+  cache = os.path.join('WMM', 'cache.npy')
+  if os.path.exists(cache):
+    return np.load(cache)
   raw = np.zeros((360, 180, 3))
   for path in os.listdir('WMM'):
+    if not path.endswith('.json'):
+      continue
     with open(os.path.join('WMM', path), 'r') as file:
       data = json.load(file)['result']
     for d in data:
@@ -156,11 +172,12 @@ def loadWMM(plot: bool = False) -> tuple[np.ndarray, float]:
     ax.set_title('World Magnetic Model')
 
     pyplot.show()
-  return model, altitude
+
+  np.save(cache, model)
+  return model
 
 
 wmm = None
-wmmAlt = None
 
 def interpolateWMM(long: float, lat: float) -> np.ndarray:
   '''!@brief Estimate the field strength at sub degree resolution using bilinear interpolation
@@ -171,8 +188,7 @@ def interpolateWMM(long: float, lat: float) -> np.ndarray:
   '''
   global wmm
   if wmm is None:
-    global wmmAlt
-    wmm, wmmAlt = loadWMM()
+    wmm = loadWMM()
   long = long % 360
   lat = lat % 180
   iLong0 = int(np.floor(long))
@@ -249,8 +265,8 @@ class ADCS:
     # Step 5: Transform output magnetic dipole to coil duty cycles
     # TODO
 
-    dCoil = np.array([1.0, 0.0, 0.0])
-    debugVector = np.zeros((3, 1))
+    dCoil = np.array([0.0, 0.0, 0.0])
+    debugVector = mag
 
     self.lastT = t
     self.lastGPS = gps
@@ -281,15 +297,21 @@ def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
 class Satellite:
 
   def __init__(self, detumble: bool = False,
-               initialOmega: float = 0.1, static: bool = False) -> None:
+               initialOmega: float = 0.1, static: bool = False, sigma: float = 0.1) -> None:
     '''!@brief Create a Satellite simulation
 
     @param detumble True will not generate a target (pass None to ADCS.__init__)
     @param initialOmega Initial angular momentum with magnitude gaussian(mu=initialOmega, sigma=initialOmega/2)
     @param static True will remain stationary, linear momentum = 0
+    @param sigma Standard deviation to add to sensor measurements and other parameters
     '''
     # Initial configuration
     self.static = static
+    self.sigma = sigma
+
+    # Add variations
+    self.realIBody = iBody * np.random.normal(1, sigma, size=(3, 3))
+    self.realIBodyInv = np.linalg.inv(self.realIBody)
 
     self.batteryVoltage = np.random.uniform(3.3, 4.2)
 
@@ -317,7 +339,8 @@ class Satellite:
       'batteryVoltage': self.batteryVoltage,
       'initialOmega': initialOmega,
       'startTime': self.startDatetime,
-      'target': self.geoTarget
+      'target': self.geoTarget,
+      'sigma': self.sigma
     }
 
     # ODE state variables
@@ -333,7 +356,7 @@ class Satellite:
     omega = np.random.uniform(-1, 1, size=(3, 1))
     omega = omega / np.linalg.norm(omega)
     omega = omega * np.random.normal(initialOmega, initialOmega / 2)
-    self.l = iBody @ omega
+    self.l = self.realIBody @ omega
 
     self.loopFreq = 10
 
@@ -365,7 +388,7 @@ class Satellite:
     self.maxAngleStep = self.maxOmega * self.minTStep
     self.maxAcceleration = np.deg2rad(50) / 1
     self.maxTorque = np.max(
-      iBody @ np.repeat([[self.maxAcceleration]], 3, axis=0))
+      self.realIBody @ np.repeat([[self.maxAcceleration]], 3, axis=0))
     self.maxLStep = self.maxTorque * self.minTStep
     self.minTStepReached = False
 
@@ -386,7 +409,7 @@ class Satellite:
     # Calculate current state
     r = quaternion.as_rotation_matrix(self.q)
     rInv = np.linalg.inv(r)
-    iInv = r @ iBodyInv @ r.T
+    iInv = r @ self.realIBodyInv @ r.T
 
     if not self.static:
       realTime = self.startDatetime + datetime.timedelta(seconds=t)
@@ -505,12 +528,16 @@ class Satellite:
     self.t.append(t)
     self.tStepList.append(t)
 
-    adcs = ADCS(
-        self.geoTarget,
-        t,
-        self.geo,
-        self.magFieldLocal,
-        self.gravityLocal)
+    gps = np.zeros(3)
+    gps[0] = self.geo[0] + np.random.normal(0, self.sigma * GEO_FACTOR)
+    gps[1] = self.geo[1] + np.random.normal(0, self.sigma * GEO_FACTOR)
+    gps[2] = self.geo[2] + np.random.normal(0, self.sigma * ALT_FACTOR)
+    magnetometer = self.magFieldLocal * \
+        np.random.normal(1, self.sigma, size=(3, 1))
+    accelerometer = self.gravityLocal * \
+        np.random.normal(1, self.sigma, size=(3, 1))
+    accelerometer = accelerometer / np.linalg.norm(accelerometer)
+    adcs = ADCS(self.geoTarget, t, gps, magnetometer, accelerometer)
 
     n = int(np.ceil(durationMax / tStep))
 
@@ -524,8 +551,18 @@ class Satellite:
         self.tStepList.append(dt)
         tRemaining = tTarget - t
 
+      # Get sensor output (add noise)
+      gps = np.zeros(3)
+      gps[0] = self.geo[0] + np.random.normal(0, self.sigma * GEO_FACTOR)
+      gps[1] = self.geo[1] + np.random.normal(0, self.sigma * GEO_FACTOR)
+      gps[2] = self.geo[2] + np.random.normal(0, self.sigma * ALT_FACTOR)
+      magnetometer = self.magFieldLocal * \
+          np.random.normal(1, self.sigma, size=(3, 1))
+      accelerometer = self.gravityLocal * \
+          np.random.normal(1, self.sigma, size=(3, 1))
+      accelerometer = accelerometer / np.linalg.norm(accelerometer)
       dCoil, self.debugVector = adcs.compute(
-          t, self.geo, self.magFieldLocal, self.gravityLocal)
+        t, gps, magnetometer, accelerometer)
       dCoil = np.clip(dCoil, -1, 1)
       self.vCoil = dCoil * self.batteryVoltage
       if self.converged:
@@ -685,6 +722,18 @@ class Satellite:
               [z[-1]], colors='tab:brown', label='Torque')
     ax.plot3D(x, y, z, 'tab:brown', alpha=0.5)
 
+    norm = np.max(np.linalg.norm(self.omegaList, axis=1))
+    if norm == 0:
+      norm = 1
+    omega = self.omegaList / norm
+
+    x = omega[:, 0, 0]
+    y = omega[:, 1, 0]
+    z = omega[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='grey', label='Omega')
+    ax.plot3D(x, y, z, 'grey', alpha=0.5)
+
     if self.geoTarget is not None:
       x = self.targetList[:, 0, 0]
       y = self.targetList[:, 1, 0]
@@ -743,15 +792,22 @@ class Satellite:
     magDipole = []
     torque = []
     gravity = []
+    omega = []
     for i in range(len(self.rList)):
       magFieldU.append(self.rInvList[i] @ self.magFieldUList[i])
       magDipole.append(self.rInvList[i] @ self.mList[i])
       torque.append(self.rInvList[i] @ self.torqueList[i])
       gravity.append(self.rInvList[i] @ self.gravityList[i])
+      omega.append(self.rInvList[i] @ self.omegaList[i])
     magFieldU = np.array(magFieldU)
     magDipole = np.array(magDipole)
     torque = np.array(torque)
     gravity = np.array(gravity)
+    omega = np.array(omega)
+
+    norm = np.max(np.linalg.norm(omega, axis=1))
+    if norm != 0:
+      omega = omega / norm
 
     x = magFieldU[:, 0, 0]
     y = magFieldU[:, 1, 0]
@@ -773,6 +829,13 @@ class Satellite:
     ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
               [z[-1]], colors='tab:brown', label='Torque')
     ax.plot3D(x, y, z, 'tab:brown', alpha=0.5)
+
+    x = omega[:, 0, 0]
+    y = omega[:, 1, 0]
+    z = omega[:, 2, 0]
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
+              [z[-1]], colors='grey', label='Omega')
+    ax.plot3D(x, y, z, 'grey', alpha=0.5)
 
     if self.geoTarget is not None:
       targetList = []
@@ -884,10 +947,12 @@ class Satellite:
         self.debugVectorList = self.debugVectorList / norm
 
     norm = np.max(np.linalg.norm(self.mList, axis=1))
-    self.mList = self.mList / norm
+    if norm != 0:
+      self.mList = self.mList / norm
 
     norm = np.max(np.linalg.norm(self.torqueList, axis=1))
-    self.torqueList = self.torqueList / norm
+    if norm != 0:
+      self.torqueList =  self.torqueList / norm
 
     self.__plotOrbit()
     self.__plotGlobal()
@@ -929,6 +994,10 @@ def main():
       default=0,
       help='Initialize angular momentum with random value up to --initial_omega rad/s')
   parser.add_argument(
+      '--sigma', '-s',
+      default=0.01,
+      help='Add gaussian noise to sensor input by multiplying by gaussian(mu=1, sigma=[s])')
+  parser.add_argument(
       '--static',
       action='store_true',
       default=False,
@@ -937,12 +1006,14 @@ def main():
   args = parser.parse_args(sys.argv[1:])
 
   args.initial_omega = float(args.initial_omega)
+  args.sigma = float(args.sigma)
   args.j = max(1, int(args.j))
 
   kwargs = {
     'detumble': args.detumble,
     'initialOmega': args.initial_omega,
-    'static': args.static
+    'static': args.static,
+    'sigma': args.sigma
   }
 
   if args.monte_carlo:
@@ -991,7 +1062,8 @@ def main():
     print(f'Total Energy  {np.average(totalEnergy):6.2f}J')
     speed = simDuration / irlDuration
     print(f'Sim speed     {speed:6.2f}s/s')
-    # TODO add collection of failed setups for individual debugging if necessary
+    # TODO add collection of failed setups for individual debugging if
+    # necessary
 
   else:
     print(f'{Fore.CYAN}Simulation starting')
