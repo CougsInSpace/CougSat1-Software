@@ -18,6 +18,7 @@ import numpy as np
 import os
 from pyorbital.orbital import Orbital
 import quaternion
+from tqdm import tqdm
 
 colorama.init(autoreset=True)
 
@@ -335,8 +336,8 @@ class ADCS:
     @param gps Geodetic coordinates from GPS (long, lat, alt)
     @param mag Sensor output of magnetometer, vector of mag field
     @param gravity Sensor output of accelerometer, vector of gravity field
-    @return tuple[np.ndarray, np.ndarray] Coil duty cycle, debug vector
-      Coil duty cycle, shape=(3) Duty cycle written to PWM output
+    @return tuple[np.ndarray, np.ndarray] Coil target current, debug vector
+      Coil target current, shape=(3) Current written to current control
       Debug vector, shape=(3, 1) Vector to plot for debug purposes, None will not plot
         debugVectorLocal: True assumes vector is in local reference frame, False is global
     '''
@@ -350,36 +351,49 @@ class ADCS:
 
     magG = interpolateWMM(gps[0], gps[1])
     magG = magG / np.linalg.norm(magG)
+    
+    if self.ecefTarget is None:
+      # Detumble, velocity control only
+      bDot = (mag - self.lastMag) / tStep
 
-    rInv = rotMatrix2(magG, mag, gravityG, gravity)
-    if rInv is None:
-      # Cannot determine attitude, don't act
-      dCoil = np.array([0.0, 0.0, 0.0])
-      return dCoil, np.zeros((3, 1))
+      dipole = -0.1 * bDot
 
-    # local = rInv @ global
-    debugVector = rInv @ gravityG
+      # m = N * I * A
+      iCoil = (dipole / coilN / coilA).reshape(3)
+      debugVector = dipole
+    else:
+      
+      # Velocity and position control
 
-    # Step 2: Determine current angular velocity
-    # TODO
+      rInv = rotMatrix2(magG, mag, gravityG, gravity)
+      if rInv is None:
+        # Cannot determine attitude, don't act
+        dCoil = np.array([0.0, 0.0, 0.0])
+        return dCoil, np.zeros((3, 1))
 
-    # Step 3: Compute desired magnetic field vector
-    # TODO
+      # local = rInv @ global
+      debugVector = rInv @ gravityG
 
-    # Step 4: Do control loop with current omega and target error (if target is not None)
-    # TODO
+      # Step 2: Determine current angular velocity
+      # TODO
 
-    # Step 5: Transform output magnetic dipole to coil duty cycles
-    # TODO
+      # Step 3: Compute desired magnetic field vector
+      # TODO
 
-    dCoil = np.array([0.0, 0.0, 0.0])
+      # Step 4: Do control loop with current omega and target error (if target is not None)
+      # TODO
+
+      # Step 5: Transform output magnetic dipole to coil duty cycles
+      # TODO
+
+      iCoil = np.array([0.0, 0.0, 0.0])
 
     self.lastT = t
     self.lastGPS = gps
     self.lastMag = mag
     self.lastGravity = gravity
 
-    return dCoil, debugVector
+    return iCoil, debugVector
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -427,9 +441,13 @@ class Satellite:
     self.ecef = geo2ECEF(self.geo[0], self.geo[1], self.geo[2])
 
     if detumble:
+      self.maxDuration = 60 * 60 * 4
+      self.loopFreq = 1
       self.geoTarget = None
       self.ecefTarget = None
     else:
+      self.maxDuration = 60 * 5
+      self.loopFreq = 10
       self.geoTarget = np.zeros(3)
       self.geoTarget[0] = (self.geo[0] +
                            np.random.uniform(-45, 45) + 180) % 360 - 180
@@ -464,7 +482,6 @@ class Satellite:
     omega = omega * np.random.normal(initialOmega, initialOmega / 2)
     self.l = self.realIBody @ omega
 
-    self.loopFreq = 10
 
     # Recording lists
     self.t = []
@@ -591,6 +608,7 @@ class Satellite:
 
       self.lastDeltaTarget = deltaTarget.reshape(3)
     else:
+      self.targetOmegaList.append(np.zeros((3, 1)))
       omegaError = None
       angleError = 0
 
@@ -611,7 +629,7 @@ class Satellite:
           print(
             f'{Fore.RED} tStep has reached minimum value with torque = {torqueAbs} Nm')
           self.minTStepReached = True
-    omegaQAbs = abs(omegaQ.w)
+    omegaQAbs = abs(omegaQ)
     if omegaQAbs != 0:
       suggestTStep = self.maxAngleStep / omegaQAbs
       tStep = min(tStep, suggestTStep)
@@ -650,10 +668,9 @@ class Satellite:
 
     return tStep
 
-  def run(self, durationMax: float = 300) -> dict:
+  def run(self) -> dict:
     '''!@brief Run simulation until residuals reach zero or max duration
 
-    @param durationMax Maximum duration to run before declaring system does not converge
     @return dict Collection of success parameters
     '''
     tStep = 1 / self.loopFreq
@@ -671,7 +688,7 @@ class Satellite:
         np.random.normal(1, self.sigma, size=(3, 1))
     adcs = ADCS(self.geoTarget, t, gps, magnetometer, accelerometer)
 
-    n = int(np.ceil(durationMax / tStep))
+    n = int(np.ceil(self.maxDuration / tStep))
 
     for i in range(1, n):
       tTarget = tStep * i
@@ -692,10 +709,9 @@ class Satellite:
           np.random.normal(1, self.sigma, size=(3, 1))
       accelerometer = self.gravityLocal * \
           np.random.normal(1, self.sigma, size=(3, 1))
-      dCoil, self.debugVector = adcs.compute(
+      iCoilTarget, self.debugVector = adcs.compute(
         t, gps, magnetometer, accelerometer)
-      dCoil = np.clip(dCoil, -1, 1)
-      self.vCoil = dCoil * self.batteryVoltage
+      self.vCoil = np.clip(iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)
       if self.converged:
         break
 
@@ -1082,6 +1098,7 @@ class Satellite:
     secAx.plot(self.t, self.omegaErrorList, 'm')
     subplots[4].set_title('Target Error')
     subplots[4].axhline(y=0, color='k')
+    secAx.axhline(y=0, color='k')
     subplots[4].set_ylabel('rad')
     secAx.set_ylabel('rad/s')
 
@@ -1184,41 +1201,39 @@ def main():
     totalEnergy = []
     start = datetime.datetime.now()
     simDuration = 0
-    with Pool(args.j) as p:
-      results = [p.apply_async(_runnerSim, kwds=kwargs) for _ in range(args.n)]
-      i = 0
-      for p in results:
-        results = p.get()
-        converged.append(results['converged'])
-        averagePower.append(results['averagePower'])
-        totalEnergy.append(results['totalEnergy'])
-        simDuration += results['timeToConvergence']
+    p = Pool(args.j)
+    jobs = [p.apply_async(_runnerSim, kwds=kwargs) for _ in range(args.n)]
+    p.close()
+    results = []
+    for job in tqdm(jobs):
+      results.append(job.get())
+    i = 0
+    for r in results:
+      converged.append(r['converged'])
+      averagePower.append(r['averagePower'])
+      totalEnergy.append(r['totalEnergy'])
+      simDuration += r['timeToConvergence']
 
-        if results['converged']:
-          timeToConvergence.append(results['timeToConvergence'])
-          print(
-            f'{Fore.CYAN}[{i:{digits}}]{Fore.RESET} {Fore.GREEN}Convergence after {results["timeToConvergence"]:6.2f}s')
-        else:
-          print(
-            f'{Fore.CYAN}[{i:{digits}}]{Fore.RESET} {Fore.RED}No convergence')
-        i += 1
+      if r['converged']:
+        timeToConvergence.append(r['timeToConvergence'])
+      i += 1
     irlDuration = (datetime.datetime.now() - start).total_seconds()
     print('-----------')
     success = sum(converged) / len(converged)
     if success == 1:
-      print(f'{Fore.GREEN}{success * 100:6.2f}% converged')
+      print(f'{Fore.GREEN}{success * 100:8.2f}% converged')
       averageConvergence = sum(timeToConvergence) / len(timeToConvergence)
-      print(f'Average time to convergence: {averageConvergence:6.2f}s')
+      print(f'Average time to convergence: {averageConvergence:8.2f}s')
     elif success != 0:
-      print(f'{Fore.YELLOW}{success * 100:6.2f}% converged')
+      print(f'{Fore.YELLOW}{success * 100:8.2f}% converged')
       averageConvergence = sum(timeToConvergence) / len(timeToConvergence)
-      print(f'Average time to convergence: {averageConvergence:6.2f}s')
+      print(f'Average time to convergence: {averageConvergence:8.2f}s')
     else:
-      print(f'{Fore.RED}{success * 100:6.2f}% converged')
-    print(f'Average Power {np.average(averagePower):6.2f}W')
-    print(f'Total Energy  {np.average(totalEnergy):6.2f}J')
+      print(f'{Fore.RED}{success * 100:8.2f}% converged')
+    print(f'Average Power {np.average(averagePower):8.2f}W')
+    print(f'Total Energy  {np.average(totalEnergy):8.2f}J')
     speed = simDuration / irlDuration
-    print(f'Sim speed     {speed:6.2f}s/s')
+    print(f'Sim speed     {speed:8.2f}s/s')
     # TODO add collection of failed setups for individual debugging if
     # necessary
 
@@ -1229,16 +1244,16 @@ def main():
     results = sim.run()
     if results['converged']:
       print(
-        f'{Fore.GREEN}Converged after {results["timeToConvergence"]:6.2f}s')
+        f'{Fore.GREEN}Converged after {results["timeToConvergence"]:8.2f}s')
     else:
       print(
-        f'{Fore.RED}Did not converged after {results["timeToConvergence"]:6.2f}s')
-    print(f'Average Power {results["averagePower"]:6.2f}W')
-    print(f'Total Energy  {results["totalEnergy"]:6.2f}J')
+        f'{Fore.RED}Did not converged after {results["timeToConvergence"]:8.2f}s')
+    print(f'Average Power {results["averagePower"]:8.2f}W')
+    print(f'Total Energy  {results["totalEnergy"]:8.2f}J')
     irlDuration = (datetime.datetime.now() - start).total_seconds()
     simDuration = results["timeToConvergence"]
     speed = simDuration / irlDuration
-    print(f'Sim speed     {speed:6.2f}s/s')
+    print(f'Sim speed     {speed:8.2f}s/s')
     sim.plot()
 
 
