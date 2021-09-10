@@ -5,3 +5,4 @@ numpy_quaternion
 numba
 scipy
 pyorbital
+tqdm

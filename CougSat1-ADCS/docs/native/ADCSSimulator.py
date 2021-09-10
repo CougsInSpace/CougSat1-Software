@@ -351,7 +351,7 @@ class ADCS:
 
     magG = interpolateWMM(gps[0], gps[1])
     magG = magG / np.linalg.norm(magG)
-    
+
     if self.ecefTarget is None:
       # Detumble, velocity control only
       bDot = (mag - self.lastMag) / tStep
@@ -360,9 +360,9 @@ class ADCS:
 
       # m = N * I * A
       iCoil = (dipole / coilN / coilA).reshape(3)
-      debugVector = dipole
+      debugVector = np.zeros((3, 1))
     else:
-      
+
       # Velocity and position control
 
       rInv = rotMatrix2(magG, mag, gravityG, gravity)
@@ -481,7 +481,6 @@ class Satellite:
     omega = omega / np.linalg.norm(omega)
     omega = omega * np.random.normal(initialOmega, initialOmega / 2)
     self.l = self.realIBody @ omega
-
 
     # Recording lists
     self.t = []
@@ -711,7 +710,8 @@ class Satellite:
           np.random.normal(1, self.sigma, size=(3, 1))
       iCoilTarget, self.debugVector = adcs.compute(
         t, gps, magnetometer, accelerometer)
-      self.vCoil = np.clip(iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)
+      self.vCoil = np.clip(
+          iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)
       if self.converged:
         break
 
@@ -839,37 +839,35 @@ class Satellite:
   def __plotGlobal(self) -> None:
     '''!@brief Plot simulation global coordinates, satellite fixed
     '''
-    ax = pyplot.figure().add_subplot(projection='3d')
+    lines = []
+    fig = pyplot.figure()
+    ax = fig.add_subplot(projection='3d')
     labels = ['x', 'y', 'z']
     colors = ['r', 'g', 'b']
     for i in range(3):
       x = self.rList[:, 0, i] * 0.5
       y = self.rList[:, 1, i] * 0.5
       z = self.rList[:, 2, i] * 0.5
-      ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]],
-                colors=colors[i], label=labels[i])
-      ax.plot3D(x, y, z, colors[i], alpha=0.2)
+      ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors=colors[i])
+      lines.append(ax.plot3D(x, y, z, colors[i], label=labels[i]))
 
     x = self.magFieldUList[:, 0, 0]
     y = self.magFieldUList[:, 1, 0]
     z = self.magFieldUList[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='lime', label='Magnetic Field')
-    ax.plot3D(x, y, z, 'lime', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='lime')
+    lines.append(ax.plot3D(x, y, z, 'lime', label='Magnetic Field'))
 
     x = self.mList[:, 0, 0]
     y = self.mList[:, 1, 0]
     z = self.mList[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='orange', label='Magnetic Dipole')
-    ax.plot3D(x, y, z, 'orange', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='orange')
+    lines.append(ax.plot3D(x, y, z, 'orange', label='Magnetic Dipole'))
 
     x = self.torqueList[:, 0, 0]
     y = self.torqueList[:, 1, 0]
     z = self.torqueList[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='tab:brown', label='Torque')
-    ax.plot3D(x, y, z, 'tab:brown', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='tab:brown')
+    lines.append(ax.plot3D(x, y, z, 'tab:brown', label='Torque'))
 
     norm = np.max(np.linalg.norm(self.omegaList, axis=1))
     if norm == 0:
@@ -879,38 +877,33 @@ class Satellite:
     x = omega[:, 0, 0]
     y = omega[:, 1, 0]
     z = omega[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='grey', label='Omega')
-    ax.plot3D(x, y, z, 'grey', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='grey')
+    lines.append(ax.plot3D(x, y, z, 'grey', label='Omega'))
 
     x = self.targetOmegaList[:, 0, 0]
     y = self.targetOmegaList[:, 1, 0]
     z = self.targetOmegaList[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='deeppink', label='Target Omega')
-    ax.plot3D(x, y, z, 'deeppink', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='deeppink')
+    lines.append(ax.plot3D(x, y, z, 'deeppink', label='Target Omega'))
 
     if self.geoTarget is not None:
       x = self.targetList[:, 0, 0]
       y = self.targetList[:, 1, 0]
       z = self.targetList[:, 2, 0]
-      ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-                [z[-1]], colors='c', label='Target')
-      ax.plot3D(x, y, z, 'c', alpha=0.5)
+      ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='c')
+      lines.append(ax.plot3D(x, y, z, 'c', label='Target'))
 
       x = self.cameraList[:, 0, 0]
       y = self.cameraList[:, 1, 0]
       z = self.cameraList[:, 2, 0]
-      ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-                [z[-1]], colors='y', label='Camera')
-      ax.plot3D(x, y, z, 'y', alpha=0.5)
+      ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='y')
+      lines.append(ax.plot3D(x, y, z, 'y', label='Camera'))
 
     x = self.gravityList[:, 0, 0]
     y = self.gravityList[:, 1, 0]
     z = self.gravityList[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='aquamarine', label='Gravity')
-    ax.plot3D(x, y, z, 'aquamarine', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='aquamarine')
+    lines.append(ax.plot3D(x, y, z, 'aquamarine', label='Gravity'))
 
     if debugVectorLocal:
       debugV = []
@@ -922,9 +915,8 @@ class Satellite:
     x = debugV[:, 0, 0]
     y = debugV[:, 1, 0]
     z = debugV[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='violet', label='Debug Vector')
-    ax.plot3D(x, y, z, 'violet', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='violet')
+    lines.append(ax.plot3D(x, y, z, 'violet', label='Debug Vector'))
 
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
@@ -932,14 +924,35 @@ class Satellite:
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
-    ax.legend()
     ax.set_title('Global')
     ax.view_init(30, 30)
+
+    leg = ax.legend(fancybox=True, shadow=True)
+    lined = {}
+    for legline, origline in zip(leg.get_lines(), lines):
+      legline.set_picker(True)
+      lined[legline] = origline[0]
+
+    def on_pick(event):
+      # On the pick event, find the original line corresponding to the legend
+      # proxy line, and toggle its visibility.
+      legline = event.artist
+      origline = lined[legline]
+      visible = not origline.get_visible()
+      origline.set_visible(visible)
+      # Change the alpha on the line in the legend so we can see what lines
+      # have been toggled.
+      legline.set_alpha(1.0 if visible else 0.2)
+      fig.canvas.draw()
+
+    fig.canvas.mpl_connect('pick_event', on_pick)
 
   def __plotLocal(self) -> None:
     '''!@brief Plot simulation local coordinates, satellite fixed
     '''
-    ax = pyplot.figure().add_subplot(projection='3d')
+    lines = []
+    fig = pyplot.figure()
+    ax = fig.add_subplot(projection='3d')
     ax.quiver([0], [0], [0], [0.5], [0], [0], colors='r', label='x', alpha=0.2)
     ax.quiver([0], [0], [0], [0], [0.5], [0], colors='g', label='y', alpha=0.2)
     ax.quiver([0], [0], [0], [0], [0], [0.5], colors='b', label='z', alpha=0.2)
@@ -971,37 +984,32 @@ class Satellite:
     x = magFieldU[:, 0, 0]
     y = magFieldU[:, 1, 0]
     z = magFieldU[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]],
-              colors='lime', label='Magnetic Field')
-    ax.plot3D(x, y, z, 'lime', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='lime')
+    lines.append(ax.plot3D(x, y, z, 'lime', label='Magnetic Field'))
 
     x = magDipole[:, 0, 0]
     y = magDipole[:, 1, 0]
     z = magDipole[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='orange', label='Magnetic Dipole')
-    ax.plot3D(x, y, z, 'orange', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='orange')
+    lines.append(ax.plot3D(x, y, z, 'orange', label='Magnetic Dipole'))
 
     x = torque[:, 0, 0]
     y = torque[:, 1, 0]
     z = torque[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='tab:brown', label='Torque')
-    ax.plot3D(x, y, z, 'tab:brown', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='tab:brown')
+    lines.append(ax.plot3D(x, y, z, 'tab:brown', label='Torque'))
 
     x = omega[:, 0, 0]
     y = omega[:, 1, 0]
     z = omega[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='grey', label='Omega')
-    ax.plot3D(x, y, z, 'grey', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='grey')
+    lines.append(ax.plot3D(x, y, z, 'grey', label='Omega'))
 
     x = targetOmega[:, 0, 0]
     y = targetOmega[:, 1, 0]
     z = targetOmega[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='deeppink', label='Target Omega')
-    ax.plot3D(x, y, z, 'deeppink', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='deeppink')
+    lines.append(ax.plot3D(x, y, z, 'deeppink', label='Target Omega'))
 
     if self.geoTarget is not None:
       targetList = []
@@ -1011,19 +1019,20 @@ class Satellite:
       x = targetList[:, 0, 0]
       y = targetList[:, 1, 0]
       z = targetList[:, 2, 0]
-      ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-                [z[-1]], colors='c', label='Target')
-      ax.plot3D(x, y, z, 'c', alpha=0.5)
+      ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='c')
+      lines.append(ax.plot3D(x, y, z, 'c', label='Target'))
 
-      ax.quiver([0], [0], [0], [rCamera[0]], [rCamera[1]],
-                [rCamera[2]], colors='y', label='Camera')
+      ax.quiver(
+          [0], [0], [0], [
+              rCamera[0]], [
+              rCamera[1]], [
+              rCamera[2]], colors='y', label='Camera')
 
     x = gravity[:, 0, 0]
     y = gravity[:, 1, 0]
     z = gravity[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='aquamarine', label='Gravity')
-    ax.plot3D(x, y, z, 'aquamarine', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='aquamarine')
+    lines.append(ax.plot3D(x, y, z, 'aquamarine', label='Gravity'))
 
     if debugVectorLocal:
       debugV = self.debugVectorList
@@ -1035,9 +1044,8 @@ class Satellite:
     x = debugV[:, 0, 0]
     y = debugV[:, 1, 0]
     z = debugV[:, 2, 0]
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]],
-              [z[-1]], colors='violet', label='Debug Vector')
-    ax.plot3D(x, y, z, 'violet', alpha=0.5)
+    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='violet')
+    lines.append(ax.plot3D(x, y, z, 'violet', label='Debug Vector'))
 
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
@@ -1045,9 +1053,28 @@ class Satellite:
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
-    ax.legend()
     ax.set_title('Local')
     ax.view_init(30, 30)
+
+    leg = ax.legend(fancybox=True, shadow=True)
+    lined = {}
+    for legline, origline in zip(leg.get_lines(), lines):
+      legline.set_picker(True)
+      lined[legline] = origline[0]
+
+    def on_pick(event):
+      # On the pick event, find the original line corresponding to the legend
+      # proxy line, and toggle its visibility.
+      legline = event.artist
+      origline = lined[legline]
+      visible = not origline.get_visible()
+      origline.set_visible(visible)
+      # Change the alpha on the line in the legend so we can see what lines
+      # have been toggled.
+      legline.set_alpha(1.0 if visible else 0.2)
+      fig.canvas.draw()
+
+    fig.canvas.mpl_connect('pick_event', on_pick)
 
   def __plotTime(self) -> None:
     '''!@brief Plot simulation time domain line graphs
