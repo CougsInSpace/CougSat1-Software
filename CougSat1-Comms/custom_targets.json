@@ -1,50 +1,14 @@
 {
   "CIS_BOARD": {
     "inherits": [
-      "FAMILY_STM32"
+      "MCU_STM32L496xG"
     ],
-    "supported_form_factors": [],
-    "core": "Cortex-M4F",
-    "extra_labels_add": [
-      "STM32L4",
-      "STM32L496RG",
-      "STM32L496xG"
-    ],
-    "config": {
-      "clock_source": {
-        "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
-        "value": "USE_PLL_MSI",
-        "macro_name": "CLOCK_SOURCE"
-      },
-      "lpticker_lptim": {
-        "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
-        "value": 1
-      }
-    },
     "overrides": {
-      "lpticker_delay_ticks": 4
+      "clock_source": "USE_PLL_HSE_XTAL"
     },
-    "detect_code": [
-      "0765"
+    "device_has_remove": [
+      "STDIO_MESSAGES"
     ],
-    "macros_add": [
-      "MBED_TICKLESS",
-      "USBHOST_OTHER"
-    ],
-    "device_has_add": [
-      "ANALOGOUT",
-      "CAN",
-      "CRC",
-      "SERIAL_ASYNCH",
-      "TRNG",
-      "FLASH",
-      "MPU"
-    ],
-    "release_versions": [
-      "2",
-      "5"
-    ],
-    "device_name": "STM32L496RG",
-    "bootloader_supported": true
+    "device_name": "STM32L496ZG"
   }
 }

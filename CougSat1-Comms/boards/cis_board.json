@@ -1,36 +1,43 @@
 {
   "build": {
+    "core": "stm32",
     "cpu": "cortex-m4",
     "extra_flags": "-DSTM32L496xx",
     "f_cpu": "80000000L",
-    "mcu": "stm32l496rgt6",
-    "variant": "NUCLEO_L496RG"
+    "mcu": "stm32l496zgt6",
+    "product_line": "STM32L496xx",
+    "variant": "STM32L4xx/L496Z(E-G)T_L4A6ZGT"
   },
   "connectivity": [
-    "can"
   ],
   "debug": {
     "default_tools": [
       "stlink"
     ],
-    "jlink_device": "STM32L496RG",
+    "jlink_device": "STM32L496ZG",
     "onboard_tools": [
       "stlink"
     ],
     "openocd_board": "st_nucleo_l4",
-    "svd_path": "STM32L4x6.svd"
+    "openocd_target": "stm32l4x",
+    "svd_path": "STM32L496.svd"
   },
   "frameworks": [
+    "arduino",
+    "cmsis",
     "mbed",
-    "stm32cube"
+    "stm32cube",
+    "libopencm3",
+    "zephyr"
   ],
-  "name": "Coug in Space L496RG",
+  "name": "Cougs in Space L496ZG",
   "upload": {
     "maximum_ram_size": 327680,
     "maximum_size": 1048576,
     "protocol": "stlink",
     "protocols": [
       "jlink",
+      "cmsis-dap",
       "stlink",
       "blackmagic",
       "mbed"

@@ -24,14 +24,14 @@ int main(void) {
   pcMod    = 1;
   pcDemod  = 1;
   pc230    = 1;
-  wait_ms(10);
+  wait_us(10e3);
   rfClkMod.setFrequency(435000000);
   rfClkDemod.setFrequency(700000000);
   rfClk230.setFrequency(1275000000);
 
   while (true) {
     statusLED = !statusLED;
-    wait_ms(500);
+    wait_us(500e3);
   }
   return MBED_SUCCESS;
 }
