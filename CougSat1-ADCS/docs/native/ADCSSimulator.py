@@ -292,6 +292,23 @@ def rotMatrix3(a: np.ndarray, aT: np.ndarray, b: np.ndarray,
   r[2] = (vectorInv @ out[2].reshape((3, 1))).reshape(3)
   return r
 
+def thetaError(v1, v2):
+    v1 = v1.flatten()
+    v2 = v2.flatten()
+    #Find the unit vectors first
+    v1unit = v1 / np.linalg.norm(v1)
+    v2unit = v2 / np.linalg.norm(v2)
+    #Find the dot product between v1 and v2 unit vectors
+    dotproduct = np.dot(v1unit, v2unit)
+    #Take arccos to find the angle in radians between the two
+    anglebetween = np.arccos(dotproduct)
+    return anglebetween
+
+def planeProject(earthMF,cameraDir,goalDirIdeal):
+  # uses this video for equation https://www.youtube.com/watch?v=QTcSBB3uVP0
+  A = np.concatenate((earthMF.T,cameraDir.T)).T
+
+  return A @ np.linalg.inv(A.T @ A) @ A.T @ goalDirIdeal
 
 orb = Orbital(
   "ISS",
@@ -377,6 +394,7 @@ class ADCS:
       # Step 2: Determine current angular velocity
       # TODO
 
+<<<<<<< Updated upstream
       # Step 3: Compute desired magnetic field vector
       # TODO
 
@@ -387,6 +405,94 @@ class ADCS:
       # TODO
 
       iCoil = np.array([0.0, 0.0, 0.0])
+=======
+    # find ecef vector of the satellite
+    ecefSat = geo2ECEF(self.gps[0], self.gps[1], self.gps[2])
+
+    magG = interpolateWMM(self.gps[0], self.gps[1])
+    magG = magG / np.linalg.norm(magG)
+
+    # local = rInv @ global
+    # global = r @ local
+    rInv = rotMatrix2(magG, self.mag, gravityG, self.gravity)
+    if rInv is None:
+      # Cannot determine attitude, don't act
+      dCoil = np.array([0.0, 0.0, 0.0])
+      return dCoil, None
+    r = np.linalg.inv(rInv)
+    q = quaternion.from_rotation_matrix(r)
+    if self.lastR is None:
+      # Cannot determine angular velocity, don't act
+      self.lastT = t
+      self.lastGPS = self.gps
+      self.lastMag = self.mag
+      self.lastGravity = self.gravity
+      self.lastR = r
+      self.lastQ = q
+      dCoil = np.array([0.0, 0.0, 0.0])
+      return dCoil, None
+    # Step 2: Determine current angular velocity
+
+    # From simulation, reverse this math to get omega & angular momentum
+    # rInv = np.linalg.inv(r)
+    # iInv = r @ self.realIBodyInv @ r.T
+    # omega = iInv @ self.l
+    # omegaQ = quaternion.from_vector_part(omega, 0)
+    # qDot = 0.5 * omegaQ * self.q
+    # q += + qDot * tStep
+
+    qDot = (q - self.lastQ) / tStep
+    # Interestingly, there is a real component in the quaternion if dividing
+    # by q or lastQ, average is okay though...
+    omegaQ = qDot * 2 / ((q + self.lastQ) / 2)
+    omega = (omegaQ.vec).reshape((3, 1))
+
+    if abs(omegaQ) > 1:
+      # One quaternion is reversed (equivalent rotation matrix b.c. 2pi)
+      qDot = (q + self.lastQ) / tStep
+      omegaQ = qDot * 2 / ((q - self.lastQ) / 2)
+      omega = (omegaQ.vec).reshape((3, 1))
+      if abs(omegaQ) > 1:
+        print('maybe not...')
+        print(self.mag)
+        print(magG)
+        print(self.gravity)
+        print(gravityG)
+        print(r)
+        print(self.lastR)
+        print(q)
+        print(self.lastQ)
+        print(qDot)
+        print(omegaQ)
+        return None, None
+
+    debugVector = omega
+
+    # Step 3: Compute desired magnetic field vector
+
+    # direction we want to point
+    goalDirIdeal = ecefSat - self.ecefTarget
+    goalDirIdeal = goalDirIdeal / np.linalg.norm(goalDirIdeal)
+
+    # make goalDir orthogonal to mag so when rotMatrix is calculated the resultant
+    # dipole direction is also orthogonal to mag, getting the maximum torque
+    goalDirIdealOrtho = crossProductMatrix(crossProductMatrix(goalDirIdeal) @ mag) @ mag
+    goalDir = planeProject(mag,rCamera,goalDirIdeal)
+
+    # calculate desired magnetic field direction
+    rBetween = rotMatrix1(goalDirIdealOrtho,rCamera)
+    dipoleDir = rBetween @ mag
+
+    # Step 4: Do control loop with current omega and target error (if target is not None)
+    controlError = thetaError(rCamera,goalDir)
+    iVector = dipoleDir * controlError
+    
+
+    # Step 5: Transform output magnetic dipole to coil duty cycles
+    # TODO
+
+    iCoil = np.array([iVector[0], iVector[1], iVector[2]])
+>>>>>>> Stashed changes
 
     self.lastT = t
     self.lastGPS = gps
