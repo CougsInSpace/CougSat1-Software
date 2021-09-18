@@ -394,18 +394,6 @@ class ADCS:
       # Step 2: Determine current angular velocity
       # TODO
 
-<<<<<<< Updated upstream
-      # Step 3: Compute desired magnetic field vector
-      # TODO
-
-      # Step 4: Do control loop with current omega and target error (if target is not None)
-      # TODO
-
-      # Step 5: Transform output magnetic dipole to coil duty cycles
-      # TODO
-
-      iCoil = np.array([0.0, 0.0, 0.0])
-=======
     # find ecef vector of the satellite
     ecefSat = geo2ECEF(self.gps[0], self.gps[1], self.gps[2])
 
@@ -492,7 +480,6 @@ class ADCS:
     # TODO
 
     iCoil = np.array([iVector[0], iVector[1], iVector[2]])
->>>>>>> Stashed changes
 
     self.lastT = t
     self.lastGPS = gps
