@@ -316,34 +316,61 @@ orb = Orbital(
     line2="2 25544  51.6453 300.4471 0003214   1.7468 140.2698 15.48606005301202")
 
 class ADCS:
-  def __init__(self, geoTarget: np.ndarray, t: float, gps: np.ndarray,
-               mag: np.ndarray, gravity: np.ndarray) -> None:
+  def __init__(self, geoTarget: np.ndarray) -> None:
     '''!@brief Initialize ADCS control algorithm
 
     @param geoTarget Geodetic coordinates of target (long, lat, alt), None indicates no target and to detumble
-    @param t Current time
-    @param gps Geodetic coordinates from GPS (long, lat, alt)
-    @param mag Sensor output of magnetometer, vector of mag field
-    @param gravity Sensor output of accelerometer, vector of gravity field (normalized)
     '''
-    mag = mag / np.linalg.norm(mag)
-    gravity = gravity / np.linalg.norm(gravity)
 
     if geoTarget is not None:
+      self.loopCount = 100
       self.ecefTarget = geo2ECEF(geoTarget[0], geoTarget[1], geoTarget[2])
     else:
+      self.loopCount = 1
       self.ecefTarget = None
 
-    self.lastT = t
-    self.lastGPS = gps
-    self.lastMag = mag
-    self.lastGravity = gravity
+    self.lastT = None
+    self.lastSensorT = None
+    self.loopIndex = 1 % self.loopCount
 
-    # global debugVectorLocal
-    # debugVectorLocal = False
+    global debugVectorLocal
+    debugVectorLocal = False
 
     # global debugVectorNorm
     # debugVectorNorm = False
+
+  def sensorAcquition(self, t: float, gps: np.ndarray,
+                      mag: np.ndarray, gravity: np.ndarray) -> None:
+    '''!@brief High frequency sensor sampling loop
+    Used to apply a low pass filter to raw data
+
+    @param t Current time
+    @param gps Geodetic coordinates from GPS (long, lat, alt)
+    @param mag Sensor output of magnetometer, vector of mag field
+    @param gravity Sensor output of accelerometer, vector of gravity field
+    '''
+    if self.lastSensorT is None:
+      self.lastSensorT = t
+      self.gps = gps
+      self.mag = mag
+      self.gravity = gravity
+      return
+
+    fc = 10
+    w = 2 * np.pi * (t - self.lastSensorT) * fc
+    alpha = w / (w + 1)
+
+    mag = mag / np.linalg.norm(mag)
+    gravity = gravity / np.linalg.norm(gravity)
+
+    self.gps = alpha * gps + (1 - alpha) * self.gps
+    self.mag = alpha * mag + (1 - alpha) * self.mag
+    self.gravity = alpha * gravity + (1 - alpha) * self.gravity
+
+    self.mag = self.mag / np.linalg.norm(self.mag)
+    self.gravity = self.gravity / np.linalg.norm(self.gravity)
+
+    self.lastSensorT = t
 
   def compute(self, t: float, gps: np.ndarray,
               mag: np.ndarray, gravity: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -358,38 +385,46 @@ class ADCS:
       Debug vector, shape=(3, 1) Vector to plot for debug purposes, None will not plot
         debugVectorLocal: True assumes vector is in local reference frame, False is global
     '''
-    mag = mag / np.linalg.norm(mag)
-    gravity = gravity / np.linalg.norm(gravity)
+    self.loopIndex = (self.loopIndex + 1) % self.loopCount
+    self.sensorAcquition(t, gps, mag, gravity)
+    if self.loopIndex != 0:
+      return None, None
+
+    if t < 10:
+      # Wait for sensors to stabilize
+      return None, None
+
+    if self.lastT is None:
+      self.lastT = t
+      self.lastGPS = self.gps
+      self.lastMag = self.mag
+      self.lastGravity = self.gravity
+      self.lastR = None
+      self.lastQ = None
+      self.iCoil = np.zeros(3)
+      return None, None
+
     tStep = t - self.lastT
-
-    # Step 1: Determine attitude from gps, magnetometer, and accelerometer
-    gravityG = geo2ECEF(gps[0], gps[1], gps[2])
-    gravityG = -gravityG / np.linalg.norm(gravityG)
-
-    magG = interpolateWMM(gps[0], gps[1])
-    magG = magG / np.linalg.norm(magG)
 
     if self.ecefTarget is None:
       # Detumble, velocity control only
-      bDot = (mag - self.lastMag) / tStep
+      bDot = (self.mag - self.lastMag) / tStep
 
       dipole = -0.1 * bDot
 
       # m = N * I * A
       iCoil = (dipole / coilN / coilA).reshape(3)
-      debugVector = np.zeros((3, 1))
-    else:
+      
+      fc = 1
+      w = 2 * np.pi * tStep * fc
+      alpha = w / (w + 1)
 
-      # Velocity and position control
+      self.iCoil = alpha * iCoil + (1 - alpha) * self.iCoil
 
-      rInv = rotMatrix2(magG, mag, gravityG, gravity)
-      if rInv is None:
-        # Cannot determine attitude, don't act
-        dCoil = np.array([0.0, 0.0, 0.0])
-        return dCoil, np.zeros((3, 1))
+      self.lastMag = self.mag
+      self.lastT = t
 
-      # local = rInv @ global
-      debugVector = rInv @ gravityG
+      return self.iCoil, np.zeros((3, 1))
 
       # Step 2: Determine current angular velocity
       # TODO
@@ -397,28 +432,28 @@ class ADCS:
     # find ecef vector of the satellite
     ecefSat = geo2ECEF(self.gps[0], self.gps[1], self.gps[2])
 
-    magG = interpolateWMM(self.gps[0], self.gps[1])
-    magG = magG / np.linalg.norm(magG)
+    # magG = interpolateWMM(self.gps[0], self.gps[1])
+    # magG = magG / np.linalg.norm(magG)
 
-    # local = rInv @ global
-    # global = r @ local
-    rInv = rotMatrix2(magG, self.mag, gravityG, self.gravity)
-    if rInv is None:
-      # Cannot determine attitude, don't act
-      dCoil = np.array([0.0, 0.0, 0.0])
-      return dCoil, None
-    r = np.linalg.inv(rInv)
-    q = quaternion.from_rotation_matrix(r)
-    if self.lastR is None:
-      # Cannot determine angular velocity, don't act
-      self.lastT = t
-      self.lastGPS = self.gps
-      self.lastMag = self.mag
-      self.lastGravity = self.gravity
-      self.lastR = r
-      self.lastQ = q
-      dCoil = np.array([0.0, 0.0, 0.0])
-      return dCoil, None
+    # # local = rInv @ global
+    # # global = r @ local
+    # rInv = rotMatrix2(magG, self.mag, gravityG, self.gravity)
+    # if rInv is None:
+    #   # Cannot determine attitude, don't act
+    #   dCoil = np.array([0.0, 0.0, 0.0])
+    #   return dCoil, None
+    # r = np.linalg.inv(rInv)
+    # q = quaternion.from_rotation_matrix(r)
+    # if self.lastR is None:
+    #   # Cannot determine angular velocity, don't act
+    #   self.lastT = t
+    #   self.lastGPS = self.gps
+    #   self.lastMag = self.mag
+    #   self.lastGravity = self.gravity
+    #   self.lastR = r
+    #   self.lastQ = q
+    #   dCoil = np.array([0.0, 0.0, 0.0])
+    #   return dCoil, None
     # Step 2: Determine current angular velocity
 
     # From simulation, reverse this math to get omega & angular momentum
@@ -429,32 +464,32 @@ class ADCS:
     # qDot = 0.5 * omegaQ * self.q
     # q += + qDot * tStep
 
-    qDot = (q - self.lastQ) / tStep
-    # Interestingly, there is a real component in the quaternion if dividing
-    # by q or lastQ, average is okay though...
-    omegaQ = qDot * 2 / ((q + self.lastQ) / 2)
-    omega = (omegaQ.vec).reshape((3, 1))
+    # qDot = (q - self.lastQ) / tStep
+    # # Interestingly, there is a real component in the quaternion if dividing
+    # # by q or lastQ, average is okay though...
+    # omegaQ = qDot * 2 / ((q + self.lastQ) / 2)
+    # omega = (omegaQ.vec).reshape((3, 1))
 
-    if abs(omegaQ) > 1:
-      # One quaternion is reversed (equivalent rotation matrix b.c. 2pi)
-      qDot = (q + self.lastQ) / tStep
-      omegaQ = qDot * 2 / ((q - self.lastQ) / 2)
-      omega = (omegaQ.vec).reshape((3, 1))
-      if abs(omegaQ) > 1:
-        print('maybe not...')
-        print(self.mag)
-        print(magG)
-        print(self.gravity)
-        print(gravityG)
-        print(r)
-        print(self.lastR)
-        print(q)
-        print(self.lastQ)
-        print(qDot)
-        print(omegaQ)
-        return None, None
+    # if abs(omegaQ) > 1:
+    #   # One quaternion is reversed (equivalent rotation matrix b.c. 2pi)
+    #   qDot = (q + self.lastQ) / tStep
+    #   omegaQ = qDot * 2 / ((q - self.lastQ) / 2)
+    #   omega = (omegaQ.vec).reshape((3, 1))
+    #   if abs(omegaQ) > 1:
+    #     print('maybe not...')
+    #     print(self.mag)
+    #     print(magG)
+    #     print(self.gravity)
+    #     print(gravityG)
+    #     print(r)
+    #     print(self.lastR)
+    #     print(q)
+    #     print(self.lastQ)
+    #     print(qDot)
+    #     print(omegaQ)
+    #     return None, None
 
-    debugVector = omega
+    # debugVector = omega
 
     # Step 3: Compute desired magnetic field vector
 
@@ -479,14 +514,16 @@ class ADCS:
     # Step 5: Transform output magnetic dipole to coil duty cycles
     # TODO
 
-    iCoil = np.array([iVector[0], iVector[1], iVector[2]])
+    iCoil = iVector.flatten()
 
     self.lastT = t
-    self.lastGPS = gps
-    self.lastMag = mag
-    self.lastGravity = gravity
+    self.lastGPS = self.gps
+    self.lastMag = self.mag
+    self.lastGravity = self.gravity
+    # self.lastR = r
+    # self.lastQ = q
 
-    return iCoil, debugVector
+    return iCoil, None
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -534,13 +571,13 @@ class Satellite:
     self.ecef = geo2ECEF(self.geo[0], self.geo[1], self.geo[2])
 
     if detumble:
-      self.maxDuration = 60 * 60 * 4
       self.loopFreq = 1
+      self.maxDuration = 60 * 60 * 4
       self.geoTarget = None
       self.ecefTarget = None
     else:
+      self.loopFreq = 100
       self.maxDuration = 60 * 5
-      self.loopFreq = 10
       self.geoTarget = np.zeros(3)
       self.geoTarget[0] = (self.geo[0] +
                            np.random.uniform(-45, 45) + 180) % 360 - 180
@@ -760,9 +797,10 @@ class Satellite:
 
     return tStep
 
-  def run(self) -> dict:
+  def run(self, progress: bool = True) -> dict:
     '''!@brief Run simulation until residuals reach zero or max duration
 
+    @param progress True will print a progress bar
     @return dict Collection of success parameters
     '''
     tStep = 1 / self.loopFreq
@@ -770,19 +808,16 @@ class Satellite:
     self.t.append(t)
     self.tStepList.append(t)
 
-    gps = np.zeros(3)
-    gps[0] = self.geo[0] + np.random.normal(0, self.sigma * GEO_FACTOR)
-    gps[1] = self.geo[1] + np.random.normal(0, self.sigma * GEO_FACTOR)
-    gps[2] = self.geo[2] + np.random.normal(0, self.sigma * ALT_FACTOR)
-    magnetometer = self.magFieldLocal * \
-        np.random.normal(1, self.sigma, size=(3, 1))
-    accelerometer = self.gravityLocal * \
-        np.random.normal(1, self.sigma, size=(3, 1))
-    adcs = ADCS(self.geoTarget, t, gps, magnetometer, accelerometer)
+    adcs = ADCS(self.geoTarget)
 
     n = int(np.ceil(self.maxDuration / tStep))
 
+    if progress:
+      pBar = tqdm(total=n)
+
     for i in range(1, n):
+      if progress:
+        pBar.update()
       tTarget = tStep * i
       tRemaining = tTarget - t
       while t < tTarget and tRemaining > self.minTStep:  # TODO add a keyboardinterrupt
@@ -801,10 +836,13 @@ class Satellite:
           np.random.normal(1, self.sigma, size=(3, 1))
       accelerometer = self.gravityLocal * \
           np.random.normal(1, self.sigma, size=(3, 1))
-      iCoilTarget, self.debugVector = adcs.compute(
+      iCoilTarget, debugVector = adcs.compute(
         t, gps, magnetometer, accelerometer)
-      self.vCoil = np.clip(
-          iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)
+      if iCoilTarget is not None:
+        self.vCoil = np.clip(
+            iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)
+      if debugVector is not None:
+        self.debugVector = debugVector
       if self.converged:
         break
 
@@ -830,6 +868,9 @@ class Satellite:
     self.results['timeToConvergence'] = t
     self.results['averagePower'] = totalEnergy / t
     self.results['totalEnergy'] = totalEnergy
+
+    if progress:
+      pBar.close()
     return self.results
 
   def __plotOrbit(self) -> None:
@@ -1261,7 +1302,7 @@ def _runnerSim(*args, **kwargs) -> dict:
   @return dict same as Satellite.run
   '''
   sim = Satellite(*args, **kwargs)
-  return sim.run()
+  return sim.run(progress=False)
 
 def main():
   parser = ArgumentParser()
@@ -1289,7 +1330,7 @@ def main():
       help='Initialize angular momentum with random value up to --initial_omega rad/s')
   parser.add_argument(
       '--sigma', '-s',
-      default=0.01,
+      default=0.003,
       help='Add gaussian noise to sensor input by multiplying by gaussian(mu=1, sigma=[s])')
   parser.add_argument(
       '--static',
@@ -1342,12 +1383,14 @@ def main():
     success = sum(converged) / len(converged)
     if success == 1:
       print(f'{Fore.GREEN}{success * 100:8.2f}% converged')
-      averageConvergence = sum(timeToConvergence) / len(timeToConvergence)
-      print(f'Average time to convergence: {averageConvergence:8.2f}s')
+      mean = np.mean(timeToConvergence)
+      std = np.std(timeToConvergence)
+      print(f'Average time to convergence: {mean:8.2f}s σ={std:8.2f}s')
     elif success != 0:
       print(f'{Fore.YELLOW}{success * 100:8.2f}% converged')
-      averageConvergence = sum(timeToConvergence) / len(timeToConvergence)
-      print(f'Average time to convergence: {averageConvergence:8.2f}s')
+      mean = np.mean(timeToConvergence)
+      std = np.std(timeToConvergence)
+      print(f'Average time to convergence: {mean:8.2f}s σ={std:8.2f}s')
     else:
       print(f'{Fore.RED}{success * 100:8.2f}% converged')
     print(f'Average Power {np.average(averagePower):8.2f}W')
