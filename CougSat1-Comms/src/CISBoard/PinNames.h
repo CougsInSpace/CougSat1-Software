@@ -254,50 +254,55 @@ typedef enum {
   USBTX         = STDIO_UART_TX,
   USBRX         = STDIO_UART_RX,
 
-  /*** Comms HW V1.0 ***/
-  LED1 = PD_2,
+  /*** Comms HW V1.2 ***/
+  LED1 = PD_8,
 
   // RF clock  generators
-  RFCLK_CS_230     = PC_3,
-  RFCLK_CS_DEMOD   = PA_7,
-  RFCLK_CS_MOD     = PA_3,
-  RFCLK_LOCK_230   = PA_8,
-  RFCLK_LOCK_DEMOD = PC_4,
-  RFCLK_LOCK_MOD   = PA_6,
-  RFCLK_MOSI       = PA_12,
-  RFCLK_SCK        = PA_1,
+  RFCLK_CS_DEMOD_N   = PC_3,
+  RFCLK_CS_MOD_N     = PD_2,
+  RFCLK_MUXOUT_DEMOD = PD_0,
+  RFCLK_MUXOUT_MOD   = PD_4,
 
   // Modulators and demodulator
-  DEMOD_ID = PC_0,
-  DEMOD_QD = PC_1,
+  DEMOD_ID    = PA_1,
+  DEMOD_QD    = PA_3,
+  DEMOD_EN    = PA_2,
+  DEMOD_VGIN  = PA_5,
+  ADC_RESET_N = PA_5,
 
-  MOD_230_ID = PC_6,
-  MOD_230_QD = PC_7,
-  MOD_700_ID = PA_4,
-  MOD_700_QD = PA_5,
+  MODDAC_SELECT = PE_3,
+  MODDAC_CLK    = PE_4,
+  MODDAC_SLEEP  = PC_5,
+
+  MODDAC_0 = PE_6,
+  MODDAC_1 = PE_7,
+  MODDAC_2 = PE_8,
+  MODDAC_3 = PE_9,
+  MODDAC_4 = PE_10,
+  MODDAC_5 = PE_11,
+  MODDAC_6 = PE_12,
+  MODDAC_7 = PE_13,
+  MODDAC_8 = PE_14,
+  MODDAC_9 = PE_15,
 
   // RF chain control
-  ANTENNA_SW = PA_2,
+  ANTENNA_SW = PD_1,
 
-  PA_230_BIAS = PB_11,
-  PA_700_BIAS = PB_2,
+  PA_PD = PD_3,
 
-  RX_LNA_EN_N = PB_1,
+  RX_LNA_EN_N = PC_0,
 
   // Power rail control
-  PC_DEMOD_LV   = PC_5,
-  PC_LDO_3V3    = PC_8,
-  PC_MOD_230_LV = PA_9,
-  PC_MOD_700_LV = PB_0,
+  PC_3V1_1   = PC_13,
+  PC_3V1_2   = PC_1,
+  PC_5V0_1_N = PC_2,
 
-  REG_INACT = PB_9,
-  REG_EN_5  = PC_13,
-  REG_EN_9  = PC_9,
+  REG_EN_5 = PB_10,
 
   // SPI flash
-  FLASH_CE_A = PB_5,
-  FLASH_CE_B = PB_4,
-  FLASH_WP_N = PB_8,
+  FLASH_CE_A_N = PB_5,
+  FLASH_CE_B_N = PB_8,
+  FLASH_WP_N   = PB_9,
 
   SPI_SCK  = PC_10,
   SPI_MISO = PC_11,
@@ -307,12 +312,12 @@ typedef enum {
   I2C_SCL = PB_6,
   I2C_SDA = PB_7,
 
-  COM_SPI_CS   = PB_13,
-  COM_SPI_MISO = PB_14,
-  COM_SPI_MOSI = PB_15,
-  COM_SPI_SCK  = PB_10,
+  COM_SPI_CS_N = PB_0,
+  COM_SPI_MISO = PA_6,
+  COM_SPI_MOSI = PA_7,
+  COM_SPI_SCK  = PA_0,
 
-  CTRL_SYNC = PB_12,
+  CTRL_SYNC = PC_4,
 } PinName;
 
 #ifdef __cplusplus
