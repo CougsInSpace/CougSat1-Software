@@ -228,6 +228,9 @@ def rotMatrix1(a: np.ndarray, aT: np.ndarray) -> np.ndarray:
   @param aT Input vector transformed state
   @return np.ndarray Transformation matrix from vFrom to vTo
   '''
+
+
+
   a = a.flatten() / np.linalg.norm(a)
   aT = aT.flatten() / np.linalg.norm(aT)
 
@@ -292,6 +295,41 @@ def rotMatrix3(a: np.ndarray, aT: np.ndarray, b: np.ndarray,
   r[2] = (vectorInv @ out[2].reshape((3, 1))).reshape(3)
   return r
 
+def rodRotation(a: np.ndarray, aT: np.ndarray):
+  '''!@brief Created a rodrigues rotation vector that describes the rotation between
+  the two input vectors
+
+
+  @param a Input vector initial state
+  @param aT Input vector transformed state
+  @return np.ndarray Rodrgues Rotation Vector from a to aT
+  '''
+
+  a = a.flatten()
+  aT = aT.flatten()
+  axis = np.cross(a,aT).flatten()
+  axis = axis / np.linalg.norm(axis)
+  theta = thetaError(a, aT)
+  rod = np.append(axis, theta)
+
+  return rod
+
+def applyRodRotation(v: np.ndarray,rod:np.ndarray):
+  '''!@brief https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+
+
+  @param v vector to be transformed
+  @param rod rodrigues rotation vector
+  @return transformed v
+  '''
+  k = rod[0:3]
+  theta = rod[3]
+  k = k.flatten() / np.linalg.norm(k)
+  v = v.flatten() / np.linalg.norm(v)
+
+  vT = (v*np.cos(theta)) + (np.cross(k,v)*np.sin(theta)) + (k*np.dot(k,v)*(1 - np.cos(theta)))
+  return vT
+
 def thetaError(v1, v2):
     v1 = v1.flatten()
     v2 = v2.flatten()
@@ -302,13 +340,31 @@ def thetaError(v1, v2):
     dotproduct = np.dot(v1unit, v2unit)
     #Take arccos to find the angle in radians between the two
     anglebetween = np.arccos(dotproduct)
+
     return anglebetween
 
-def planeProject(earthMF,cameraDir,goalDirIdeal):
+def planeProject(earthMF,cameraDir,targetIdeal):
   # uses this video for equation https://www.youtube.com/watch?v=QTcSBB3uVP0
-  A = np.concatenate((earthMF.T,cameraDir.T)).T
+  earthMF = earthMF.flatten()
+  cameraDir = cameraDir.flatten()
+  targetIdeal = targetIdeal.flatten()
+  
+  planeVec = np.cross(earthMF,cameraDir)
+  normal = vectorProject(targetIdeal,planeVec)
 
-  return A @ np.linalg.inv(A.T @ A) @ A.T @ goalDirIdeal
+  return targetIdeal - normal
+
+def vectorProject(u,v):
+  '''
+  Vector projecttion of u onto v
+  '''
+  return (np.dot(v,u) / (np.linalg.norm(v)**2)) * v
+
+def saturate(v: np.ndarray, min: float, max: float):
+  for i in range(0,v.size):
+    if v[i] > max or v[i] < min:
+      v = v * abs(max/v[i])
+  return v
 
 orb = Orbital(
   "ISS",
@@ -332,6 +388,7 @@ class ADCS:
     self.lastT = None
     self.lastSensorT = None
     self.loopIndex = 1 % self.loopCount
+    self.lastControlError = 0
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -373,13 +430,14 @@ class ADCS:
     self.lastSensorT = t
 
   def compute(self, t: float, gps: np.ndarray,
-              mag: np.ndarray, gravity: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+              mag: np.ndarray, gravity: np.ndarray, r: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     '''!@brief Compute ADCS loop given input from sensors
 
     @param t Current time
     @param gps Geodetic coordinates from GPS (long, lat, alt)
     @param mag Sensor output of magnetometer, vector of mag field
     @param gravity Sensor output of accelerometer, vector of gravity field
+    @param r Rotation matrix from global to local (cheating, will need to be determined independently later)
     @return tuple[np.ndarray, np.ndarray] Coil target current, debug vector
       Coil target current, shape=(3) Current written to current control
       Debug vector, shape=(3, 1) Vector to plot for debug purposes, None will not plot
@@ -490,32 +548,49 @@ class ADCS:
     #     return None, None
 
     # debugVector = omega
+    
+    # change mag and rCamera to local global coordinates
+    rInv = np.linalg.inv(r)
+    magGlobal = r @ mag
+    rCameraGlobal = r @ rCamera
+
 
     # Step 3: Compute desired magnetic field vector
 
     # direction we want to point
-    goalDirIdeal = ecefSat - self.ecefTarget
-    goalDirIdeal = goalDirIdeal / np.linalg.norm(goalDirIdeal)
+    targetIdeal = self.ecefTarget - ecefSat
+    targetIdeal = targetIdeal / np.linalg.norm(targetIdeal)
 
     # make goalDir orthogonal to mag so when rotMatrix is calculated the resultant
     # dipole direction is also orthogonal to mag, getting the maximum torque
-    goalDirIdealOrtho = crossProductMatrix(crossProductMatrix(goalDirIdeal) @ mag) @ mag
-    goalDir = planeProject(mag,rCamera,goalDirIdeal)
+    targetDir = planeProject(magGlobal,rCameraGlobal,targetIdeal)
 
     # calculate desired magnetic field direction
-    rBetween = rotMatrix1(goalDirIdealOrtho,rCamera)
-    dipoleDir = rBetween @ mag
+    rod = rodRotation(targetDir,rCameraGlobal)
+    rod[3] = np.pi / 2 # make the rotation transformation 90deg
+    dipoleDir = applyRodRotation(magGlobal,rod)
+    dipoleDir = dipoleDir / np.linalg.norm(dipoleDir)
 
     # Step 4: Do control loop with current omega and target error (if target is not None)
-    controlError = thetaError(rCamera,goalDir)
-    iVector = dipoleDir * controlError
-    
+    controlError = thetaError(rCameraGlobal,targetDir)
+    controlErrorDerivative = (controlError - self.lastControlError) / tStep
+    proportionalGain = 1
+    derivativeGain = 5.5
 
+    # print("aaaaaaaaa")
+    # print(controlError * proportionalGain)
+    # print(controlErrorDerivative * derivativeGain)
+    
+    # print(rCameraGlobal)
+    # print(targetDir)
+
+    iVector = dipoleDir * ((controlError*proportionalGain) + (controlErrorDerivative*derivativeGain))
     # Step 5: Transform output magnetic dipole to coil duty cycles
     # TODO
 
-    iCoil = iVector.flatten()
+    iCoil = rInv @ iVector.reshape((3,1))
 
+    self.lastControlError = controlError
     self.lastT = t
     self.lastGPS = self.gps
     self.lastMag = self.mag
@@ -523,7 +598,8 @@ class ADCS:
     # self.lastR = r
     # self.lastQ = q
 
-    return iCoil, None
+
+    return iCoil.flatten(), targetDir.reshape((3,1))
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -680,6 +756,7 @@ class Satellite:
     gravity = -gravity / np.linalg.norm(gravity)
     self.gravityLocal = rInv @ gravity
 
+    # find torque produced by magnetorquer
     mLocal = np.zeros(3)
     mLocal += coilN * self.iCoil[0] * np.array([coilA, 0, 0])
     mLocal += coilN * self.iCoil[1] * np.array([0, coilA, 0])
@@ -837,9 +914,9 @@ class Satellite:
       accelerometer = self.gravityLocal * \
           np.random.normal(1, self.sigma, size=(3, 1))
       iCoilTarget, debugVector = adcs.compute(
-        t, gps, magnetometer, accelerometer)
+        t, gps, magnetometer, accelerometer, self.rList[-1])
       if iCoilTarget is not None:
-        self.vCoil = np.clip(
+        self.vCoil = saturate(
             iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)
       if debugVector is not None:
         self.debugVector = debugVector
