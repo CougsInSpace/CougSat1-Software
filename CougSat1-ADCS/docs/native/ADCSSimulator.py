@@ -343,24 +343,47 @@ def thetaError(v1, v2):
 
     return anglebetween
 
-def planeProject(earthMF,cameraDir,targetIdeal):
-  # uses this video for equation https://www.youtube.com/watch?v=QTcSBB3uVP0
-  earthMF = earthMF.flatten()
-  cameraDir = cameraDir.flatten()
-  targetIdeal = targetIdeal.flatten()
-  
-  planeVec = np.cross(earthMF,cameraDir)
-  normal = vectorProject(targetIdeal,planeVec)
+def planeProject(v1,v2,u):
+  '''!@brief Projects vector onto plane
 
-  return targetIdeal - normal
+
+  @param v1 1st vector in projection plane
+  @param v2 2nd vector in projection plane
+  @param u vector to project
+  @return u projected onto plane formed by v1 and v2
+  '''
+  
+  v1 = v1.flatten()
+  v2 = v2.flatten()
+  u = u.flatten()
+  
+  planeVec = np.cross(v1,v2)
+  normal = vectorProject(u,planeVec)
+
+  return u - normal
 
 def vectorProject(u,v):
-  '''
-  Vector projecttion of u onto v
+  '''!@brief Projects vector onto vector
+
+
+  @param u vector to project
+  @param v vector to be projected onto
+  @return vector projection of u onto v
   '''
   return (np.dot(v,u) / (np.linalg.norm(v)**2)) * v
 
 def saturate(v: np.ndarray, min: float, max: float):
+  '''!@brief Enforces min/max values for each element of v
+  without changing the direction of v. Used to enforce the 
+  voltage limits of each magnetorquer without changing the
+  direction of the dipole.
+
+  @param v vector to enforce min/max values on
+  @param min minimum allowable value
+  @param max maximum allowable value
+  @return v with min/max values applied
+  '''
+  
   for i in range(0,v.size):
     if v[i] > max or v[i] < min:
       v = v * abs(max/v[i])
@@ -389,6 +412,7 @@ class ADCS:
     self.lastSensorT = None
     self.loopIndex = 1 % self.loopCount
     self.lastControlError = 0
+    self.lastAngleBetweenTargets = 1 
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -547,7 +571,6 @@ class ADCS:
     #     print(omegaQ)
     #     return None, None
 
-    # debugVector = omega
     
     # change mag and rCamera to local global coordinates
     rInv = np.linalg.inv(r)
@@ -564,7 +587,7 @@ class ADCS:
     # make goalDir orthogonal to mag so when rotMatrix is calculated the resultant
     # dipole direction is also orthogonal to mag, getting the maximum torque
     targetDir = planeProject(magGlobal,rCameraGlobal,targetIdeal)
-
+    
     # calculate desired magnetic field direction
     rod = rodRotation(targetDir,rCameraGlobal)
     rod[3] = np.pi / 2 # make the rotation transformation 90deg
@@ -576,13 +599,6 @@ class ADCS:
     controlErrorDerivative = (controlError - self.lastControlError) / tStep
     proportionalGain = 1
     derivativeGain = 5.5
-
-    # print("aaaaaaaaa")
-    # print(controlError * proportionalGain)
-    # print(controlErrorDerivative * derivativeGain)
-    
-    # print(rCameraGlobal)
-    # print(targetDir)
 
     iVector = dipoleDir * ((controlError*proportionalGain) + (controlErrorDerivative*derivativeGain))
     # Step 5: Transform output magnetic dipole to coil duty cycles
