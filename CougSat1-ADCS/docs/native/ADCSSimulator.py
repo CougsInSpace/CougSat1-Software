@@ -307,9 +307,15 @@ def rodRotation(a: np.ndarray, aT: np.ndarray):
 
   a = a.flatten()
   aT = aT.flatten()
+
   axis = np.cross(a,aT).flatten()
-  axis = axis / np.linalg.norm(axis)
-  theta = thetaError(a, aT)
+  if np.linalg.norm(axis) == 0:
+    axis = np.array([0,0,1])
+    theta = 0
+  else:
+    axis = axis / np.linalg.norm(axis)
+    theta = thetaError(a, aT)
+  
   rod = np.append(axis, theta)
 
   return rod
@@ -337,9 +343,15 @@ def thetaError(v1, v2):
     v1unit = v1 / np.linalg.norm(v1)
     v2unit = v2 / np.linalg.norm(v2)
     #Find the dot product between v1 and v2 unit vectors
-    dotproduct = np.dot(v1unit, v2unit)
-    #Take arccos to find the angle in radians between the two
-    anglebetween = np.arccos(dotproduct)
+    dotProduct = np.dot(v1unit, v2unit)
+
+    # if statement to handle rounding errors that make
+    # dotProduct > 1 when v1=v2
+    if dotProduct < 1:
+      #Take arccos to find the angle in radians between the two
+      anglebetween = np.arccos(dotProduct)
+    else:
+      anglebetween = 0
 
     return anglebetween
 
@@ -412,7 +424,9 @@ class ADCS:
     self.lastSensorT = None
     self.loopIndex = 1 % self.loopCount
     self.lastControlError = 0
-    self.lastAngleBetweenTargets = 1 
+    self.controlErrorDerivative = 0
+    self.lastAngleBetweenTargets = 1
+    self.rotationStage = 1
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -582,12 +596,30 @@ class ADCS:
 
     # direction we want to point
     targetIdeal = self.ecefTarget - ecefSat
-    targetIdeal = targetIdeal / np.linalg.norm(targetIdeal)
+    targetIdeal = np.array([3, -8, 9])
+    #targetIdeal = targetIdeal / np.linalg.norm(targetIdeal)
 
-    # make goalDir orthogonal to mag so when rotMatrix is calculated the resultant
-    # dipole direction is also orthogonal to mag, getting the maximum torque
-    targetDir = planeProject(magGlobal,rCameraGlobal,targetIdeal)
-    
+    # determines how far out of the plane rCameraGlobal is
+    rCameraInPlane = planeProject(magGlobal,targetIdeal,rCameraGlobal)
+    inPlaneError = thetaError(rCameraInPlane,rCameraGlobal)
+
+    # bad 2-step rotation. Rotates to magGlobal, then to targetIdeal
+    if self.rotationStage == 3 or (thetaError(targetIdeal, rCameraGlobal) < np.pi/16 and np.abs(self.controlErrorDerivative) < .0001):
+      self.rotationStage = 3
+      targetDir = rCameraGlobal
+      print("third")
+    elif self.rotationStage == 2 or (inPlaneError < np.pi / 64 and np.abs(self.controlErrorDerivative) < .003):
+      self.rotationStage = 2
+      # we're in plane, move to final destination
+      targetDir = planeProject(rCameraGlobal,magGlobal,targetIdeal)
+      print("second")
+    else:
+      # go back into plane
+      targetDir = magGlobal
+      print("first")
+
+    targetDir = targetDir / np.linalg.norm(targetDir)
+
     # calculate desired magnetic field direction
     rod = rodRotation(targetDir,rCameraGlobal)
     rod[3] = np.pi / 2 # make the rotation transformation 90deg
@@ -596,11 +628,11 @@ class ADCS:
 
     # Step 4: Do control loop with current omega and target error (if target is not None)
     controlError = thetaError(rCameraGlobal,targetDir)
-    controlErrorDerivative = (controlError - self.lastControlError) / tStep
+    self.controlErrorDerivative = (controlError - self.lastControlError) / tStep
     proportionalGain = 1
-    derivativeGain = 5.5
+    derivativeGain = 8
 
-    iVector = dipoleDir * ((controlError*proportionalGain) + (controlErrorDerivative*derivativeGain))
+    iVector = dipoleDir * ((controlError*proportionalGain) + (self.controlErrorDerivative*derivativeGain))
     # Step 5: Transform output magnetic dipole to coil duty cycles
     # TODO
 
@@ -614,8 +646,7 @@ class ADCS:
     # self.lastR = r
     # self.lastQ = q
 
-
-    return iCoil.flatten(), targetDir.reshape((3,1))
+    return iCoil.flatten(), targetIdeal.reshape((3,1))
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
