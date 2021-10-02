@@ -364,13 +364,27 @@ def planeProject(v1,v2,u):
   @param u vector to project
   @return u projected onto plane formed by v1 and v2
   '''
-  
   v1 = v1.flatten()
   v2 = v2.flatten()
   u = u.flatten()
   
   planeVec = np.cross(v1,v2)
   normal = vectorProject(u,planeVec)
+
+  return u - normal
+
+def planeProjectNorm(n,u):
+  '''!@brief Projects vector onto using plane normal as plane
+  definition
+
+  @param n plane normal vector
+  @param u vector to project
+  @return u projected onto plane defined by n
+  '''
+  n = n.flatten()
+  u = u.flatten()
+
+  normal = vectorProject(u,n)
 
   return u - normal
 
@@ -595,9 +609,9 @@ class ADCS:
     # Step 3: Compute desired magnetic field vector
 
     # direction we want to point
-    targetIdeal = self.ecefTarget - ecefSat
+    #targetIdeal = self.ecefTarget - ecefSat
     targetIdeal = np.array([3, -8, 9])
-    #targetIdeal = targetIdeal / np.linalg.norm(targetIdeal)
+    targetIdeal = targetIdeal / np.linalg.norm(targetIdeal)
 
     # determines how far out of the plane rCameraGlobal is
     rCameraInPlane = planeProject(magGlobal,targetIdeal,rCameraGlobal)
