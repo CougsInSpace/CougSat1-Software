@@ -373,6 +373,20 @@ def planeProject(v1,v2,u):
 
   return u - normal
 
+def torque2Dipole(torqueDir, mag):
+  '''!@brief Find dipole that generates the desired torque
+
+
+  @param torqueDir direction of torque
+  @param mag earth magnetic field
+  @return direction of dipole
+  '''
+  torqueDir = torqueDir.flatten()
+  mag = mag.flatten()
+
+  dipoleDir = np.cross(mag,torqueDir)
+  return dipoleDir / np.linalg.norm(dipoleDir)
+
 def planeProjectNorm(n,u):
   '''!@brief Projects vector onto using plane normal as plane
   definition
@@ -389,7 +403,7 @@ def planeProjectNorm(n,u):
   return u - normal
 
 def vectorProject(u,v):
-  '''!@brief Projects vector onto vector
+  '''!@brief Projects u onto v
 
 
   @param u vector to project
@@ -397,6 +411,14 @@ def vectorProject(u,v):
   @return vector projection of u onto v
   '''
   return (np.dot(v,u) / (np.linalg.norm(v)**2)) * v
+
+def findNormal(v1,v2,u):
+  v1 = v1.flatten()
+  v2 = v2.flatten()
+
+  planeNormal = np.cross(v1,v2)
+
+  return vectorProject(u,planeNormal)
 
 def saturate(v: np.ndarray, min: float, max: float):
   '''!@brief Enforces min/max values for each element of v
@@ -609,36 +631,42 @@ class ADCS:
     # Step 3: Compute desired magnetic field vector
 
     # direction we want to point
-    #targetIdeal = self.ecefTarget - ecefSat
-    targetIdeal = np.array([3, -8, 9])
+    targetIdeal = self.ecefTarget - ecefSat
+    #targetIdeal = np.array([3, -8, 9])
     targetIdeal = targetIdeal / np.linalg.norm(targetIdeal)
 
     # determines how far out of the plane rCameraGlobal is
     rCameraInPlane = planeProject(magGlobal,targetIdeal,rCameraGlobal)
     inPlaneError = thetaError(rCameraInPlane,rCameraGlobal)
 
-    # bad 2-step rotation. Rotates to magGlobal, then to targetIdeal
-    if self.rotationStage == 3 or (thetaError(targetIdeal, rCameraGlobal) < np.pi/16 and np.abs(self.controlErrorDerivative) < .0001):
-      self.rotationStage = 3
-      targetDir = rCameraGlobal
-      print("third")
-    elif self.rotationStage == 2 or (inPlaneError < np.pi / 64 and np.abs(self.controlErrorDerivative) < .003):
+    axis = np.array([0,0,0])
+    # better 2-step rotation.
+    if inPlaneError < np.pi / 64 and (np.abs(self.controlErrorDerivative) < .003 or self.rotationStage == 2): # target mode
       self.rotationStage = 2
       # we're in plane, move to final destination
       targetDir = planeProject(rCameraGlobal,magGlobal,targetIdeal)
+      targetDir = targetDir / np.linalg.norm(targetDir)
+
+      # calculate desired magnetic field direction
+      rod = rodRotation(targetDir,rCameraGlobal)
+      rod[3] = np.pi / 2 # make the rotation transformation 90deg
+      dipoleDir = applyRodRotation(magGlobal,rod)
+      dipoleDir = dipoleDir / np.linalg.norm(dipoleDir)
+
       print("second")
-    else:
+    else: # torque mode
+      self.rotationStage = 1
       # go back into plane
-      targetDir = magGlobal
+      # find ideal torque to rotate back into plane then project it
+      # onto plane of possible torques (plane normal to magGlobal)
+      rCameraGlobalProj = planeProject(targetIdeal,magGlobal,rCameraGlobal)
+      axis = np.cross(rCameraGlobal.flatten(),rCameraGlobalProj.flatten())
+      torque = planeProjectNorm(magGlobal,axis)
+      dipoleDir = torque2Dipole(torque,magGlobal)
+
+      targetDir = planeProject(targetIdeal,magGlobal,rCameraGlobal)
+
       print("first")
-
-    targetDir = targetDir / np.linalg.norm(targetDir)
-
-    # calculate desired magnetic field direction
-    rod = rodRotation(targetDir,rCameraGlobal)
-    rod[3] = np.pi / 2 # make the rotation transformation 90deg
-    dipoleDir = applyRodRotation(magGlobal,rod)
-    dipoleDir = dipoleDir / np.linalg.norm(dipoleDir)
 
     # Step 4: Do control loop with current omega and target error (if target is not None)
     controlError = thetaError(rCameraGlobal,targetDir)
@@ -659,8 +687,8 @@ class ADCS:
     self.lastGravity = self.gravity
     # self.lastR = r
     # self.lastQ = q
-
-    return iCoil.flatten(), targetIdeal.reshape((3,1))
+    
+    return iCoil.flatten(), axis.reshape((3,1))
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
