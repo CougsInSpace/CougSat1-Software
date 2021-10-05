@@ -459,8 +459,12 @@ class ADCS:
     self.lastT = None
     self.lastSensorT = None
     self.loopIndex = 1 % self.loopCount
-    self.lastControlError = 0
-    self.controlErrorDerivative = 0
+    #------------------------#
+    self.lastControlError1 = 0
+    self.lastControlError2 = 0
+    self.controlErrorDerivative1 = 0
+    self.controlErrorDerivative2 = 0
+    #------------------------#
     self.lastAngleBetweenTargets = 1
     self.rotationStage = 1
 
@@ -635,52 +639,44 @@ class ADCS:
     #targetIdeal = np.array([3, -8, 9])
     targetIdeal = targetIdeal / np.linalg.norm(targetIdeal)
 
-    # determines how far out of the plane rCameraGlobal is
-    rCameraInPlane = planeProject(magGlobal,targetIdeal,rCameraGlobal)
-    inPlaneError = thetaError(rCameraInPlane,rCameraGlobal)
+    # torque to get the satellite into the earthMF/target plane
+    rCameraGlobalProj = planeProject(targetIdeal,magGlobal,rCameraGlobal)
+    axis = np.cross(rCameraGlobal.flatten(),rCameraGlobalProj.flatten())
+    torque1 = planeProjectNorm(magGlobal,axis)
 
-    axis = np.array([0,0,0])
-    # better 2-step rotation.
-    if inPlaneError < np.pi / 64 and (np.abs(self.controlErrorDerivative) < .003 or self.rotationStage == 2): # target mode
-      self.rotationStage = 2
-      # we're in plane, move to final destination
-      targetDir = planeProject(rCameraGlobal,magGlobal,targetIdeal)
-      targetDir = targetDir / np.linalg.norm(targetDir)
+    # torque to get the satellite to the target direction
+    targetDir = planeProject(magGlobal,rCameraGlobal,targetIdeal)
+    torque2 = np.cross(rCameraGlobal.flatten(),targetDir.flatten())
 
-      # calculate desired magnetic field direction
-      rod = rodRotation(targetDir,rCameraGlobal)
-      rod[3] = np.pi / 2 # make the rotation transformation 90deg
-      dipoleDir = applyRodRotation(magGlobal,rod)
-      dipoleDir = dipoleDir / np.linalg.norm(dipoleDir)
+    torque1 = torque1 / np.linalg.norm(torque1)
+    torque2 = torque2 / np.linalg.norm(torque2)
 
-      print("second")
-    else: # torque mode
-      self.rotationStage = 1
-      # go back into plane
-      # find ideal torque to rotate back into plane then project it
-      # onto plane of possible torques (plane normal to magGlobal)
-      rCameraGlobalProj = planeProject(targetIdeal,magGlobal,rCameraGlobal)
-      axis = np.cross(rCameraGlobal.flatten(),rCameraGlobalProj.flatten())
-      torque = planeProjectNorm(magGlobal,axis)
-      dipoleDir = torque2Dipole(torque,magGlobal)
-
-      targetDir = planeProject(targetIdeal,magGlobal,rCameraGlobal)
-
-      print("first")
-
-    # Step 4: Do control loop with current omega and target error (if target is not None)
-    controlError = thetaError(rCameraGlobal,targetDir)
-    self.controlErrorDerivative = (controlError - self.lastControlError) / tStep
+    # Step 4: Control loop for both steps simultaneously
+    controlError1 = thetaError(rCameraGlobal,rCameraGlobalProj)
+    controlError2 = thetaError(rCameraGlobal,targetDir)
+    self.controlErrorDerivative1 = (controlError1 - self.lastControlError1) / tStep
+    self.controlErrorDerivative2 = (controlError2 - self.lastControlError2) / tStep
     proportionalGain = 1
-    derivativeGain = 8
+    derivativeGain = 6.5
+    
+    # control loop for each torque
+    torque1 = torque1 * ((controlError1*proportionalGain) + (self.controlErrorDerivative1*derivativeGain))
+    torque2 = torque2 * ((controlError2*proportionalGain) + (self.controlErrorDerivative2*derivativeGain))
 
-    iVector = dipoleDir * ((controlError*proportionalGain) + (self.controlErrorDerivative*derivativeGain))
+    # final combined torque
+    torque = torque1 + torque2
+
+    dipole = torque2Dipole(torque,magGlobal)
+
+    iVector = dipole
     # Step 5: Transform output magnetic dipole to coil duty cycles
     # TODO
 
+    # set coil currents
     iCoil = rInv @ iVector.reshape((3,1))
 
-    self.lastControlError = controlError
+    self.lastControlError1 = controlError1
+    self.lastControlError2 = controlError2
     self.lastT = t
     self.lastGPS = self.gps
     self.lastMag = self.mag
@@ -688,7 +684,7 @@ class ADCS:
     # self.lastR = r
     # self.lastQ = q
     
-    return iCoil.flatten(), axis.reshape((3,1))
+    return iCoil.flatten(), torque.reshape((3,1))
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -817,7 +813,7 @@ class Satellite:
     # Convergence thresholds
     self.omegaThreshold = np.deg2rad(1) / 1
     self.angleThreshold = np.deg2rad(1)
-    self.currentThreshold = 1e-3
+    self.currentThreshold = 99 # was 1e-3, effectively turned it off
 
     self.converged = False
 
@@ -1227,7 +1223,7 @@ class Satellite:
     ax.set_title('Global')
     ax.view_init(30, 30)
 
-    leg = ax.legend(fancybox=True, shadow=True)
+    leg = ax.legend(fancybox=True, shadow=False)
     lined = {}
     for legline, origline in zip(leg.get_lines(), lines):
       legline.set_picker(True)
@@ -1356,7 +1352,7 @@ class Satellite:
     ax.set_title('Local')
     ax.view_init(30, 30)
 
-    leg = ax.legend(fancybox=True, shadow=True)
+    leg = ax.legend(fancybox=True, shadow=False)
     lined = {}
     for legline, origline in zip(leg.get_lines(), lines):
       legline.set_picker(True)
