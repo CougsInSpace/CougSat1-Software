@@ -1,10 +1,10 @@
-#include <CISConsole.h>
 #include "../../CISLibrary/drivers/GPS/Venus838FLPx.h"
+#include "../tools/CISConsole.h"
 #include "Configuration.h"
 #include "interfaces/CDH.h"
+#include <CISConsole.h>
 #include <mbed.h>
 #include <rtos.h>
-#include "../tools/CISConsole.h"
 
 //#include "../../CISLibrary/tools/CISConsole.h"
 //#include "ADCS.h"
@@ -27,17 +27,27 @@ int main(void) {
   LOG("ADCS", "Start");
   // ADCS adcs;
   // adcs.startThread();
-  Serial       gpsSerial = Serial(PinName(PA_9), PinName(PA_10));
-  Venus838FLPx gps1(gpsSerial, PinName(PA_8), PinName(PA_11));
-  GPSData_t    gpsData;
+  RawSerial           gpsSerial = RawSerial(PA_2, USBRX, 9600);
+  Venus838FLPx        gps1(gpsSerial, PinName(PA_8), PinName(PA_11));
+  GPSData_t           gpsData;
+  mbed_error_status_t error = 0;
+  DigitalOut led(D4);
+  led = 0;
+
   while (true) {
     LOG("ADCS", "Main");
-    gps1.read(gpsData);
-    LOG("GPS",
-       "Latitude: %f\n   Longitude: %f\n Altitude: %f\n  Ground Speed: %f  \n "
-        "Current Time: %d",
-        gpsData.latitude, gpsData.longitude, gpsData.altitude,
-        gpsData.groundSpeed, gpsData.time);
+    printf("put someting on serial\n");
+    
+    error = gps1.read(gpsData);
+    if (!error) {
+      led = !led;
+      LOG("GPS",
+          "Latitude: %f\n   Longitude: %f\n Altitude: %f\n  Ground Speed: %f  "
+          "\n "
+          "Current Time: %d",
+          gpsData.latitude, gpsData.longitude, gpsData.altitude,
+          gpsData.groundSpeed, gpsData.time);
+    }
     wait(.5);
   }
 }

@@ -7,9 +7,10 @@
  * @param reset pin of the GPS
  * @param pulse pin of the GPS
  */
-Venus838FLPx::Venus838FLPx(Serial & serial, PinName reset, PinName pulse) :
-  serial(serial), reset(reset), pulse(pulse) {
+Venus838FLPx::Venus838FLPx(RawSerial & serial, PinName re, PinName pulse) :
+  serial(serial), reset(re, 1), pulse(pulse) {
   DEBUG("GPS", "Created GPS");
+  serial.attach(this, &Venus838FLPx::gps_read);
 }
 
 Venus838FLPx::Venus838FLPx(const Venus838FLPx & copy) :
@@ -31,14 +32,23 @@ Venus838FLPx::~Venus838FLPx() {}
  * @return mbed_error_status_t
  */
 mbed_error_status_t Venus838FLPx::read(GPSData_t & data, bool blocking) {
-  mbed_error_status_t error          = 0;
-  char                nmeaString[83] = {'\0'};
+  mbed_error_status_t error = 0;
+  reset.write(1);
 
   for (uint8_t i = 0; i < 6; ++i) {
-    DEBUG("GPS", "Read String");
-    serial.gets(nmeaString, 83);
+   // DEBUG("GPS", "Read String");
+    
+    // if (serial.readable()) {
+    //   serial.gets(nmeaString, 83);
+    // } else {
+    //   ERROR("GPS", "Serial is not readable");
+    //   DEBUG("GPS", "Readable Status: %d", serial.readable());
+    //   error = 1;
+    //   return error;
+    // }
 
     DEBUG("GPS", "Raw String: %s", nmeaString);
+    if(nmeaString[0]) gpsIndex = 0;
 
     switch (nmeaString[5]) // 5th element is unique for each string
     {
@@ -71,6 +81,11 @@ mbed_error_status_t Venus838FLPx::read(GPSData_t & data, bool blocking) {
         break;
     }
   }
+  return error;
+}
+void Venus838FLPx::gps_read() {
+  DEBUG("GPS", "PLEASE AcTUALY INterupt\r\n");
+  nmeaString[gpsIndex++] = serial.getc();
 }
 
 mbed_error_status_t Venus838FLPx::parseGGA(
