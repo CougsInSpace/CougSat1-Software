@@ -379,13 +379,13 @@ def torque2Dipole(torqueDir, mag):
 
   @param torqueDir direction of torque
   @param mag earth magnetic field
-  @return direction of dipole
+  @return dipole
   '''
   torqueDir = torqueDir.flatten()
   mag = mag.flatten()
 
   dipoleDir = np.cross(mag,torqueDir)
-  return dipoleDir / np.linalg.norm(dipoleDir)
+  return dipoleDir
 
 def planeProjectNorm(n,u):
   '''!@brief Projects vector onto using plane normal as plane
@@ -645,15 +645,15 @@ class ADCS:
     torque1 = planeProjectNorm(magGlobal,axis)
 
     # torque to get the satellite to the target direction
-    targetDir = planeProject(magGlobal,rCameraGlobal,targetIdeal)
-    torque2 = np.cross(rCameraGlobal.flatten(),targetDir.flatten())
+    targetDir = planeProject(magGlobal,targetIdeal,rCameraGlobal)
+    torque2 = np.cross(targetDir.flatten(),targetIdeal.flatten())
 
     torque1 = torque1 / np.linalg.norm(torque1)
     torque2 = torque2 / np.linalg.norm(torque2)
 
     # Step 4: Control loop for both steps simultaneously
     controlError1 = thetaError(rCameraGlobal,rCameraGlobalProj)
-    controlError2 = thetaError(rCameraGlobal,targetDir)
+    controlError2 = thetaError(targetIdeal,targetDir)
     self.controlErrorDerivative1 = (controlError1 - self.lastControlError1) / tStep
     self.controlErrorDerivative2 = (controlError2 - self.lastControlError2) / tStep
     proportionalGain = 1
@@ -674,6 +674,7 @@ class ADCS:
 
     # set coil currents
     iCoil = rInv @ iVector.reshape((3,1))
+    iCoil = iCoil * 100000
 
     self.lastControlError1 = controlError1
     self.lastControlError2 = controlError2
@@ -738,7 +739,7 @@ class Satellite:
       self.ecefTarget = None
     else:
       self.loopFreq = 100
-      self.maxDuration = 60 * 5
+      self.maxDuration = 60 * 15
       self.geoTarget = np.zeros(3)
       self.geoTarget[0] = (self.geo[0] +
                            np.random.uniform(-45, 45) + 180) % 360 - 180
