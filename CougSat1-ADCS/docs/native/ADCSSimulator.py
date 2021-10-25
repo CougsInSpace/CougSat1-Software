@@ -17,7 +17,6 @@ from multiprocessing import Pool, cpu_count
 import numpy as np
 import os
 from pyorbital.orbital import Orbital
-from pyorbital import astronomy
 import quaternion
 from tqdm import tqdm
 
@@ -413,21 +412,6 @@ def vectorProject(u,v):
   '''
   return (np.dot(v,u) / (np.linalg.norm(v)**2)) * v
 
-def sunDir(time: datetime.datetime):
-  '''!@brief Find position of sun in Global frame
-
-  @param time Current time
-  @return sunDir Direction vector of sun in Global frame
-  '''
-  ascDec = astronomy.sun_ra_dec(time)
-  long = np.degrees(ascDec[0])
-  lat = np.degrees(ascDec[1])
-
-  sunDir = geo2ECEF(long,lat,1)
-  sunDir = sunDir / np.linalg.norm(sunDir.flatten())
-
-  return sunDir
-
 def findNormal(v1,v2,u):
   v1 = v1.flatten()
   v2 = v2.flatten()
@@ -482,7 +466,7 @@ class ADCS:
     self.controlErrorDerivative2 = 0
     #------------------------#
     self.lastAngleBetweenTargets = 1
-    self.lastSunDir = np.array([0,0,0])
+    self.rotationStage = 1
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -524,7 +508,7 @@ class ADCS:
     self.lastSensorT = t
 
   def compute(self, t: float, gps: np.ndarray,
-              mag: np.ndarray, gravity: np.ndarray,realTime: datetime.datetime, r: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+              mag: np.ndarray, gravity: np.ndarray, r: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     '''!@brief Compute ADCS loop given input from sensors
 
     @param t Current time
@@ -539,10 +523,6 @@ class ADCS:
     '''
     self.loopIndex = (self.loopIndex + 1) % self.loopCount
     self.sensorAcquition(t, gps, mag, gravity)
-
-    # this code should probably be in sensorAcquition
-    sunDirGlobal = sunDir(realTime)
-
     if self.loopIndex != 0:
       return None, None
 
@@ -593,7 +573,7 @@ class ADCS:
 
     # # local = rInv @ global
     # # global = r @ local
-    rInvSensor = rotMatrix2(mag, self.mag, gravityG, self.gravity)
+    # rInv = rotMatrix2(magG, self.mag, gravityG, self.gravity)
     # if rInv is None:
     #   # Cannot determine attitude, don't act
     #   dCoil = np.array([0.0, 0.0, 0.0])
@@ -702,7 +682,6 @@ class ADCS:
     self.lastGPS = self.gps
     self.lastMag = self.mag
     self.lastGravity = self.gravity
-    self.lastSunDir = sunDirGlobal
     # self.lastR = r
     # self.lastQ = q
     
@@ -760,7 +739,7 @@ class Satellite:
       self.ecefTarget = None
     else:
       self.loopFreq = 100
-      self.maxDuration = 60 * 5
+      self.maxDuration = 60 * 15
       self.geoTarget = np.zeros(3)
       self.geoTarget[0] = (self.geo[0] +
                            np.random.uniform(-45, 45) + 180) % 360 - 180
@@ -1020,9 +999,8 @@ class Satellite:
           np.random.normal(1, self.sigma, size=(3, 1))
       accelerometer = self.gravityLocal * \
           np.random.normal(1, self.sigma, size=(3, 1))
-      realTime = self.startDatetime + datetime.timedelta(seconds=t)
       iCoilTarget, debugVector = adcs.compute(
-        t, gps, magnetometer, accelerometer, realTime, self.rList[-1])
+        t, gps, magnetometer, accelerometer, self.rList[-1])
       if iCoilTarget is not None:
         self.vCoil = saturate(
             iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)

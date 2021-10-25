@@ -25,25 +25,23 @@ colorama.init(autoreset=True)
 
 def latLongSun(time: datetime.datetime):
   ascDec = astronomy.sun_ra_dec(time)
-  # sideReal = astronomy.gmst(time)
+  sideReal = astronomy.gmst(time)
+
+  print(sideReal)
 
   asc = ascDec[0]
   dec = ascDec[1]
 
-  # if asc < 0:
-  #   asc = asc + (2*np.pi)
+  if asc < 0:
+    asc = asc + (2*np.pi)
 
-  # print(asc)
-  # print(dec)
-  # long = asc - sideReal
-  # if long > np.pi:
-  #   long = np.pi - long
-  # lat = dec
-
-  # long = asc - (2*np.pi)
+  long = asc - sideReal
+  if long > np.pi:
+    long = np.pi - long
+  lat = dec
   
 
-  return np.array([np.degrees(dec), np.degrees(asc)])
+  return np.array([np.degrees(lat), np.degrees(long)])
 
 realTime = datetime.datetime.now()
 
