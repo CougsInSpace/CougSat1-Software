@@ -337,7 +337,7 @@ def applyRodRotation(v: np.ndarray,rod:np.ndarray):
   vT = (v*np.cos(theta)) + (np.cross(k,v)*np.sin(theta)) + (k*np.dot(k,v)*(1 - np.cos(theta)))
   return vT
 
-def thetaError(v1, v2):
+def thetaError(v1,v2):
     v1 = v1.flatten()
     v2 = v2.flatten()
     #Find the unit vectors first
@@ -374,7 +374,7 @@ def planeProject(v1,v2,u):
 
   return u - normal
 
-def torque2Dipole(torqueDir, mag):
+def torque2Dipole(torqueDir,mag):
   '''!@brief Find dipole that generates the desired torque
 
 
@@ -426,7 +426,7 @@ def sunDir(time: datetime.datetime):
   sunDir = geo2ECEF(long,lat,1)
   sunDir = sunDir / np.linalg.norm(sunDir.flatten())
 
-  return sunDir
+  return sunDir.reshape((3,1))
 
 def findNormal(v1,v2,u):
   v1 = v1.flatten()
@@ -452,6 +452,60 @@ def saturate(v: np.ndarray, min: float, max: float):
     if v[i] > max or v[i] < min:
       v = v * abs(max/v[i])
   return v
+
+def rotMatrix2Mod(a: np.ndarray, aT: np.ndarray, b: np.ndarray, bT: np.ndarray):
+  '''!@brief !!!CURRENTLY DOES NOT WORK PROPERLY!!!
+  Finds rotation matrix between a and b to aT and bT, but priortizes 
+  the vector a. It rotates a to aT first and then finds the closest b can get to 
+  bT without compromising the first rotation.
+
+  @param a untransformed priority vector
+  @param aT transformed priority vector
+  @param b untransformed secondary vector
+  @param bT transformed secondary vector
+  @return rotation matrix from a and b to aT and bT
+  '''
+  a = a.flatten() / np.linalg.norm(a)
+  aT = aT.flatten() / np.linalg.norm(aT)
+  b = b.flatten() / np.linalg.norm(b)
+  bT = bT.flatten() / np.linalg.norm(bT)
+
+  # rotate to a first and then apply the same rotation to b
+  rod = rodRotation(a, aT)
+  bT2 = applyRodRotation(b, rod)
+
+  # find normal vectors for planes of aT/bT and aT/bT2
+  n1 = np.cross(aT, bT)
+  n2 = np.cross(aT, bT2)
+
+  # find the two complimentary angles between the planes
+  theta1 = thetaError(n1, n2)
+  theta2 = (np.pi) - theta1
+
+  # two candidates for the second Rodrigues Rotation Vector (RRV)
+  # specifically for b
+  testRod1 = np.array([aT[0], aT[1], aT[2], theta1])
+  testRod2 = np.array([aT[0], aT[1], aT[2], theta2])
+
+  # apply the two RRV candidates
+  bTFinal1 = applyRodRotation(bT2, testRod1)
+  bTFinal2 = applyRodRotation(bT2, testRod2)
+
+  # find error for how close to the actual bT each RRV rotated b to be
+  error1 = thetaError(bT, bTFinal1)
+  error2 = thetaError(bT, bTFinal2)
+
+  # check each candidate, choose the better one
+  if error1 < error2:
+    bTFinal = bTFinal1
+  else:
+    bTFinal = bTFinal2
+
+  print(error1)
+  print(error2)
+
+  # make rotation matrix
+  return rotMatrix2(a, aT, b, bTFinal)
 
 orb = Orbital(
   "ISS",
@@ -482,7 +536,7 @@ class ADCS:
     self.controlErrorDerivative2 = 0
     #------------------------#
     self.lastAngleBetweenTargets = 1
-    self.lastSunDir = np.array([0,0,0])
+    self.lastSunDirLocal = np.array([0,0,0])
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -524,7 +578,7 @@ class ADCS:
     self.lastSensorT = t
 
   def compute(self, t: float, gps: np.ndarray,
-              mag: np.ndarray, gravity: np.ndarray,realTime: datetime.datetime, r: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+              mag: np.ndarray, gravity: np.ndarray, sunDirLocal: np.ndarray, realTime: datetime.datetime, r: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     '''!@brief Compute ADCS loop given input from sensors
 
     @param t Current time
@@ -537,6 +591,8 @@ class ADCS:
       Debug vector, shape=(3, 1) Vector to plot for debug purposes, None will not plot
         debugVectorLocal: True assumes vector is in local reference frame, False is global
     '''
+    rInv = np.linalg.inv(r)
+    
     self.loopIndex = (self.loopIndex + 1) % self.loopCount
     self.sensorAcquition(t, gps, mag, gravity)
 
@@ -588,12 +644,17 @@ class ADCS:
     # find ecef vector of the satellite
     ecefSat = geo2ECEF(self.gps[0], self.gps[1], self.gps[2])
 
-    # magG = interpolateWMM(self.gps[0], self.gps[1])
-    # magG = magG / np.linalg.norm(magG)
+    magG = interpolateWMM(self.gps[0], self.gps[1])
+    magG = magG / np.linalg.norm(magG)
 
     # # local = rInv @ global
     # # global = r @ local
-    rInvSensor = rotMatrix2(mag, self.mag, gravityG, self.gravity)
+    mag = mag / np.linalg.norm(mag)
+    magG = magG / np.linalg.norm(magG)
+    sunDirLocal = sunDirLocal / np.linalg.norm(sunDirLocal)
+    sunDirGlobal = sunDirGlobal / np.linalg.norm(sunDirGlobal)
+
+    rSensor = rotMatrix2(mag, magG, sunDirLocal, sunDirGlobal)
     # if rInv is None:
     #   # Cannot determine attitude, don't act
     #   dCoil = np.array([0.0, 0.0, 0.0])
@@ -645,11 +706,9 @@ class ADCS:
     #     print(omegaQ)
     #     return None, None
 
-    
     # change mag and rCamera to local global coordinates
-    rInv = np.linalg.inv(r)
-    magGlobal = r @ mag
-    rCameraGlobal = r @ rCamera
+    magGlobal = rSensor @ mag
+    rCameraGlobal = rSensor @ rCamera
 
 
     # Step 3: Compute desired magnetic field vector
@@ -702,11 +761,11 @@ class ADCS:
     self.lastGPS = self.gps
     self.lastMag = self.mag
     self.lastGravity = self.gravity
-    self.lastSunDir = sunDirGlobal
+    self.lastSunDirLocal = sunDirGlobal
     # self.lastR = r
     # self.lastQ = q
     
-    return iCoil.flatten(), torque.reshape((3,1))
+    return iCoil.flatten(), sunDirGlobal.reshape((3,1))
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -728,7 +787,6 @@ def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
   return rCoil, lCoil
 
 class Satellite:
-
   def __init__(self, detumble: bool = False,
                initialOmega: float = 0.1, static: bool = False, sigma: float = 0.1) -> None:
     '''!@brief Create a Satellite simulation
@@ -862,6 +920,8 @@ class Satellite:
     gravity = geo2ECEF(self.geo[0], self.geo[1], self.geo[2])
     gravity = -gravity / np.linalg.norm(gravity)
     self.gravityLocal = rInv @ gravity
+
+    self.sunDirLocal = rInv @ sunDir(realTime)
 
     # find torque produced by magnetorquer
     mLocal = np.zeros(3)
@@ -1021,8 +1081,9 @@ class Satellite:
       accelerometer = self.gravityLocal * \
           np.random.normal(1, self.sigma, size=(3, 1))
       realTime = self.startDatetime + datetime.timedelta(seconds=t)
+      diodes = self.sunDirLocal # add error based on experiments
       iCoilTarget, debugVector = adcs.compute(
-        t, gps, magnetometer, accelerometer, realTime, self.rList[-1])
+        t, gps, magnetometer, accelerometer, diodes, realTime, self.rList[-1])
       if iCoilTarget is not None:
         self.vCoil = saturate(
             iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)
@@ -1251,6 +1312,7 @@ class Satellite:
     for legline, origline in zip(leg.get_lines(), lines):
       legline.set_picker(True)
       lined[legline] = origline[0]
+      lined[legline].set_visible(False)
 
     def on_pick(event):
       # On the pick event, find the original line corresponding to the legend
@@ -1386,6 +1448,7 @@ class Satellite:
       # proxy line, and toggle its visibility.
       legline = event.artist
       origline = lined[legline]
+      lined[legline].set_visible(False)
       visible = not origline.get_visible()
       origline.set_visible(visible)
       # Change the alpha on the line in the legend so we can see what lines
