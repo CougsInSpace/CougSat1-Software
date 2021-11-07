@@ -93,29 +93,28 @@ VoltageNode * vNodesPVIn[COUNT_PV] = {&vNodePVIn_0A, &vNodePVIn_0B,
     &vNodePVIn_1A, &vNodePVIn_1B, &vNodePVIn_2A, &vNodePVIn_2B, &vNodePVIn_3A,
     &vNodePVIn_3B};
 
-DigitalOut inputSwitch_02A(PC_PV02A, true);
-DigitalOut inputSwitch_02B(PC_PV02B, true);
-DigitalOut inputSwitch_13A(PC_PV13A, true);
-DigitalOut inputSwitch_13B(PC_PV13B, true);
+// DigitalOut inputSwitch_02A(PC_PV02A, true); // PC_PV02A was removed on new
+// version of PMIC DigitalOut inputSwitch_02B(PC_PV02B, true); DigitalOut
+// inputSwitch_13A(PC_PV13A, true); DigitalOut inputSwitch_13B(PC_PV13B, true);
 
-DigitalOut * inputSwitching[COUNT_INPUT_SW] = {
-    &inputSwitch_02A, &inputSwitch_02B, &inputSwitch_13A, &inputSwitch_13B};
+// DigitalOut * inputSwitching[COUNT_INPUT_SW] = {
+//     &inputSwitch_02A, &inputSwitch_02B, &inputSwitch_13A, &inputSwitch_13B};
 
 // clang-format off
-CurrentNode iNodePR3V3_0(adcEPS3, ADCChannel_t::CM_07, GAIN_PR_3V3_0, PC_3V3_0_N, true, INITIAL_PR_3V3_0, RANK_PR_3V3_0);
-CurrentNode iNodePR3V3_1(adcEPS3, ADCChannel_t::CM_06, GAIN_PR_3V3_1, PC_3V3_1_N, true, INITIAL_PR_3V3_1, RANK_PR_3V3_1);
-CurrentNode iNodePR3V3_2(adcEPS3, ADCChannel_t::CM_05, GAIN_PR_3V3_2, PC_3V3_2_N, true, INITIAL_PR_3V3_2, RANK_PR_3V3_2);
-CurrentNode iNodePR3V3_3(adcEPS3, ADCChannel_t::CM_04, GAIN_PR_3V3_3, PC_3V3_3_N, true, INITIAL_PR_3V3_3, RANK_PR_3V3_3);
-CurrentNode iNodePR3V3_4(adcEPS3, ADCChannel_t::CM_03, GAIN_PR_3V3_4, PC_3V3_4_N, true, INITIAL_PR_3V3_4, RANK_PR_3V3_4);
+CurrentNode iNodePR3V3_0(adcEPS3, ADCChannel_t::CM_07, GAIN_PR_3V3_0, PC_3V3_0, false, INITIAL_PR_3V3_0, RANK_PR_3V3_0); // done
+CurrentNode iNodePR3V3_1(adcEPS3, ADCChannel_t::CM_06, GAIN_PR_3V3_1, PC_3V3_1, false, INITIAL_PR_3V3_1, RANK_PR_3V3_1); // done
+CurrentNode iNodePR3V3_2(adcEPS3, ADCChannel_t::CM_05, GAIN_PR_3V3_2, PC_3V3_2, false, INITIAL_PR_3V3_2, RANK_PR_3V3_2); // done
+CurrentNode iNodePR3V3_3(adcEPS3, ADCChannel_t::CM_04, GAIN_PR_3V3_3, PC_3V3_3, false, INITIAL_PR_3V3_3, RANK_PR_3V3_3);
+CurrentNode iNodePR3V3_4(adcEPS3, ADCChannel_t::CM_03, GAIN_PR_3V3_4, PC_3V3_4, false, INITIAL_PR_3V3_4, RANK_PR_3V3_4);
 CurrentNode iNodePR3V3_5(adcEPS3, ADCChannel_t::CM_02, GAIN_PR_3V3_5, PC_3V3_5, false, INITIAL_PR_3V3_5, RANK_PR_3V3_5);
-CurrentNode iNodePR3V3_6(adcEPS3, ADCChannel_t::CM_01, GAIN_PR_3V3_6, PC_3V3_6_N, true, INITIAL_PR_3V3_6, RANK_PR_3V3_6);
-CurrentNode iNodePR3V3_7(adcEPS3, ADCChannel_t::CM_00, GAIN_PR_3V3_7, PC_3V3_7_N, true, INITIAL_PR_3V3_7, RANK_PR_3V3_7);
-CurrentNode iNodePR3V3_8(adcEPS4, ADCChannel_t::CM_07, GAIN_PR_3V3_8, PC_3V3_8_N, true, INITIAL_PR_3V3_8, RANK_PR_3V3_8);
-CurrentNode iNodePR3V3_9(adcEPS4, ADCChannel_t::CM_06, GAIN_PR_3V3_9, PC_3V3_9_N, true, INITIAL_PR_3V3_9, RANK_PR_3V3_9);
-CurrentNode iNodePR3V3_10(adcEPS4, ADCChannel_t::CM_05, GAIN_PR_3V3_10, PC_3V3_10_N, true, INITIAL_PR_3V3_10, RANK_PR_3V3_10);
-CurrentNode iNodePR3V3_11(adcEPS4, ADCChannel_t::CM_04, GAIN_PR_3V3_11, PC_3V3_11_N, true, INITIAL_PR_3V3_11, RANK_PR_3V3_11);
-CurrentNode iNodePR3V3_12(adcEPS4, ADCChannel_t::CM_03, GAIN_PR_3V3_12, PC_3V3_12_N, true, INITIAL_PR_3V3_12, RANK_PR_3V3_12);
-CurrentNode iNodePR3V3_PV(adcEPS5, ADCChannel_t::CM_07, GAIN_PR_3V3_PV, PC_3V3_PV_N, true, INITIAL_PR_3V3_PV, RANK_PR_3V3_PV);
+CurrentNode iNodePR3V3_6(adcEPS3, ADCChannel_t::CM_01, GAIN_PR_3V3_6, PC_3V3_6, false, INITIAL_PR_3V3_6, RANK_PR_3V3_6);
+CurrentNode iNodePR3V3_7(adcEPS3, ADCChannel_t::CM_00, GAIN_PR_3V3_7, PC_3V3_7, false, INITIAL_PR_3V3_7, RANK_PR_3V3_7);
+CurrentNode iNodePR3V3_8(adcEPS4, ADCChannel_t::CM_07, GAIN_PR_3V3_8, PC_3V3_8, false, INITIAL_PR_3V3_8, RANK_PR_3V3_8);
+CurrentNode iNodePR3V3_9(adcEPS4, ADCChannel_t::CM_06, GAIN_PR_3V3_9, PC_3V3_9, false, INITIAL_PR_3V3_9, RANK_PR_3V3_9);
+CurrentNode iNodePR3V3_10(adcEPS4, ADCChannel_t::CM_05, GAIN_PR_3V3_10, PC_3V3_10, false, INITIAL_PR_3V3_10, RANK_PR_3V3_10);
+CurrentNode iNodePR3V3_11(adcEPS4, ADCChannel_t::CM_04, GAIN_PR_3V3_11, PC_3V3_11, false, INITIAL_PR_3V3_11, RANK_PR_3V3_11);
+CurrentNode iNodePR3V3_12(adcEPS4, ADCChannel_t::CM_03, GAIN_PR_3V3_12, PC_3V3_12, false, INITIAL_PR_3V3_12, RANK_PR_3V3_12);
+CurrentNode iNodePR3V3_PV(adcEPS5, ADCChannel_t::CM_07, GAIN_PR_3V3_PV, PC_3V3_PV, false, INITIAL_PR_3V3_PV, RANK_PR_3V3_PV);
 
 CurrentNode * iNodesPR3V3[COUNT_PR_3V3] = {
   &iNodePR3V3_0,
@@ -133,13 +132,13 @@ CurrentNode * iNodesPR3V3[COUNT_PR_3V3] = {
   &iNodePR3V3_12,
   &iNodePR3V3_PV};
 
-CurrentNode iNodePRBatt_0(adcEPS4, ADCChannel_t::CM_02, GAIN_PR_BATT_0, PC_BATT_0_N, true, INITIAL_PR_BATT_0, RANK_PR_BATT_0);
-CurrentNode iNodePRBatt_1(adcEPS4, ADCChannel_t::CM_01, GAIN_PR_BATT_1, PC_BATT_1_N, true, INITIAL_PR_BATT_1, RANK_PR_BATT_1);
-CurrentNode iNodePRBatt_2(adcEPS4, ADCChannel_t::CM_00, GAIN_PR_BATT_2, PC_BATT_2_N, true, INITIAL_PR_BATT_2, RANK_PR_BATT_2);
-CurrentNode iNodePRBatt_3(adcEPS5, ADCChannel_t::CM_03, GAIN_PR_BATT_3, PC_BATT_3_N, true, INITIAL_PR_BATT_3, RANK_PR_BATT_3);
-CurrentNode iNodePRBatt_4(adcEPS5, ADCChannel_t::CM_02, GAIN_PR_BATT_4, PC_BATT_4_N, true, INITIAL_PR_BATT_4, RANK_PR_BATT_4);
-CurrentNode iNodePRBatt_5(adcEPS5, ADCChannel_t::CM_01, GAIN_PR_BATT_5, PC_BATT_5_N, true, INITIAL_PR_BATT_5, RANK_PR_BATT_5);
-CurrentNode iNodePRBatt_6(adcEPS5, ADCChannel_t::CM_00, GAIN_PR_BATT_6, PC_BATT_6_N, true, INITIAL_PR_BATT_6, RANK_PR_BATT_6);
+CurrentNode iNodePRBatt_0(adcEPS4, ADCChannel_t::CM_02, GAIN_PR_BATT_0, PC_BATT_0, false, INITIAL_PR_BATT_0, RANK_PR_BATT_0);
+CurrentNode iNodePRBatt_1(adcEPS4, ADCChannel_t::CM_01, GAIN_PR_BATT_1, PC_BATT_1, false, INITIAL_PR_BATT_1, RANK_PR_BATT_1);
+CurrentNode iNodePRBatt_2(adcEPS4, ADCChannel_t::CM_00, GAIN_PR_BATT_2, PC_BATT_2, false, INITIAL_PR_BATT_2, RANK_PR_BATT_2);
+CurrentNode iNodePRBatt_3(adcEPS5, ADCChannel_t::CM_03, GAIN_PR_BATT_3, PC_BATT_3, false, INITIAL_PR_BATT_3, RANK_PR_BATT_3);
+CurrentNode iNodePRBatt_4(adcEPS5, ADCChannel_t::CM_02, GAIN_PR_BATT_4, PC_BATT_4, false, INITIAL_PR_BATT_4, RANK_PR_BATT_4);
+CurrentNode iNodePRBatt_5(adcEPS5, ADCChannel_t::CM_01, GAIN_PR_BATT_5, PC_BATT_5, false, INITIAL_PR_BATT_5, RANK_PR_BATT_5);
+CurrentNode iNodePRBatt_6(adcEPS5, ADCChannel_t::CM_00, GAIN_PR_BATT_6, PC_BATT_6, false, INITIAL_PR_BATT_6, RANK_PR_BATT_6);
 
 CurrentNode * iNodesPRBatt[COUNT_PR_BATT] = {
   &iNodePRBatt_0,
@@ -150,13 +149,13 @@ CurrentNode * iNodesPRBatt[COUNT_PR_BATT] = {
   &iNodePRBatt_5,
   &iNodePRBatt_6};
   
-CurrentNode iNodeBH_0(adcEPS5, ADCChannel_t::CM_04, GAIN_BH_0, PC_BH_0_N, true, INITIAL_BH_0);
-CurrentNode iNodeBH_1(adcEPS5, ADCChannel_t::CM_05, GAIN_BH_1, PC_BH_1_N, true, INITIAL_BH_1);
+CurrentNode iNodeBH_0(adcEPS5, ADCChannel_t::CM_04, GAIN_BH_0, PC_BH_0, false, INITIAL_BH_0);
+CurrentNode iNodeBH_1(adcEPS5, ADCChannel_t::CM_05, GAIN_BH_1, PC_BH_1, false, INITIAL_BH_1);
 
 CurrentNode * iNodesBatteryHeaters[COUNT_BH] = {&iNodeBH_0, &iNodeBH_1};
 
-CurrentNode iNodeDeploy_0(adcEPS6, ADCChannel_t::CM_07, GAIN_DEPLOY_0, PC_DEPLOY_0_N, true, INITIAL_DEPLOY_0);
-CurrentNode iNodeDeploy_1(adcEPS7, ADCChannel_t::CM_00, GAIN_DEPLOY_1, PC_DEPLOY_1_N, true, INITIAL_DEPLOY_1);
+CurrentNode iNodeDeploy_0(adcEPS6, ADCChannel_t::CM_07, GAIN_DEPLOY_0, PC_DEPLOY_0, false, INITIAL_DEPLOY_0);
+CurrentNode iNodeDeploy_1(adcEPS7, ADCChannel_t::CM_00, GAIN_DEPLOY_1, PC_DEPLOY_1, false, INITIAL_DEPLOY_1);
 
 CurrentNode * iNodesDeployables[COUNT_DEPLOY] = {&iNodeDeploy_0, &iNodeDeploy_1};
 

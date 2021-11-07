@@ -74,12 +74,6 @@ mbed_error_status_t eventPeriodic() {
     return error;
   }
 
-  error = iNode3V3OutB.update();
-  if (error) {
-    LOGE("eventPeriodic", "Failed to update current for node3V3OutB: 0x%08X",
-        error);
-    return error;
-  }
 
   // Find the current to shed if regulator > its maximum
   double toShed = 0.0;
@@ -87,11 +81,7 @@ mbed_error_status_t eventPeriodic() {
   buf = iNode3V3OutA.get() - THRES_CURRENT_REG_MAX;
   if (buf > toShed)
     toShed = buf;
-
-  buf = iNode3V3OutB.get() - THRES_CURRENT_REG_MAX;
-  if (buf > toShed)
-    toShed = buf;
-
+  
   // Check the regulators' temperature
   bool regulatorsOvertemp = false;
 
@@ -124,7 +114,7 @@ mbed_error_status_t eventPeriodic() {
 
   if (toShed < 0 && regulatorsOvertemp) {
     // If overtemp, reduce load by 25%
-    toShed = iNode3V3OutA.get() * 0.25 + iNode3V3OutB.get() * 0.25;
+    toShed = iNode3V3OutA.get() * 0.25;
   }
 
   error = shedLoad(iNodesPR3V3, COUNT_PR_3V3, toShed);
@@ -208,7 +198,7 @@ mbed_error_status_t eventPeriodic() {
 
   if (toShed < 0 && batteriesOvertemp) {
     // If overtemp, shed 25%
-    toShed = iNodeBattOutA.get() * 0.25 + iNodeBattOutB.get() * 0.25;
+    toShed = iNodeBattOutA.get() * 0.25;
   }
 
   error = shedLoad(iNodesPRBatt, COUNT_PR_BATT, toShed);

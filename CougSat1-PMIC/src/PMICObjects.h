@@ -44,9 +44,9 @@ extern CurrentNode iNodeBattInB;
 extern CurrentNode iNodeBattOutA;
 extern CurrentNode iNodeBattOutB;
 extern CurrentNode iNode3V3InA;
-extern CurrentNode iNode3V3InB;
+//extern CurrentNode iNode3V3InB;
 extern CurrentNode iNode3V3OutA;
-extern CurrentNode iNode3V3OutB;
+//extern CurrentNode iNode3V3OutB; //iNode3V3Out
 extern CurrentNode iNodePR3V3_EPS;
 
 extern VoltageNode vNodeBattA;

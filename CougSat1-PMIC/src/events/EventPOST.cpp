@@ -155,16 +155,7 @@ mbed_error_status_t eventPOST() {
     LOG("POST", "iNode3V3InA: %9.5fA", value);
     ++passedCount;
   }
-  ++testCount;
-  error = iNode3V3InB.updateAndGet(value);
-  if (error) {
-    LOGE("POST", "iNode3V3InB failed to get current, 0x%08X", error);
-  } else if (value < POST_3V3_IN_I_LOW || value > POST_3V3_IN_I_HIGH) {
-    LOGE("POST", "iNode3V3InB exceeds limits: %9.5fA", value);
-  } else {
-    LOG("POST", "iNode3V3InB: %9.5fA", value);
-    ++passedCount;
-  }
+
   ++testCount;
   error = iNode3V3OutA.updateAndGet(value);
   if (error) {
@@ -176,15 +167,16 @@ mbed_error_status_t eventPOST() {
     ++passedCount;
   }
   ++testCount;
-  error = iNode3V3OutB.updateAndGet(value);
-  if (error) {
-    LOGE("POST", "iNode3V3OutB failed to get current, 0x%08X", error);
-  } else if (value < POST_3V3_OUT_I_LOW || value > POST_3V3_OUT_I_HIGH) {
-    LOGE("POST", "iNode3V3OutB exceeds limits: %9.5fA", value);
-  } else {
-    LOG("POST", "iNode3V3OutB: %9.5fA", value);
-    ++passedCount;
-  }
+
+  // error = iNode3V3OutB.updateAndGet(value);
+  // if (error) {
+  //   LOGE("POST", "iNode3V3OutB failed to get current, 0x%08X", error);
+  // } else if (value < POST_3V3_OUT_I_LOW || value > POST_3V3_OUT_I_HIGH) {
+  //   LOGE("POST", "iNode3V3OutB exceeds limits: %9.5fA", value);
+  // } else {
+  //   LOG("POST", "iNode3V3OutB: %9.5fA", value);
+  //   ++passedCount;
+  // }
 
   ++testCount;
   error = iNodePR3V3_EPS.updateAndGet(value);
@@ -281,7 +273,7 @@ mbed_error_status_t eventPOST() {
     ++testCount;
     error = thermistorsMPPT[i]->get(value);
     if (error) {
-      LOGE("POST", "thermistorsMPPT[%d] failed to get temperature, 0x%08X", i,
+      LOGE("POST", "thermistors MPPT[%d] failed to get temperature, 0x%08X", i,
           error);
     } else if (value < POST_THERM_MPPT_TEMP_K_LOW ||
                value > POST_THERM_MPPT_TEMP_K_HIGH) {
