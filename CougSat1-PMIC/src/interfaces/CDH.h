@@ -3,7 +3,7 @@
 
 #include <mbed.h>
 
-enum class CDHCommand_t {
+enum class CDHCommand_t: uint8_t {
   TURN_OFF        = 0x00,
   TURN_ON         = 0x01,
   VOLTAGE_REQ     = 0x02,
@@ -36,17 +36,19 @@ public:
   CDH(I2CSlave & i2c);
 
   bool              hasMessage();
-  mbed_error_code_t processMessage();
+  mbed_error_status_t processMessage();
 
 private:
-  mbed_error_code_t processMsgPowerChange(char * msgBody);
-  mbed_error_code_t processMsgVoltageRequest(char * msgBody);
-  mbed_error_code_t processMsgCurrentRequest(char * msgBody);
-  mbed_error_code_t processMsgTemperatureRequest(char * msgBody);
-  mbed_error_code_t processMsgPowerChannelStatus(char * msgBody);
-  mbed_error_code_t processMsgSolarChannelStatus(char * msgBody);
+  mbed_error_status_t processMsgPowerChange(char * msgBody, bool on);
+  mbed_error_status_t processMsgVoltageRequest(char * msgBody);
+  mbed_error_status_t processMsgCurrentRequest(char * msgBody);
+  mbed_error_status_t processMsgTemperatureRequest(char * msgBody);
+  mbed_error_status_t processMsgPowerChannelStatus();
+  mbed_error_status_t processMsgSolarChannelStatus();
 
   I2CSlave & i2c;
+  char * buf;
+  int bufferSize;
 };
 
 #endif /* _SRC_INTERFACES_CDH_H_ */
