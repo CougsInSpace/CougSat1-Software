@@ -7,10 +7,10 @@
  * @param reset pin of the GPS
  * @param pulse pin of the GPS
  */
-Venus838FLPx::Venus838FLPx(RawSerial & serial, PinName re, PinName pulse) :
+Venus838FLPx::Venus838FLPx(UnbufferedSerial & serial, PinName re, PinName pulse) :
   serial(serial), reset(re, 1), pulse(pulse) {
   DEBUG("GPS", "Created GPS");
-  serial.attach(this, &Venus838FLPx::gps_read);
+  serial.attach(callback(this, &Venus838FLPx::gps_read));
 }
 
 Venus838FLPx::Venus838FLPx(const Venus838FLPx & copy) :
@@ -85,7 +85,8 @@ mbed_error_status_t Venus838FLPx::read(GPSData_t & data, bool blocking) {
 }
 void Venus838FLPx::gps_read() {
   DEBUG("GPS", "PLEASE AcTUALY INterupt\r\n");
-  nmeaString[gpsIndex++] = serial.getc();
+ // nmeaString[gpsIndex++] = serial.getc();
+  serial.read(&nmeaString[gpsIndex++], 1);
 }
 
 mbed_error_status_t Venus838FLPx::parseGGA(

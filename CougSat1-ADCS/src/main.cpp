@@ -23,31 +23,63 @@
  * Program start routine
  * @return error code
  */
+  DigitalOut led(D4);
+  DigitalOut led_2(LED2);
+  UnbufferedSerial gpsSerial(NC, USBTX, 9600);
+  BufferedSerial gpsSerial2(NC,)
+  int i = 0;
+  char buf[83] = {'\0'};
+
+void gps_signal(){
+  char c;
+ // while(gpsSerial.readable()){
+    gpsSerial.read(&c,1);
+
+    if (i < 83) buf[i++] = c;
+    //LOG("GPS", "read byte");
+  //}
+  led = !led;
+ // LOG("GPS", "Rx signaled");
+}
 int main(void) {
+  gpsSerial.format(8,SerialBase::None,1);
   LOG("ADCS", "Start");
   // ADCS adcs;
   // adcs.startThread();
-  RawSerial           gpsSerial = RawSerial(PA_2, USBRX, 9600);
-  Venus838FLPx        gps1(gpsSerial, PinName(PA_8), PinName(PA_11));
+ // Venus838FLPx        gps1(gpsSerial, PinName(PA_8), PinName(PA_11));
   GPSData_t           gpsData;
+  //DigitalIn reciveX(D0);
   mbed_error_status_t error = 0;
-  DigitalOut led(D4);
   led = 0;
+  gpsSerial.attach(&gps_signal);
 
   while (true) {
     LOG("ADCS", "Main");
-    printf("put someting on serial\n");
-    
-    error = gps1.read(gpsData);
-    if (!error) {
-      led = !led;
-      LOG("GPS",
-          "Latitude: %f\n   Longitude: %f\n Altitude: %f\n  Ground Speed: %f  "
-          "\n "
-          "Current Time: %d",
-          gpsData.latitude, gpsData.longitude, gpsData.altitude,
-          gpsData.groundSpeed, gpsData.time);
+    led_2 = !led_2;
+    if (i == 83){
+      buf[82] = '\0';
+      
+    }else{
+      buf[i+1] = '\0';
     }
-    wait(.5);
+      LOG("GPS", "%s", buf);
+      LOG("GPS", "bytes recived: %d\n", i);
+      i = 0;
+  //  DEBUG("ADCS", "RX: %d\n", reciveX.read());
+    //printf("put someting on serial\n");
+    
+   // if (gpsSerial.readable()){
+   //    led = !led;
+   // }
+    //error = gps1.read(gpsData);
+    // if (!error) {
+    //   LOG("GPS",
+    //       "Latitude: %f\n   Longitude: %f\n Altitude: %f\n  Ground Speed: %f  "
+    //       "\n "
+    //       "Current Time: %d",
+    //       gpsData.latitude, gpsData.longitude, gpsData.altitude,
+    //       gpsData.groundSpeed, gpsData.time);
+    //}
+    ThisThread::sleep_for(1s);
   }
 }

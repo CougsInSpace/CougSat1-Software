@@ -9,10 +9,11 @@
 
 class Venus838FLPx : GPS {
 public:
+
   Venus838FLPx(const Venus838FLPx & copy);
   Venus838FLPx & operator=(const Venus838FLPx &);
 
-  Venus838FLPx(RawSerial & serial, PinName reset, PinName pulse);
+  Venus838FLPx(UnbufferedSerial & serial, PinName reset, PinName pulse);
   ~Venus838FLPx();
 
   mbed_error_status_t read(GPSData_t & data, bool blocking = true);
@@ -29,8 +30,9 @@ private:
 
   int         gpsIndex       = 0;
   char        nmeaString[83] = {'\0'};
-  RawSerial & serial;
+  UnbufferedSerial & serial;
   DigitalOut  reset;
+ // DigitalOut  indicator;
   DigitalIn   pulse;
 };
 
