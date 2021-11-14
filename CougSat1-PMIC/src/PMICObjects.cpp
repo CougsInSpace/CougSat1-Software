@@ -172,12 +172,9 @@ CurrentNode iNodeBattOutB(adcEPS2, ADCChannel_t::CM_04, GAIN_BATT_OUT_B);
 VoltageNode vNodeBattA(adcEPS2, ADCChannel_t::CM_00, GAIN_V_BATT_A);
 VoltageNode vNodeBattB(adcEPS2, ADCChannel_t::CM_07, GAIN_V_BATT_B);
 
-CurrentNode iNode3V3InA(adcEPS1, ADCChannel_t::CM_05, GAIN_3V3_IN_A);
-CurrentNode iNode3V3InB(adcEPS0, ADCChannel_t::CM_06, GAIN_3V3_IN_B);
-CurrentNode iNode3V3OutA(adcEPS1, ADCChannel_t::CM_06, GAIN_3V3_OUT_A);
-CurrentNode iNode3V3OutB(adcEPS0, ADCChannel_t::CM_05, GAIN_3V3_OUT_B);
-VoltageNode vNode3V3A(adcEPS1, ADCChannel_t::CM_07, GAIN_V_3V3_A);
-VoltageNode vNode3V3B(adcEPS0, ADCChannel_t::CM_04, GAIN_V_3V3_B);
+CurrentNode iNode3V3In(adcEPS1, ADCChannel_t::CM_05, GAIN_3V3_IN_A);
+CurrentNode iNode3V3Out(adcEPS1, ADCChannel_t::CM_06, GAIN_3V3_OUT_A);
+VoltageNode vNode3V3(adcEPS1, ADCChannel_t::CM_07, GAIN_V_3V3_A);
 
 CurrentNode iNodePR3V3_EPS(adcEPS5, ADCChannel_t::CM_06, GAIN_PR_3V3_EPS);
 

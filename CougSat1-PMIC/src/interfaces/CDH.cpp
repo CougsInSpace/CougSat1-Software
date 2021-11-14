@@ -183,10 +183,7 @@ mbed_error_status_t CDH::processMsgVoltageRequest(char * msgBody) {
       error = vNodeBattB.updateAndGet(voltage);
       break;
     case 0x0A:  // 3.3V Regulator A
-      error = vNode3V3A.updateAndGet(voltage);
-      break;
-    case 0x0B:  // 3.3V Regulator B
-      error = vNode3V3B.updateAndGet(voltage);
+      error = vNode3V3.updateAndGet(voltage);
       break;
   }
 
@@ -239,16 +236,23 @@ mbed_error_status_t CDH::processMsgCurrentRequest(char * msgBody) {
       error = (*iNodesPV[7]).updateAndGet(current);
       break;
     case 0x08:  // Battery A
-      // in vs out ???????????????
+      double currentBattAIn = 0.0, currentBattAOut = 0.0;
+      error = iNodeBattInA.updateAndGet(currentBattAIn);
+      if (error != MBED_SUCCESS)
+        break;
+      error = iNodeBattOutA.updateAndGet(currentBattAOut);
+      current = currentBattAOut - currentBattAIn;
       break;
     case 0x09:  // Battery B
-      // in vs out ????????????
+      double currentBattBIn = 0.0, currentBattBOut = 0.0;
+      error = iNodeBattInB.updateAndGet(currentBattBIn);
+      if (error != MBED_SUCCESS)
+        break;
+      error = iNodeBattOutB.updateAndGet(currentBattBOut);
+      current = currentBattBOut - currentBattBIn;
       break;
-    case 0x0A:  // 3.3V Regulator A
-      // in vs out
-      break;
-    case 0x0B:  // 3.3V Regulator B
-      // in vs out
+    case 0x0A:  // 3.3V Regulator
+      error = iNode3V3Out.updateAndGet(current);
       break;
     case 0x0C:  // PR_3.3V-0
       error = (*iNodesPR3V3[0]).updateAndGet(current);
@@ -287,7 +291,7 @@ mbed_error_status_t CDH::processMsgCurrentRequest(char * msgBody) {
       error = (*iNodesPR3V3[11]).updateAndGet(current);
       break;
     case 0x18:  // PR_3.3V-12
-      error = (*iNodesPR3V3[12]).updateAndGet(current); // 13??
+      error = (*iNodesPR3V3[12]).updateAndGet(current);
       break;
     case 0x19:  // PR_BATT-0
       error = (*iNodesPRBatt[0]).updateAndGet(current);
@@ -325,32 +329,37 @@ mbed_error_status_t CDH::processMsgCurrentRequest(char * msgBody) {
     case 0x25:  // PR_BH-1
       error = (*iNodesBatteryHeaters[1]).updateAndGet(current);
       break;
-    case 0x26:  // PR_DEPLOY
+    case 0x26:  // PR_DEPLOY-1
+      error = (*iNodesDeployables[0]).updateAndGet(current);
       break;
-    case 0x27:  // PMIC
+    case 0x27:  // PR_DEPLOY-2
+      error = (*iNodesDeployables[1]).updateAndGet(current);
       break;
-    case 0x28:  // MPPT 0
+    case 0x28:  // EPS
+      error = iNodePR3V3_EPS.updateAndGet(current);
+      break;
+    case 0x29:  // MPPT 0
       error = (*iNodesPVIn[0]).updateAndGet(current);
       break;
-    case 0x29:  // MPPT 1
+    case 0x2A:  // MPPT 1
       error = (*iNodesPVIn[1]).updateAndGet(current);
       break;
-    case 0x2A:  // MPPT 2
+    case 0x2B:  // MPPT 2
       error = (*iNodesPVIn[2]).updateAndGet(current);
       break;
-    case 0x2B:  // MPPT 3
+    case 0x2C:  // MPPT 3
       error = (*iNodesPVIn[3]).updateAndGet(current);
       break;
-    case 0x2C:  // MPPT 4
+    case 0x2D:  // MPPT 4
       error = (*iNodesPVIn[4]).updateAndGet(current);
       break;
-    case 0x2D:  // MPPT 5
+    case 0x2E:  // MPPT 5
       error = (*iNodesPVIn[5]).updateAndGet(current);
       break;
-    case 0x2E:  // MPPT 6
+    case 0x2F:  // MPPT 6
       error = (*iNodesPVIn[6]).updateAndGet(current);
       break;
-    case 0x2F:  // MPPT 7
+    case 0x30:  // MPPT 7
       error = (*iNodesPVIn[7]).updateAndGet(current);
       break;
   }
@@ -379,23 +388,6 @@ mbed_error_status_t CDH::processMsgTemperatureRequest(char * msgBody) {
 
   // Switch possible messages
   switch (message) {
-    case 0x00:  // Solar Panel 0A
-      //error = (*thermistorsEPS[0]).get(temp); //??
-      break;
-    case 0x01:  // Solar Panel 0B
-      break;
-    case 0x02:  // Solar Panel 1A
-      break;
-    case 0x03:  // Solar Panel 1B
-      break;
-    case 0x04:  // Solar Panel 2A
-      break;
-    case 0x05:  // Solar Panel 2B
-      break;
-    case 0x06:  // Solar Panel 3A
-      break;
-    case 0x07:  // Solar Panel 3B
-      break;
     case 0x08:  // Battery A
       error = thermistorBattA.get(temp);
       break;
@@ -411,38 +403,38 @@ mbed_error_status_t CDH::processMsgTemperatureRequest(char * msgBody) {
     case 0x27:  // PMIC
       error = thermistorPMIC.get(temp);
       break;
-    case 0x28:  // MPPT 0
+    case 0x29:  // MPPT 0
       error = (*thermistorsMPPT[0]).get(temp);
       break;
-    case 0x29:  // MPPT 1
+    case 0x2A:  // MPPT 1
       error = (*thermistorsMPPT[1]).get(temp);
       break;
-    case 0x2A:  // MPPT 2
+    case 0x2B:  // MPPT 2
       error = (*thermistorsMPPT[2]).get(temp);
       break;
-    case 0x2B:  // MPPT 3
+    case 0x2C:  // MPPT 3
       error = (*thermistorsMPPT[3]).get(temp);
       break;
-    case 0x2C:  // MPPT 4
+    case 0x2D:  // MPPT 4
       error = (*thermistorsMPPT[4]).get(temp);
       break;
-    case 0x2D:  // MPPT 5
+    case 0x2E:  // MPPT 5
       error = (*thermistorsMPPT[5]).get(temp);
       break;
-    case 0x2E:  // MPPT 6
+    case 0x2F:  // MPPT 6
       error = (*thermistorsMPPT[6]).get(temp);
       break;
-    case 0x2F:  // MPPT 7
+    case 0x30:  // MPPT 7
       error = (*thermistorsMPPT[7]).get(temp);
       break;
-    case 0x30:  // PCB -X -Y
+    case 0x31:  // PCB -X -Y
       // Find labels for PCBs
       break;
-    case 0x31:  // PCB -X +Y
+    case 0x32:  // PCB -X +Y
       break;
-    case 0x32:  // PCB +X -Y
+    case 0x33:  // PCB +X -Y
       break;
-    case 0x33:  // PCB +X +Y
+    case 0x34:  // PCB +X +Y
       break;
   }
 
@@ -468,6 +460,7 @@ mbed_error_status_t CDH::processMsgPowerChannelStatus() {
   *buf = 0x00000000000000;
   
   // bit manipulate all the values into place
+
 
   return MBED_ERROR_UNSUPPORTED;
 }

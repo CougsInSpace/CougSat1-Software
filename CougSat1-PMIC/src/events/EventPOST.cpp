@@ -83,23 +83,13 @@ mbed_error_status_t eventPOST() {
     ++passedCount;
   }
   ++testCount;
-  error = vNode3V3A.updateAndGet(value);
+  error = vNode3V3.updateAndGet(value);
   if (error) {
     LOGE("POST", "vNode3V3A failed to get voltage, 0x%08X", error);
   } else if (value < POST_3V3_V_LOW || value > POST_3V3_V_HIGH) {
     LOGE("POST", "vNode3V3A exceeds limits: %9.5fV", value);
   } else {
     LOG("POST", "vNode3V3A: %9.5fV", value);
-    ++passedCount;
-  }
-  ++testCount;
-  error = vNode3V3B.updateAndGet(value);
-  if (error) {
-    LOGE("POST", "vNode3V3B failed to get voltage, 0x%08X", error);
-  } else if (value < POST_3V3_V_LOW || value > POST_3V3_V_HIGH) {
-    LOGE("POST", "vNode3V3B exceeds limits: %9.5fV", value);
-  } else {
-    LOG("POST", "vNode3V3B: %9.5fV", value);
     ++passedCount;
   }
 
@@ -146,7 +136,7 @@ mbed_error_status_t eventPOST() {
   }
 
   ++testCount;
-  error = iNode3V3InA.updateAndGet(value);
+  error = iNode3V3In.updateAndGet(value);
   if (error) {
     LOGE("POST", "iNode3V3InA failed to get current, 0x%08X", error);
   } else if (value < POST_3V3_IN_I_LOW || value > POST_3V3_IN_I_HIGH) {
@@ -157,7 +147,7 @@ mbed_error_status_t eventPOST() {
   }
 
   ++testCount;
-  error = iNode3V3OutA.updateAndGet(value);
+  error = iNode3V3Out.updateAndGet(value);
   if (error) {
     LOGE("POST", "iNode3V3OutA failed to get current, 0x%08X", error);
   } else if (value < POST_3V3_OUT_I_LOW || value > POST_3V3_OUT_I_HIGH) {
