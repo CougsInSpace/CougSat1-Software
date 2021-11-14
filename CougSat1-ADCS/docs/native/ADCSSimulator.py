@@ -540,6 +540,7 @@ class ADCS:
     self.inResetLoop = False
 
     self.simTime = 0
+    self.iCoil = np.zeros(3)
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -726,27 +727,27 @@ class ADCS:
     TargetCamera = thetaError(targetIdeal, rCameraGlobal) #might not matter?
     EarthTarget = thetaError(magGlobal, targetIdeal)
     
-    print(t)
+    #print(t)
     #see if angle between each pair of vectors is greater than roughly pi minus 0.05 (chosen arbitrarily, can be changed as needed)
-    if ((EarthCamera >= (np.pi/2 - 0.2) and EarthCamera <= (np.pi/2 + 0.2)) and (EarthTarget >= (np.pi/2 - 0.2) and EarthTarget <= (np.pi/2 + 0.2)) and TargetCamera > np.pi/8) or self.inResetLoop == True: #if all three are roughly perpendicular
-        print("aaaaaaaa")
+    if ((EarthCamera >= (np.pi/2 - 0.2) and EarthCamera <= (np.pi/2 + 0.2)) and (EarthTarget >= (np.pi/2 - 0.2) and EarthTarget <= (np.pi/2 + 0.2)) and TargetCamera > np.pi/8) or self.inResetLoop == True: #if all three are roughly perpendicular OFROR OR
+        #print("aaaaaaaa")
         if self.inResetLoop == False:
           self.inResetLoop = True
 
           # set loop start time to the current time
           self.resetStartTime = t
           
-        torque = np.cross(rCameraGlobal.flatten(), magGlobal.flatten())
-        torque = torque / np.linalg.norm(torque)
+          torque = np.cross(rCameraGlobal.flatten(), magGlobal.flatten())
+          torque = torque / np.linalg.norm(torque)
 
-        dipole = torque2Dipole(torque,magGlobal)
-        iVector = dipole
-        #Transform output magnetic dipole to coil duty cycles
-        #TODO
+          dipole = torque2Dipole(torque,magGlobal)
+          iVector = dipole
+          #Transform output magnetic dipole to coil duty cycle
+          #TODO
 
-        # set coil currents
-        iCoil = rInv @ iVector.reshape((3,1))
-        iCoil = iCoil * 100000
+          # set coil currents
+          iCoil = rInv @ iVector.reshape((3,1))
+          self.iCoil = iCoil * 1000
 
         self.lastT = t
         self.lastGPS = self.gps
@@ -756,9 +757,9 @@ class ADCS:
         # self.lastR = r
         # self.lastQ = q
 
-        if t > self.resetStartTime + 40:
+        if t > self.resetStartTime + 8:
           self.inResetLoop = False
-        return iCoil.flatten(), np.array([0,0,0]).reshape((3,1))
+        return self.iCoil.flatten(), np.array([0,0,0]).reshape((3,1))
 
     else:
         # torque to get the satellite into the earthMF/target plane
@@ -861,7 +862,7 @@ class Satellite:
       self.ecefTarget = None
     else:
       self.loopFreq = 100
-      self.maxDuration = 60 * 5
+      self.maxDuration = 60 * 20
       self.geoTarget = np.zeros(3)
       self.geoTarget[0] = (self.geo[0] +
                            np.random.uniform(-45, 45) + 180) % 360 - 180
