@@ -731,58 +731,59 @@ class ADCS:
     print(t)
     
     #see if angle between each pair of vectors is greater than roughly pi minus 0.05 (chosen arbitrarily, can be changed as needed)
-    if EarthTarget <= (np.pi/2 + 0.2) or EarthTarget >= (np.pi/2 - 0.2):
-      self.prioritizeinplane = 4
+    if EarthTarget <= (np.pi/2 + 0.2) and EarthTarget >= (np.pi/2 - 0.2):
+        print("Logan's Code")
+        self.prioritizeinplane = 4
 
-    else:
-        # torque to get the satellite into the earthMF/target plane
-        rCameraGlobalProj = planeProject(targetIdeal,magGlobal,rCameraGlobal)
-        axis = np.cross(rCameraGlobal.flatten(),rCameraGlobalProj.flatten())
-        torque1 = planeProjectNorm(magGlobal,axis)
+    
+    # torque to get the satellite into the earthMF/target plane
+    rCameraGlobalProj = planeProject(targetIdeal,magGlobal,rCameraGlobal)
+    axis = np.cross(rCameraGlobal.flatten(),rCameraGlobalProj.flatten())
+    torque1 = planeProjectNorm(magGlobal,axis)
 
-        # torque to get the satellite to the target direction
-        targetDir = planeProject(magGlobal,targetIdeal,rCameraGlobal)
-        torque2 = np.cross(targetDir.flatten(),targetIdeal.flatten())
+    # torque to get the satellite to the target direction
+    targetDir = planeProject(magGlobal,targetIdeal,rCameraGlobal)
+    torque2 = np.cross(targetDir.flatten(),targetIdeal.flatten())
 
-        torque1 = torque1 / np.linalg.norm(torque1) 
-        torque2 = torque2 / np.linalg.norm(torque2)
+    torque1 = torque1 / np.linalg.norm(torque1) 
+    torque2 = torque2 / np.linalg.norm(torque2)
 
-        # Step 4: Control loop for both steps simultaneously
-        controlError1 = thetaError(rCameraGlobal,rCameraGlobalProj)
-        controlError2 = thetaError(targetIdeal,targetDir)
-        self.controlErrorDerivative1 = (controlError1 - self.lastControlError1) / tStep
-        self.controlErrorDerivative2 = (controlError2 - self.lastControlError2) / tStep
-        proportionalGain = 1
-        derivativeGain = 6.5
-        
-        # control loop for each torque
-        torque1 = torque1 * ((controlError1*proportionalGain) + (self.controlErrorDerivative1*derivativeGain))
-        torque2 = torque2 * ((controlError2*proportionalGain) + (self.controlErrorDerivative2*derivativeGain))
+    # Step 4: Control loop for both steps simultaneously
+    controlError1 = thetaError(rCameraGlobal,rCameraGlobalProj)
+    controlError2 = thetaError(targetIdeal,targetDir)
+    self.controlErrorDerivative1 = (controlError1 - self.lastControlError1) / tStep
+    self.controlErrorDerivative2 = (controlError2 - self.lastControlError2) / tStep
+    proportionalGain = 1
+    derivativeGain = 6.5
+    
+    # control loop for each torque
+    torque1 = torque1 * ((controlError1*proportionalGain) + (self.controlErrorDerivative1*derivativeGain))
+    torque2 = torque2 * ((controlError2*proportionalGain) + (self.controlErrorDerivative2*derivativeGain))
 
-        # final combined torque
-        torque = (torque1 *  self.prioritizeinplane) + torque2
+    # final combined torque
+    torque = (torque1 *  self.prioritizeinplane) + torque2
 
-        dipole = torque2Dipole(torque,magGlobal)
+    dipole = torque2Dipole(torque,magGlobal)
 
-        iVector = dipole
-        # Step 5: Transform output magnetic dipole to coil duty cycles
-        # TODO
+    iVector = dipole
+    # Step 5: Transform output magnetic dipole to coil duty cycles
+    # TODO
 
-        # set coil currents
-        iCoil = rInv @ iVector.reshape((3,1))
-        iCoil = iCoil * 100000
+    # set coil currents
+    iCoil = rInv @ iVector.reshape((3,1))
+    iCoil = iCoil * 100000
 
-        self.lastControlError1 = controlError1
-        self.lastControlError2 = controlError2
-        self.lastT = t
-        self.lastGPS = self.gps
-        self.lastMag = self.mag
-        self.lastGravity = self.gravity
-        self.lastSunDirLocal = sunDirGlobal
-        # self.lastR = r
-        # self.lastQ = q
-        
-        return iCoil.flatten(), np.array([0,0,0]).reshape((3,1))
+    self.lastControlError1 = controlError1
+    self.lastControlError2 = controlError2
+    self.lastT = t
+    self.lastGPS = self.gps
+    self.lastMag = self.mag
+    self.lastGravity = self.gravity
+    self.lastSunDirLocal = sunDirGlobal
+    # self.lastR = r
+    # self.lastQ = q
+    
+    return iCoil.flatten(), np.array([0,0,0]).reshape((3,1))
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
