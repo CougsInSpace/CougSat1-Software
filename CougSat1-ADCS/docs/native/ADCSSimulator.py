@@ -20,6 +20,9 @@ from pyorbital.orbital import Orbital
 from pyorbital import astronomy
 import quaternion
 from tqdm import tqdm
+import pickle
+import math
+import random
 
 colorama.init(autoreset=True)
 
@@ -537,6 +540,7 @@ class ADCS:
     #------------------------#
     self.lastAngleBetweenTargets = 1
     self.lastSunDirLocal = np.array([0,0,0])
+    self.stage = 0
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -733,17 +737,31 @@ class ADCS:
     # Step 4: Control loop for both steps simultaneously
     controlError1 = thetaError(rCameraGlobal,rCameraGlobalProj)
     controlError2 = thetaError(targetIdeal,targetDir)
-    self.controlErrorDerivative1 = (controlError1 - self.lastControlError1) / tStep
-    self.controlErrorDerivative2 = (controlError2 - self.lastControlError2) / tStep
-    proportionalGain = 1
-    derivativeGain = 6.5
+    controlErrorDerivative1 = (controlError1 - self.lastControlError1) / tStep
+    controlErrorDerivative2 = (controlError2 - self.lastControlError2) / tStep
+    # proportionalGain1 = 2
+    # derivativeGain1 = 12
+    # proportionalGain2 = 1
+    # derivativeGain2 = 10
+
+    proportionalGain1 = 1
+    derivativeGain1 = 6.5
+    proportionalGain2 = 1
+    derivativeGain2 = 6.5
+    
+
+    flag = 0
+    if self.stage == 1 or (controlError1 <= .05 and abs(controlErrorDerivative1) <= .025):
+      self.stage = 1
+      flag = 1
+
     
     # control loop for each torque
-    torque1 = torque1 * ((controlError1*proportionalGain) + (self.controlErrorDerivative1*derivativeGain))
-    torque2 = torque2 * ((controlError2*proportionalGain) + (self.controlErrorDerivative2*derivativeGain))
+    torque1 = torque1 * ((controlError1*proportionalGain1) + (controlErrorDerivative1*derivativeGain1))
+    torque2 = torque2 * ((controlError2*proportionalGain2) + (controlErrorDerivative2*derivativeGain2))
 
     # final combined torque
-    torque = torque1 + torque2
+    torque = torque1 + (flag*torque2)
 
     dipole = torque2Dipole(torque,magGlobal)
 
@@ -753,7 +771,7 @@ class ADCS:
 
     # set coil currents
     iCoil = rInv @ iVector.reshape((3,1))
-    iCoil = iCoil * 100000
+    iCoil = iCoil
 
     self.lastControlError1 = controlError1
     self.lastControlError2 = controlError2
@@ -765,7 +783,7 @@ class ADCS:
     # self.lastR = r
     # self.lastQ = q
     
-    return iCoil.flatten(), sunDirGlobal.reshape((3,1))
+    return iCoil.flatten(), torque1.reshape((3,1))
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -912,6 +930,9 @@ class Satellite:
     if not self.static:
       realTime = self.startDatetime + datetime.timedelta(seconds=t)
       self.geo = np.array(orb.get_lonlatalt(realTime))
+      self.sunDirLocal = rInv @ sunDir(realTime)
+    else:
+      self.sunDirLocal = rInv @ sunDir(self.startDatetime)
 
     magField = interpolateWMM(self.geo[0], self.geo[1])
     magFieldU = magField / np.linalg.norm(magField)
@@ -920,8 +941,6 @@ class Satellite:
     gravity = geo2ECEF(self.geo[0], self.geo[1], self.geo[2])
     gravity = -gravity / np.linalg.norm(gravity)
     self.gravityLocal = rInv @ gravity
-
-    self.sunDirLocal = rInv @ sunDir(realTime)
 
     # find torque produced by magnetorquer
     mLocal = np.zeros(3)
@@ -1117,6 +1136,7 @@ class Satellite:
 
     if progress:
       pBar.close()
+
     return self.results
 
   def __plotOrbit(self) -> None:
@@ -1550,7 +1570,18 @@ def _runnerSim(*args, **kwargs) -> dict:
   @return dict same as Satellite.run
   '''
   sim = Satellite(*args, **kwargs)
-  return sim.run(progress=False)
+  results = sim.run(progress=False)
+  if not sim.converged:
+    simData = (sim.rList, sim.magFieldUList, sim.mList, sim.torqueList, sim.omegaList, sim.targetOmegaList,\
+      sim.targetList, sim.cameraList, sim.gravityList, sim.debugVectorList,\
+      sim.geoTarget, debugVectorLocal)
+    simFile = open("simFile" + str(random.randint(0,10000)) +".pickle", 'wb')
+    pickle.dump(simData, simFile)
+    simFile.close()
+  # uncomment to plot failed results
+  # if sim.converged == False:
+  #   sim.plot()
+  return results
 
 def main():
   parser = ArgumentParser()
@@ -1608,11 +1639,16 @@ def main():
     timeToConvergence = []
     averagePower = []
     totalEnergy = []
+
     start = datetime.datetime.now()
     simDuration = 0
-    p = Pool(args.j)
+
+    # where the simulations are run
+    p = Pool(args.j) # args.j is the number of cpu threads for async
     jobs = [p.apply_async(_runnerSim, kwds=kwargs) for _ in range(args.n)]
     p.close()
+
+     # loop through the array jobs[] to find the results 
     results = []
     for job in tqdm(jobs):
       results.append(job.get())
@@ -1629,6 +1665,8 @@ def main():
     irlDuration = (datetime.datetime.now() - start).total_seconds()
     print('-----------')
     success = sum(converged) / len(converged)
+
+    # print % converged in appropriate color
     if success == 1:
       print(f'{Fore.GREEN}{success * 100:8.2f}% converged')
       mean = np.mean(timeToConvergence)
