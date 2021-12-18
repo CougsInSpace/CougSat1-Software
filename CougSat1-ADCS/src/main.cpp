@@ -1,29 +1,19 @@
-/******************************************************************************
- * Copyright (c) 2019 by Cougs in Space - Washington State University         *
- * Cougs in Space website: cis.vcea.wsu.edu                                   *
- *                                                                            *
- * This file is a part of flight and/or ground software for Cougs in Space's  *
- * satellites. This file is proprietary and confidential.                     *
- * Unauthorized copying of this file, via any medium is strictly prohibited.  *
- ******************************************************************************/
-/**
- * @file main.cpp
- * @author Ryal O'Neil
- * @date 2019-1-27
- * @brief Starts the ADCS software
- *
- * Initializes ADCS object and starts the priority queue
- */
-
+//#include <CISConsole.h>
 #include "ADCS.h"
+#include <mbed.h>
+
 
 /**
- * @brief main, initializes ADCS object 
- * 
- * @return int 
+ * @brief Initializes the all of the subclasses of the ADCS
+ *
+ * @return mbed_error_status_t
  */
-int main()
-{
-    ADCS adcs;
-    adcs.mainThread();
+
+/**
+ * Program start routine
+ * @return error code
+ */
+int main(void) {
+  ADCS adcs;
+  adcs.startThread();
 }
