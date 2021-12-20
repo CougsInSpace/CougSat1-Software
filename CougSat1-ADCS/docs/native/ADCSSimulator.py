@@ -541,6 +541,8 @@ class ADCS:
     self.lastAngleBetweenTargets = 1
     self.lastSunDirLocal = np.array([0,0,0])
     self.stage = 0
+    self.stageTime = 0
+    self.lastTargetEarthNormal = np.array([0,0,0])
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -739,21 +741,23 @@ class ADCS:
     controlError2 = thetaError(targetIdeal,targetDir)
     controlErrorDerivative1 = (controlError1 - self.lastControlError1) / tStep
     controlErrorDerivative2 = (controlError2 - self.lastControlError2) / tStep
-    # proportionalGain1 = 2
-    # derivativeGain1 = 12
-    # proportionalGain2 = 1
-    # derivativeGain2 = 10
-
-    proportionalGain1 = 1
-    derivativeGain1 = 6.5
+    proportionalGain1 = 2
+    derivativeGain1 = 12
     proportionalGain2 = 1
-    derivativeGain2 = 6.5
-    
+    derivativeGain2 = 10
 
-    flag = 0
-    if self.stage == 1 or (controlError1 <= .05 and abs(controlErrorDerivative1) <= .025):
-      self.stage = 1
-      flag = 1
+    #default gains
+    # proportionalGain1 = 1
+    # derivativeGain1 = 6.5
+    # proportionalGain2 = 1
+    # derivativeGain2 = 6.5
+
+    # inplane staging
+    flag = 1 # change to 0 if uncommenting following code
+    # if self.stage == 1 or (controlError1 <= .02 and abs(controlErrorDerivative1) <= .005):
+    #   self.stage = 1
+    #   flag = 1
+    #   self.stageTime = t
 
     
     # control loop for each torque
@@ -782,7 +786,7 @@ class ADCS:
     self.lastSunDirLocal = sunDirGlobal
     # self.lastR = r
     # self.lastQ = q
-    
+
     return iCoil.flatten(), torque1.reshape((3,1))
 
 def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
@@ -806,7 +810,7 @@ def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
 
 class Satellite:
   def __init__(self, detumble: bool = False,
-               initialOmega: float = 0.1, static: bool = False, sigma: float = 0.1) -> None:
+               initialOmega: float = 0.1, static: bool = False, sigma: float = 0.1, pickleFailed: bool = False) -> None:
     '''!@brief Create a Satellite simulation
 
     @param detumble True will not generate a target (pass None to ADCS.__init__)
@@ -836,7 +840,7 @@ class Satellite:
       self.ecefTarget = None
     else:
       self.loopFreq = 100
-      self.maxDuration = 60 * 5
+      self.maxDuration = 60 * 10
       self.geoTarget = np.zeros(3)
       self.geoTarget[0] = (self.geo[0] +
                            np.random.uniform(-45, 45) + 180) % 360 - 180
@@ -1110,7 +1114,11 @@ class Satellite:
         self.debugVector = debugVector
       if self.converged:
         break
-
+    
+    # check how close when failed
+    # if not self.converged:
+    #   print(self.omegaErrorList[-1])
+    
     self.rList = np.array(self.rList)
     self.rInvList = np.array(self.rInvList)
     self.magFieldUList = np.array(self.magFieldUList)
@@ -1564,23 +1572,22 @@ class Satellite:
 
     pyplot.show()
 
-def _runnerSim(*args, **kwargs) -> dict:
+def _runnerSim(**kwargs) -> dict:
   '''!@brief Multithreaded runner to execute simulation and return results
 
   @return dict same as Satellite.run
   '''
-  sim = Satellite(*args, **kwargs)
+  sim = Satellite(**kwargs)
   results = sim.run(progress=False)
-  if not sim.converged:
+
+  if not sim.converged and kwargs['pickleFailed']:
     simData = (sim.rList, sim.magFieldUList, sim.mList, sim.torqueList, sim.omegaList, sim.targetOmegaList,\
       sim.targetList, sim.cameraList, sim.gravityList, sim.debugVectorList,\
       sim.geoTarget, debugVectorLocal)
     simFile = open("simFile" + str(random.randint(0,10000)) +".pickle", 'wb')
     pickle.dump(simData, simFile)
     simFile.close()
-  # uncomment to plot failed results
-  # if sim.converged == False:
-  #   sim.plot()
+
   return results
 
 def main():
@@ -1616,6 +1623,11 @@ def main():
       action='store_true',
       default=False,
       help='Remain stationary, linear momentum = 0')
+  parser.add_argument(
+      '--pickle-failed',
+      action='store_true',
+      default=False,
+      help='Pickle failed simulation results in monte-carlo')
 
   args = parser.parse_args(sys.argv[1:])
 
@@ -1627,7 +1639,8 @@ def main():
     'detumble': args.detumble,
     'initialOmega': args.initial_omega,
     'static': args.static,
-    'sigma': args.sigma
+    'sigma': args.sigma,
+    'pickleFailed': args.pickle_failed
   }
 
   if args.monte_carlo:
