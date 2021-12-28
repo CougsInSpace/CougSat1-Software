@@ -324,6 +324,31 @@ def rodRotation(a: np.ndarray, aT: np.ndarray):
 
   return rod
 
+def rotationVector(a: np.ndarray, aT: np.ndarray):
+  '''!@brief Create rotation vector with axis and angle of rotation.
+  Similiar to Rodrigues vector but the angle is stored as the 
+  magnitude of the vector instead of as a fourth element
+
+  @param a Input vector initial state
+  @param aT Input vector transformed state
+  @return np.ndarray Rotation vector between a and aT
+  '''
+  a = a.flatten()
+  aT = aT.flatten()
+  
+  axis = np.cross(a, aT)
+
+  # handle case if a and aT are parallel 
+  if np.linalg.norm(axis) == 0:
+    axis = np.array([0,0,1])
+    theta = 0
+  else:
+    axis = axis / np.linalg.norm(axis)
+    theta = thetaError(a, aT)
+  rotVec = axis * theta
+
+  return rotVec.reshape((3,1))
+
 def applyRodRotation(v: np.ndarray,rod:np.ndarray):
   '''!@brief https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
 
@@ -404,7 +429,7 @@ def planeProjectNorm(n,u):
 
   normal = vectorProject(u,n)
 
-  return u - normal
+  return (u - normal)
 
 def vectorProject(u,v):
   '''!@brief Projects u onto v
@@ -415,6 +440,47 @@ def vectorProject(u,v):
   @return vector projection of u onto v
   '''
   return (np.dot(v,u) / (np.linalg.norm(v)**2)) * v
+
+def findTorque(u: np.ndarray, v: np.ndarray, mag: np.ndarray):
+  '''!@brief Find torque that will move u to v on the shortest
+  possible path.
+
+
+  @param u That will be moved (camera)
+  @param v Vector that is the target (target)
+  @return Torque that will move u to v on the shortest path
+  '''
+  u = u.flatten()
+  v = v.flatten()
+  mag = mag.flatten()
+
+  w1 = np.cross(u, v)
+  w2 = (u + v) / 2
+  norm = np.cross(w1,w2)
+  torque = np.cross(norm,mag)
+
+  #decide direction of torque
+  theta = thetaErrorVec(u,v,torque)
+  rod = np.append(-1*torque.flatten(),theta)
+  vec = applyRodRotation(u,rod)
+  if thetaError(vec,v) < .00001:
+    torque = -torque
+  #c2Overc1 = (-(w1[0]*mag[0]) - (w1[1]*mag[1]) - (w1[2]*mag[2])) / ((v[0]*mag[0]) + (v[1]*mag[1]) + (v[2]*mag[2]))
+  return torque
+
+def thetaErrorVec(u: np.ndarray, v: np.ndarray, axis: np.ndarray):
+  '''!@brief Theta error to see how close the rotation about axis is to
+  completion
+
+  @param u Rotating vector
+  @param v Target vector
+  @param axis Axis about which rotation is happening
+  @return Angle representing how complete rotation is
+  '''
+  uProj = planeProjectNorm(axis,u)
+  vProj = planeProjectNorm(axis,v)
+
+  return thetaError(uProj,vProj)
 
 def sunDir(time: datetime.datetime):
   '''!@brief Find position of sun in Global frame
@@ -642,7 +708,7 @@ class ADCS:
       self.lastMag = self.mag
       self.lastT = t
 
-      return self.iCoil, np.zeros((3, 1))
+      return self.iCoil, r @ dipole.reshape((3,1))
 
       # Step 2: Determine current angular velocity
       # TODO
@@ -713,17 +779,38 @@ class ADCS:
     #     return None, None
 
     # change mag and rCamera to local global coordinates
-    magGlobal = rSensor @ mag
-    rCameraGlobal = rSensor @ rCamera
+    magGlobal = r @ mag
+    rCameraGlobal = r @ rCamera
 
 
-    # Step 3: Compute desired magnetic field vector
-
+    # # Step 3: Compute desired magnetic field vector
+    
     # direction we want to point
-    targetIdeal = self.ecefTarget - ecefSat
+    targetGlobal = self.ecefTarget - ecefSat
     #targetIdeal = np.array([3, -8, 9])
-    targetIdeal = targetIdeal / np.linalg.norm(targetIdeal)
+    targetGlobal = targetGlobal / np.linalg.norm(targetGlobal)
 
+    torque1 = findTorque(rCameraGlobal,targetGlobal,magGlobal)
+
+    controlError1 = thetaErrorVec(rCameraGlobal, targetGlobal, torque1)
+    controlError1Derivative = -1
+
+    bDot = (self.mag - self.lastMag) / tStep
+    torque2 = np.cross(bDot.flatten(), mag.flatten())
+    torque2 = r @ torque2.reshape((3,1))
+    torque1 = torque1.reshape((3,1))
+
+    proportionalGain = 1#2.3*(1.44-np.exp(-.02*t))#.3 + .7*np.exp(-.01*t)
+    derivativeGain = 12
+
+    torque1 = torque1 / np.linalg.norm(torque1)
+    #torque2 = torque2 / np.linalg.norm(torque2)
+    torque1 = (torque1*(proportionalGain*controlError1))
+    torque2 = (torque2*(derivativeGain*controlError1Derivative))
+    torque = torque1 + torque2
+    dipole = torque2Dipole(torque, magGlobal)
+
+    '''
     # torque to get the satellite into the earthMF/target plane
     rCameraGlobalProj = planeProject(targetIdeal,magGlobal,rCameraGlobal)
     axis = np.cross(rCameraGlobal.flatten(),rCameraGlobalProj.flatten())
@@ -745,13 +832,7 @@ class ADCS:
     derivativeGain1 = 12
     proportionalGain2 = 1
     derivativeGain2 = 10
-
-    #default gains
-    # proportionalGain1 = 1
-    # derivativeGain1 = 6.5
-    # proportionalGain2 = 1
-    # derivativeGain2 = 6.5
-
+    '''
     # inplane staging
     flag = 1 # change to 0 if uncommenting following code
     # if self.stage == 1 or (controlError1 <= .02 and abs(controlErrorDerivative1) <= .005):
@@ -759,37 +840,41 @@ class ADCS:
     #   flag = 1
     #   self.stageTime = t
 
-    
+    '''
     # control loop for each torque
     torque1 = torque1 * ((controlError1*proportionalGain1) + (controlErrorDerivative1*derivativeGain1))
     torque2 = torque2 * ((controlError2*proportionalGain2) + (controlErrorDerivative2*derivativeGain2))
-
+    
     # final combined torque
     torque = torque1 + (flag*torque2)
 
     dipole = torque2Dipole(torque,magGlobal)
-
+    '''
     iVector = dipole
     # Step 5: Transform output magnetic dipole to coil duty cycles
     # TODO
 
     # set coil currents
     iCoil = rInv @ iVector.reshape((3,1))
-    iCoil = iCoil
-
+    
     self.lastControlError1 = controlError1
-    self.lastControlError2 = controlError2
+    #self.lastControlError2 = controlError2
     self.lastT = t
     self.lastGPS = self.gps
     self.lastMag = self.mag
     self.lastGravity = self.gravity
     self.lastSunDirLocal = sunDirGlobal
+    self.lastTorque1 = torque1
     # self.lastR = r
     # self.lastQ = q
+    if t < 102:
+      test = np.array([0,0,0])
+    else:
+      test = torque2
 
-    return iCoil.flatten(), torque1.reshape((3,1))
+    return iCoil.flatten(), test.reshape((3,1))
 
-def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
+def magnetorquer(N, cog: np.ndarray, iVector: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
   '''!@brief Create a magnetorquer for number of loops and geometry
 
@@ -840,7 +925,7 @@ class Satellite:
       self.ecefTarget = None
     else:
       self.loopFreq = 100
-      self.maxDuration = 60 * 10
+      self.maxDuration = 60 * 3
       self.geoTarget = np.zeros(3)
       self.geoTarget[0] = (self.geo[0] +
                            np.random.uniform(-45, 45) + 180) % 360 - 180
