@@ -412,6 +412,8 @@ def torque2Dipole(torqueDir,mag):
   '''
   torqueDir = torqueDir.flatten()
   mag = mag.flatten()
+  # print(torqueDir)
+  # print(mag)
 
   dipoleDir = np.cross(mag,torqueDir)
   return dipoleDir
@@ -609,6 +611,9 @@ class ADCS:
     self.stage = 0
     self.stageTime = 0
     self.lastTargetEarthNormal = np.array([0,0,0])
+    self.lastTorque = np.array([0,0,0])
+    self.lastResetT = 0
+    self.reset = False
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -650,7 +655,7 @@ class ADCS:
     self.lastSensorT = t
 
   def compute(self, t: float, gps: np.ndarray,
-              mag: np.ndarray, gravity: np.ndarray, sunDirLocal: np.ndarray, realTime: datetime.datetime, r: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+              mag: np.ndarray, gravity: np.ndarray, sunDirLocal: np.ndarray, realTime: datetime.datetime, r: np.ndarray, omega: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     '''!@brief Compute ADCS loop given input from sensors
 
     @param t Current time
@@ -790,9 +795,19 @@ class ADCS:
     #targetIdeal = np.array([3, -8, 9])
     targetGlobal = targetGlobal / np.linalg.norm(targetGlobal)
 
+    # checkOrtho = thetaError(magGlobal, targetGlobal)
+
+    # rCameraGlobalProj = planeProject(magGlobal, targetGlobal, rCameraGlobal)
+    # controlError1 = thetaError(rCameraGlobalProj, rCameraGlobal)
+    # if (checkOrtho > np.deg2rad(80) and checkOrtho < np.deg2rad(100)) and controlError1 < .02:
+    #   torqueDirIdeal = np.cross(rCameraGlobal.flatten(), targetGlobal.flatten())
+    #   torque1 = planeProjectNorm(magGlobal, torqueDirIdeal)
+    #   print("sdfjalkjsdf")
+    # else:
     torque1 = findTorque(rCameraGlobal,targetGlobal,magGlobal)
 
     controlError1 = thetaErrorVec(rCameraGlobal, targetGlobal, torque1)
+
     controlError1Derivative = -1
 
     bDot = (self.mag - self.lastMag) / tStep
@@ -800,56 +815,57 @@ class ADCS:
     torque2 = r @ torque2.reshape((3,1))
     torque1 = torque1.reshape((3,1))
 
-    proportionalGain = 1#2.3*(1.44-np.exp(-.02*t))#.3 + .7*np.exp(-.01*t)
-    derivativeGain = 12
+    if thetaError(targetGlobal, rCameraGlobal) > .14:
+      proportionalGain = 1#2.3*(1.44-np.exp(-.02*t))#.3 + .7*np.exp(-.01*t)
+      derivativeGain = 18
+    else:
+      proportionalGain = 1
+      derivativeGain = 2
+
+    # checkOrtho = thetaError(magGlobal, targetGlobal)
+    # if checkOrtho > np.deg2rad(80) and checkOrtho < np.deg2rad(100) and self.stage == 0:
+    #   self.stage = 1
+
+    # if self.stage == 0:
+    #   rCameraProj = planeProject(magGlobal, targetGlobal, rCameraGlobal)
+    #   idealAxis = np.cross(rCameraGlobal.flatten(), rCameraProj.flatten())
+    #   controlError = thetaError(rCameraGlobal, rCameraProj)
+    #   controlErrorDerivative = (controlError - self.controlErrorDerivative1) / tStep
+    #   self.lastControlError1 = controlError
+
+    #   if controlErrorDerivative < .01:
+    #     self.stage = 1
+    #   else:
+    #     torque1 = planeProjectNorm(magGlobal, idealAxis)
+    #     controlError1 = controlError
+    #     derivativeGain = 10
 
     torque1 = torque1 / np.linalg.norm(torque1)
-    #torque2 = torque2 / np.linalg.norm(torque2)
-    torque1 = (torque1*(proportionalGain*controlError1))
-    torque2 = (torque2*(derivativeGain*controlError1Derivative))
-    torque = torque1 + torque2
+    torque1 = torque1*proportionalGain*controlError1
+    torque2 = torque2*derivativeGain*controlError1Derivative
+    torque = 1*(torque1.reshape((3,1)) + torque2.reshape((3,1)))
+
+
+    #checkOrtho = thetaError(magGlobal, targetGlobal)
+    # if np.linalg.norm(omega) < .005:#self.lastResetT + 510 < t:
+    #   self.lastResetT = t
+    #   # print("reset")
+
+    # if self.lastResetT + 120 < t or np.linalg.norm(omega) > .05:
+    #   torque = torque2
+    #   # if np.linalg.norm(omega) > .05:
+    #   #   print("slow down")
+    #   # else: 
+    #   #   print("timeout")
+
+    checkOrtho = thetaError(magGlobal, targetGlobal)
+    if checkOrtho > np.deg2rad(75) and checkOrtho < np.deg2rad(105): #and self.stage == 0:
+      torque = torque2
+      print("uh oh")
+    #   #self.stage = 1
+
     dipole = torque2Dipole(torque, magGlobal)
 
-    '''
-    # torque to get the satellite into the earthMF/target plane
-    rCameraGlobalProj = planeProject(targetIdeal,magGlobal,rCameraGlobal)
-    axis = np.cross(rCameraGlobal.flatten(),rCameraGlobalProj.flatten())
-    torque1 = planeProjectNorm(magGlobal,axis)
-
-    # torque to get the satellite to the target direction
-    targetDir = planeProject(magGlobal,targetIdeal,rCameraGlobal)
-    torque2 = np.cross(targetDir.flatten(),targetIdeal.flatten())
-
-    torque1 = torque1 / np.linalg.norm(torque1)
-    torque2 = torque2 / np.linalg.norm(torque2)
-
-    # Step 4: Control loop for both steps simultaneously
-    controlError1 = thetaError(rCameraGlobal,rCameraGlobalProj)
-    controlError2 = thetaError(targetIdeal,targetDir)
-    controlErrorDerivative1 = (controlError1 - self.lastControlError1) / tStep
-    controlErrorDerivative2 = (controlError2 - self.lastControlError2) / tStep
-    proportionalGain1 = 2
-    derivativeGain1 = 12
-    proportionalGain2 = 1
-    derivativeGain2 = 10
-    '''
-    # inplane staging
-    flag = 1 # change to 0 if uncommenting following code
-    # if self.stage == 1 or (controlError1 <= .02 and abs(controlErrorDerivative1) <= .005):
-    #   self.stage = 1
-    #   flag = 1
-    #   self.stageTime = t
-
-    '''
-    # control loop for each torque
-    torque1 = torque1 * ((controlError1*proportionalGain1) + (controlErrorDerivative1*derivativeGain1))
-    torque2 = torque2 * ((controlError2*proportionalGain2) + (controlErrorDerivative2*derivativeGain2))
-    
-    # final combined torque
-    torque = torque1 + (flag*torque2)
-
-    dipole = torque2Dipole(torque,magGlobal)
-    '''
     iVector = dipole
     # Step 5: Transform output magnetic dipole to coil duty cycles
     # TODO
@@ -857,22 +873,18 @@ class ADCS:
     # set coil currents
     iCoil = rInv @ iVector.reshape((3,1))
     
-    self.lastControlError1 = controlError1
-    #self.lastControlError2 = controlError2
+    #self.lastControlError1 = controlError1
+    #self.lastControlError2 = controlError1
     self.lastT = t
     self.lastGPS = self.gps
     self.lastMag = self.mag
     self.lastGravity = self.gravity
     self.lastSunDirLocal = sunDirGlobal
-    self.lastTorque1 = torque1
+    self.lastTorque = torque
     # self.lastR = r
     # self.lastQ = q
-    if t < 102:
-      test = np.array([0,0,0])
-    else:
-      test = torque2
 
-    return iCoil.flatten(), test.reshape((3,1))
+    return iCoil.flatten(), torque1.reshape((3,1))
 
 def magnetorquer(N, cog: np.ndarray, iVector: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -925,7 +937,7 @@ class Satellite:
       self.ecefTarget = None
     else:
       self.loopFreq = 100
-      self.maxDuration = 60 * 3
+      self.maxDuration = 60 * 5
       self.geoTarget = np.zeros(3)
       self.geoTarget[0] = (self.geo[0] +
                            np.random.uniform(-45, 45) + 180) % 360 - 180
@@ -936,6 +948,11 @@ class Satellite:
           self.geoTarget[0],
           self.geoTarget[1],
           self.geoTarget[2])
+      # magField = interpolateWMM(self.geo[0], self.geo[1])
+      # target = np.cross(magField.flatten(), np.array([1,1,1]))
+      # target = (target / np.linalg.norm(target)) * 6378
+      # self.ecefTarget = target.reshape((3,1)) + self.ecef
+      #yayaya
 
     self.results = {
       'batteryVoltage': self.batteryVoltage,
@@ -1191,7 +1208,7 @@ class Satellite:
       realTime = self.startDatetime + datetime.timedelta(seconds=t)
       diodes = self.sunDirLocal # add error based on experiments
       iCoilTarget, debugVector = adcs.compute(
-        t, gps, magnetometer, accelerometer, diodes, realTime, self.rList[-1])
+        t, gps, magnetometer, accelerometer, diodes, realTime, self.rList[-1], self.omegaList[-1])
       if iCoilTarget is not None:
         self.vCoil = saturate(
             iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)
