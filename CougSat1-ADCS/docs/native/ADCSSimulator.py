@@ -861,7 +861,7 @@ class ADCS:
     checkOrtho = thetaError(magGlobal, targetGlobal)
     if checkOrtho > np.deg2rad(75) and checkOrtho < np.deg2rad(105): #and self.stage == 0:
       torque = torque2
-      print("uh oh")
+      # print("uh oh")
     #   #self.stage = 1
 
     dipole = torque2Dipole(torque, magGlobal)
@@ -925,6 +925,7 @@ class Satellite:
 
     self.batteryVoltage = np.random.uniform(3.3, 4.2)
 
+    # set time to a random date
     self.startDatetime = datetime.datetime.now()
     self.startDatetime += datetime.timedelta(days=np.random.uniform(-100, 100))
     self.geo = np.array(orb.get_lonlatalt(self.startDatetime))
@@ -1237,6 +1238,7 @@ class Satellite:
     self.angleErrorList = np.array(self.angleErrorList)
     self.omegaErrorList = np.array(self.omegaErrorList)
 
+
     totalEnergy = sum(self.pCoilList * self.tStepList)
 
     self.results['converged'] = self.converged
@@ -1360,7 +1362,7 @@ class Satellite:
       z = self.rList[:, 2, i] * 0.5
       ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors=colors[i])
       lines.append(ax.plot3D(x, y, z, colors[i], label=labels[i]))
-
+    print(self.mList)
     x = self.magFieldUList[:, 0, 0]
     y = self.magFieldUList[:, 1, 0]
     z = self.magFieldUList[:, 2, 0]
