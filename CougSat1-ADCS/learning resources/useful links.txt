@@ -2,3 +2,4 @@ Explaination for why the IMU can't measure gravity while in orbit - https://www.
 Explaination of quaternions with interactive website - https://www.youtube.com/watch?v=zjMuIxRvygQ
 Explaination of bDot algorithm - https://www.youtube.com/watch?v=uNZeDMmDdbo
 Torque free 3D angular velocity explained using Poinsot's Ellipsoid - https://www.youtube.com/watch?v=l51LcwHOW7s
+Intro video by Travers on how the satellite's attitude control algorithm works - https://www.youtube.com/watch?v=lS-L49FbJQw
