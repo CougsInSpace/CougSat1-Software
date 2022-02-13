@@ -428,13 +428,16 @@ mbed_error_status_t CDH::processMsgTemperatureRequest(char * msgBody) {
       error = (*thermistorsMPPT[7]).get(temp);
       break;
     case 0x31:  // PCB -X -Y
-      // Find labels for PCBs
+      error = (*thermistorsEPS[9]).get(temp);
       break;
     case 0x32:  // PCB -X +Y
+      error = (*thermistorsEPS[10]).get(temp);
       break;
     case 0x33:  // PCB +X -Y
+      error = (*thermistorsEPS[11]).get(temp);
       break;
     case 0x34:  // PCB +X +Y
+      error = (*thermistorsEPS[12]).get(temp);
       break;
   }
 
@@ -458,11 +461,110 @@ mbed_error_status_t CDH::processMsgPowerChannelStatus() {
   // Set buffer variables
   bufferSize = 7;
   *buf = 0x00000000000000;
+  int64_t temp = 0;
+  bool on = false;
   
   // bit manipulate all the values into place
 
+  // Inodes, getSwitch();
 
-  return MBED_ERROR_UNSUPPORTED;
+  for (int i = 0; i < 28; i++) {                         // Only 37 ? not the 56 requested
+    temp = 0;
+    // get status
+    switch (i) 
+    {
+      case 0:
+        on = (*iNodes3V3[0]).getSwitch();
+        break;
+      case 1:
+        on = (*iNodes3V3[1]).getSwitch();
+        break;
+      case 2:
+        on = (*iNodes3V3[2]).getSwitch();
+        break;
+      case 3:
+        on = (*iNodes3V3[3]).getSwitch();
+        break;
+      case 4:
+        on = (*iNodes3V3[4]).getSwitch();
+        break;
+      case 5:
+        on = (*iNodes3V3[5]).getSwitch();
+        break;
+      case 6:
+        on = (*iNodes3V3[6]).getSwitch();
+        break;
+      case 7:
+        on = (*iNodes3V3[7]).getSwitch();
+        break;
+      case 8:
+        on = (*iNodes3V3[8]).getSwitch();
+        break;
+      case 9:
+        on = (*iNodes3V3[9]).getSwitch();
+        break;
+      case 10:
+        on = (*iNodes3V3[10]).getSwitch();
+        break;
+      case 11:
+        on = (*iNodes3V3[11]).getSwitch();
+        break;
+      case 12:
+        on = (*iNodes3V3[12]).getSwitch();
+        break;
+      case 13:
+        on = (*iNodesPRBatt[0]).getSwitch();
+        break;
+      case 14:
+        on = (*iNodesPRBatt[1]).getSwitch();
+        break;
+      case 15:
+        on = (*iNodesPRBatt[2]).getSwitch();
+        break;
+      case 16:
+        on = (*iNodesPRBatt[3]).getSwitch();
+        break;
+      case 17:
+        on = (*iNodesPRBatt[4]).getSwitch();
+        break;
+      case 18:
+        on = (*iNodesPRBatt[5]).getSwitch();
+        break;
+      case 19:
+        on = (*iNodesPRBatt[6]).getSwitch();
+        break;
+      case 20://
+        //?? on = (*iNodesPV3V3[0]).getSwitch();
+        break;
+      case 21://
+        break;
+      case 22://
+        break;
+      case 23://
+        break;
+      case 24:
+        on = iNodeBH_0.getSwitch();
+        break;
+      case 25:
+        on = iNodeBH_1.getSwitch();
+        break;
+      case 26:
+        on = iNodeDeploy_0.getSwitch();
+        break;
+      case 27:
+        on = iNodeDeploy_1.getSwitch();
+        break;
+    }
+    
+    if (on)
+      temp = 1;
+    // bit manipulate into the correct position
+    temp = temp << i;
+    // OR onto the buffer
+    *buf = *buf | temp;    
+  }
+
+  return MBED_SUCCESS;
 }
 
 /**
@@ -475,11 +577,21 @@ mbed_error_status_t CDH::processMsgSolarChannelStatus() {
   // Set buffer variables
   bufferSize = 2;
   *buf = 0x0000;
+  int16_t temp = 0;
+  bool on = false;
 
   // Bit manipulate all the values into place
-  for (int i = 0; i < 16; i++) {
-
+  for (int i = 0; i < 8; i++) {                         // Only 8 ? not the 16 requested
+    temp = 0;
+    // get status
+    on = (*iNodesPVIn[i]).getSwitch();
+    if (on)
+      temp = 1;
+    // bit manipulate into the correct position
+    temp = temp << i;
+    // OR onto the buffer
+    *buf = *buf | temp;    
   }
 
-  return MBED_ERROR_UNSUPPORTED;
+  return MBED_SUCCESS;
 }
