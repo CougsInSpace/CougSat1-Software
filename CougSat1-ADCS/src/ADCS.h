@@ -5,12 +5,14 @@
 #include "interfaces/CDH.h"
 #include <mbed.h>
 #include <rtos.h>
+#include <../../eigen/Eigen/Dense>
 
 
 class ADCS {
 private:
   Thread monitor;
   Thread cdhRead;
+  Thread attitudeDeterminationThread;
   char   message[9];
   CDH    cdh;
   void   cdhThread();
@@ -18,5 +20,6 @@ private:
 public:
   ADCS();
   void startThread();
+  void attitudeDetermination();
 };
 #endif /* ADCS_H */

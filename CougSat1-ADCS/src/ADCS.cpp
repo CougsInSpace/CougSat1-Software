@@ -1,5 +1,7 @@
 #include "ADCS.h"
+#include <../../CISLibrary/eigen/Eigen/Dense>
 
+using Eigen::MatrixXd; // should this be here?
 /**
  * @brief Function for cdh communication thread
  *
@@ -16,6 +18,20 @@ void ADCS::cdhThread() {
   }
 }
 
+void ADCS::attitudeDetermination() {
+  while (true) {
+    
+
+    // code to read magnetometer
+    
+    // code to read photodiodes
+
+    // code to determine orientation
+
+    
+  }
+}
+
 /**
  * @brief Construct a new ADCS::ADCS object
  *
@@ -27,6 +43,7 @@ ADCS::ADCS() : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL) {
   // monitor.set_priority(osPriorityNormal);
   // cdhRead.set_priority(osPriorityNormal);
   cdhRead.start(callback(this, &ADCS::cdhThread));
+  attitudeDeterminationThread.start(callback(this, &ADCS::attitudeDetermination));
   // monitor.start(callback(this, &ADCS::monitorThread));
 }
 
