@@ -27,12 +27,12 @@ import random
 
 '''Initilization Section Start'''
 # Inertia matrix
-Ixx = 1
+Ixx = 1.5
 Ixy = 0
 Ixz = 0
-Iyy = 1
+Iyy = -1
 Iyz = 0
-Izz = 1
+Izz = .2
 iLocal = np.array([[Ixx, Ixy, Ixz],
                   [Ixy, Iyy, Iyz],
                   [Ixz, Iyz, Izz]]) #/ 1e6
@@ -85,9 +85,9 @@ for i in range(int(tMax/tStep)):
 
     # update quaternion orientation
     q = q + qdot * tStep
-    axisXGlobal = rInv @ axisX
-    axisYGlobal = rInv @ axisY
-    axisZGlobal = rInv @ axisZ
+    axisXGlobal = r @ axisX
+    axisYGlobal = r @ axisY
+    axisZGlobal = r @ axisZ
     
     # append updated vectors to their respective lists to be plotted later
     axisListX.append(axisXGlobal)

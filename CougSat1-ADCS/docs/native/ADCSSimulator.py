@@ -412,8 +412,6 @@ def torque2Dipole(torqueDir,mag):
   '''
   torqueDir = torqueDir.flatten()
   mag = mag.flatten()
-  # print(torqueDir)
-  # print(mag)
 
   dipoleDir = np.cross(mag,torqueDir)
   return dipoleDir
@@ -580,8 +578,8 @@ def rotMatrix2Mod(a: np.ndarray, aT: np.ndarray, b: np.ndarray, bT: np.ndarray):
 
 orb = Orbital(
   "ISS",
-  line1="1 25544U 98067A   21249.54028389  .00002593  00000-0  55940-4 0  9993",
-    line2="2 25544  51.6453 300.4471 0003214   1.7468 140.2698 15.48606005301202")
+    line1="1 25544U 98067A   21249.54028389  .00002593  00000-0  55940-4 0  9993",
+      line2="2 25544  51.6453 300.4471 0003214   1.7468 140.2698 15.48606005301202")
 
 class ADCS:
   def __init__(self, geoTarget: np.ndarray) -> None:
@@ -1362,7 +1360,7 @@ class Satellite:
       z = self.rList[:, 2, i] * 0.5
       ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors=colors[i])
       lines.append(ax.plot3D(x, y, z, colors[i], label=labels[i]))
-    print(self.mList)
+ 
     x = self.magFieldUList[:, 0, 0]
     y = self.magFieldUList[:, 1, 0]
     z = self.magFieldUList[:, 2, 0]
