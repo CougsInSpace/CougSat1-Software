@@ -209,6 +209,10 @@ mbed_error_status_t CDH::processMsgCurrentRequest(char * msgBody) {
   double current = 0.0;
   mbed_error_status_t error = MBED_ERROR_UNSUPPORTED;
 
+  // For case statements
+  double currentBattAIn = 0.0, currentBattAOut = 0.0;
+  double currentBattBIn = 0.0, currentBattBOut = 0.0;
+
   // Switch possible messages
   switch (message) {
     case 0x00:  // Solar Panel 0A
@@ -236,7 +240,8 @@ mbed_error_status_t CDH::processMsgCurrentRequest(char * msgBody) {
       error = (*iNodesPV[7]).updateAndGet(current);
       break;
     case 0x08:  // Battery A
-      double currentBattAIn = 0.0, currentBattAOut = 0.0;
+      currentBattAIn = 0.0;
+      currentBattAOut = 0.0;
       error = iNodeBattInA.updateAndGet(currentBattAIn);
       if (error != MBED_SUCCESS)
         break;
@@ -244,7 +249,8 @@ mbed_error_status_t CDH::processMsgCurrentRequest(char * msgBody) {
       current = currentBattAOut - currentBattAIn;
       break;
     case 0x09:  // Battery B
-      double currentBattBIn = 0.0, currentBattBOut = 0.0;
+      currentBattBIn = 0.0;
+      currentBattBOut = 0.0;
       error = iNodeBattInB.updateAndGet(currentBattBIn);
       if (error != MBED_SUCCESS)
         break;
@@ -474,43 +480,43 @@ mbed_error_status_t CDH::processMsgPowerChannelStatus() {
     switch (i) 
     {
       case 0:
-        on = (*iNodes3V3[0]).getSwitch();
+        on = (*iNodesPR3V3[0]).getSwitch();
         break;
       case 1:
-        on = (*iNodes3V3[1]).getSwitch();
+        on = (*iNodesPR3V3[1]).getSwitch();
         break;
       case 2:
-        on = (*iNodes3V3[2]).getSwitch();
+        on = (*iNodesPR3V3[2]).getSwitch();
         break;
       case 3:
-        on = (*iNodes3V3[3]).getSwitch();
+        on = (*iNodesPR3V3[3]).getSwitch();
         break;
       case 4:
-        on = (*iNodes3V3[4]).getSwitch();
+        on = (*iNodesPR3V3[4]).getSwitch();
         break;
       case 5:
-        on = (*iNodes3V3[5]).getSwitch();
+        on = (*iNodesPR3V3[5]).getSwitch();
         break;
       case 6:
-        on = (*iNodes3V3[6]).getSwitch();
+        on = (*iNodesPR3V3[6]).getSwitch();
         break;
       case 7:
-        on = (*iNodes3V3[7]).getSwitch();
+        on = (*iNodesPR3V3[7]).getSwitch();
         break;
       case 8:
-        on = (*iNodes3V3[8]).getSwitch();
+        on = (*iNodesPR3V3[8]).getSwitch();
         break;
       case 9:
-        on = (*iNodes3V3[9]).getSwitch();
+        on = (*iNodesPR3V3[9]).getSwitch();
         break;
       case 10:
-        on = (*iNodes3V3[10]).getSwitch();
+        on = (*iNodesPR3V3[10]).getSwitch();
         break;
       case 11:
-        on = (*iNodes3V3[11]).getSwitch();
+        on = (*iNodesPR3V3[11]).getSwitch();
         break;
       case 12:
-        on = (*iNodes3V3[12]).getSwitch();
+        on = (*iNodesPR3V3[12]).getSwitch();
         break;
       case 13:
         on = (*iNodesPRBatt[0]).getSwitch();
@@ -543,16 +549,16 @@ mbed_error_status_t CDH::processMsgPowerChannelStatus() {
       case 23://
         break;
       case 24:
-        on = iNodeBH_0.getSwitch();
+        //on = iNodeBH_0.getSwitch();
         break;
       case 25:
-        on = iNodeBH_1.getSwitch();
+        //on = iNodeBH_1.getSwitch();
         break;
       case 26:
-        on = iNodeDeploy_0.getSwitch();
+        //on = iNodeDeploy_0.getSwitch();
         break;
       case 27:
-        on = iNodeDeploy_1.getSwitch();
+        //on = iNodeDeploy_1.getSwitch();
         break;
     }
     

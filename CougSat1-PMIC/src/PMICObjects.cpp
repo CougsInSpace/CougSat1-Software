@@ -43,10 +43,14 @@ InterruptIn interruptCtrlSync(CTRL_SYNC);
 InterruptIn interruptBusI2CIRQ(BUS_I2C_IRQ);
 
 /******************************** Power Nodes *********************************/
-CurrentNode iNodePV_0A(adcPV0, ADCChannel_t::CM_07, GAIN_PV_0A);
-CurrentNode iNodePV_1A(adcPV1, ADCChannel_t::CM_07, GAIN_PV_1A);
-CurrentNode iNodePV_2A(adcPV2, ADCChannel_t::CM_07, GAIN_PV_2A);
-CurrentNode iNodePV_3A(adcPV3, ADCChannel_t::CM_07, GAIN_PV_3A);
+CurrentNode iNodePV_0A(adcPV0, ADCChannel_t::CM_00, GAIN_PV_0A);
+CurrentNode iNodePV_0B(adcPV0, ADCChannel_t::CM_06, GAIN_PV_0B);
+CurrentNode iNodePV_1A(adcPV1, ADCChannel_t::CM_00, GAIN_PV_1A);
+CurrentNode iNodePV_1B(adcPV1, ADCChannel_t::CM_06, GAIN_PV_1B);
+CurrentNode iNodePV_2A(adcPV2, ADCChannel_t::CM_00, GAIN_PV_2A);
+CurrentNode iNodePV_2B(adcPV2, ADCChannel_t::CM_06, GAIN_PV_2B);
+CurrentNode iNodePV_3A(adcPV3, ADCChannel_t::CM_00, GAIN_PV_3A);
+CurrentNode iNodePV_3B(adcPV3, ADCChannel_t::CM_06, GAIN_PV_3B);
 
 CurrentNode * iNodesPV[COUNT_PV] = {&iNodePV_0A, &iNodePV_0B, &iNodePV_1A,
     &iNodePV_1B, &iNodePV_2A, &iNodePV_2B, &iNodePV_3A, &iNodePV_3B};
