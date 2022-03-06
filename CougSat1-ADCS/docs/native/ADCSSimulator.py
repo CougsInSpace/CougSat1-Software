@@ -1672,7 +1672,7 @@ class Satellite:
     self.__plotLocal()
     self.__plotTime()
 
-    pyplot.show()
+    pyplot.show() 
 
 def _runnerSim(**kwargs) -> dict:
   '''!@brief Multithreaded runner to execute simulation and return results

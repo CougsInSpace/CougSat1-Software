@@ -6,23 +6,34 @@ import quaternion
 import time
 import math
 import matplotlib.pyplot as pyplot
+from solid_works_curves import *
 
-# Default starting point
-startTime = dt.datetime.now()
-tStep = 15 # tStep in seconds
-bbqOmega = 0 # rad/s
+'''INITIALIZATION PARAMETERS START'''
+# Simulation parameters
+tStep = 60 # tStep in seconds
+tMax = 270*60 # time simulation runs for in seconds
+
+# Universe parameters
 maxSolarConst = 1322 # W/m^2
 minSolarConst = 1414 # W/m^2
-tMax = 90*60
-area = .1*.1 #m^2
-albedoFac = .55 # varies between .25 and .55 based on terrain
+albedoFac = .55 # earth albedo factor, varies between .25 and .55 based on terrain
 earthBBT = 255 # kelvin. Earth black body temp
 boltzmann = 5.67e-8 # W/m^2K^4
-emissivity = 1 # emissivity of satellite
+emissivity = 1 # emissivity of satellite (IR absorptivity)
+
+# Satellite parameters
+bbqOmega = 0 # rad/s WARNING: higher than .005 will neccesitate a smaller tstep
+startTime = dt.datetime.now()
+sunFace = np.array([1,0,0]) # direction vector for point on satellite facing sun
+area = .1*.1 #m^2
+'''INITIALIZATION PARAMETERS END'''
+
+fileNames = ["+x", "+y", "+z", "-x", "-y", "-z"]
+
 
 # Constants
-EARTH_A = 6378.137
-EARTH_B = 6356.752
+EARTH_A = 6378.137 # big radius of earth (km)
+EARTH_B = 6356.752 # small radius of earth (km)
 
 GEO_FACTOR = 1e-3
 ALT_FACTOR = 1e4
@@ -32,15 +43,10 @@ orb = Orbital(
   "ISS",
     line1="1 25544U 98067A   21249.54028389  .00002593  00000-0  55940-4 0  9993",
       line2="2 25544  51.6453 300.4471 0003214   1.7468 140.2698 15.48606005301202")
-# updated
-# orb = Orbital(
-#   "ISS",
-#   line1="25544U 98067A   22049.03783859  .00007772  00000-0  14488-3 0  9991",
-#     line2="25544  51.6424 206.6447 0005686 140.2013 326.0656 15.49824186326703")
 
 class Satellite:
   def __init__(self, Tf:float, tStep: float, startTime: dt.datetime, 
-                bbqOmega: float, maxSolarConst: float, minSolarConst: float, area: float):
+                bbqOmega: float, maxSolarConst: float, minSolarConst: float, area: float, sunFace: np.ndarray):
     self.currentTime = startTime
     self.t = 0
     self.tMax = Tf
@@ -52,15 +58,26 @@ class Satellite:
                                 [0, 0, 1],
                                 [-1,0, 0],
                                 [0,-1, 0],
-                                [0, 0,-1]]).T # add surface absorbtivity here (Local Frame)
-    self.q = quaternion.from_float_array([1, 0, 0, 0])
-    self.omegaq = quaternion.from_float_array(np.append([0], self.omega))
-    self.qdot = .5*self.omegaq
+                                [0, 0,-1]]).T # TODO add surface absorbtivity here (Local Frame)
 
+
+    if np.linalg.norm(sunFace) != 0:
+      sunDirection = sunDir(self.currentTime)
+      axis = np.cross(sunFace.flatten(), sunDirection.flatten())
+      angle = thetaError(sunFace, sunDirection)
+      axAng = (axis / np.linalg.norm(axis)) * angle
+      self.q = quaternion.from_rotation_vector(axAng)
+    else:
+      self.q = quaternion.from_float_array([1, 0, 0, 0])
+    self.omegaq = quaternion.from_float_array(np.append([0], self.omega))
+    self.qdot = .5*self.omegaq*self.q
+
+    # flux variation throughout year
     yearFraction = toYearFraction(self.currentTime)  
     offset = toYearFraction(dt.datetime(2000, 1, 4))
     self.currentFlux = math.sqrt(((minSolarConst*math.sin(math.pi*(yearFraction - offset)))**2) + ((maxSolarConst*math.cos(math.pi*(yearFraction - offset)))**2))
 
+    # position of satellite in orbit
     self.latLong = np.array(orb.get_lonlatalt(self.currentTime))
     self.ecef = geo2ECEF(self.latLong[0], self.latLong[1], self.latLong[2])
     
@@ -74,9 +91,12 @@ class Satellite:
 
 
   def run(self):
+    # main for loop
     n = int(np.ceil(self.tMax / self.tStep))
     for i in range(1,n):
-      r = quaternion.as_rotation_matrix(self.q)
+      r = quaternion.as_rotation_matrix(self.q) # local to global
+      print(self.q)
+      rInv = np.linalg.inv(r) # global to local
       faceNormalsGlobal = r @ self.faceNormals
 
       # find sun direction and check if the satellite is in shadow
@@ -97,18 +117,19 @@ class Satellite:
 
       # ir flux
       IRFluxDir = albedoFluxDir
-      IRFlux = IRFluxDir*boltzmann*emissivity*earthBBT
+      IRFlux = IRFluxDir*boltzmann*emissivity*(earthBBT**4)
       faceIRFluxes = findFluxes(faceNormalsGlobal, IRFlux)
 
       # sum everything up
       totalFlux = faceSolarFluxes + faceAlbedofluxes + faceIRFluxes
 
+      # plotting lists
       self.fluxList.append(totalFlux.reshape((6,1)))
       self.netFlux = self.netFlux + (totalFlux * tStep)
-      self.sunList.append(sunDirection.reshape((3,1)))
-      self.ecefList.append(self.ecef.reshape((3,1)))
+      self.sunList.append(rInv @ sunDirection.reshape((3,1)))
+      self.ecefList.append(rInv @ self.ecef.reshape((3,1)))
       if not shadowBool:
-        self.shadowList.append(self.ecef.reshape((3,1)))
+        self.shadowList.append(rInv @ self.ecef.reshape((3,1)))
       self.timeList.append(self.t)
 
 
@@ -117,31 +138,34 @@ class Satellite:
       self.t += self.tStep
       
       # update orientation and orbit
-      self.q = self.q + (self.omegaq * self.tStep)
+      self.q = self.q + (self.qdot * self.tStep)
+      self.qdot = .5*self.omegaq*self.q
+      self.q = self.q / abs(self.q)
       self.latLong = np.array(orb.get_lonlatalt(self.currentTime))
       self.ecef = geo2ECEF(self.latLong[0], self.latLong[1], self.latLong[2])
 
-      # calculate flux based on time of year
+      # calculate current flux based on time of year
       yearFraction = toYearFraction(self.currentTime)  
       offset = toYearFraction(dt.datetime(2000, 1, 4))
       self.currentFlux = math.sqrt(((minSolarConst*math.sin(math.pi*(yearFraction - offset)))**2) + ((maxSolarConst*math.cos(math.pi*(yearFraction - offset)))**2))
-
-    # self.plotLocal()
+    # add curve data to xml
     time = np.array(self.timeList)
     fluxes = np.array(self.fluxList)
-    for i in range(0, 1):
+    curves = SW_curves("SolidWorks Curves")
+    for i in range(0, 6):
       list = np.concatenate(([time], [fluxes[:,i,0]]), axis=0).T
-      directory = "Heat Flux Output"
-      fileName = "flux-" + str(i) + ".xml"
+      curves.add_curve("flux " + fileNames[i], list) 
+    curves.generate_SW_curve_file("Heat Flux Output")
 
-      print(list)
-      create_SW_XML(list, directory, fileName)
+
+
 
   def plotLocal(self):
     # plot everything
     self.fluxList = np.array(self.fluxList)
     netFluxNorm = self.netFlux / np.max(self.netFlux)
     self.sunList = np.array(self.sunList)
+    print(np.max(self.netFlux))
 
     lines = []
     fig = pyplot.figure()
@@ -250,7 +274,29 @@ class Satellite:
 
     fig.canvas.mpl_connect('pick_event', on_pick)
 
-    pyplot.show()
+  def linePlots(self):
+    time = np.array(self.timeList)
+    fluxes = np.array(self.fluxList)
+
+    _, subplots = pyplot.subplots(2, 1, sharex=True)
+    subplots[-1].set_xlabel('Time (s)')
+
+    px = fluxes[:, 0, 0]
+    py = fluxes[:, 1, 0]
+    pz = fluxes[:, 2, 0]
+    nx = fluxes[:, 3, 0]
+    ny = fluxes[:, 4, 0]
+    nz = fluxes[:, 5, 0]
+    subplots[0].plot(time, px, 'r')
+    subplots[0].plot(time, py, 'g')
+    subplots[0].plot(time, pz, 'b')
+    subplots[0].plot(time, nx, 'r')
+    subplots[0].plot(time, ny, 'g')
+    subplots[0].plot(time, nz, 'b')
+    subplots[0].set_title('Fluxes')
+    subplots[0].axhline(y=0, color='k')
+    subplots[0].set_ylabel('W/m^2')
+    
 
 def checkShadow(ecef, sunDir):
   #check if the satellite is in the earth's shadow
@@ -287,12 +333,19 @@ def vectorProject(u,v):
   return (np.dot(v,u) / (np.linalg.norm(v)**2)) * v
 
 def findFluxes(faceNormals: np.ndarray, flux: np.ndarray):
+  '''!@brief Calculates fluxes for each face based on angle
+  to the flux vector
+
+  @param faceNormals matrix of face normals
+  @param flux current flux vector
+  @return 6 element list of fluxes for each face
+  '''
   faceFluxes = flux.flatten() @ faceNormals
   for j in range(0, 6):
     if faceFluxes[j] >= 0:
       faceFluxes[j] = 0 # in shadow
     else:
-      faceFluxes[j] = -1*faceFluxes[j]
+      faceFluxes[j] = -1*faceFluxes[j] # make positive
 
   return faceFluxes
 
@@ -349,66 +402,30 @@ def geo2ECEF(longitude: float, latitude: float, altitude: float) -> np.ndarray:
   z = (EARTH_B**2 / EARTH_A**2 * N + altitude) * np.sin(latitude)
   return np.array([[x], [y], [z]])
 
-def init_SW_XML(file_contents, path, name):
-  #init_SW_XML(file_contents, path, name)#
-  # Purpose: initializes a SW file that contains the data
-  #
-  # Variables: file_contents, type - string (contains contents of the file); 
-  #             path, type - string (contains directory path to save the file); 
-  #             name, type - string (name of the file including extention);
-  #
-  # Requirements: data in a necessary for SW_XML format, name variable has desired extention
-  #
-  # Returns: True (boolean), (success code)
-  import os
+def thetaError(v1,v2):
+    v1 = v1.flatten()
+    v2 = v2.flatten()
+    #Find the unit vectors first
+    v1unit = v1 / np.linalg.norm(v1)
+    v2unit = v2 / np.linalg.norm(v2)
+    #Find the dot product between v1 and v2 unit vectors
+    dotProduct = np.dot(v1unit, v2unit)
 
-  completeName = os.path.join(path, name)
-  
-  SW_file = open(completeName, "w")
-  SW_file.write(file_contents)
-  SW_file.close()
+    # if statement to handle rounding errors that make
+    # dotProduct > 1 when v1=v2
+    if dotProduct < 1:
+      #Take arccos to find the angle in radians between the two
+      anglebetween = np.arccos(dotProduct)
+    else:
+      anglebetween = 0
 
-  return True # return success code
-
-def parse_to_SW_format(data_stream):
-  #parse_to_SW_format(data_stream)#
-  # Purpose: transforms a numpy array into a desired format for SW XML file (string)
-  #
-  # Variables: data_stream, type - numpy array (2d array that contains datapoints of time (first entry), heat flux through each side (second entry)); 
-  #
-  # Requirements: data in a numpy array
-  #
-  # Returns: SW_string (str), (string in a format specific for SW XML file)
-  SW_string = ""
-
-  for data_point in data_stream:
-      SW_string += "              <data points= \"" + str(data_point[0]) + " " + str(data_point[1]) + "\"/>\n"
-
-  return SW_string
-
-def create_SW_XML(data, path, name_w_extention):
-  #create_SW_XML(data, path, name)#
-  # Purpose: creates a SW file that contains the data in a necessary location
-  #
-  # Variables: data, type - numpy array (2d array that contains datapoints of time (first entry), heat flux through each side (second entry)); 
-  #             path, type - string (contains directory path to save the file); 
-  #             name, type - string (name of the file including extention);
-  #
-  # Returns: True (boolean), (success code of initialized file)
-  header = "<?xml version=\"1.0\"?>\n\n<curves>\n          <functioncurve id=\"0\" name=\"Time curve\" type=\"1\" source=\"\" shape=\"0\">\"\n"
-
-  bottom = "          </functioncurve>\n\n</curves>"
-
-  parsed_SW_XML_data = parse_to_SW_format(data)
-
-  file_contents = header + parsed_SW_XML_data + bottom
-
-  init_SW_XML(file_contents, path, name_w_extention)
-
-  return init_SW_XML(file_contents, path, name_w_extention)
+    return anglebetween
 
 def main():
-  sim = Satellite(tMax, tStep, startTime, bbqOmega, maxSolarConst, minSolarConst, area)
+  sim = Satellite(tMax, tStep, startTime, bbqOmega, maxSolarConst, minSolarConst, area, sunFace)
   sim.run()
+  sim.plotLocal()
+  sim.linePlots()
+  pyplot.show()
 
 main()
