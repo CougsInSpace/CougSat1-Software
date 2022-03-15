@@ -24,7 +24,8 @@ emissivity = 1 # emissivity of satellite (IR absorptivity)
 # Satellite parameters
 bbqOmega = 0 # rad/s WARNING: higher than .005 will neccesitate a smaller tstep
 startTime = dt.datetime.now()
-sunFace = np.array([1,0,0]) # direction vector for point on satellite facing sun
+# startTime = dt.datetime(2022, 9, 15) # set manual date
+sunFace = np.array([1,0,0]) # direction vector for direction on satellite pointing at sun
 area = .1*.1 #m^2
 '''INITIALIZATION PARAMETERS END'''
 
@@ -34,6 +35,7 @@ fileNames = ["+x", "+y", "+z", "-x", "-y", "-z"]
 # Constants
 EARTH_A = 6378.137 # big radius of earth (km)
 EARTH_B = 6356.752 # small radius of earth (km)
+EARTH_MEAN = (EARTH_A + EARTH_B) / 2
 
 GEO_FACTOR = 1e-3
 ALT_FACTOR = 1e4
@@ -43,6 +45,12 @@ orb = Orbital(
   "ISS",
     line1="1 25544U 98067A   21249.54028389  .00002593  00000-0  55940-4 0  9993",
       line2="2 25544  51.6453 300.4471 0003214   1.7468 140.2698 15.48606005301202")
+
+# TLE for hot case
+# orb = Orbital(
+#   "Iridium 137",
+#     line1 = "1 43076U 17083G   22073.57996760  .00000086  00000-0  23787-4 0  9997",
+#       line2 = "2 43076  86.3937 252.1455 0001977 100.5738 259.5680 14.34217242221202")
 
 class Satellite:
   def __init__(self, Tf:float, tStep: float, startTime: dt.datetime, 
@@ -78,9 +86,11 @@ class Satellite:
     self.currentFlux = math.sqrt(((minSolarConst*math.sin(math.pi*(yearFraction - offset)))**2) + ((maxSolarConst*math.cos(math.pi*(yearFraction - offset)))**2))
 
     # position of satellite in orbit
-    self.latLong = np.array(orb.get_lonlatalt(self.currentTime))
-    self.ecef = geo2ECEF(self.latLong[0], self.latLong[1], self.latLong[2])
-    
+    # self.latLong = np.array(orb.get_lonlatalt(self.currentTime))
+    # self.ecef = geo2ECEF(self.latLong[0], self.latLong[1], self.latLong[2])
+    self.ecef, _ = orb.get_position(self.currentTime, normalize=False)
+    self.ecef = np.array(self.ecef).reshape((3,1))
+
     # lists for plotting
     self.fluxList = []
     self.netFlux = np.array([0,0,0,0,0,0])
@@ -95,7 +105,6 @@ class Satellite:
     n = int(np.ceil(self.tMax / self.tStep))
     for i in range(1,n):
       r = quaternion.as_rotation_matrix(self.q) # local to global
-      print(self.q)
       rInv = np.linalg.inv(r) # global to local
       faceNormalsGlobal = r @ self.faceNormals
 
@@ -141,8 +150,10 @@ class Satellite:
       self.q = self.q + (self.qdot * self.tStep)
       self.qdot = .5*self.omegaq*self.q
       self.q = self.q / abs(self.q)
-      self.latLong = np.array(orb.get_lonlatalt(self.currentTime))
-      self.ecef = geo2ECEF(self.latLong[0], self.latLong[1], self.latLong[2])
+      # self.latLong = np.array(orb.get_lonlatalt(self.currentTime))
+      # self.ecef = geo2ECEF(self.latLong[0], self.latLong[1], self.latLong[2])
+      self.ecef, _ = orb.get_position(self.currentTime, normalize=False)
+      self.ecef = np.array(self.ecef).reshape((3,1))
 
       # calculate current flux based on time of year
       yearFraction = toYearFraction(self.currentTime)  
@@ -165,7 +176,7 @@ class Satellite:
     self.fluxList = np.array(self.fluxList)
     netFluxNorm = self.netFlux / np.max(self.netFlux)
     self.sunList = np.array(self.sunList)
-    print(np.max(self.netFlux))
+    self.shadowList = np.array(self.shadowList)
 
     lines = []
     fig = pyplot.figure()
@@ -235,15 +246,16 @@ class Satellite:
     ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='lime')
     lines.append(ax.plot3D(x,y,z, 'lime', label='Earth'))
 
-    norm = np.max(np.linalg.norm(self.shadowList, axis=1))
-    list = self.shadowList / norm
+    if self.shadowList.size > 1:
+      norm = np.max(np.linalg.norm(self.shadowList, axis=1))
+      list = self.shadowList / norm
 
-    x = list[:, 0, 0]
-    y = list[:, 1, 0]
-    z = list[:, 2, 0]
+      x = list[:, 0, 0]
+      y = list[:, 1, 0]
+      z = list[:, 2, 0]
 
-    ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='grey')
-    lines.append(ax.plot3D(x,y,z, 'grey', label='Shadow'))
+      ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='grey')
+      lines.append(ax.plot3D(x,y,z, 'grey', label='Shadow'))
 
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
