@@ -1,5 +1,4 @@
 #include "ADCS.h"
-#include <../../CISLibrary/eigen/Eigen/Dense>
 
 using Eigen::MatrixXd; // should this be here?
 /**

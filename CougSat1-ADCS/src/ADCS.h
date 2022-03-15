@@ -5,7 +5,7 @@
 #include "interfaces/CDH.h"
 #include <mbed.h>
 #include <rtos.h>
-#include <../../eigen/Eigen/Dense>
+#include "vectorFunctions.h"
 
 
 class ADCS {
