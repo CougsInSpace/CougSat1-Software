@@ -1,6 +1,6 @@
 //#include <CISConsole.h>
 #include "stdio.h"
-#include "photodiode.h"
+//#include "photodiode.h"
 #include "ADCS.h"
 #include <mbed.h>
 #include <iostream>
@@ -17,25 +17,24 @@
  * @return error code
  */
 int main(void) {
-  //ADCS adcs;
-  //adcs.startThread();
+  ADCS adcs;
+  adcs.startThread();
 
-  Photodiodes test(A1, A1, A2, A2, A3, A3);
-   voltages* volttest;
-   while(true) {
-       volttest = test.getVoltages();
-       std::cout << (int) (100 * test.get_pos_x()) << endl;
-       std::cout << (int) (100 * test.get_pos_y()) << endl;
-       std::cout << (int) (100 * test.get_pos_z()) << endl;
-       std::cout << "testy4" << endl;
 
-       //printf("%f,", test.get_pos_x());
-       //printf("%f,", test.get_pos_y());
-       //printf("%f", 0.1/*test.get_pos_z()*/);
-       //printf("test");
-       printf("\n");
-       ThisThread::sleep_for(1s);
-   }
+  //  while(true) {
+  //      volttest = test.getVoltages();
+  //      std::cout << (int) (100 * test.get_pos_x()) << endl;
+  //      std::cout << (int) (100 * test.get_pos_y()) << endl;
+  //      std::cout << (int) (100 * test.get_pos_z()) << endl;
+  //      std::cout << "testy4" << endl;
+
+  //      //printf("%f,", test.get_pos_x());
+  //      //printf("%f,", test.get_pos_y());
+  //      //printf("%f", 0.1/*test.get_pos_z()*/);
+  //      //printf("test");
+  //      printf("\n");
+  //      ThisThread::sleep_for(1s);
+  //  }
 }
 
 

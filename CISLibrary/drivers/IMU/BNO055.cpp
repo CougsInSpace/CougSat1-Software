@@ -91,13 +91,13 @@ mbed_error_status_t BNO055::readAccel(IMUValueSet_t & data, bool blocking) {
   return (mbed_error_status_t)256;
 }
 
-#if MBED_MAJOR_VERSION == 2
-#define WAIT_MS(x) wait_ms(x)
-#elif MBED_MAJOR_VERSION == 5
-#define WAIT_MS(x) Thread::wait(x)
-#else
-#error "Running on Unknown OS"
-#endif
+//#if MBED_MAJOR_VERSION == 2
+//#define WAIT_MS(x) wait_ms(x)
+//#elif MBED_MAJOR_VERSION == 5
+#define WAIT_MS(x) ThisThread::sleep_for(x)
+//#else
+//#error "Running on Unknown OS"
+//#endif
 
 /////////////// Read data & normalize /////////////////////
 void BNO055::get_Euler_Angles(BNO055_EULER_TypeDef * el) {
