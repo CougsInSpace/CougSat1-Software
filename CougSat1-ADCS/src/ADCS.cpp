@@ -53,16 +53,17 @@ void ADCS::attitudeDetermination() {
     volts = photodiodes.getVoltages();
 
     // print input values
-    printf("Mag Data X: %d, Y: %d, Z: %d\r\n", magData.x, magData.y, magData.z);
-    printf("Euler Angle X: %d, Y: %d, Z: %d\r\n", eulerData.h, eulerData.p, eulerData.r);
-    printf("Quat Data X: %d, Y: %d, Z: %d, W: %d\r\n", quatData.x, quatData.y, quatData.z, quatData.w);
+    printf("Mag Data X: %lf, Y: %lf, Z: %lf\r\n", magData.x, magData.y, magData.z);
+    printf("Euler Angle X: %lf, Y: %lf, Z: %lf\r\n", eulerData.h, eulerData.p, eulerData.r);
+    printf("Quat Data X: %lf, Y: %lf, Z: %lf, W: %lf\r\n", quatData.x, quatData.y, quatData.z, quatData.w);
 
-    printf("Photodiodes X: %d, Y: %d, Z: %d\r\n", volts->volt_pos_x, volts->volt_pos_y, volts->volt_pos_z);
+    printf("Photodiodes X: %f, Y: %f, Z: %f\r\n", volts->volt_pos_x, volts->volt_pos_y, volts->volt_pos_z);
 
 
     // code to determine orientation
 
-    ThisThread::sleep_for(500ms);    
+    ThisThread::sleep_for(5s); 
+    printf("\n\n");   
   }
 }
 
@@ -74,7 +75,7 @@ void ADCS::startThread() {
   printf("Outside Main!\r\n");
   DigitalOut led1(PinName(5));
   while (true) {
-    printf("Process Main!\r\n");
+    //printf("Process Main!\r\n");
     led1 = !led1;
     ThisThread::sleep_for(1000);
     // ThisThread::flags_wait_all(0x00);
