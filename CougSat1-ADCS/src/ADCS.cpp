@@ -41,6 +41,10 @@ void ADCS::attitudeDetermination() {
   Photodiodes photodiodes(A1, A1, A2, A2, A3, A3);
   voltages* volts;
 
+  // initial orientation
+  Vector3f magi(0,1,0);
+  Vector3f suni(1,0,0);
+
   while (true) {
     
     // code to read magnetometer
@@ -56,11 +60,15 @@ void ADCS::attitudeDetermination() {
     printf("Mag Data X: %lf, Y: %lf, Z: %lf\r\n", magData.x, magData.y, magData.z);
     printf("Euler Angle X: %lf, Y: %lf, Z: %lf\r\n", eulerData.h, eulerData.p, eulerData.r);
     printf("Quat Data X: %lf, Y: %lf, Z: %lf, W: %lf\r\n", quatData.x, quatData.y, quatData.z, quatData.w);
-
     printf("Photodiodes X: %f, Y: %f, Z: %f\r\n", volts->volt_pos_x, volts->volt_pos_y, volts->volt_pos_z);
 
 
     // code to determine orientation
+    Vector3f magf(magData.x, magData.y, magData.z);
+    Vector3f sunf(volts->volt_pos_x, volts->volt_pos_y, volts->volt_pos_z);
+    Quaternionf qAttitude = determineAttitude(magi, magf, suni, sunf);
+    Vector3f eulerAttitude = qAttitude.toRotationMatrix().eulerAngles(0,1,2);
+    printf("Calculated Attitude Euler X: %lf, Y: %lf, Z: %lf\r\n", eulerAttitude[0], eulerAttitude[1], eulerAttitude[2]);
 
     ThisThread::sleep_for(5s); 
     printf("\n\n");   
