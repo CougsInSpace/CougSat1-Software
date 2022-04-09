@@ -41,27 +41,49 @@ orb = Orbital(
       line2="2 25544  51.6453 300.4471 0003214   1.7468 140.2698 15.48606005301202")
 
 def main():
-  time = dt.datetime.now()
+  # starTime = dt.datetime.now()
+  startTime = dt.datetime(2022, 1, 1) # set manual date
+  time=startTime
   tStep = dt.timedelta(days=1)
   angleList = []
   timeList = []
-  
-  ecef1, _ = orb.get_position(time, normalize=True)
-  ecef1 = np.array(ecef1).reshape((3,1))
 
-  ecef2, _ = orb.get_position(time + dt.timedelta(minutes=15), normalize=True)
-  ecef2 = np.array(ecef2).reshape((3,1))
+  sign = 1
 
-  for i in range(1,365):
+  for i in range(1,2*365):
+    ecef1, _ = orb.get_position(time, normalize=True)
+    ecef1 = np.array(ecef1).reshape((3,1))
+
+    ecef2, _ = orb.get_position(time + dt.timedelta(minutes=15), normalize=True)
+    ecef2 = np.array(ecef2).reshape((3,1))
+
+    norm = np.cross(ecef1.flatten(), ecef2.flatten())
+
+
     sun = sunDir(time)
     proj = planeProject(ecef1, ecef2, sun)
-    angle = thetaError(sun,proj)
 
-    angleList.append((angle/np.pi) * 180)
+    if thetaError(sun, norm) > np.pi/2:
+      sign = -1
+    else:
+      sign = 1
+
+    angle = (thetaError(sun,proj)/np.pi)*180 * sign
+
+    angleList.append(angle)
     timeList.append(i)
 
     time += tStep
   #end
+
+  max = np.amax(angleList)
+  maxi = np.argmax(angleList)
+
+  print("Maximum beta angle: ", max, " degrees")
+  print("Date of max beta angle: ", (startTime + dt.timedelta(days=maxi*1.0)))
+
+
+
   np.array(angleList)
   np.array(timeList)
 
@@ -72,6 +94,13 @@ def main():
   pyplot.show()
 
 
+
+
+
+
+
+
+# useful functions
 
 def sunDir(time: dt.datetime):
   '''!@brief Find position of sun in Global frame
