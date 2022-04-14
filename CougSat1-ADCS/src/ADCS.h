@@ -9,7 +9,7 @@
 #include <BNO055.h>
 #include <photodiode.h>
 
-
+using namespace std;
 
 class ADCS {
 private:
