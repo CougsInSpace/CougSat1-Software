@@ -34,7 +34,15 @@ public:
     float get_pos_z();
     float get_neg_z();
     SunVector getSunVector();
+    void setOffset(double posX, double negX, double posY, double negY ,double posZ, double negZ);
 private:
+    double pos_x_offset;
+    double neg_x_offset;
+    double pos_y_offset;
+    double neg_y_offset;
+    double pos_z_offset;
+    double neg_z_offset;
+
     AnalogIn pos_x; // each of these read in from the constructor
     AnalogIn neg_x;
     AnalogIn pos_y;
