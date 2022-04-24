@@ -38,12 +38,19 @@ void ADCS::attitudeDetermination() {
   BNO055_EULER_TypeDef eulerData;
   BNO055_QUATERNION_TypeDef quatData;
   //photodiod initiamization
+
+  //A1 = -z
+  //A2 = +y
+  //A3 = +x
   Photodiodes photodiodes(A3, A3, A2, A2, A1, A1);
   voltages* volts;
 
+  photodiodes.setOffset(.000488, 0, .003907, 0, .003907, 0);
+
   // initial orientation
   imu.readMag(magData);
-  ThisThread::sleep_for(1s);
+  printf("Waiting for IMU warmup\n");
+  ThisThread::sleep_for(10s);
   imu.readMag(magData);
   imu.get_Euler_Angles(&eulerData);
   imu.get_quaternion(&quatData);
@@ -53,8 +60,8 @@ void ADCS::attitudeDetermination() {
 
 
   Eigen::Vector3f magi(magData.x, magData.y, magData.z);
-  Eigen::Vector3f suni(volts->volt_pos_x, volts->volt_pos_y, volts->volt_pos_z);
-
+  Eigen::Vector3f suni(volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
+  
   int t = 0;
   while (true) {
     
@@ -70,7 +77,7 @@ void ADCS::attitudeDetermination() {
 
 
     Eigen::Vector3f magf(magData.x, magData.y, magData.z);
-    Eigen::Vector3f sunf(volts->volt_pos_x, volts->volt_pos_y, volts->volt_pos_z);
+    Eigen::Vector3f sunf(volts->volt_pos_x, volts->volt_pos_y, -1* volts->volt_pos_z);
     Eigen::Vector3f magfNorm = magf.normalized();
     Eigen::Vector3f sunfNorm = sunf.normalized();
 
@@ -91,15 +98,18 @@ void ADCS::attitudeDetermination() {
     Eigen::Vector3f eulerAttitude = qAttitude.toRotationMatrix().eulerAngles(0,1,2);
 
 
+
     // print input values
-    // printf("Mag Data X: %lf, Y: %lf, Z: %lf\r\n", magData.x, magData.y, magData.z);
+    printf("Mag Data X: %lf, Y: %lf, Z: %lf\r\n", magData.x, magData.y, magData.z);
    // printf("Mag Data X Norm: %lf, Y: %lf, Z: %lf\r\n", magfNorm[0], magfNorm[1], magfNorm[2]);
-    // printf("Euler Angle X: %lf, Y: %lf, Z: %lf\r\n", eulerData.h, eulerData.p, eulerData.r);
-    // printf("Quat Data X: %lf, Y: %lf, Z: %lf, W: %lf\r\n", quatData.x, quatData.y, quatData.z, quatData.w);
-    // printf("Photodiodes X: %f, Y: %f, Z: %f\r\n", volts->volt_pos_x, volts->volt_pos_y, volts->volt_pos_z);
-    //printf("Photodiodes X Norm: %f, Y: %f, Z: %f\r\n", sunfNorm[0], sunfNorm[1], sunfNorm[2]);
-    printf("Calculated Attitude Euler X: %f, Y: %f, Z: %f\r\n", eulerAttitude[0], eulerAttitude[1], eulerAttitude[2]);
-    printf("Calculated Attitude Quaternion W: %f, X: %f, Y: %f, Z: %f\r\n", qAttitude.w(), qAttitude.x(), qAttitude.y(), qAttitude.z());
+    printf("Euler Angle Heading: %lf, Pitch: %lf, Roll: %lf\r\n", eulerData.h, eulerData.p, eulerData.r); //from imu
+    //printf("Calculated Attitude Euler X: %lf, Y: %lf, Z: %lf\r\n", eulerAttitude[0], eulerAttitude[1], eulerAttitude[2]); // from math
+
+
+    //printf("Quat Data X: %lf, Y: %lf, Z: %lf, W: %lf\r\n", quatData.x, quatData.y, quatData.z, quatData.w);// from imu
+    printf("Photodiodes X: %f, Y: %f, Z: %f\r\n", volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
+    printf("Photodiodes X Norm: %f, Y: %f, Z: %f\r\n", sunfNorm[0], sunfNorm[1], sunfNorm[2]);
+    printf("Calculated Attitude Quaternion W: %lf, X: %lf, Y: %lf, Z: %lf\r\n", qAttitude.w(), qAttitude.x(), qAttitude.y(), qAttitude.z()); //from math
     printf("\n\n"); 
     
     

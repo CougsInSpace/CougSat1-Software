@@ -13,28 +13,28 @@ Quaternionf determineAttitude(Vector3f x1i, Vector3f x1f, Vector3f x2i, Vector3f
 
     Vector3f ax2 = x1f;
     ax2.normalize();
-    std::cout << "ax2: " << ax2 << std::endl;
+    // std::cout << "ax2: " << ax2 << std::endl;
 
     double theta2 = vecOrthoAngle(x2Prime, x2f, ax2);
-    std::cout << "theta2: " << theta2 << std::endl;
+    // std::cout << "theta2: " << theta2 << std::endl;
     Vector3f dirCheckVec = x2Prime.cross(x2f);
-    std::cout << "dirCheckVec: " << dirCheckVec << std::endl;
+    // std::cout << "dirCheckVec: " << dirCheckVec << std::endl;
     //TODO try catch for divide by zero
     int8_t dirCheck;
     ax2.dot(dirCheckVec) >=0 ? dirCheck = 1 : dirCheck = -1;
-    std::cout << "dirCHeck: " << dirCheck << std::endl;
+    // std::cout << "dirCHeck: " << dirCheck << std::endl;
     ax2 *= dirCheck;
-    std::cout << "ax2: " << ax2 << std::endl;
+    // std::cout << "ax2: " << ax2 << std::endl;
     AngleAxisf axAng2(theta2, ax2);
     //std::cout << "axAng2: " << axAng2 << std::endl;
     Quaternionf q2(axAng2);
-    std::cout << "q2: " << q2 << std::endl;
+    // std::cout << "q2: " << q2 << std::endl;
 
 
-    std::cout << "Q1: " << q1 << std::endl;
-    std::cout << "Q2: " << q2 << std::endl;
+    // std::cout << "Q1: " << q1 << std::endl;
+    // std::cout << "Q2: " << q2 << std::endl;
     Quaternionf bigQ =  q2 * q1;
-    std::cout << "BIG DOG Q : " << bigQ << std::endl;
+    // std::cout << "BIG DOG Q : " << bigQ << std::endl;
     return bigQ; // not commutative
 }
 
