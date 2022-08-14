@@ -45,7 +45,7 @@ void ADCS::attitudeDetermination() {
   Photodiodes photodiodes(A3, A3, A2, A2, A1, A1);
   voltages* volts;
 
-  photodiodes.setOffset(.000488, 0, .003907, 0, .003907, 0);
+   photodiodes.setOffset(.01, 0, .01, 0, .01, 0);
 
   // initial orientation
   imu.readMag(magData);
@@ -100,20 +100,24 @@ void ADCS::attitudeDetermination() {
 
 
     // print input values
-    printf("Mag Data X: %lf, Y: %lf, Z: %lf\r\n", magData.x, magData.y, magData.z);
+    // printf("Mag Data X: %lf, Y: %lf, Z: %lf\r\n", magData.x, magData.y, magData.z);
    // printf("Mag Data X Norm: %lf, Y: %lf, Z: %lf\r\n", magfNorm[0], magfNorm[1], magfNorm[2]);
-    printf("Euler Angle Heading: %lf, Pitch: %lf, Roll: %lf\r\n", eulerData.h, eulerData.p, eulerData.r); //from imu
+    // printf("Euler Angle Heading: %lf, Pitch: %lf, Roll: %lf\r\n", eulerData.h, eulerData.p, eulerData.r); //from imu
     //printf("Calculated Attitude Euler X: %lf, Y: %lf, Z: %lf\r\n", eulerAttitude[0], eulerAttitude[1], eulerAttitude[2]); // from math
 
-
     //printf("Quat Data X: %lf, Y: %lf, Z: %lf, W: %lf\r\n", quatData.x, quatData.y, quatData.z, quatData.w);// from imu
-    printf("Photodiodes X: %f, Y: %f, Z: %f\r\n", volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
-    printf("Photodiodes X Norm: %f, Y: %f, Z: %f\r\n", sunfNorm[0], sunfNorm[1], sunfNorm[2]);
-    printf("Calculated Attitude Quaternion W: %lf, X: %lf, Y: %lf, Z: %lf\r\n", qAttitude.w(), qAttitude.x(), qAttitude.y(), qAttitude.z()); //from math
-    printf("\n\n"); 
+    // printf("Photodiodes X: %f, Y: %f, Z: %f\r\n", volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
+    // printf("Photodiodes Norm X: %f, Y: %f, Z: %f\r\n", sunfNorm[0], sunfNorm[1], sunfNorm[2]);
+    // printf("Calculated Attitude Quaternion W: %lf, X: %lf, Y: %lf, Z: %lf\r\n", qAttitude.w(), qAttitude.x(), qAttitude.y(), qAttitude.z()); //from math
+    // printf("\n\n"); 
+
+
+    // print statements for pyserial
+    // printf("%f\r\n%f\r\n%f\r\n", sunfNorm[0], sunfNorm[1], sunfNorm[2]);
+    printf("%f\r\n%f\r\n%f\r\n", magfNorm[0], magfNorm[1], magfNorm[2]);
     
-    
-    ThisThread::sleep_for(5s);   
+
+    ThisThread::sleep_for(100ms);   
   }
 }
 

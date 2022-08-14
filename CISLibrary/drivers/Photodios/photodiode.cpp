@@ -14,11 +14,18 @@ pos_x(pin_1), neg_x(pin_2), pos_y(pin_3), neg_y(pin_4), pos_z(pin_5), neg_z(pin_
 Voltages* Photodiodes::getVoltages() // Reads voltages into struct voltages
 {
     curVolt.volt_pos_x = pos_x.read() - pos_x_offset;
+    curVolt.volt_pos_x < 0 ? curVolt.volt_pos_x = 0 : 0;
     curVolt.volt_neg_x = neg_x.read() - neg_x_offset;
+    curVolt.volt_neg_x < 0 ? curVolt.volt_neg_x = 0 : 0;
     curVolt.volt_pos_y = pos_y.read() - pos_y_offset;
+    curVolt.volt_pos_y < 0 ? curVolt.volt_pos_y = 0 : 0;
     curVolt.volt_neg_y = neg_y.read() - neg_y_offset;
+    curVolt.volt_neg_y < 0 ? curVolt.volt_neg_y = 0 : 0;
     curVolt.volt_pos_z = pos_z.read() - pos_z_offset;
+    curVolt.volt_pos_z < 0 ? curVolt.volt_pos_z = 0 : 0;
     curVolt.volt_neg_z = neg_z.read() - neg_z_offset;
+    curVolt.volt_neg_z < 0 ? curVolt.volt_neg_z = 0 : 0;
+
     return &curVolt;
 }
 
