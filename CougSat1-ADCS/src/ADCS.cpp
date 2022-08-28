@@ -45,7 +45,7 @@ void ADCS::attitudeDetermination() {
   Photodiodes photodiodes(A3, A3, A2, A2, A1, A1);
   voltages* volts;
 
-   photodiodes.setOffset(.01, 0, .01, 0, .01, 0);
+  photodiodes.setOffset(.002, .002, .002, .002, .008, .008);
 
   // initial orientation
   imu.readMag(magData);
@@ -62,7 +62,6 @@ void ADCS::attitudeDetermination() {
   Eigen::Vector3f magi(magData.x, magData.y, magData.z);
   Eigen::Vector3f suni(volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
   
-  int t = 0;
   while (true) {
     
     // code to read magnetometer
@@ -112,9 +111,12 @@ void ADCS::attitudeDetermination() {
     // printf("\n\n"); 
 
 
-    // print statements for pyserial
-    // printf("%f\r\n%f\r\n%f\r\n", sunfNorm[0], sunfNorm[1], sunfNorm[2]);
+    // Print statements for pyserial
+    printf("x\r\n");
+    printf("%f\r\n%f\r\n%f\r\n", sunfNorm[0], sunfNorm[1], sunfNorm[2]);
     printf("%f\r\n%f\r\n%f\r\n", magfNorm[0], magfNorm[1], magfNorm[2]);
+    // printf("%lf\n\r", volts->volt_pos_x);
+    printf("%f\r\n%f\r\n%f\r\n%f\r\n", qAttitude.w(), qAttitude.x(), qAttitude.y(), qAttitude.z());
     
 
     ThisThread::sleep_for(100ms);   
@@ -131,7 +133,7 @@ void ADCS::startThread() {
   while (true) {
     //printf("Process Main!\r\n");
     led1 = !led1;
-    ThisThread::sleep_for(1000);
+    ThisThread::sleep_for(1s);
     // ThisThread::flags_wait_all(0x00);
   }
 }

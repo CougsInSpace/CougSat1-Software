@@ -1,40 +1,42 @@
 #include "vectorFunctions.h"
 
 Quaternionf determineAttitude(Vector3f x1i, Vector3f x1f, Vector3f x2i, Vector3f x2f) {
+    // find simple axis-angle between x1i and x1f
     Vector3f ax1 = x1i.cross(x1f);
     ax1.normalize();
     float theta1 = vecAngle(x1i, x1f);
+
+    // create the first quaternion
     AngleAxisf axAng1(theta1, ax1);
     Quaternionf q1(axAng1);
 
+    // apply axAng1 rotation to x2i to get new x2i called x2Prime
     Quaternionf x2iq(0, x2i(0), x2i(1), x2i(2));
     Quaternionf x2Primeq = q1 * x2iq * q1.conjugate();
     Vector3f x2Prime(x2Primeq.coeffs()[0], x2Primeq.coeffs()[1], x2Primeq.coeffs()[2]);
 
+    // define the axis for the second axis-angle rotation
     Vector3f ax2 = x1f;
     ax2.normalize();
-    // std::cout << "ax2: " << ax2 << std::endl;
 
+    // find the angle for the second axis-angle rotation
     double theta2 = vecOrthoAngle(x2Prime, x2f, ax2);
-    // std::cout << "theta2: " << theta2 << std::endl;
+
+    // check the direction of the second rotation
+    // this is an extra step that is only neccesary for the second rotation
     Vector3f dirCheckVec = x2Prime.cross(x2f);
-    // std::cout << "dirCheckVec: " << dirCheckVec << std::endl;
     //TODO try catch for divide by zero
     int8_t dirCheck;
     ax2.dot(dirCheckVec) >=0 ? dirCheck = 1 : dirCheck = -1;
-    // std::cout << "dirCHeck: " << dirCheck << std::endl;
     ax2 *= dirCheck;
-    // std::cout << "ax2: " << ax2 << std::endl;
+
+    // create the second quaternion
     AngleAxisf axAng2(theta2, ax2);
-    //std::cout << "axAng2: " << axAng2 << std::endl;
     Quaternionf q2(axAng2);
-    // std::cout << "q2: " << q2 << std::endl;
 
-
-    // std::cout << "Q1: " << q1 << std::endl;
-    // std::cout << "Q2: " << q2 << std::endl;
+    // calculate the final rotation by multiplying the two quaternion rotations
     Quaternionf bigQ =  q2 * q1;
-    // std::cout << "BIG DOG Q : " << bigQ << std::endl;
+
     return bigQ; // not commutative
 }
 
