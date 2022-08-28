@@ -22,6 +22,12 @@ private:
   I2C    sensorBus;
   BNO055 imu;
 
+  IMUValueSet_t magData;
+  BNO055_EULER_TypeDef eulerData;
+  BNO055_QUATERNION_TypeDef quatData;
+  Photodiodes photodiodes(A3, A3, A2, A2, A1, A1);
+  voltages* volts;
+
 public:
   ADCS();
   void startThread();
