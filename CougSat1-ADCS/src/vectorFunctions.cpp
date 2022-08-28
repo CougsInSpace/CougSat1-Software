@@ -21,6 +21,10 @@ int main() {
 
     return 0;
 }
+
+// difference between the different normalize functions 
+// https://stackoverflow.com/questions/48019329/difference-between-norm-normalize-and-normalized-in-eigen
+//
 Vector4f rodRotation(Vector3f a, Vector3f aT) {
     Vector3f axis = a.cross(aT); //cross product
     float theta = 0;
