@@ -25,7 +25,7 @@ import math
 import random
 
 
-def main():
+def main(): #just for testing 
     # put code here for testing. Python and C++ functions should have same
     # outputs for identical inputs. Test them separetly from rest of ADCS code
     # before putting them in the vectorFunctions.h file
@@ -37,7 +37,6 @@ def main():
     print(rodRotation(x,y))
 
 
-#TODO
 def rodRotation(a: np.ndarray, aT: np.ndarray):
   '''!@brief Created a rodrigues rotation vector that describes the rotation between
   the two input vectors
@@ -63,7 +62,6 @@ def rodRotation(a: np.ndarray, aT: np.ndarray):
 
   return rod
 
-#TODO
 def rotationVector(a: np.ndarray, aT: np.ndarray):
   '''!@brief Create rotation vector with axis and angle of rotation.
   Similiar to Rodrigues vector but the angle is stored as the 
