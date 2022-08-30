@@ -32,10 +32,10 @@ void SatelliteState::initVecQ(Vector3f omega, Quaternionf q) {
     this->stateVec.omega1 = omega(0);
     this->stateVec.omega2 = omega(1);
     this->stateVec.omega3 = omega(2);
-    this->stateVec.qw = q.coeffs()[0];
-    this->stateVec.qx = q.coeffs()[1];
-    this->stateVec.qy = q.coeffs()[2];
-    this->stateVec.qz = q.coeffs()[3];
+    this->stateVec.qw = q.coeffs()[3];
+    this->stateVec.qx = q.coeffs()[0];
+    this->stateVec.qy = q.coeffs()[1];
+    this->stateVec.qz = q.coeffs()[2];
     this->updateStateFromVec();
     return;
 }
@@ -74,11 +74,11 @@ void SatelliteState::updateStateFromVec() {
 }
 
 Vector3f SatelliteState::qToRotVec(Quaternionf q) {
-    float a = acos(q.coeffs()[0]);
-    Vector3f axis(q.coeffs()[1], q.coeffs()[2], q.coeffs()[3]);
+    float a = acos(q.coeffs()[3]) * 2;
+    Vector3f axis(q.coeffs()[0], q.coeffs()[1], q.coeffs()[2]);
     axis.normalize();
 
-    return a * axis;
+    return (a * axis);
 }
 
 MatrixXf SatelliteState::getMat() {
@@ -95,4 +95,10 @@ Vector3f SatelliteState::getOmega() {
 
 Vector3f SatelliteState::getRot() {
     return this->rotVec;
+}
+
+MatrixXf SatelliteState::getRotMat() {
+    MatrixXf rotMat(6,1);
+    rotMat << this->omega, this->rotVec;
+    return rotMat;
 }

@@ -33,6 +33,7 @@ public:
     Quaternionf getQ();
     Vector3f getOmega();
     Vector3f getRot();
+    MatrixXf getRotMat();
 private:
     void updateStateFromVec();
     Vector3f qToRotVec(Quaternionf q);
@@ -43,5 +44,4 @@ private:
     MatrixXf stateMat;
     Vector3f rotVec;
 };
-
 #endif

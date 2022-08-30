@@ -3,6 +3,7 @@
 
 #include "../../CISLibrary/Eigen/Dense"
 #include "../../CISLibrary/Eigen/Geometry"
+#include "../../CISLibrary/Eigen/Cholesky"
 #include "satelliteState.h"
 
 using Eigen::MatrixXd;

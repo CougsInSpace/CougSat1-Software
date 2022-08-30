@@ -20,7 +20,8 @@ void qFilter(SatelliteState lastStateEst,
 
     // Step 1
     // Create set of state vectors with desired covariance and mean of 0
-    MatrixXf S = choleskyDecomposition(lastCovariance, 6);
+    LLT<MatrixXf> lltOfA(lastCovariance);
+    MatrixXf S = lltOfA.matrixL(); // cholesky decomposition
     S = S * sqrt(12);
     MatrixXf W_i(6, 12);
     W_i << S, -1 * S; // concatenate matrices
@@ -31,12 +32,15 @@ void qFilter(SatelliteState lastStateEst,
     SatelliteState X_i[12];
     for (short i = 0; i < 12; i++) {
         Vector3f omega(W_i(0,i), W_i(1,i), W_i(2,i));
-        omega += lastStateEst.getOmega();
+        omega = omega + lastStateEst.getOmega();
         Vector3f rot(W_i(3,i), W_i(4,i), W_i(5,i));
         Quaternionf q = lastStateEst.getQ() * rotVecToQ(rot);
         X_i[i].initVecQ(omega, q);
     }
     MatrixXf X_i_Mat = stateArrToSigmaMat(X_i);
+    // Quaternionf qTest = lastStateEst.getQ() * lastStateEst.getQ();
+    // cout << averageState(X_i, qTest).getQ() << endl;
+    // cout << "______" << endl;
 
     // Step 3
     // Predict value of state vector at next time interval
@@ -44,15 +48,17 @@ void qFilter(SatelliteState lastStateEst,
     for (short i = 0; i < 12; i++) {
         // find change in orientation over deltaT
         Vector3f deltaRot = X_i[i].getOmega() * deltaT;
-        // find new quaternion orientation after deltaT
-        Quaternionf newStateQ = X_i[i].getQ() * rotVecToQ(deltaRot);
+        // find new quaternion orientation after deltaT 
+        Quaternionf newStateQ = rotVecToQ(deltaRot) * X_i[i].getQ();
         // init sigma point in Y_i
         Y_i[i].initVecQ(X_i[i].getOmega(), newStateQ);
     }
 
     // Step 4
     // Find average state vector of Y_i
+    // cout << lastStateEst.getQ() << endl;
     SatelliteState xHat_kMinus = averageState(Y_i, lastStateEst.getQ());
+    // cout << xHat_kMinus.getQ() << endl;
 
     //Step 5
     // Create WPrime_i matrix by subtracting the mean vector and converting the quaternion rotation into a rotation vector
@@ -82,7 +88,7 @@ void qFilter(SatelliteState lastStateEst,
     for (short i = 0; i < 12; i++) {
         Quaternionf sunfqPredicted = Y_i[i].getQ() * suniq * Y_i[i].getQ().conjugate();
         for (short j = 0; j < 3; j++) {
-            Z_i_Mat(j,i) = sunfqPredicted.coeffs()[j + 1];
+            Z_i_Mat(j,i) = sunfqPredicted.coeffs()[j];
         }
     }
 
@@ -99,6 +105,7 @@ void qFilter(SatelliteState lastStateEst,
 
     // The innovation
     Vector3f v_k = measf - z_kMinus;
+    // cout << v_k << endl;
 
     // Step 9
     // Find innovation covariance P_vv by adding measurement noise R to measurement covariance P_zz
@@ -126,42 +133,26 @@ void qFilter(SatelliteState lastStateEst,
 
     // Step 11
     // Calculate kalman gain K_k and apply it to state estimate xHat_k and estimate error covariance P_k
-    MatrixXf K_k = P_xz * P_vv.inverse(); // TODO matrix dimensions probably won't agree
+    MatrixXf K_k = P_xz * P_vv.inverse(); 
+    MatrixXf xHat_k = xHat_kMinus.getRotMat() + (K_k * v_k);
+    MatrixXf P_k = P_kMinus - (K_k * P_vv * K_k.transpose());
+    //Step 12
+    // Create updated estimate of covariance and state vector
+    
     return;
 }
 
-// Cholesky decomposition. Copied from Wikipedia:
-// https://en.wikipedia.org/wiki/Cholesky_decomposition#The_Cholesky%E2%80%93Banachiewicz_and_Cholesky%E2%80%93Crout_algorithms
-// TODO can be replaced by built in eigen function https://eigen.tuxfamily.org/dox/group__QuickRefPage.html
-MatrixXf choleskyDecomposition(MatrixXf A, short dimensionSize) {
-    MatrixXf L(6,6);
-    for (short i = 0; i < dimensionSize; i++) {
-        for (short j = 0; j <= i; j++) {
-            float sum = 0;
-            for (short k = 0; k < j; k++) {
-                sum += L(j,k) * L(j,k);
-            }
-
-            if (i == j) {
-                L(i,j) = sqrt(A(i,i) - sum);
-            } else {
-                L(i,j) = (1.0 / L(j,j) * (A(i,j) - sum));
-            }
-        }
-    }
-}
-
 Vector3f qToRotVec(Quaternionf q) {
-    float a = acos(q.coeffs()[0]);
-    Vector3f axis(q.coeffs()[1], q.coeffs()[2], q.coeffs()[3]);
+    float a = acos(q.coeffs()[3]) * 2;
+    Vector3f axis(q.coeffs()[0], q.coeffs()[1], q.coeffs()[2]);
     axis.normalize();
 
-    return a * axis;
+    return (a * axis);
 }
 
 Quaternionf rotVecToQ(Vector3f rotVec) {
     float a = rotVec.norm();
-    float sina = sin(a);
+    float sina = sin(a/2);
     rotVec.normalize();
     Quaternionf q(cos(a/2), sina * rotVec(0), sina * rotVec(1), sina * rotVec(2));
     return q;
@@ -176,35 +167,48 @@ MatrixXf stateArrToSigmaMat(SatelliteState stateArr[12]) {
 }
 
 SatelliteState averageState(SatelliteState stateArr[12], Quaternionf avgCalcStartQ) {
+    // Was giving wrong results because covariance matrix was too high
     // Find average angular velocity vector
-    Vector3f omegaAvg;
+    Vector3f omegaAvg(0,0,0);
     for (short i = 0; i < 12; i++) {
-        omegaAvg += stateArr[i].getOmega();
+        omegaAvg = omegaAvg + stateArr[i].getOmega();
     }
     omegaAvg /= 12;
 
     //Find average quaternion orientation
     Quaternionf q_tAvg = avgCalcStartQ;
-    Vector3f eRotAvg(1,1,1);
-    while (eRotAvg.norm() > 1) { // TODO pick appropriate error threshold
+    Vector3f eRotAvg(1,1,1); 
+    short counter = 0;
+    while (eRotAvg.norm() > .01 && counter < 100) { // TODO pick appropriate error threshold
+        // find quaternion rotation between each stateArr quaternion and the average 
+        // quaternion
         Quaternionf e_iArr[12];
         for (short i = 0; i < 12; i++) {
             e_iArr[i] = stateArr[i].getQ() * q_tAvg.conjugate();
         }
 
+        // convert quaternion rotations to rotation vectors
         Vector3f e_iRotArr[12];
         for (short i = 0; i < 12; i++) {
             e_iRotArr[i] = qToRotVec(e_iArr[i]);
         }
         
+        // find average rotation vector from set of 12
         eRotAvg = Vector3f::Zero();
         for (short i = 0; i < 12; i++) {
-            eRotAvg += e_iRotArr[i];
+            eRotAvg = eRotAvg + e_iRotArr[i];
         }
         eRotAvg /= 12;
 
+        // update mean estimate
         q_tAvg = rotVecToQ(eRotAvg) * q_tAvg;
+        // cout << q_tAvg << endl;
+        
+        counter++;
+
     }
+    // cout << counter << endl;
+    // cout << stateArrToSigmaMat(stateArr) << endl;
 
     SatelliteState state(omegaAvg, q_tAvg);
     return state;
