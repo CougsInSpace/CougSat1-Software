@@ -17,8 +17,12 @@ from multiprocessing import Pool, cpu_count
 import numpy as np
 import os
 from pyorbital.orbital import Orbital
+from pyorbital import astronomy
 import quaternion
 from tqdm import tqdm
+import pickle
+import math
+import random
 
 colorama.init(autoreset=True)
 
@@ -228,6 +232,9 @@ def rotMatrix1(a: np.ndarray, aT: np.ndarray) -> np.ndarray:
   @param aT Input vector transformed state
   @return np.ndarray Transformation matrix from vFrom to vTo
   '''
+
+
+
   a = a.flatten() / np.linalg.norm(a)
   aT = aT.flatten() / np.linalg.norm(aT)
 
@@ -292,11 +299,287 @@ def rotMatrix3(a: np.ndarray, aT: np.ndarray, b: np.ndarray,
   r[2] = (vectorInv @ out[2].reshape((3, 1))).reshape(3)
   return r
 
+def rodRotation(a: np.ndarray, aT: np.ndarray):
+  '''!@brief Created a rodrigues rotation vector that describes the rotation between
+  the two input vectors
+
+
+  @param a Input vector initial state
+  @param aT Input vector transformed state
+  @return np.ndarray Rodrgues Rotation Vector from a to aT
+  '''
+
+  a = a.flatten()
+  aT = aT.flatten()
+
+  axis = np.cross(a,aT).flatten()
+  if np.linalg.norm(axis) == 0:
+    axis = np.array([0,0,1])
+    theta = 0
+  else:
+    axis = axis / np.linalg.norm(axis)
+    theta = thetaError(a, aT)
+  
+  rod = np.append(axis, theta)
+
+  return rod
+
+def rotationVector(a: np.ndarray, aT: np.ndarray):
+  '''!@brief Create rotation vector with axis and angle of rotation.
+  Similiar to Rodrigues vector but the angle is stored as the 
+  magnitude of the vector instead of as a fourth element
+
+  @param a Input vector initial state
+  @param aT Input vector transformed state
+  @return np.ndarray Rotation vector between a and aT
+  '''
+  a = a.flatten()
+  aT = aT.flatten()
+  
+  axis = np.cross(a, aT)
+
+  # handle case if a and aT are parallel 
+  if np.linalg.norm(axis) == 0:
+    axis = np.array([0,0,1])
+    theta = 0
+  else:
+    axis = axis / np.linalg.norm(axis)
+    theta = thetaError(a, aT)
+  rotVec = axis * theta
+
+  return rotVec.reshape((3,1))
+
+def applyRodRotation(v: np.ndarray,rod:np.ndarray):
+  '''!@brief https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+
+
+  @param v vector to be transformed
+  @param rod rodrigues rotation vector
+  @return transformed v
+  '''
+  k = rod[0:3]
+  theta = rod[3]
+  k = k.flatten() / np.linalg.norm(k)
+  v = v.flatten() / np.linalg.norm(v)
+
+  vT = (v*np.cos(theta)) + (np.cross(k,v)*np.sin(theta)) + (k*np.dot(k,v)*(1 - np.cos(theta)))
+  return vT
+
+def thetaError(v1,v2):
+    v1 = v1.flatten()
+    v2 = v2.flatten()
+    #Find the unit vectors first
+    v1unit = v1 / np.linalg.norm(v1)
+    v2unit = v2 / np.linalg.norm(v2)
+    #Find the dot product between v1 and v2 unit vectors
+    dotProduct = np.dot(v1unit, v2unit)
+
+    # if statement to handle rounding errors that make
+    # dotProduct > 1 when v1=v2
+    if dotProduct < 1:
+      #Take arccos to find the angle in radians between the two
+      anglebetween = np.arccos(dotProduct)
+    else:
+      anglebetween = 0
+
+    return anglebetween
+
+def planeProject(v1,v2,u):
+  '''!@brief Projects vector onto plane
+
+
+  @param v1 1st vector in projection plane
+  @param v2 2nd vector in projection plane
+  @param u vector to project
+  @return u projected onto plane formed by v1 and v2
+  '''
+  v1 = v1.flatten()
+  v2 = v2.flatten()
+  u = u.flatten()
+  
+  planeVec = np.cross(v1,v2)
+  normal = vectorProject(u,planeVec)
+
+  return u - normal
+
+def torque2Dipole(torqueDir,mag):
+  '''!@brief Find dipole that generates the desired torque
+
+
+  @param torqueDir direction of torque
+  @param mag earth magnetic field
+  @return dipole
+  '''
+  torqueDir = torqueDir.flatten()
+  mag = mag.flatten()
+
+  dipoleDir = np.cross(mag,torqueDir)
+  return dipoleDir
+
+def planeProjectNorm(n,u):
+  '''!@brief Projects vector onto using plane normal as plane
+  definition
+
+  @param n plane normal vector
+  @param u vector to project
+  @return u projected onto plane defined by n
+  '''
+  n = n.flatten()
+  u = u.flatten()
+
+  normal = vectorProject(u,n)
+
+  return (u - normal)
+
+def vectorProject(u,v):
+  '''!@brief Projects u onto v
+
+
+  @param u vector to project
+  @param v vector to be projected onto
+  @return vector projection of u onto v
+  '''
+  return (np.dot(v,u) / (np.linalg.norm(v)**2)) * v
+
+def findTorque(u: np.ndarray, v: np.ndarray, mag: np.ndarray):
+  '''!@brief Find torque that will move u to v on the shortest
+  possible path.
+
+
+  @param u That will be moved (camera)
+  @param v Vector that is the target (target)
+  @return Torque that will move u to v on the shortest path
+  '''
+  u = u.flatten()
+  v = v.flatten()
+  mag = mag.flatten()
+
+  w1 = np.cross(u, v)
+  w2 = (u + v) / 2
+  norm = np.cross(w1,w2)
+  torque = np.cross(norm,mag)
+
+  #decide direction of torque
+  theta = thetaErrorVec(u,v,torque)
+  rod = np.append(-1*torque.flatten(),theta)
+  vec = applyRodRotation(u,rod)
+  if thetaError(vec,v) < .00001:
+    torque = -torque
+  #c2Overc1 = (-(w1[0]*mag[0]) - (w1[1]*mag[1]) - (w1[2]*mag[2])) / ((v[0]*mag[0]) + (v[1]*mag[1]) + (v[2]*mag[2]))
+  return torque
+
+def thetaErrorVec(u: np.ndarray, v: np.ndarray, axis: np.ndarray):
+  '''!@brief Theta error to see how close the rotation about axis is to
+  completion
+
+  @param u Rotating vector
+  @param v Target vector
+  @param axis Axis about which rotation is happening
+  @return Angle representing how complete rotation is
+  '''
+  uProj = planeProjectNorm(axis,u)
+  vProj = planeProjectNorm(axis,v)
+
+  return thetaError(uProj,vProj)
+
+def sunDir(time: datetime.datetime):
+  '''!@brief Find position of sun in Global frame
+
+  @param time Current time
+  @return sunDir Direction vector of sun in Global frame
+  '''
+  ascDec = astronomy.sun_ra_dec(time)
+  long = np.degrees(ascDec[0])
+  lat = np.degrees(ascDec[1])
+
+  sunDir = geo2ECEF(long,lat,1)
+  sunDir = sunDir / np.linalg.norm(sunDir.flatten())
+
+  return sunDir.reshape((3,1))
+
+def findNormal(v1,v2,u):
+  v1 = v1.flatten()
+  v2 = v2.flatten()
+
+  planeNormal = np.cross(v1,v2)
+
+  return vectorProject(u,planeNormal)
+
+def saturate(v: np.ndarray, min: float, max: float):
+  '''!@brief Enforces min/max values for each element of v
+  without changing the direction of v. Used to enforce the 
+  voltage limits of each magnetorquer without changing the
+  direction of the dipole.
+
+  @param v vector to enforce min/max values on
+  @param min minimum allowable value
+  @param max maximum allowable value
+  @return v with min/max values applied
+  '''
+  
+  for i in range(0,v.size):
+    if v[i] > max or v[i] < min:
+      v = v * abs(max/v[i])
+  return v
+
+def rotMatrix2Mod(a: np.ndarray, aT: np.ndarray, b: np.ndarray, bT: np.ndarray):
+  '''!@brief !!!CURRENTLY DOES NOT WORK PROPERLY!!!
+  Finds rotation matrix between a and b to aT and bT, but priortizes 
+  the vector a. It rotates a to aT first and then finds the closest b can get to 
+  bT without compromising the first rotation.
+
+  @param a untransformed priority vector
+  @param aT transformed priority vector
+  @param b untransformed secondary vector
+  @param bT transformed secondary vector
+  @return rotation matrix from a and b to aT and bT
+  '''
+  a = a.flatten() / np.linalg.norm(a)
+  aT = aT.flatten() / np.linalg.norm(aT)
+  b = b.flatten() / np.linalg.norm(b)
+  bT = bT.flatten() / np.linalg.norm(bT)
+
+  # rotate to a first and then apply the same rotation to b
+  rod = rodRotation(a, aT)
+  bT2 = applyRodRotation(b, rod)
+
+  # find normal vectors for planes of aT/bT and aT/bT2
+  n1 = np.cross(aT, bT)
+  n2 = np.cross(aT, bT2)
+
+  # find the two complimentary angles between the planes
+  theta1 = thetaError(n1, n2)
+  theta2 = (np.pi) - theta1
+
+  # two candidates for the second Rodrigues Rotation Vector (RRV)
+  # specifically for b
+  testRod1 = np.array([aT[0], aT[1], aT[2], theta1])
+  testRod2 = np.array([aT[0], aT[1], aT[2], theta2])
+
+  # apply the two RRV candidates
+  bTFinal1 = applyRodRotation(bT2, testRod1)
+  bTFinal2 = applyRodRotation(bT2, testRod2)
+
+  # find error for how close to the actual bT each RRV rotated b to be
+  error1 = thetaError(bT, bTFinal1)
+  error2 = thetaError(bT, bTFinal2)
+
+  # check each candidate, choose the better one
+  if error1 < error2:
+    bTFinal = bTFinal1
+  else:
+    bTFinal = bTFinal2
+
+  print(error1)
+  print(error2)
+
+  # make rotation matrix
+  return rotMatrix2(a, aT, b, bTFinal)
 
 orb = Orbital(
   "ISS",
-  line1="1 25544U 98067A   21249.54028389  .00002593  00000-0  55940-4 0  9993",
-    line2="2 25544  51.6453 300.4471 0003214   1.7468 140.2698 15.48606005301202")
+    line1="1 25544U 98067A   21249.54028389  .00002593  00000-0  55940-4 0  9993",
+      line2="2 25544  51.6453 300.4471 0003214   1.7468 140.2698 15.48606005301202")
 
 class ADCS:
   def __init__(self, geoTarget: np.ndarray) -> None:
@@ -315,6 +598,20 @@ class ADCS:
     self.lastT = None
     self.lastSensorT = None
     self.loopIndex = 1 % self.loopCount
+    #------------------------#
+    self.lastControlError1 = 0
+    self.lastControlError2 = 0
+    self.controlErrorDerivative1 = 0
+    self.controlErrorDerivative2 = 0
+    #------------------------#
+    self.lastAngleBetweenTargets = 1
+    self.lastSunDirLocal = np.array([0,0,0])
+    self.stage = 0
+    self.stageTime = 0
+    self.lastTargetEarthNormal = np.array([0,0,0])
+    self.lastTorque = np.array([0,0,0])
+    self.lastResetT = 0
+    self.reset = False
 
     global debugVectorLocal
     debugVectorLocal = False
@@ -356,20 +653,27 @@ class ADCS:
     self.lastSensorT = t
 
   def compute(self, t: float, gps: np.ndarray,
-              mag: np.ndarray, gravity: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+              mag: np.ndarray, gravity: np.ndarray, sunDirLocal: np.ndarray, realTime: datetime.datetime, r: np.ndarray, omega: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     '''!@brief Compute ADCS loop given input from sensors
 
     @param t Current time
     @param gps Geodetic coordinates from GPS (long, lat, alt)
     @param mag Sensor output of magnetometer, vector of mag field
     @param gravity Sensor output of accelerometer, vector of gravity field
+    @param r Rotation matrix from global to local (cheating, will need to be determined independently later)
     @return tuple[np.ndarray, np.ndarray] Coil target current, debug vector
       Coil target current, shape=(3) Current written to current control
       Debug vector, shape=(3, 1) Vector to plot for debug purposes, None will not plot
         debugVectorLocal: True assumes vector is in local reference frame, False is global
     '''
+    rInv = np.linalg.inv(r)
+    
     self.loopIndex = (self.loopIndex + 1) % self.loopCount
     self.sensorAcquition(t, gps, mag, gravity)
+
+    # this code should probably be in sensorAcquition
+    sunDirGlobal = sunDir(realTime)
+
     if self.loopIndex != 0:
       return None, None
 
@@ -407,34 +711,41 @@ class ADCS:
       self.lastMag = self.mag
       self.lastT = t
 
-      return self.iCoil, np.zeros((3, 1))
+      return self.iCoil, r @ dipole.reshape((3,1))
 
-    # Step 1: Determine attitude from gps, magnetometer, and accelerometer
-    gravityG = geo2ECEF(self.gps[0], self.gps[1], self.gps[2])
-    gravityG = -gravityG / np.linalg.norm(gravityG)
+      # Step 2: Determine current angular velocity
+      # TODO
+
+    # find ecef vector of the satellite
+    ecefSat = geo2ECEF(self.gps[0], self.gps[1], self.gps[2])
 
     magG = interpolateWMM(self.gps[0], self.gps[1])
     magG = magG / np.linalg.norm(magG)
 
-    # local = rInv @ global
-    # global = r @ local
-    rInv = rotMatrix2(magG, self.mag, gravityG, self.gravity)
-    if rInv is None:
-      # Cannot determine attitude, don't act
-      dCoil = np.array([0.0, 0.0, 0.0])
-      return dCoil, None
-    r = np.linalg.inv(rInv)
-    q = quaternion.from_rotation_matrix(r)
-    if self.lastR is None:
-      # Cannot determine angular velocity, don't act
-      self.lastT = t
-      self.lastGPS = self.gps
-      self.lastMag = self.mag
-      self.lastGravity = self.gravity
-      self.lastR = r
-      self.lastQ = q
-      dCoil = np.array([0.0, 0.0, 0.0])
-      return dCoil, None
+    # # local = rInv @ global
+    # # global = r @ local
+    mag = mag / np.linalg.norm(mag)
+    magG = magG / np.linalg.norm(magG)
+    sunDirLocal = sunDirLocal / np.linalg.norm(sunDirLocal)
+    sunDirGlobal = sunDirGlobal / np.linalg.norm(sunDirGlobal)
+
+    rSensor = rotMatrix2(mag, magG, sunDirLocal, sunDirGlobal)
+    # if rInv is None:
+    #   # Cannot determine attitude, don't act
+    #   dCoil = np.array([0.0, 0.0, 0.0])
+    #   return dCoil, None
+    # r = np.linalg.inv(rInv)
+    # q = quaternion.from_rotation_matrix(r)
+    # if self.lastR is None:
+    #   # Cannot determine angular velocity, don't act
+    #   self.lastT = t
+    #   self.lastGPS = self.gps
+    #   self.lastMag = self.mag
+    #   self.lastGravity = self.gravity
+    #   self.lastR = r
+    #   self.lastQ = q
+    #   dCoil = np.array([0.0, 0.0, 0.0])
+    #   return dCoil, None
     # Step 2: Determine current angular velocity
 
     # From simulation, reverse this math to get omega & angular momentum
@@ -445,54 +756,135 @@ class ADCS:
     # qDot = 0.5 * omegaQ * self.q
     # q += + qDot * tStep
 
-    qDot = (q - self.lastQ) / tStep
-    # Interestingly, there is a real component in the quaternion if dividing
-    # by q or lastQ, average is okay though...
-    omegaQ = qDot * 2 / ((q + self.lastQ) / 2)
-    omega = (omegaQ.vec).reshape((3, 1))
+    # qDot = (q - self.lastQ) / tStep
+    # # Interestingly, there is a real component in the quaternion if dividing
+    # # by q or lastQ, average is okay though...
+    # omegaQ = qDot * 2 / ((q + self.lastQ) / 2)
+    # omega = (omegaQ.vec).reshape((3, 1))
 
-    if abs(omegaQ) > 1:
-      # One quaternion is reversed (equivalent rotation matrix b.c. 2pi)
-      qDot = (q + self.lastQ) / tStep
-      omegaQ = qDot * 2 / ((q - self.lastQ) / 2)
-      omega = (omegaQ.vec).reshape((3, 1))
-      if abs(omegaQ) > 1:
-        print('maybe not...')
-        print(self.mag)
-        print(magG)
-        print(self.gravity)
-        print(gravityG)
-        print(r)
-        print(self.lastR)
-        print(q)
-        print(self.lastQ)
-        print(qDot)
-        print(omegaQ)
-        return None, None
+    # if abs(omegaQ) > 1:
+    #   # One quaternion is reversed (equivalent rotation matrix b.c. 2pi)
+    #   qDot = (q + self.lastQ) / tStep
+    #   omegaQ = qDot * 2 / ((q - self.lastQ) / 2)
+    #   omega = (omegaQ.vec).reshape((3, 1))
+    #   if abs(omegaQ) > 1:
+    #     print('maybe not...')
+    #     print(self.mag)
+    #     print(magG)
+    #     print(self.gravity)
+    #     print(gravityG)
+    #     print(r)
+    #     print(self.lastR)
+    #     print(q)
+    #     print(self.lastQ)
+    #     print(qDot)
+    #     print(omegaQ)
+    #     return None, None
 
-    debugVector = omega
+    # change mag and rCamera to local global coordinates
+    magGlobal = r @ mag
+    rCameraGlobal = r @ rCamera
 
-    # Step 3: Compute desired magnetic field vector
-    # TODO
 
-    # Step 4: Do control loop with current omega and target error (if target is not None)
-    # TODO
+    # # Step 3: Compute desired magnetic field vector
+    
+    # direction we want to point
+    targetGlobal = self.ecefTarget - ecefSat
+    #targetIdeal = np.array([3, -8, 9])
+    targetGlobal = targetGlobal / np.linalg.norm(targetGlobal)
 
+    # checkOrtho = thetaError(magGlobal, targetGlobal)
+
+    # rCameraGlobalProj = planeProject(magGlobal, targetGlobal, rCameraGlobal)
+    # controlError1 = thetaError(rCameraGlobalProj, rCameraGlobal)
+    # if (checkOrtho > np.deg2rad(80) and checkOrtho < np.deg2rad(100)) and controlError1 < .02:
+    #   torqueDirIdeal = np.cross(rCameraGlobal.flatten(), targetGlobal.flatten())
+    #   torque1 = planeProjectNorm(magGlobal, torqueDirIdeal)
+    #   print("sdfjalkjsdf")
+    # else:
+    torque1 = findTorque(rCameraGlobal,targetGlobal,magGlobal)
+
+    controlError1 = thetaErrorVec(rCameraGlobal, targetGlobal, torque1)
+
+    controlError1Derivative = -1
+
+    bDot = (self.mag - self.lastMag) / tStep
+    torque2 = np.cross(bDot.flatten(), mag.flatten())
+    torque2 = r @ torque2.reshape((3,1))
+    torque1 = torque1.reshape((3,1))
+
+    if thetaError(targetGlobal, rCameraGlobal) > .14:
+      proportionalGain = 1#2.3*(1.44-np.exp(-.02*t))#.3 + .7*np.exp(-.01*t)
+      derivativeGain = 18
+    else:
+      proportionalGain = 1
+      derivativeGain = 2
+
+    # checkOrtho = thetaError(magGlobal, targetGlobal)
+    # if checkOrtho > np.deg2rad(80) and checkOrtho < np.deg2rad(100) and self.stage == 0:
+    #   self.stage = 1
+
+    # if self.stage == 0:
+    #   rCameraProj = planeProject(magGlobal, targetGlobal, rCameraGlobal)
+    #   idealAxis = np.cross(rCameraGlobal.flatten(), rCameraProj.flatten())
+    #   controlError = thetaError(rCameraGlobal, rCameraProj)
+    #   controlErrorDerivative = (controlError - self.controlErrorDerivative1) / tStep
+    #   self.lastControlError1 = controlError
+
+    #   if controlErrorDerivative < .01:
+    #     self.stage = 1
+    #   else:
+    #     torque1 = planeProjectNorm(magGlobal, idealAxis)
+    #     controlError1 = controlError
+    #     derivativeGain = 10
+
+    torque1 = torque1 / np.linalg.norm(torque1)
+    torque1 = torque1*proportionalGain*controlError1
+    torque2 = torque2*derivativeGain*controlError1Derivative
+    torque = 1*(torque1.reshape((3,1)) + torque2.reshape((3,1)))
+
+
+    #checkOrtho = thetaError(magGlobal, targetGlobal)
+    # if np.linalg.norm(omega) < .005:#self.lastResetT + 510 < t:
+    #   self.lastResetT = t
+    #   # print("reset")
+
+    # if self.lastResetT + 120 < t or np.linalg.norm(omega) > .05:
+    #   torque = torque2
+    #   # if np.linalg.norm(omega) > .05:
+    #   #   print("slow down")
+    #   # else: 
+    #   #   print("timeout")
+
+    checkOrtho = thetaError(magGlobal, targetGlobal)
+    if checkOrtho > np.deg2rad(75) and checkOrtho < np.deg2rad(105): #and self.stage == 0:
+      torque = torque2
+      # print("uh oh")
+    #   #self.stage = 1
+
+    dipole = torque2Dipole(torque, magGlobal)
+
+    iVector = dipole
     # Step 5: Transform output magnetic dipole to coil duty cycles
     # TODO
 
-    iCoil = np.array([0.0, 0.0, 0.0])
-
+    # set coil currents
+    iCoil = rInv @ iVector.reshape((3,1))
+    
+    #self.lastControlError1 = controlError1
+    #self.lastControlError2 = controlError1
     self.lastT = t
     self.lastGPS = self.gps
     self.lastMag = self.mag
     self.lastGravity = self.gravity
-    self.lastR = r
-    self.lastQ = q
+    self.lastSunDirLocal = sunDirGlobal
+    self.lastTorque = torque
+    # self.lastR = r
+    # self.lastQ = q
 
-    return iCoil, debugVector
+    return iCoil.flatten(), torque1.reshape((3,1))
 
-def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
+def magnetorquer(N, cog: np.ndarray, iVector: np.ndarray,
                  edge1: np.ndarray, edge2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
   '''!@brief Create a magnetorquer for number of loops and geometry
 
@@ -512,9 +904,8 @@ def magnetorquer(N, cog: np.ndarray, center: np.ndarray,
   return rCoil, lCoil
 
 class Satellite:
-
   def __init__(self, detumble: bool = False,
-               initialOmega: float = 0.1, static: bool = False, sigma: float = 0.1) -> None:
+               initialOmega: float = 0.1, static: bool = False, sigma: float = 0.1, pickleFailed: bool = False) -> None:
     '''!@brief Create a Satellite simulation
 
     @param detumble True will not generate a target (pass None to ADCS.__init__)
@@ -532,6 +923,7 @@ class Satellite:
 
     self.batteryVoltage = np.random.uniform(3.3, 4.2)
 
+    # set time to a random date
     self.startDatetime = datetime.datetime.now()
     self.startDatetime += datetime.timedelta(days=np.random.uniform(-100, 100))
     self.geo = np.array(orb.get_lonlatalt(self.startDatetime))
@@ -555,6 +947,11 @@ class Satellite:
           self.geoTarget[0],
           self.geoTarget[1],
           self.geoTarget[2])
+      # magField = interpolateWMM(self.geo[0], self.geo[1])
+      # target = np.cross(magField.flatten(), np.array([1,1,1]))
+      # target = (target / np.linalg.norm(target)) * 6378
+      # self.ecefTarget = target.reshape((3,1)) + self.ecef
+      #yayaya
 
     self.results = {
       'batteryVoltage': self.batteryVoltage,
@@ -619,7 +1016,7 @@ class Satellite:
     # Convergence thresholds
     self.omegaThreshold = np.deg2rad(1) / 1
     self.angleThreshold = np.deg2rad(1)
-    self.currentThreshold = 1e-3
+    self.currentThreshold = 99 # was 1e-3, effectively turned it off
 
     self.converged = False
 
@@ -638,6 +1035,9 @@ class Satellite:
     if not self.static:
       realTime = self.startDatetime + datetime.timedelta(seconds=t)
       self.geo = np.array(orb.get_lonlatalt(realTime))
+      self.sunDirLocal = rInv @ sunDir(realTime)
+    else:
+      self.sunDirLocal = rInv @ sunDir(self.startDatetime)
 
     magField = interpolateWMM(self.geo[0], self.geo[1])
     magFieldU = magField / np.linalg.norm(magField)
@@ -647,6 +1047,7 @@ class Satellite:
     gravity = -gravity / np.linalg.norm(gravity)
     self.gravityLocal = rInv @ gravity
 
+    # find torque produced by magnetorquer
     mLocal = np.zeros(3)
     mLocal += coilN * self.iCoil[0] * np.array([coilA, 0, 0])
     mLocal += coilN * self.iCoil[1] * np.array([0, coilA, 0])
@@ -803,16 +1204,22 @@ class Satellite:
           np.random.normal(1, self.sigma, size=(3, 1))
       accelerometer = self.gravityLocal * \
           np.random.normal(1, self.sigma, size=(3, 1))
+      realTime = self.startDatetime + datetime.timedelta(seconds=t)
+      diodes = self.sunDirLocal # add error based on experiments
       iCoilTarget, debugVector = adcs.compute(
-        t, gps, magnetometer, accelerometer)
+        t, gps, magnetometer, accelerometer, diodes, realTime, self.rList[-1], self.omegaList[-1])
       if iCoilTarget is not None:
-        self.vCoil = np.clip(
+        self.vCoil = saturate(
             iCoilTarget * coilR, -self.batteryVoltage, self.batteryVoltage)
       if debugVector is not None:
         self.debugVector = debugVector
       if self.converged:
         break
-
+    
+    # check how close when failed
+    # if not self.converged:
+    #   print(self.omegaErrorList[-1])
+    
     self.rList = np.array(self.rList)
     self.rInvList = np.array(self.rInvList)
     self.magFieldUList = np.array(self.magFieldUList)
@@ -829,6 +1236,7 @@ class Satellite:
     self.angleErrorList = np.array(self.angleErrorList)
     self.omegaErrorList = np.array(self.omegaErrorList)
 
+
     totalEnergy = sum(self.pCoilList * self.tStepList)
 
     self.results['converged'] = self.converged
@@ -838,6 +1246,7 @@ class Satellite:
 
     if progress:
       pBar.close()
+
     return self.results
 
   def __plotOrbit(self) -> None:
@@ -951,7 +1360,7 @@ class Satellite:
       z = self.rList[:, 2, i] * 0.5
       ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors=colors[i])
       lines.append(ax.plot3D(x, y, z, colors[i], label=labels[i]))
-
+ 
     x = self.magFieldUList[:, 0, 0]
     y = self.magFieldUList[:, 1, 0]
     z = self.magFieldUList[:, 2, 0]
@@ -1028,11 +1437,12 @@ class Satellite:
     ax.set_title('Global')
     ax.view_init(30, 30)
 
-    leg = ax.legend(fancybox=True, shadow=True)
+    leg = ax.legend(fancybox=True, shadow=False)
     lined = {}
     for legline, origline in zip(leg.get_lines(), lines):
       legline.set_picker(True)
       lined[legline] = origline[0]
+      lined[legline].set_visible(False)
 
     def on_pick(event):
       # On the pick event, find the original line corresponding to the legend
@@ -1157,7 +1567,7 @@ class Satellite:
     ax.set_title('Local')
     ax.view_init(30, 30)
 
-    leg = ax.legend(fancybox=True, shadow=True)
+    leg = ax.legend(fancybox=True, shadow=False)
     lined = {}
     for legline, origline in zip(leg.get_lines(), lines):
       legline.set_picker(True)
@@ -1168,6 +1578,7 @@ class Satellite:
       # proxy line, and toggle its visibility.
       legline = event.artist
       origline = lined[legline]
+      lined[legline].set_visible(False)
       visible = not origline.get_visible()
       origline.set_visible(visible)
       # Change the alpha on the line in the legend so we can see what lines
@@ -1261,15 +1672,25 @@ class Satellite:
     self.__plotLocal()
     self.__plotTime()
 
-    pyplot.show()
+    pyplot.show() 
 
-def _runnerSim(*args, **kwargs) -> dict:
+def _runnerSim(**kwargs) -> dict:
   '''!@brief Multithreaded runner to execute simulation and return results
 
   @return dict same as Satellite.run
   '''
-  sim = Satellite(*args, **kwargs)
-  return sim.run(progress=False)
+  sim = Satellite(**kwargs)
+  results = sim.run(progress=False)
+
+  if not sim.converged and kwargs['pickleFailed']:
+    simData = (sim.rList, sim.magFieldUList, sim.mList, sim.torqueList, sim.omegaList, sim.targetOmegaList,\
+      sim.targetList, sim.cameraList, sim.gravityList, sim.debugVectorList,\
+      sim.geoTarget, debugVectorLocal)
+    simFile = open("simFile" + str(random.randint(0,10000)) +".pickle", 'wb')
+    pickle.dump(simData, simFile)
+    simFile.close()
+
+  return results
 
 def main():
   parser = ArgumentParser()
@@ -1304,6 +1725,11 @@ def main():
       action='store_true',
       default=False,
       help='Remain stationary, linear momentum = 0')
+  parser.add_argument(
+      '--pickle-failed',
+      action='store_true',
+      default=False,
+      help='Pickle failed simulation results in monte-carlo')
 
   args = parser.parse_args(sys.argv[1:])
 
@@ -1315,7 +1741,8 @@ def main():
     'detumble': args.detumble,
     'initialOmega': args.initial_omega,
     'static': args.static,
-    'sigma': args.sigma
+    'sigma': args.sigma,
+    'pickleFailed': args.pickle_failed
   }
 
   if args.monte_carlo:
@@ -1327,11 +1754,16 @@ def main():
     timeToConvergence = []
     averagePower = []
     totalEnergy = []
+
     start = datetime.datetime.now()
     simDuration = 0
-    p = Pool(args.j)
+
+    # where the simulations are run
+    p = Pool(args.j) # args.j is the number of cpu threads for async
     jobs = [p.apply_async(_runnerSim, kwds=kwargs) for _ in range(args.n)]
     p.close()
+
+     # loop through the array jobs[] to find the results 
     results = []
     for job in tqdm(jobs):
       results.append(job.get())
@@ -1348,6 +1780,8 @@ def main():
     irlDuration = (datetime.datetime.now() - start).total_seconds()
     print('-----------')
     success = sum(converged) / len(converged)
+
+    # print % converged in appropriate color
     if success == 1:
       print(f'{Fore.GREEN}{success * 100:8.2f}% converged')
       mean = np.mean(timeToConvergence)
