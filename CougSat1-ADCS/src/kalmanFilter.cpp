@@ -1,6 +1,7 @@
 #include "kalmanFilter.h"
 
-void qFilter(SatelliteState lastStateEst,
+
+returnKalman qFilter(SatelliteState lastStateEst,
     MatrixXf lastEstErrCovariance, 
     MatrixXf procNoiseCovariance,
     Matrix3f R,
@@ -134,12 +135,20 @@ void qFilter(SatelliteState lastStateEst,
     // Step 11
     // Calculate kalman gain K_k and apply it to state estimate xHat_k and estimate error covariance P_k
     MatrixXf K_k = P_xz * P_vv.inverse(); 
-    MatrixXf xHat_k = xHat_kMinus.getRotMat() + (K_k * v_k);
-    MatrixXf P_k = P_kMinus - (K_k * P_vv * K_k.transpose());
+    MatrixXf xHat_k = xHat_kMinus.getRotMat() + (K_k * v_k); // State estimate
+    MatrixXf P_k = P_kMinus - (K_k * P_vv * K_k.transpose()); // Covariance estimate
+    
     //Step 12
     // Create updated estimate of covariance and state vector
+    Vector3f omegaTemp(xHat_k(0,0),xHat_k(1,0),xHat_k(2,0));
+    Vector3f rotTemp(xHat_k(3,0),xHat_k(4,0),xHat_k(5,0));
+    SatelliteState updatedStateEst(omegaTemp, rotVecToQ(rotTemp));
+
+    returnKalman stateCov;
+    stateCov.stateEst = updatedStateEst;
+    stateCov.covEst = P_k;
     
-    return;
+    return stateCov;
 }
 
 Vector3f qToRotVec(Quaternionf q) {

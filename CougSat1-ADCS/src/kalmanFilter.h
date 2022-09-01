@@ -10,7 +10,12 @@ using Eigen::MatrixXd;
 using Eigen::Quaternion;
 using namespace Eigen;
 
-void qFilter(SatelliteState lastStateEst,
+struct returnKalman {
+    SatelliteState stateEst;
+    MatrixXf covEst;
+};
+
+returnKalman qFilter(SatelliteState lastStateEst,
     MatrixXf lastEstErrCovariance, 
     MatrixXf procNoiseCovariance,
     Matrix3f R,
