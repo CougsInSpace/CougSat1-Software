@@ -19,14 +19,34 @@ def strip_unwanted_tags(d, tags): #strips unwanted json tags, only includes desi
         filtered_list.append(temp_dict) #
     return filtered_list #return the filtered list containing only the tags we want 
 
-def merge_tags(l1, l2): #merges tags from 2 different lists of dicts. Used to get the x, y, and z components all in one 
-    pass
+def merge_tags(list_of_filtered_lists): #merges all dicts from the list into one dict
+    output_list = list_of_filtered_lists[0]
+    for i in range(0, len(output_list)):
+        for j in range(1, len(list_of_filtered_lists)):
+            for key, value in list_of_filtered_lists[j][i].items():
+                output_list[i][key] = value #adds the value 
+    # for l1 in list_of_filtered_lists: #l1 is a list of dicts 
+    #     for item in l1:
+    #         for key in item.keys():
+    return output_list 
 
 temp_list_of_filtered_lists = [] #will store the filtered x, y, and z components 
 for file in files_to_process: #processes each file 
+    print("Processing file " + file)
     f = open(file, "r")
     dict_from_file = json.loads(str(f.read())) #represents the json from the file as a python dictionary 
     f.close()
 
     filtered_list = strip_unwanted_tags(dict_from_file, tags_to_keep)
     temp_list_of_filtered_lists.append(filtered_list)
+    print("Finished processing file " + file)
+
+print("Merging lists")
+output_list = merge_tags(temp_list_of_filtered_lists)
+print("Finished merging lists")
+
+print("Outputting to file")
+output_file = open("out.json", "w")
+output_file.write(json.dumps(output_list, indent=1))
+output_file.close()
+print("Finished outputting to file")
