@@ -14,13 +14,15 @@ ADF4360    rfClkMod(spiRFClk, RFCLK_CS_MOD, 7, 20000000);
 ADF4360    rfClkDemod(spiRFClk, RFCLK_CS_DEMOD, 7, 20000000);
 ADF4360    rfClk230(spiRFClk, RFCLK_CS_230, 7, 20000000);
 
+// pc =  power control comms.sch
+// turn pin pd3 (might have changed in newer version) on and off to beep
 /**
  * Program start routine
  * @return error code
- */
+ */ 
 int main(void) {
-  regEn5   = 1;
-  pcLDO3V3 = 0;
+  regEn5   = 1; // Turns on 5v regulator which is power supply for power amplifier
+  pcLDO3V3 = 0; 
   pcMod    = 1;
   pcDemod  = 1;
   pc230    = 1;
