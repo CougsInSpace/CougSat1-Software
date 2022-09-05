@@ -81,7 +81,8 @@ void ADCS::attitudeDetermination() {
   Matrix3f sunCovMat{{ 0.36135865,  0.45814491, -0.12726127},
                      { 0.45814491,  0.58427518, -0.16126741},
                      { 0.12726127, -0.16126741,  0.05436621}};
-  Vector3f magi(magData.x, magData.y, magData.z);
+  // Vector3f magi(magData.x, magData.y, magData.z);
+  Vector3f magi(0,0,1);
   Vector3f suni(volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
 
   while (true) { 
@@ -107,7 +108,8 @@ void ADCS::attitudeDetermination() {
     volts = photodiodes.getVoltages();
 
     // Create vectors from measurements
-    Vector3f magf(magData.x, magData.y, magData.z);
+    // Vector3f magf(magData.x, magData.y, magData.z);
+    Vector3f magf(0,0,1);
     Vector3f sunf(volts->volt_pos_x, volts->volt_pos_y, -1* volts->volt_pos_z);
     Vector3f magfNorm = magf.normalized();
     Vector3f sunfNorm = sunf.normalized();

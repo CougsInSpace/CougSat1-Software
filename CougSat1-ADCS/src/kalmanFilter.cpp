@@ -51,7 +51,6 @@ returnKalman qFilter(SatelliteState lastStateEst,
         // init sigma point in Y_i
         Y_i[i].initVecQ(X_i[i].getOmega(), newStateQ);
     }
-    cout << stateArrToSigmaMat(Y_i) << endl;
 
     // Step 4
     // Find average state vector of Y_i
@@ -62,7 +61,7 @@ returnKalman qFilter(SatelliteState lastStateEst,
     MatrixXf WPrime_i(6,12);
     for (short i = 0; i < 12; i++) {
         Vector3f omega = Y_i[i].getOmega() - xHat_kMinus.getOmega();
-        Vector3f rot = qToRotVec(xHat_kMinus.getQ().conjugate() * Y_i[i].getQ());
+        Vector3f rot = qToRotVec(Y_i[i].getQ()*xHat_kMinus.getQ().conjugate()); //  multiplication order specified in paper
 
         for (short j = 0; j < 3; j++) {
             // WPrime_i is upside down from W_i for some reason
@@ -99,7 +98,6 @@ returnKalman qFilter(SatelliteState lastStateEst,
         z_kMinus += z_i;
     }
     z_kMinus /= 12;
-
     // The innovation
     Vector3f v_k = measf - z_kMinus;
 
@@ -129,9 +127,18 @@ returnKalman qFilter(SatelliteState lastStateEst,
 
     // Step 11
     // Calculate kalman gain K_k and apply it to state estimate xHat_k and estimate error covariance P_k
-    MatrixXf K_k = P_xz * P_vv.inverse(); 
+    MatrixXf K_k = P_xz * P_vv.inverse();
     MatrixXf xHat_k = xHat_kMinus.getRotMat() + (K_k * v_k); // State estimate
     MatrixXf P_k = P_kMinus - (K_k * P_vv * K_k.transpose()); // Covariance estimate
+    // cout << P_xz << endl;
+    // cout << "o" << endl;
+    // cout << P_vv.inverse() << endl;
+    // cout << "v" << endl;
+    // cout << P_vv << endl;
+    // cout << "d" << endl;
+    // cout << P_xz * P_vv.inverse() <<endl;
+    // cout << "k" << endl;
+    // cout << K_k << endl;
 
     //Step 12
     // Create updated estimate of covariance and state vector
@@ -143,7 +150,6 @@ returnKalman qFilter(SatelliteState lastStateEst,
     stateCov.stateEst = updatedStateEst;
     stateCov.covEst = P_k;
 
-    Quaternionf qOut = rotVecToQ(rotTemp);
     // printf("%f\r\n%f\r\n%f\r\n%f\r\n", qOut.w(), qOut.x(), qOut.y(), qOut.z());
     
     return stateCov;
