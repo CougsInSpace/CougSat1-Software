@@ -17,7 +17,7 @@ returnKalman qFilter(SatelliteState lastStateEst,
 
     // Step 0
     // Combine estimate covariance and process noise covariance
-    MatrixXf lastCovariance = lastEstErrCovariance + procNoiseCovariance;
+    MatrixXf lastCovariance = lastEstErrCovariance;// + procNoiseCovariance;
 
     // Step 1
     // Create set of state vectors with desired covariance and mean of 0
@@ -39,9 +39,6 @@ returnKalman qFilter(SatelliteState lastStateEst,
         X_i[i].initVecQ(omega, q);
     }
     MatrixXf X_i_Mat = stateArrToSigmaMat(X_i);
-    // Quaternionf qTest = lastStateEst.getQ() * lastStateEst.getQ();
-    // cout << averageState(X_i, qTest).getQ() << endl;
-    // cout << "______" << endl;
 
     // Step 3
     // Predict value of state vector at next time interval
@@ -54,13 +51,12 @@ returnKalman qFilter(SatelliteState lastStateEst,
         // init sigma point in Y_i
         Y_i[i].initVecQ(X_i[i].getOmega(), newStateQ);
     }
+    cout << stateArrToSigmaMat(Y_i) << endl;
 
     // Step 4
     // Find average state vector of Y_i
-    // cout << lastStateEst.getQ() << endl;
     SatelliteState xHat_kMinus = averageState(Y_i, lastStateEst.getQ());
-    // cout << xHat_kMinus.getQ() << endl;
-
+    
     //Step 5
     // Create WPrime_i matrix by subtracting the mean vector and converting the quaternion rotation into a rotation vector
     MatrixXf WPrime_i(6,12);
@@ -106,7 +102,6 @@ returnKalman qFilter(SatelliteState lastStateEst,
 
     // The innovation
     Vector3f v_k = measf - z_kMinus;
-    // cout << v_k << endl;
 
     // Step 9
     // Find innovation covariance P_vv by adding measurement noise R to measurement covariance P_zz
@@ -137,7 +132,7 @@ returnKalman qFilter(SatelliteState lastStateEst,
     MatrixXf K_k = P_xz * P_vv.inverse(); 
     MatrixXf xHat_k = xHat_kMinus.getRotMat() + (K_k * v_k); // State estimate
     MatrixXf P_k = P_kMinus - (K_k * P_vv * K_k.transpose()); // Covariance estimate
-    
+
     //Step 12
     // Create updated estimate of covariance and state vector
     Vector3f omegaTemp(xHat_k(0,0),xHat_k(1,0),xHat_k(2,0));
@@ -147,6 +142,9 @@ returnKalman qFilter(SatelliteState lastStateEst,
     returnKalman stateCov;
     stateCov.stateEst = updatedStateEst;
     stateCov.covEst = P_k;
+
+    Quaternionf qOut = rotVecToQ(rotTemp);
+    // printf("%f\r\n%f\r\n%f\r\n%f\r\n", qOut.w(), qOut.x(), qOut.y(), qOut.z());
     
     return stateCov;
 }
@@ -188,7 +186,7 @@ SatelliteState averageState(SatelliteState stateArr[12], Quaternionf avgCalcStar
     Quaternionf q_tAvg = avgCalcStartQ;
     Vector3f eRotAvg(1,1,1); 
     short counter = 0;
-    while (eRotAvg.norm() > .01 && counter < 100) { // TODO pick appropriate error threshold
+    while (eRotAvg.norm() > .01 && counter < 10) { // TODO pick appropriate error threshold
         // find quaternion rotation between each stateArr quaternion and the average 
         // quaternion
         Quaternionf e_iArr[12];

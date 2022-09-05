@@ -9,6 +9,7 @@
 using Eigen::MatrixXd;
 using Eigen::Quaternion;
 using namespace Eigen;
+using namespace std;
 
 struct returnKalman {
     SatelliteState stateEst;

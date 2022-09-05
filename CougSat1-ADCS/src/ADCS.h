@@ -8,6 +8,7 @@
 #include "vectorFunctions.h"
 #include <BNO055.h>
 #include <photodiode.h>
+#include "kalmanFilter.h"
 
 using namespace std;
 
@@ -25,12 +26,13 @@ private:
   IMUValueSet_t magData;
   BNO055_EULER_TypeDef eulerData;
   BNO055_QUATERNION_TypeDef quatData;
-  Photodiodes photodiodes(A3, A3, A2, A2, A1, A1);
   voltages* volts;
 
 public:
   ADCS();
   void startThread();
   void attitudeDetermination();
+  void attitudeDeterminationLoop();
+  void attitudeControl();
 };
 #endif /* ADCS_H */

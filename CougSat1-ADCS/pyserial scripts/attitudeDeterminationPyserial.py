@@ -11,9 +11,6 @@ ser = serial.Serial(
     timeout = 1
 )
 
-filteredq = quaternion.from_float_array([1,0,0,0])
-qUncertainty = quaternion.from_float_array([1,0,0,0])
-
 startPoint = True
 while startPoint:
     line = ser.readline()
@@ -22,67 +19,52 @@ while startPoint:
         startPoint = False
         print("Plotting started")
 
-vectorMat = []
+# Vector plotting
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+
+# Orientation plotting
+axes = np.array([[1,0,0], [0,1,0], [0,0,1]])
 for i in range(1000):
-    vec1 = [0,0,0]
-    for j in range(3):
+    # vec1 = [0,0,0]
+    # for j in range(3):
+    #     line = ser.readline()
+    #     string = line.decode().strip()
+    #     vec1[j] = float(string)
+
+    # vec2 = [0,0,0]
+    # for j in range(3):
+    #     line = ser.readline()
+    #     string = line.decode().strip()
+    #     vec2[j] = float(string)
+
+    vec3 = [0,0,0,0]
+    for j in range(4):
         line = ser.readline()
         string = line.decode().strip()
-        vec1[j] = float(string)
+        vec3[j] = float(string)
     ser.readline() # move past "x" in serial output
 
-    vectorMat.append(vec1)
-    matrix = np.array(vectorMat)
-print((matrix.T @ matrix)/1000)
-# TODO CALCULATE COVARIANCE
+    q = quaternion.from_float_array(vec3)
+    r = quaternion.as_rotation_matrix(q)
 
-# STARTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-# # Vector plotting
-# fig = plt.figure()
-# ax = fig.add_subplot(projection='3d')
+    axesT = axes @ r
 
-# # Orientation plotting
-# axes = np.array([[1,0,0], [0,1,0], [0,0,1]])
-# for i in range(10000):
-#     vec1 = [0,0,0]
-#     for j in range(3):
-#         line = ser.readline()
-#         string = line.decode().strip()
-#         vec1[j] = float(string)
+    plt.cla()
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    ax.set_zlim(-1, 1)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
 
-#     vec2 = [0,0,0]
-#     for j in range(3):
-#         line = ser.readline()
-#         string = line.decode().strip()
-#         vec2[j] = float(string)
+    ax.quiver(0, 0, 0, axes[0,:], axes[1,:], axes[2,:])
+    ax.quiver(0, 0, 0, axesT[0,:], axesT[1,:], axesT[2,:], colors="red")
+    # ax.quiver(0, 0, 0, vec1[0], vec1[1], vec1[2], colors="yellow")
+    # ax.quiver(0, 0, 0, vec2[0], vec2[1], vec2[2], colors="green")
 
-#     vec3 = [0,0,0,0]
-#     for j in range(4):
-#         line = ser.readline()
-#         string = line.decode().strip()
-#         vec3[j] = float(string)
-#     ser.readline() # move past "x" in serial output
+    plt.pause(.05)
 
-#     q = quaternion.from_float_array(vec3)
-#     r = quaternion.as_rotation_matrix(q)
-
-#     axesT = axes @ r
-
-#     plt.cla()
-#     ax.set_xlim(-1, 1)
-#     ax.set_ylim(-1, 1)
-#     ax.set_zlim(-1, 1)
-#     ax.set_xlabel('x')
-#     ax.set_ylabel('y')
-#     ax.set_zlabel('z')
-
-#     ax.quiver(0, 0, 0, axes[0,:], axes[1,:], axes[2,:])
-#     ax.quiver(0, 0, 0, axesT[0,:], axesT[1,:], axesT[2,:], colors="red")
-#     ax.quiver(0, 0, 0, vec1[0], vec1[1], vec1[2], colors="yellow")
-#     ax.quiver(0, 0, 0, vec2[0], vec2[1], vec2[2], colors="green")
-
-#     plt.pause(.05)
-# ENDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
 
 
 

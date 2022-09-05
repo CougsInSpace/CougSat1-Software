@@ -35,13 +35,8 @@ public:
     Vector3f getRot();
     MatrixXf getRotMat();
 private:
-    void updateStateFromVec();
     Vector3f qToRotVec(Quaternionf q);
 
-    Vector3f omega;
-    Quaternionf q;
     StateVector stateVec;
-    MatrixXf stateMat;
-    Vector3f rotVec;
 };
 #endif

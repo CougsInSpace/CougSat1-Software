@@ -24,7 +24,6 @@ void SatelliteState::initFloats(float omega1, float omega2, float omega3, float 
     this->stateVec.qx = qx;
     this->stateVec.qy = qy;
     this->stateVec.qz = qz;
-    this->updateStateFromVec();
     return;
 }
 
@@ -36,40 +35,17 @@ void SatelliteState::initVecQ(Vector3f omega, Quaternionf q) {
     this->stateVec.qx = q.coeffs()[0];
     this->stateVec.qy = q.coeffs()[1];
     this->stateVec.qz = q.coeffs()[2];
-    this->updateStateFromVec();
     return;
 }
 
 void SatelliteState::initMat(MatrixXf mat) {
-    this->stateVec.omega1 = stateMat(0,0);
-    this->stateVec.omega2 = stateMat(1,0);
-    this->stateVec.omega3 = stateMat(2,0);
-    this->stateVec.qw = stateMat(3,0);
-    this->stateVec.qx = stateMat(4,0);
-    this->stateVec.qy = stateMat(5,0);
-    this->stateVec.qz = stateMat(6,0);
-    this->updateStateFromVec();
-    return;
-}
-
-void SatelliteState::updateStateFromVec() {
-    Vector3f omega(this->stateVec.omega1, this->stateVec.omega2, this->stateVec.omega3);
-    Quaternionf q(this->stateVec.qw, this->stateVec.qx, this->stateVec.qy, this->stateVec.qz);
-    this->omega = omega;
-    this->q = q;
-
-    MatrixXf stateMat(7,1);
-    stateMat(0,0) = stateVec.omega1;
-    stateMat(1,0) = stateVec.omega2;
-    stateMat(2,0) = stateVec.omega3;
-    stateMat(3,0) = stateVec.qw;
-    stateMat(4,0) = stateVec.qx;
-    stateMat(5,0) = stateVec.qy;
-    stateMat(6,0) = stateVec.qz;
-    this->stateMat = stateMat;
-
-    this->rotVec = this->qToRotVec(q);
-
+    this->stateVec.omega1 = mat(0,0);
+    this->stateVec.omega2 = mat(1,0);
+    this->stateVec.omega3 = mat(2,0);
+    this->stateVec.qw = mat(3,0);
+    this->stateVec.qx = mat(4,0);
+    this->stateVec.qy = mat(5,0);
+    this->stateVec.qz = mat(6,0);
     return;
 }
 
@@ -82,23 +58,38 @@ Vector3f SatelliteState::qToRotVec(Quaternionf q) {
 }
 
 MatrixXf SatelliteState::getMat() {
-    return this->stateMat;
+    MatrixXf stateMat(7,1);
+    stateMat(0,0) = stateVec.omega1;
+    stateMat(1,0) = stateVec.omega2;
+    stateMat(2,0) = stateVec.omega3;
+    stateMat(3,0) = stateVec.qw;
+    stateMat(4,0) = stateVec.qx;
+    stateMat(5,0) = stateVec.qy;
+    stateMat(6,0) = stateVec.qz;
+    return stateMat;
 }
 
 Quaternionf SatelliteState::getQ() {
-    return this->q;
+    Quaternionf q(this->stateVec.qw, this->stateVec.qx, this->stateVec.qy, this->stateVec.qz);
+    return q;
 }
 
 Vector3f SatelliteState::getOmega() {
-    return this->omega;
+    Vector3f omega(this->stateVec.omega1, this->stateVec.omega2, this->stateVec.omega3);
+    return omega;
 }
 
 Vector3f SatelliteState::getRot() {
-    return this->rotVec;
+    Quaternionf q(this->stateVec.qw, this->stateVec.qx, this->stateVec.qy, this->stateVec.qz);
+    return qToRotVec(q);
 }
 
 MatrixXf SatelliteState::getRotMat() {
     MatrixXf rotMat(6,1);
-    rotMat << this->omega, this->rotVec;
+    Quaternionf q(this->stateVec.qw, this->stateVec.qx, this->stateVec.qy, this->stateVec.qz);
+    Vector3f rotVec = qToRotVec(q);
+    Vector3f omega(this->stateVec.omega1, this->stateVec.omega2, this->stateVec.omega3);
+    rotMat << omega, rotVec;
+
     return rotMat;
 }

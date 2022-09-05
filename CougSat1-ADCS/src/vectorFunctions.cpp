@@ -8,19 +8,19 @@ using namespace std;
 bool floatCloseToZero(float f) {
     return f < FLOAT_COMPARISON_EPSILON;
 }
-Vector4f rodRotation(Vector3f a, Vector3f aT); //forward declaration 
+// Vector4f rodRotation(Vector3f a, Vector3f aT); //forward declaration 
 
-void testRodRotation() {
-    Vector3f a(1, 0, 0); 
-    Vector3f aT(0, 0, -1); 
-    Vector4f rod = rodRotation(a, aT); 
-    std::cout << rod << std::endl;
-}
-int main() {
-    // testRodRotation();
+// void testRodRotation() {
+//     Vector3f a(1, 0, 0); 
+//     Vector3f aT(0, 0, -1); 
+//     Vector4f rod = rodRotation(a, aT); 
+//     std::cout << rod << std::endl;
+// }
+// int main() {
+//     // testRodRotation();
 
-    return 0;
-}
+//     return 0;
+// }
 
 // difference between the different normalize functions 
 // https://stackoverflow.com/questions/48019329/difference-between-norm-normalize-and-normalized-in-eigen
@@ -42,24 +42,24 @@ Vector4f rodRotation(Vector3f a, Vector3f aT) {
     Vector4f rod(axis[0], axis[1], axis[2], theta); //sets the values in rod
     return rod;
 }
-Vector3f rotationVector(Vector3f a, Vector3f aT) {
-    Vector3f axis = a.cross(aT); 
-    //handle case if a and aT are parallel 
-    float theta = 0;
-    if (floatCloseToZero(axis.norm())) {
-        cout << "float is close to 0\n"; 
-        axis[0] = 0; //x 
-        axis[1] = 0; //y 
-        axis[2] = 1; //z 
-        theta = 0;
-    } else {
-        cout << "float is not close to 0\n";
-        axis.normalize(); 
-        theta = vecAngle(a, aT); 
-    }
-    Vec3 rotVec = axis * theta; 
-    return rotVec
-}
+// Vector3f rotationVector(Vector3f a, Vector3f aT) {
+//     Vector3f axis = a.cross(aT); 
+//     //handle case if a and aT are parallel 
+//     float theta = 0;
+//     if (floatCloseToZero(axis.norm())) {
+//         cout << "float is close to 0\n"; 
+//         axis[0] = 0; //x 
+//         axis[1] = 0; //y 
+//         axis[2] = 1; //z 
+//         theta = 0;
+//     } else {
+//         cout << "float is not close to 0\n";
+//         axis.normalize(); 
+//         theta = vecAngle(a, aT); 
+//     }
+//     Vec3 rotVec = axis * theta; 
+//     return rotVec;
+// }
 
 
 
