@@ -12,7 +12,7 @@
 ADCS::ADCS() : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL), sensorBus(D14,D15), imu(sensorBus,NC,(0X28<<1)) {
   // monitor.set_priority(osPriorityNormal);
   // cdhRead.set_priority(osPriorityNormal);
-  cdhRead.start(callback(this, &ADCS::cdhThread));
+  // cdhRead.start(callback(this, &ADCS::cdhThread));
   attitudeDeterminationThread.start(callback(this, &ADCS::attitudeDetermination));
   // monitor.start(callback(this, &ADCS::monitorThread));
 }
@@ -63,26 +63,25 @@ void ADCS::attitudeDetermination() {
 
   //Kalman filter stuff
   SatelliteState currentState(0,0,0,1,0,0,0);
-  MatrixXf stateCovariance{{1, 0, 0, 0, 0, 2},
-                           {0, 1, 0, 0, 0, 0},
-                           {0, 0, 1, 0, 0, 0},
-                           {0, 0, 0, 1, 0, 0},
-                           {0, 0, 0, 0, 1, 0},
-                           {2, 0, 0, 0, 0, 1}};
-  MatrixXf procNoiseCovariance{{0,0,0,0,0,0},
-                               {0,0,0,0,0,0},
-                               {0,0,0,0,0,0},
-                               {0,0,0,0,0,0},
-                               {0,0,0,0,0,0},
-                               {0,0,0,0,0,0}};
+  MatrixXf stateCovariance{{0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0}};
+  MatrixXf procNoiseCovariance{{.1,.1,.1,.1,.1,.1},
+                               {.1,.1,.1,.1,.1,.1},
+                               {.1,.1,.1,.1,.1,.1},
+                               {.1,.1,.1,.1,.1,.1},
+                               {.1,.1,.1,.1,.1,.1},
+                               {.1,.1,.1,.1,.1,.1}};
   Matrix3f magneticCovMat{{ 0.29629224,  0.2503048,  -0.38154479},
                           { 0.2503048,   0.21185839, -0.32251307},
                           {-0.38154479, -0.32251307,  0.49184944}};
   Matrix3f sunCovMat{{ 0.36135865,  0.45814491, -0.12726127},
                      { 0.45814491,  0.58427518, -0.16126741},
-                     { 0.12726127, -0.16126741,  0.05436621}};
-  // Vector3f magi(magData.x, magData.y, magData.z);
-  Vector3f magi(0,0,1);
+                     {-0.12726127, -0.16126741,  0.05436621}};
+  Vector3f magi(magData.x, magData.y, magData.z);
   Vector3f suni(volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
 
   while (true) { 
@@ -108,20 +107,20 @@ void ADCS::attitudeDetermination() {
     volts = photodiodes.getVoltages();
 
     // Create vectors from measurements
-    // Vector3f magf(magData.x, magData.y, magData.z);
-    Vector3f magf(0,0,1);
+    Vector3f magf(magData.x, magData.y, magData.z);
     Vector3f sunf(volts->volt_pos_x, volts->volt_pos_y, -1* volts->volt_pos_z);
     Vector3f magfNorm = magf.normalized();
     Vector3f sunfNorm = sunf.normalized();
+    Vector3f magiNorm = magi.normalized();
 
     // Code to determine orientation (only for mag sensor right now)
     returnKalman stateStruct = qFilter(currentState,
-                                     stateCovariance, 
-                                     procNoiseCovariance,
-                                     magneticCovMat,
-                                     magi.normalized(),
-                                     magfNorm,
-                                     .1);
+                                       stateCovariance, 
+                                       procNoiseCovariance,
+                                       magneticCovMat,
+                                       magiNorm,
+                                       magfNorm,
+                                       .1);
     currentState = stateStruct.stateEst;
     stateCovariance = stateStruct.covEst;
     Quaternionf qAttitude = currentState.getQ();
@@ -147,7 +146,7 @@ void ADCS::attitudeDetermination() {
     // printf("%f\r\n%f\r\n%f\r\n", magfNorm[0], magfNorm[1], magfNorm[2]);
     // printf("%lf\n\r", volts->volt_pos_x);
     // printf("%f\r\n%f\r\n%f\r\n%f\r\n", qAttitude.w(), qAttitude.x(), qAttitude.y(), qAttitude.z());
-    
+
     ThisThread::sleep_for(100ms);
 
     // time_t endTime = time();

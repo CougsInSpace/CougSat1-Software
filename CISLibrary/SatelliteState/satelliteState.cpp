@@ -89,7 +89,7 @@ MatrixXf SatelliteState::getRotMat() {
     Quaternionf q(this->stateVec.qw, this->stateVec.qx, this->stateVec.qy, this->stateVec.qz);
     Vector3f rotVec = qToRotVec(q);
     Vector3f omega(this->stateVec.omega1, this->stateVec.omega2, this->stateVec.omega3);
-    rotMat << omega, rotVec;
+    rotMat << rotVec, omega;
 
     return rotMat;
 }

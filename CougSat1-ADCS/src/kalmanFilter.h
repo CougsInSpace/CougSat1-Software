@@ -5,6 +5,7 @@
 #include "../../CISLibrary/Eigen/Geometry"
 #include "../../CISLibrary/Eigen/Cholesky"
 #include "satelliteState.h"
+#include <mbed_stats.h>
 
 using Eigen::MatrixXd;
 using Eigen::Quaternion;
@@ -28,5 +29,7 @@ Vector3f qToRotVec(Quaternionf q);
 Quaternionf rotVecToQ(Vector3f rotVec);
 MatrixXf stateArrToSigmaMat(SatelliteState stateArr[12]);
 SatelliteState averageState(SatelliteState stateArr[12], Quaternionf avgCalcStartQ);
+MatrixXf step1(MatrixXf mat);
+SatelliteState step12(MatrixXf xHat_k);
 
 #endif

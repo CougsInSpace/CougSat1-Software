@@ -22,6 +22,7 @@ private:
   void   cdhThread();
   I2C    sensorBus;
   BNO055 imu;
+  uint32_t stackSize = 8192;
 
   IMUValueSet_t magData;
   BNO055_EULER_TypeDef eulerData;

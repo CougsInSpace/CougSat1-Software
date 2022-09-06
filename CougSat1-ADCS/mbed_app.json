@@ -1,7 +1,12 @@
 {
+  "macros": [
+    "MBED_HEAP_STATS_ENABLED=1"
+  ],
   "target_overrides": {
     "*": {
-      "platform.minimal-printf-enable-floating-point": true
+      "platform.minimal-printf-enable-floating-point": true,
+      "rtos.main-thread-stack-size": 8192,
+      "rtos.thread-stack-size": 8192
     }
   }
 }

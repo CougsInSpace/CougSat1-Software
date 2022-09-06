@@ -14,40 +14,43 @@ returnKalman qFilter(SatelliteState lastStateEst,
        procNoiseCovariance = the covariance matrix of the process noise. I believe this is just a catchall for unpredicatable noise
                              and will need to be chosen manually
     */
-
     // Step 0
     // Combine estimate covariance and process noise covariance
-    MatrixXf lastCovariance = lastEstErrCovariance;// + procNoiseCovariance;
+    MatrixXf lastCovariance = lastEstErrCovariance + procNoiseCovariance;
 
     // Step 1
     // Create set of state vectors with desired covariance and mean of 0
     LLT<MatrixXf> lltOfA(lastCovariance);
-    MatrixXf S = lltOfA.matrixL(); // cholesky decomposition
+    MatrixXf S = lltOfA.matrixL(); // Cholesky decomposition
     S = S * sqrt(12);
     MatrixXf W_i(6, 12);
-    W_i << S, -1 * S; // concatenate matrices
+    W_i << S, -1 * S; // Concatenate matrices
+    // SMALL CHANGES IN OMEGA COMPOUND AND BECOME HUGE
 
     // Step 2
     // Build set of state vector sigma points X_i by converting rot vector to quaternion representation
     // and shifting the sigma points by the last error estimate
+    // cout << "lastStateEst" << endl;
+    // cout << lastStateEst.getOmega() << endl;
+    // cout << "omega" << endl;
+    // cout << W_i << endl;
     SatelliteState X_i[12];
     for (short i = 0; i < 12; i++) {
-        Vector3f omega(W_i(0,i), W_i(1,i), W_i(2,i));
+        Vector3f rot(W_i(0,i), W_i(1,i), W_i(2,i));
+        Vector3f omega(W_i(3,i), W_i(4,i), W_i(5,i));
         omega = omega + lastStateEst.getOmega();
-        Vector3f rot(W_i(3,i), W_i(4,i), W_i(5,i));
-        Quaternionf q = lastStateEst.getQ() * rotVecToQ(rot);
+        Quaternionf q = rotVecToQ(rot) * lastStateEst.getQ();
         X_i[i].initVecQ(omega, q);
     }
-    MatrixXf X_i_Mat = stateArrToSigmaMat(X_i);
 
     // Step 3
     // Predict value of state vector at next time interval
-    SatelliteState Y_i[12];
+    SatelliteState Y_i[12]; // X_i IS MAKING Y_i BIG
     for (short i = 0; i < 12; i++) {
         // find change in orientation over deltaT
         Vector3f deltaRot = X_i[i].getOmega() * deltaT;
         // find new quaternion orientation after deltaT 
-        Quaternionf newStateQ = rotVecToQ(deltaRot) * X_i[i].getQ();
+        Quaternionf newStateQ = X_i[i].getQ() * rotVecToQ(deltaRot);
         // init sigma point in Y_i
         Y_i[i].initVecQ(X_i[i].getOmega(), newStateQ);
     }
@@ -55,14 +58,15 @@ returnKalman qFilter(SatelliteState lastStateEst,
     // Step 4
     // Find average state vector of Y_i
     SatelliteState xHat_kMinus = averageState(Y_i, lastStateEst.getQ());
+    cout << xHat_kMinus.getOmega() << endl;
+    cout << "u" << endl;
     
     //Step 5
     // Create WPrime_i matrix by subtracting the mean vector and converting the quaternion rotation into a rotation vector
-    MatrixXf WPrime_i(6,12);
+    MatrixXf WPrime_i(6,12); // Y_i IS MAKING OMEGA BIG
     for (short i = 0; i < 12; i++) {
         Vector3f omega = Y_i[i].getOmega() - xHat_kMinus.getOmega();
         Vector3f rot = qToRotVec(Y_i[i].getQ()*xHat_kMinus.getQ().conjugate()); //  multiplication order specified in paper
-
         for (short j = 0; j < 3; j++) {
             // WPrime_i is upside down from W_i for some reason
             WPrime_i(j, i) = rot(j);
@@ -72,20 +76,18 @@ returnKalman qFilter(SatelliteState lastStateEst,
 
     //Step 6
     //Find a priori covariance of WPrime_i
-    MatrixXf P_kMinus(6,6);
+    MatrixXf P_kMinus = MatrixXf::Zero(6,6);
     for (short i = 0; i < 12; i++) {
         P_kMinus += WPrime_i.col(i) * WPrime_i.col(i).transpose();
     }
 
     // Step 7
     // Predict measurement vector direction using measurement model
-    Quaternionf suniq(0, measi(0), measi(1), measi(2));// TODO HOW TO ACCOUNT FOR MULTIPLE MEASUREMENT VECTORS? MAYBE SWITCH BETWEEN THEM ON EACH RECURSION?
+    // TODO HOW TO ACCOUNT FOR MULTIPLE MEASUREMENT VECTORS? MAYBE SWITCH BETWEEN THEM ON EACH RECURSION?
     MatrixXf Z_i_Mat(3, 12);
     for (short i = 0; i < 12; i++) {
-        Quaternionf sunfqPredicted = Y_i[i].getQ() * suniq * Y_i[i].getQ().conjugate();
-        for (short j = 0; j < 3; j++) {
-            Z_i_Mat(j,i) = sunfqPredicted.coeffs()[j];
-        }
+        Vector3f measfPredicted = Y_i[i].getQ().toRotationMatrix() * measi;
+        Z_i_Mat.col(i) = measfPredicted;
     }
 
     // Step 8
@@ -94,12 +96,11 @@ returnKalman qFilter(SatelliteState lastStateEst,
     // Average predicted measurement
     Vector3f z_kMinus(0,0,0);
     for (short i = 0; i < 12; i++) {
-        Vector3f z_i(Z_i_Mat(0,i), Z_i_Mat(1,i), Z_i_Mat(2,i));
-        z_kMinus += z_i;
+        z_kMinus += Z_i_Mat.col(i);
     }
     z_kMinus /= 12;
     // The innovation
-    Vector3f v_k = measf - z_kMinus;
+    Vector3f v_k = measf - z_kMinus.normalized();
 
     // Step 9
     // Find innovation covariance P_vv by adding measurement noise R to measurement covariance P_zz
@@ -110,7 +111,7 @@ returnKalman qFilter(SatelliteState lastStateEst,
     }
     // Find P_zz
     MatrixXf Z_i_MatCov = Z_i_Mat - Z_kMinusMat;
-    Matrix3f P_zz;
+    Matrix3f P_zz = Matrix3f::Zero();
     for (short i = 0; i < 12; i++) {
         P_zz += Z_i_MatCov.col(i) * Z_i_MatCov.col(i).transpose();
     }
@@ -119,7 +120,7 @@ returnKalman qFilter(SatelliteState lastStateEst,
 
     // Step 10
     // Calculate the cross correlation matrix P_xz
-    MatrixXf P_xz(6,3);
+    MatrixXf P_xz = MatrixXf::Zero(6,3);
     for (short i = 0; i < 12; i++) {
         P_xz += WPrime_i.col(i) * Z_i_MatCov.col(i).transpose();
     }
@@ -130,27 +131,31 @@ returnKalman qFilter(SatelliteState lastStateEst,
     MatrixXf K_k = P_xz * P_vv.inverse();
     MatrixXf xHat_k = xHat_kMinus.getRotMat() + (K_k * v_k); // State estimate
     MatrixXf P_k = P_kMinus - (K_k * P_vv * K_k.transpose()); // Covariance estimate
-    // cout << P_xz << endl;
+    cout << xHat_kMinus.getRotMat() << endl;
+    // cout << v_k << endl;
+    // cout << "b" << endl;
+    // cout << measf << endl;
     // cout << "o" << endl;
     // cout << P_vv.inverse() << endl;
     // cout << "v" << endl;
-    // cout << P_vv << endl;
+    // cout << P_vv << endl; // should be symmetric
     // cout << "d" << endl;
-    // cout << P_xz * P_vv.inverse() <<endl;
+    // cout << P_xz << endl;
     // cout << "k" << endl;
     // cout << K_k << endl;
+    // mbed_stats_heap_get(&heapStats);
+    // printf("%lu\r\n", heapStats.alloc_fail_cnt);
+    // printf("%lu\r\n", heapStats.reserved_size);
 
     //Step 12
     // Create updated estimate of covariance and state vector
-    Vector3f omegaTemp(xHat_k(0,0),xHat_k(1,0),xHat_k(2,0));
-    Vector3f rotTemp(xHat_k(3,0),xHat_k(4,0),xHat_k(5,0));
-    SatelliteState updatedStateEst(omegaTemp, rotVecToQ(rotTemp));
-
     returnKalman stateCov;
-    stateCov.stateEst = updatedStateEst;
+    stateCov.stateEst = step12(xHat_k);
     stateCov.covEst = P_k;
 
-    // printf("%f\r\n%f\r\n%f\r\n%f\r\n", qOut.w(), qOut.x(), qOut.y(), qOut.z());
+    // cout << P_k << endl;
+    // cout << "y" << endl;
+    // cout << K_k << endl;
     
     return stateCov;
 }
@@ -225,4 +230,11 @@ SatelliteState averageState(SatelliteState stateArr[12], Quaternionf avgCalcStar
 
     SatelliteState state(omegaAvg, q_tAvg);
     return state;
+}
+
+SatelliteState step12(MatrixXf xHat_k) {
+    Vector3f omegaTemp(xHat_k(0,0),xHat_k(1,0),xHat_k(2,0));
+    Vector3f rotTemp(xHat_k(3,0),xHat_k(4,0),xHat_k(5,0));
+    SatelliteState updatedStateEst(omegaTemp, rotVecToQ(rotTemp));
+    return updatedStateEst;
 }
