@@ -52,37 +52,54 @@ void ADCS::attitudeDetermination() {
 
   // initial orientation
   imu.readMag(magData);
+  imu.readGyro(gyroData);
   printf("Waiting for IMU warmup\n");
   ThisThread::sleep_for(10s);
   imu.readMag(magData);
+  imu.readGyro(gyroData);
   imu.get_Euler_Angles(&eulerData);
   imu.get_quaternion(&quatData);
   
   // code to read photodiodes
   volts = photodiodes.getVoltages();
 
-  //Kalman filter stuff
-  SatelliteState currentState(0,0,0,1,0,0,0);
-  MatrixXf stateCovariance{{0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0}};
-  MatrixXf procNoiseCovariance{{.1,.1,.1,.1,.1,.1},
-                               {.1,.1,.1,.1,.1,.1},
-                               {.1,.1,.1,.1,.1,.1},
-                               {.1,.1,.1,.1,.1,.1},
-                               {.1,.1,.1,.1,.1,.1},
-                               {.1,.1,.1,.1,.1,.1}};
-  Matrix3f magneticCovMat{{ 0.29629224,  0.2503048,  -0.38154479},
-                          { 0.2503048,   0.21185839, -0.32251307},
-                          {-0.38154479, -0.32251307,  0.49184944}};
-  Matrix3f sunCovMat{{ 0.36135865,  0.45814491, -0.12726127},
-                     { 0.45814491,  0.58427518, -0.16126741},
-                     {-0.12726127, -0.16126741,  0.05436621}};
+  // Kalman filter 1 stuff
+  // SatelliteState currentState(0,0,0,1,0,0,0);
+  // MatrixXf stateCovariance{{0, 0, 0, 0, 0, 0},
+  //                          {0, 0, 0, 0, 0, 0},
+  //                          {0, 0, 0, 0, 0, 0},
+  //                          {0, 0, 0, 0, 0, 0},
+  //                          {0, 0, 0, 0, 0, 0},
+  //                          {0, 0, 0, 0, 0, 0}};
+  // MatrixXf procNoiseCovariance{{.1,.1,.1,.1,.1,.1},
+  //                              {.1,.1,.1,.1,.1,.1},
+  //                              {.1,.1,.1,.1,.1,.1},
+  //                              {.1,.1,.1,.1,.1,.1},
+  //                              {.1,.1,.1,.1,.1,.1},
+  //                              {.1,.1,.1,.1,.1,.1}};
+  // Matrix3f magneticCovMat{{ 0.29629224,  0.2503048,  -0.38154479},
+  //                         { 0.2503048,   0.21185839, -0.32251307},
+  //                         {-0.38154479, -0.32251307,  0.49184944}};
+  // Matrix3f sunCovMat{{ 0.36135865,  0.45814491, -0.12726127},
+  //                    { 0.45814491,  0.58427518, -0.16126741},
+  //                    {-0.12726127, -0.16126741,  0.05436621}};
+
+  //Kalman filter 2 stuff
   Vector3f magi(magData.x, magData.y, magData.z);
   Vector3f suni(volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
+  Vector3f magiNorm = magi.normalized();
+  Vector3f suniNorm = suni.normalized();
+
+  Vector3f wk_B2I_B(gyroData.x, gyroData.y, gyroData.z);
+  Quaternionf qk_I2B(1,0,0,0);
+  Vector3f biask(0,0,0);
+  bool eclp = true;
+  float dt = .25;
+  float sig_r = .1; // standard deviation of noise
+  float sig_w = .05; // standard deviation of bias
+  Matrix3f R_ss = .5*Matrix3f::Identity();
+  Matrix3f R_m = .1*Matrix3f::Identity(); // IF THE FACTOR IS EXTREMELY HIGH IT WILL STAY STABLE FOR LONGER, BUT ANY MOTION STILL HAS ERRONEOUS RESULTS
+  MatrixXf Pk = MatrixXf::Identity(6,6);
 
   while (true) { 
     // using namespace std::chrono_literals;
@@ -98,8 +115,9 @@ void ADCS::attitudeDetermination() {
     //     break;
     // }
 
-    // code to read magnetometer
+    // code to read BNO055 sensor
     imu.readMag(magData);
+    imu.readGyro(gyroData);
     imu.get_Euler_Angles(&eulerData);
     imu.get_quaternion(&quatData);
 
@@ -107,47 +125,51 @@ void ADCS::attitudeDetermination() {
     volts = photodiodes.getVoltages();
 
     // Create vectors from measurements
-    Vector3f magf(magData.x, magData.y, magData.z);
+    Vector3f magf(magData.x, magData.y, magData.z); //  units of mG???
     Vector3f sunf(volts->volt_pos_x, volts->volt_pos_y, -1* volts->volt_pos_z);
+    Vector3f omega(gyroData.x, gyroData.y, gyroData.z); // units of degrees per second
+    omega *= (PI / 180.0);
     Vector3f magfNorm = magf.normalized();
     Vector3f sunfNorm = sunf.normalized();
-    Vector3f magiNorm = magi.normalized();
 
+    printf("x\r\n");
     // Code to determine orientation (only for mag sensor right now)
-    returnKalman stateStruct = qFilter(currentState,
-                                       stateCovariance, 
-                                       procNoiseCovariance,
-                                       magneticCovMat,
-                                       magiNorm,
-                                       magfNorm,
-                                       .1);
-    currentState = stateStruct.stateEst;
-    stateCovariance = stateStruct.covEst;
-    Quaternionf qAttitude = currentState.getQ();
+    ReturnKalman returnVars =  multiplicativeFilter(
+      omega, 
+      qk_I2B,
+      biask, 
+      sunfNorm, 
+      suniNorm,
+      eclp,
+      magfNorm,
+      magiNorm,
+      dt,
+      sig_r,
+      sig_w,
+      R_ss,
+      R_m,
+      Pk
+    );
+
+    wk_B2I_B = returnVars.wk1_B2I_B;
+    qk_I2B = returnVars.qk1_I2B;
+    biask = returnVars.biask1;
+    Pk = returnVars.Pk1;
      
     // Quaternionf qAttitude = determineAttitude(magi.normalized(), magfNorm, suni.normalized(), sunfNorm);
 
-    // Print statements
-    // printf("Mag Data X: %lf, Y: %lf, Z: %lf\r\n", magData.x, magData.y, magData.z);
-    // printf("Mag Data X Norm: %lf, Y: %lf, Z: %lf\r\n", magfNorm[0], magfNorm[1], magfNorm[2]);
-    // printf("Euler Angle Heading: %lf, Pitch: %lf, Roll: %lf\r\n", eulerData.h, eulerData.p, eulerData.r); //from imu
-    //printf("Calculated Attitude Euler X: %lf, Y: %lf, Z: %lf\r\n", eulerAttitude[0], eulerAttitude[1], eulerAttitude[2]); // from math
-
-    //printf("Quat Data X: %lf, Y: %lf, Z: %lf, W: %lf\r\n", quatData.x, quatData.y, quatData.z, quatData.w);// from imu
-    // printf("Photodiodes X: %f, Y: %f, Z: %f\r\n", volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
-    // printf("Photodiodes Norm X: %f, Y: %f, Z: %f\r\n", sunfNorm[0], sunfNorm[1], sunfNorm[2]);
-    // printf("Calculated Attitude Quaternion W: %lf, X: %lf, Y: %lf, Z: %lf\r\n", qAttitude.w(), qAttitude.x(), qAttitude.y(), qAttitude.z()); //from math
-    // printf("\n\n"); 
-
 
     // Print statements for pyserial
-    printf("x\r\n");
-    // printf("%f\r\n%f\r\n%f\r\n", sunfNorm[0], sunfNorm[1], sunfNorm[2]);
-    // printf("%f\r\n%f\r\n%f\r\n", magfNorm[0], magfNorm[1], magfNorm[2]);
-    // printf("%lf\n\r", volts->volt_pos_x);
-    // printf("%f\r\n%f\r\n%f\r\n%f\r\n", qAttitude.w(), qAttitude.x(), qAttitude.y(), qAttitude.z());
+    // cout << "omega" << endl;
+    // cout << omega << endl;
+    // cout << "wk_B2I_B" << endl;
+    // cout << wk_B2I_B << endl;
+    // cout << "biask" << endl;
+    // cout << biask << endl;
+    // cout << qk_I2B << endl;
+    cout << magfNorm << endl;
 
-    ThisThread::sleep_for(100ms);
+    ThisThread::sleep_for(250ms);
 
     // time_t endTime = time();
     // printf("Took %d seconds to run loop", endTime - startTime);

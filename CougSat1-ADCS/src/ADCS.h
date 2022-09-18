@@ -8,9 +8,11 @@
 #include "vectorFunctions.h"
 #include <BNO055.h>
 #include <photodiode.h>
-#include "kalmanFilter.h"
+#include "kalmanFilterMultiplicative.h"
 
 using namespace std;
+
+#define PI 3.141592653589793238
 
 class ADCS {
 private:
@@ -25,6 +27,7 @@ private:
   uint32_t stackSize = 8192;
 
   IMUValueSet_t magData;
+  IMUValueSet_t gyroData;
   BNO055_EULER_TypeDef eulerData;
   BNO055_QUATERNION_TypeDef quatData;
   voltages* volts;
