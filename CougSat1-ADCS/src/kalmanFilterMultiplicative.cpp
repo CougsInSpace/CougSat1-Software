@@ -94,9 +94,9 @@ ReturnKalman multiplicativeFilter(Vector3f wk_B2I_B,
     // End
 
     Vector3f del_qk1_vec;
-    del_qk1_vec(0) = delX(0);
-    del_qk1_vec(1) = delX(1);
-    del_qk1_vec(2) = delX(2);
+    del_qk1_vec(0) = .5*delX(0);
+    del_qk1_vec(1) = .5*delX(1);
+    del_qk1_vec(2) = .5*delX(2);
 
     float del_qk1_ns = del_qk1_vec.squaredNorm();
     Quaternionf del_qk1;
@@ -106,7 +106,7 @@ ReturnKalman multiplicativeFilter(Vector3f wk_B2I_B,
     } else {
         del_qk1.coeffs() << del_qk1_vec, sqrt(1 - del_qk1_ns);
     }
-    Quaternionf qk1_I2B_Corrected = del_qk1 * qk1_I2B;
+    Quaternionf qk1_I2B_Corrected =  del_qk1*qk1_I2B;
 
     biask1(0) += delX(3);
     biask1(1) += delX(4);

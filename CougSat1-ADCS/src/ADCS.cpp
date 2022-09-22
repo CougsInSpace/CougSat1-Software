@@ -104,12 +104,12 @@ void ADCS::attitudeDetermination() {
   while (true) { 
     // using namespace std::chrono_literals;
 
-    // std::future<int> threadObj = std::async(test_func);
+    // std::future<int> threadObj = std::async(test_func); // Start thread running
     // std::this_thread::sleep_for(std::chrono::milliseconds(100)); //may need to be adjusted
 
-    // std::future_status status = threadObj.wait_for(0ms);
-    // if (status == std::future_status::ready) {
-    //     int result = threadObj.get();
+    // std::future_status status = threadObj.wait_for(0ms); // check if thread is done
+    // if (status == std::future_status::ready) { 
+    //     int result = threadObj.get(); // join thread
     // } else {
     //     std::cout<<"TODO: attitudeDeterminationLoop took too long, error"<<std::endl;
     //     break;
@@ -162,14 +162,16 @@ void ADCS::attitudeDetermination() {
     // Print statements for pyserial
     // cout << "omega" << endl;
     // cout << omega << endl;
-    // cout << "wk_B2I_B" << endl;
-    // cout << wk_B2I_B << endl;
+    cout << "wk_B2I_B" << endl;
+    cout << wk_B2I_B << endl;
     // cout << "biask" << endl;
     // cout << biask << endl;
-    // cout << qk_I2B << endl;
-    cout << magfNorm << endl;
+    // cout << magfNorm << endl;
+    cout << qk_I2B.coeffs() << endl;
 
-    ThisThread::sleep_for(250ms);
+    // cout << magfNorm << endl;
+
+    ThisThread::sleep_for(100ms);
 
     // time_t endTime = time();
     // printf("Took %d seconds to run loop", endTime - startTime);

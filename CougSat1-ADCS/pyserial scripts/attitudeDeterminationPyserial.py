@@ -24,69 +24,32 @@ fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
 
 # Orientation plotting
-# axes = np.array([[1,0,0], [0,1,0], [0,0,1]])
-# for i in range(1000):
-#     vec1 = [0,0,0]
-#     for j in range(3):
-#         line = ser.readline()
-#         string = line.decode().strip()
-#         vec1[j] = float(string)
-
-    # vec2 = [0,0,0]
-    # for j in range(3):
-    #     line = ser.readline()
-    #     string = line.decode().strip()
-    #     vec2[j] = float(string)
-
-    # vec3 = [0,0,0,0]
-    # for j in range(4):
-    #     line = ser.readline()
-    #     string = line.decode().strip()
-    #     vec3[j] = float(string)
-    # ser.readline() # move past "x" in serial output
-
-    # q = quaternion.from_float_array([vec3[3], vec3[0], vec3[1], vec3[2]])
-    # r = quaternion.as_rotation_matrix(q)
-
-    # axesT = axes @ r
-
-    # plt.cla()
-    # ax.set_xlim(-1, 1)
-    # ax.set_ylim(-1, 1)
-    # ax.set_zlim(-1, 1)
-    # ax.set_xlabel('x')
-    # ax.set_ylabel('y')
-    # ax.set_zlabel('z')
-
-    # ax.quiver(0, 0, 0, axes[0,:], axes[1,:], axes[2,:])
-    # ax.quiver(0, 0, 0, axesT[0,:], axesT[1,:], axesT[2,:], colors="red")
-    # ax.quiver(0, 0, 0, vec1[0], vec1[1], vec1[2], colors="yellow")
-    # ax.quiver(0, 0, 0, vec2[0], vec2[1], vec2[2], colors="green")
-
-    # plt.pause(.05)
-
-
-
-
-
-
-# Plotting one vector
-dataList = []
+axes = np.array([[1,0,0], [0,1,0], [0,0,1]])
 for i in range(1000):
-    vec = [0,0,0]
+    vec1 = [0,0,0]
     for j in range(3):
         line = ser.readline()
         string = line.decode().strip()
-        if len(string) > 2:
-            vec[j] = float(string)
-    ser.readline() # move past "x" in serial output
-            
-    dataList.append(vec)
-    plotList = np.array(dataList)
+        vec1[j] = float(string)
 
-    x = plotList[:, 0]
-    y = plotList[:, 1]
-    z = plotList[:, 2]
+    vec2 = [0,0,0]
+    for j in range(3):
+        line = ser.readline()
+        string = line.decode().strip()
+        vec2[j] = float(string)
+
+    vec3 = [0,0,0,0]
+    for j in range(4):
+        line = ser.readline()
+        string = line.decode().strip()
+        vec3[j] = float(string)
+    ser.readline() # move past "x" in serial output
+
+    q = quaternion.from_float_array([vec3[3], vec3[0], vec3[1], vec3[2]])
+    r = quaternion.as_rotation_matrix(q)
+
+    axesT = axes @ r
+
     plt.cla()
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
@@ -94,8 +57,45 @@ for i in range(1000):
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
-    ax.quiver([0],[0],[0], [x[-1]], [y[-1]], [z[-1]])
+
+    ax.quiver(0, 0, 0, axes[0,:], axes[1,:], axes[2,:])
+    ax.quiver(0, 0, 0, axesT[0,:], axesT[1,:], axesT[2,:], colors="red")
+    ax.quiver(0, 0, 0, vec1[0], vec1[1], vec1[2], colors="yellow")
+    ax.quiver(0, 0, 0, vec2[0], vec2[1], vec2[2], colors="green")
+
     plt.pause(.05)
+
+
+
+
+
+
+# Plotting one vector
+# dataList = []
+# for i in range(1000):
+#     vec = [0,0,0]
+#     for j in range(3):
+#         line = ser.readline()
+#         string = line.decode().strip()
+#         if len(string) > 2:
+#             vec[j] = float(string)
+#     ser.readline() # move past "x" in serial output
+            
+#     dataList.append(vec)
+#     plotList = np.array(dataList)
+
+#     x = plotList[:, 0]
+#     y = plotList[:, 1]
+#     z = plotList[:, 2]
+#     plt.cla()
+#     ax.set_xlim(-1, 1)
+#     ax.set_ylim(-1, 1)
+#     ax.set_zlim(-1, 1)
+#     ax.set_xlabel('x')
+#     ax.set_ylabel('y')
+#     ax.set_zlabel('z')
+#     ax.quiver([0],[0],[0], [x[-1]], [y[-1]], [z[-1]])
+#     plt.pause(.05)
 
 # Plotting two vectors
 # data1List = []
