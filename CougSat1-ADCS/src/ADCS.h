@@ -13,6 +13,7 @@
 // #include <Eigen.h>
 
 using namespace std;
+using namespace IMU_EKF;
 
 #define PI 3.141592653589793238
 

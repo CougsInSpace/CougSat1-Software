@@ -90,17 +90,26 @@ void ADCS::attitudeDetermination() {
   Vector3f magiNorm = magi.normalized();
   Vector3f suniNorm = suni.normalized();
 
-  Vector3f wk_B2I_B(gyroData.x, gyroData.y, gyroData.z);
-  Quaternionf qk_I2B(1,0,0,0);
-  Vector3f biask(0,0,0);
+  // Vector3f wk_B2I_B(gyroData.x, gyroData.y, gyroData.z);
+  // Quaternionf qk_I2B(1,0,0,0);
+  // Vector3f biask(0,0,0);
   bool eclp = true;
   float dt = .25;
-  float sig_r = .1; // standard deviation of noise
-  float sig_w = .05; // standard deviation of bias
-  Matrix3f R_ss = .5*Matrix3f::Identity();
-  Matrix3f R_m = .1*Matrix3f::Identity(); // IF THE FACTOR IS EXTREMELY HIGH IT WILL STAY STABLE FOR LONGER, BUT ANY MOTION STILL HAS ERRONEOUS RESULTS
-  MatrixXf Pk = MatrixXf::Identity(6,6);
+  // float sig_r = .1; // standard deviation of noise
+  // float sig_w = .05; // standard deviation of bias
+  // Matrix3f R_ss = .5*Matrix3f::Identity();
+  // Matrix3f R_m = .1*Matrix3f::Identity(); // IF THE FACTOR IS EXTREMELY HIGH IT WILL STAY STABLE FOR LONGER, BUT ANY MOTION STILL HAS ERRONEOUS RESULTS
+  // MatrixXf Pk = MatrixXf::Identity(6,6);
 
+  Eigen::Matrix<float, 3, 3> W;
+  W << 0,0,0,0,0,0,0,0,0;
+  Eigen::Matrix<float, 3, 1> V;
+  V << 0,0,0;
+  float incl = 0; //  no idea what this is
+  float B = 1; // geomagnetic field strength
+
+  IMU_EKF::ESKF<float> kalmanFilter;
+  kalmanFilter.initWithAccAndMag(suni(0), suni(1), suni(2), magi(0), magi(1), magi(2), W.inverse(), V);
   while (true) { 
     // using namespace std::chrono_literals;
 
@@ -133,28 +142,39 @@ void ADCS::attitudeDetermination() {
     Vector3f sunfNorm = sunf.normalized();
 
     printf("x\r\n");
-    // Code to determine orientation (only for mag sensor right now)
-    ReturnKalman returnVars =  multiplicativeFilter(
-      omega, 
-      qk_I2B,
-      biask, 
-      sunfNorm, 
-      suniNorm,
-      eclp,
-      magfNorm,
-      magiNorm,
-      dt,
-      sig_r,
-      sig_w,
-      R_ss,
-      R_m,
-      Pk
-    );
+    kalmanFilter.predict(dt);
+    kalmanFilter.correctGyr(omega(0), omega(1), omega(2));
+    if (eclp == false) {
+      kalmanFilter.correctAcc(sunfNorm(0), sunfNorm(1), sunfNorm(2));
+    }
+    kalmanFilter.correctMag(magfNorm(0), magfNorm(1), magfNorm(2), incl, B, W, V);
+    kalmanFilter.reset();
 
-    wk_B2I_B = returnVars.wk1_B2I_B;
-    qk_I2B = returnVars.qk1_I2B;
-    biask = returnVars.biask1;
-    Pk = returnVars.Pk1;
+    IMU_EKF::Quaternion<float> qEKF = kalmanFilter.getAttitude(); // order xyzw
+    Quaternionf q(qEKF[w],qEKF[v1], qEKF[v2], qEKF[v3]);
+
+    // Code to determine orientation (only for mag sensor right now)
+    // ReturnKalman returnVars =  multiplicativeFilter(
+    //   omega, 
+    //   qk_I2B,
+    //   biask, 
+    //   sunfNorm, 
+    //   suniNorm,
+    //   eclp,
+    //   magfNorm,
+    //   magiNorm,
+    //   dt,
+    //   sig_r,
+    //   sig_w,
+    //   R_ss,
+    //   R_m,
+    //   Pk
+    // );
+
+    // wk_B2I_B = returnVars.wk1_B2I_B;
+    // qk_I2B = returnVars.qk1_I2B;
+    // biask = returnVars.biask1;
+    // Pk = returnVars.Pk1;
      
     // Quaternionf qAttitude = determineAttitude(magi.normalized(), magfNorm, suni.normalized(), sunfNorm);
 
@@ -162,16 +182,16 @@ void ADCS::attitudeDetermination() {
     // Print statements for pyserial
     // cout << "omega" << endl;
     // cout << omega << endl;
-    cout << "wk_B2I_B" << endl;
-    cout << wk_B2I_B << endl;
-    // cout << "biask" << endl;
-    // cout << biask << endl;
-    // cout << magfNorm << endl;
-    cout << qk_I2B.coeffs() << endl;
+    // cout << "wk_B2I_B" << endl;
+    // cout << wk_B2I_B << endl;
+    // // cout << "biask" << endl;
+    // // cout << biask << endl;
+    // // cout << magfNorm << endl;
+    cout << q.coeffs() << endl;
 
     // cout << magfNorm << endl;
 
-    ThisThread::sleep_for(100ms);
+    ThisThread::sleep_for(250ms);
 
     // time_t endTime = time();
     // printf("Took %d seconds to run loop", endTime - startTime);

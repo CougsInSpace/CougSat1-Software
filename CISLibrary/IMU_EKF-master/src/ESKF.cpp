@@ -5,7 +5,7 @@
 #include "utilities.h"
 
 #include "..\..\CISLibrary\Eigen\Eigen_Repo\Eigen\LU"
-#include <Wire.h>
+// #include <Wire.h>
 
 #ifndef SGN
 #define SGN(X) ((X > 0) - (X < 0))
