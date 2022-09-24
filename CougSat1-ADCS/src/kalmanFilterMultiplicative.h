@@ -5,6 +5,7 @@
 // #include "../../CISLibrary/Eigen/Geometry"
 // #include "../../CISLibrary/Eigen/Cholesky"
 #include <Eigen.h>
+#include "..\..\CISLibrary\Eigen\Eigen_Repo\Eigen\Geometry"
 #include "satelliteState.h"
 
 using Eigen::MatrixXd;

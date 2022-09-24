@@ -4,7 +4,7 @@
 #include "ESKF.h"
 #include "utilities.h"
 
-#include <Eigen/LU>
+#include "..\..\CISLibrary\Eigen\Eigen_Repo\Eigen\LU"
 #include <Wire.h>
 
 #ifndef SGN

@@ -1,8 +1,10 @@
 #ifndef SatelliteState_H
 #define SatelliteState_H
 
-#include "../Eigen/Dense"
-#include "../Eigen/Geometry"
+// #include "../Eigen/Dense"
+// #include "../Eigen/Geometry"
+#include <Eigen.h>
+#include "..\..\CISLibrary\Eigen\Eigen_Repo\Eigen\Geometry"
 #include <iostream>
 
 using Eigen::MatrixXd;

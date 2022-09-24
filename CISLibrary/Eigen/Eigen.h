@@ -58,7 +58,7 @@ namespace std {
 }
 
 // Include main EIGEN Core header
-#include <Eigen/Core>
+#include "Eigen_Repo/Eigen/Core"
 
 #ifdef NEED_A0_RESTORED
 # define A0 NEED_A0_RESTORED
