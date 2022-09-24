@@ -1,9 +1,10 @@
 #ifndef kalmanFilter_H_
 #define kalmanFilter_H_
 
-#include "../../CISLibrary/Eigen/Dense"
-#include "../../CISLibrary/Eigen/Geometry"
-#include "../../CISLibrary/Eigen/Cholesky"
+// #include "../../CISLibrary/Eigen/Dense"
+// #include "../../CISLibrary/Eigen/Geometry"
+// #include "../../CISLibrary/Eigen/Cholesky"
+#include <Eigen.h>
 #include "satelliteState.h"
 
 using Eigen::MatrixXd;
