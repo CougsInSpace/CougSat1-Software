@@ -9,7 +9,7 @@
 #define TEST_IHU_ADDRESS 0xAC
 #define BUS_I2C0_SDA PinName(25)
 #define BUS_I2C0_SCL PinName(24)
-ADCS::ADCS(float dtInit) : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL), sensorBus(D14,D15), imu(sensorBus,NC,(0X28<<1)) {
+ADCS::ADCS(float dtInit) : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL), sensorBus(D14,D15), imu(sensorBus,NC,(0X28<<1)), coilX(COIL_X_FWD, COIL_X_REV, COIL_X_SLEEP_N) coilY(COIL_Y_FWD, COIL_Y_REV, COIL_Y_SLEEP_N), coilZ(COIL_Z_FWD, COIL_Z_REV, COIL_Z_SLEEP_N) {
   this->dt = dtInit;
   // monitor.set_priority(osPriorityNormal);
   // cdhRead.set_priority(osPriorityNormal);
@@ -209,7 +209,7 @@ void ADCS::attitudeDetermination() {
 }
 
 void ADCS::attitudeControl() {
-
+  
 }
 
 /**

@@ -11,6 +11,8 @@
 #include "kalmanFilterMultiplicative.h"
 // #include <ESKF.h>
 // #include <Eigen.h>
+#include "DRV8837.h"
+#include "PinNames.h"
 
 using namespace std;
 // using namespace IMU_EKF;
@@ -29,6 +31,10 @@ private:
   I2C    sensorBus;
   BNO055 imu;
   uint32_t stackSize = 8192;
+
+  DRV8837 coilX;
+  DRV8837 coilY;
+  DRV8837 coilZ;
 
   IMUValueSet_t magData;
   IMUValueSet_t gyroData;
