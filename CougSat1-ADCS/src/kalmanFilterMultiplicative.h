@@ -5,37 +5,37 @@
 // #include "../../CISLibrary/Eigen/Geometry"
 // #include "../../CISLibrary/Eigen/Cholesky"
 #include <Eigen.h>
-#include "..\..\CISLibrary\Eigen\Eigen_Repo\Eigen\Geometry"
+// #include "..\..\CISLibrary\Eigen\Eigen_Repo\Eigen\Geometry"
 #include "satelliteState.h"
 
 using Eigen::MatrixXd;
-using Eigen::Quaternion;
+using Eigen::Quaterniond;
 using namespace Eigen;
 using namespace std;
 
 struct ReturnKalman {
-    Vector3f wk1_B2I_B;
-    Quaternionf qk1_I2B;
-    Vector3f biask1;
-    MatrixXf Pk1;
+    Vector3d wk1_B2I_B;
+    Quaterniond qk1_I2B;
+    Vector3d biask1;
+    MatrixXd Pk1;
 };
 
-ReturnKalman multiplicativeFilter(Vector3f wk_B2I_B, 
-    Quaternionf qk_I2B,
-    Vector3f biask, 
-    Vector3f SMeas, 
-    Vector3f SRef,
+ReturnKalman multiplicativeFilter(Vector3d wk_B2I_B, 
+    Quaterniond qk_I2B,
+    Vector3d biask, 
+    Vector3d SMeas, 
+    Vector3d SRef,
     bool eclp,
-    Vector3f BMeas,
-    Vector3f BRef,
+    Vector3d BMeas,
+    Vector3d BRef,
     float dt,
     float sig_r,
     float sig_w,
-    Matrix3f R_ss,
-    Matrix3f R_m,
-    MatrixXf Pk);
-Matrix3f skew(Vector3f vec);
-MatrixXf construct6by6(Matrix3f mat_11, Matrix3f mat_12, Matrix3f mat_21, Matrix3f mat_22);
+    Matrix3d R_ss,
+    Matrix3d R_m,
+    MatrixXd Pk);
+Matrix3d skew(Vector3d vec);
+MatrixXd construct6by6(Matrix3d mat_11, Matrix3d mat_12, Matrix3d mat_21, Matrix3d mat_22);
 int factorial(int x);
 
 #endif

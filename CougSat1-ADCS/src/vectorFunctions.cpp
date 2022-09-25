@@ -85,8 +85,6 @@ Vector4f rodRotation(Vector3f a, Vector3f aT) {
 
 
 
-
-
 Quaternionf determineAttitude(Vector3f x1i, Vector3f x1f, Vector3f x2i, Vector3f x2f) {
     // find simple axis-angle between x1i and x1f
     Vector3f ax1 = x1i.cross(x1f);

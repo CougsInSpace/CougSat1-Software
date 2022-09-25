@@ -1,10 +1,8 @@
 #ifndef ESKF_IMPL
 #define ESKF_IMPL
-
+// CHANGE EVERYTHING TO USING EIEGEN MATR9X AND VECOTR
 #include "ESKF.h"
-#include "utilities.h"
-
-#include "..\..\CISLibrary\Eigen\Eigen_Repo\Eigen\LU"
+// #include "utilities.h"
 // #include <Wire.h>
 
 #ifndef SGN
@@ -39,7 +37,7 @@ ESKF<precision>::ESKF()
 template <typename precision>
 void ESKF<precision>::init()
 {
-    qref_ = Quaternion<precision>();
+    Eigen::Quaternion<precision> qref_;
     x_.setZero();
     P_.setIdentity();
     Q_.setIdentity();
@@ -84,15 +82,20 @@ void ESKF<precision>::initWithAcc(const float ax, const float ay, const float az
     // see https://cache.freescale.com/files/sensors/doc/app_note/AN3461.pdf
     // rotation sequence R = Rx * Ry * Rz
     // eq. 38
-    precision roll = std::atan2(ay, SGN(-az) * std::sqrt(az * az + 0.01 * ax * ax));
+    float roll = std::atan2(ay, SGN(-az) * std::sqrt(az * az + 0.01 * ax * ax));
     // eq. 37
-    precision pitch = std::atan(-ax / std::sqrt(ay * ay + az * az));
+    float pitch = std::atan(-ax / std::sqrt(ay * ay + az * az));
 
-    precision sr05 = std::sin(0.5 * roll);
-    precision cr05 = std::cos(0.5 * roll);
-    precision sp05 = std::sin(0.5 * pitch);
-    precision cp05 = std::cos(0.5 * pitch);
-    qref_ = Quaternion<precision>(sr05, 0, 0, cr05) * Quaternion<precision>(0, sp05, 0, cp05);
+    float sr05 = std::sin(0.5 * roll);
+    float cr05 = std::cos(0.5 * roll);
+    float sp05 = std::sin(0.5 * pitch);
+    float cp05 = std::cos(0.5 * pitch);
+
+    Eigen::Quaternion<precision> q_1(cr05, sr05, 0, 0);
+    Eigen::Quaternion<precision> q_2(cp05, 0, sp05, 0);
+
+    qref_ = q_1 * q_2;
+    
 }
 
 template <typename precision>
@@ -103,16 +106,16 @@ void ESKF<precision>::initWithAccAndMag(const float ax, const float ay, const fl
     // see https://cache.freescale.com/files/sensors/doc/app_note/AN3461.pdf
     // rotation sequence R = Rx * Ry * Rz
     // eq. 38
-    precision roll = std::atan2(ay, SGN(-az) * std::sqrt(az * az + 0.01 * ax * ax));
+    float roll = std::atan2(ay, SGN(-az) * std::sqrt(az * az + 0.01 * ax * ax));
     // eq. 37
-    precision pitch = std::atan(-ax / std::sqrt(ay * ay + az * az));
+    float pitch = std::atan(-ax / std::sqrt(ay * ay + az * az));
 
     // see https://www.nxp.com/docs/en/application-note/AN4246.pdf
     // eq. 6 - 10
-    precision sr = std::sin(roll);
-    precision cr = std::cos(roll);
-    precision sp = std::sin(pitch);
-    precision cp = std::cos(pitch);
+    float sr = std::sin(roll);
+    float cr = std::cos(roll);
+    float sp = std::sin(pitch);
+    float cp = std::cos(pitch);
 
     Eigen::Matrix<precision, 3, 3> RxT;
     RxT << 1, 0, 0,
@@ -129,24 +132,30 @@ void ESKF<precision>::initWithAccAndMag(const float ax, const float ay, const fl
     Eigen::Matrix<precision, 3, 1> Bf;
     Bf = RyT * RxT * Winv * (Bp - V);
 
-    precision yaw = -atan2(-Bf(1), Bf(0));
+    float yaw = -atan2(-Bf(1), Bf(0));
 
-    precision sr05 = std::sin(0.5 * roll);
-    precision cr05 = std::cos(0.5 * roll);
-    precision sp05 = std::sin(0.5 * pitch);
-    precision cp05 = std::cos(0.5 * pitch);
-    precision sy05 = std::sin(0.5 * yaw);
-    precision cy05 = std::cos(0.5 * yaw);
+    float sr05 = std::sin(0.5 * roll);
+    float cr05 = std::cos(0.5 * roll);
+    float sp05 = std::sin(0.5 * pitch);
+    float cp05 = std::cos(0.5 * pitch);
+    float sy05 = std::sin(0.5 * yaw);
+    float cy05 = std::cos(0.5 * yaw);
 
-    qref_ = Quaternion<precision>(sr05, 0, 0, cr05) * Quaternion<precision>(0, sp05, 0, cp05) * Quaternion<precision>(0, 0, sy05, cy05);
+    Eigen::Quaternion<precision> q_1(cr05, sr05, 0, 0);
+    Eigen::Quaternion<precision> q_2(cp05, 0, sp05, 0);
+    Eigen::Quaternion<precision> q_3 (cy05, 0, 0, sy05);
+
+    qref_ = q_1 * q_2 * q_3;
+    // qref_ = Eigen::Quaternion<precision> * Eigen::Quaternion<precision>(cp05, 0, sp05, 0) * Eigen::Quaternion<precision>(cy05, 0, 0, sy05);
 }
 
 template <typename precision>
 void ESKF<precision>::predict(precision dt)
 {
     // eq. 23
-    Quaternion<precision> angular_velocity_quat(x_[12], x_[13], x_[14], 0);
-    qref_ += dt * ((0.5 * angular_velocity_quat) * qref_);
+    Eigen::Quaternion<precision> angular_velocity_quat(0, .5*x_[12], .5*x_[13], .5*x_[14]);
+    Eigen::Quaternion<precision> dtq(dt, 0, 0, 0);
+    qref_.coeffs() = qref_.coeffs() + (dtq * ((angular_velocity_quat) * qref_)).coeffs();
     qref_.normalize();
 
     Eigen::Matrix<precision, 9, 9> A;
@@ -168,8 +177,8 @@ void ESKF<precision>::predict(precision dt)
     Eigen::Matrix<precision, 3, 1> angular_velocity = x_.segment(12, 3);
     Eigen::Matrix<precision, 3, 1> error = x_.segment(9, 3);
     Eigen::Matrix<precision, 6, 6> Jac = Eigen::Matrix<precision, 6, 6>::Zero();
-    Jac.topLeftCorner(3, 3) = toCrossMatrix<precision>(error);
-    Jac.topRightCorner(3, 3) = -toCrossMatrix<precision>(angular_velocity);
+    Jac.topLeftCorner(3, 3) = this->toCrossMatrix(error);
+    Jac.topRightCorner(3, 3) = -this->toCrossMatrix(angular_velocity);
     // eq. 39
     Eigen::Matrix<precision, 6, 6> G = Eigen::Matrix<precision, 6, 6>::Identity();
     G.bottomRightCorner(3, 3) *= -1;
@@ -184,34 +193,35 @@ void ESKF<precision>::correctGyr(const float gx, const float gy, const float gz)
     // z
     Eigen::Matrix<precision, MEASSUREMENT_GYR_SIZE, 1> z;
     z << gx * DEG_TO_RAD, gy * DEG_TO_RAD, gz * DEG_TO_RAD;
-
+    cout << "jjjjjjj" << endl;
     // Kalman Gain
     // K = P * H' (H * P * H' + V * R * V')^-
     // H = eye(3)
     Eigen::Matrix<precision, 3, MEASSUREMENT_GYR_SIZE> K;
     K = P_.bottomRightCorner(3, 3) * (P_.bottomRightCorner(3, 3) + R_Gyr_).inverse();
-
+    cout << "jjjjjjj" << endl;
     // x = x + K * (z - H * x)
     x_.segment(12, 3) += K * (z - x_.segment(12, 3));
-
+    cout << "jjjjjjj" << endl;
     // P = (I - KH)P
     Eigen::Matrix<precision, 3, 3> IKH = Eigen::Matrix<precision, 3, 3>::Identity();
     IKH -= K;
-
+    cout << "jjjjjjj" << endl;
     P_.bottomRightCorner(3, 3) = IKH * P_.bottomRightCorner(3, 3);
 }
 
 template <typename precision>
-void ESKF<precision>::correctAcc(const float ax, const float ay, const float az)
+void ESKF<precision>::correctMeasurement(const float mxi, const float myi, const float mzi, const float mxf, const float myf, const float mzf)
 {
     // z
     Eigen::Matrix<precision, MEASSUREMENT_ACC_SIZE, 1> z;
-    z << ax * G_TO_MS2, ay * G_TO_MS2, az * G_TO_MS2;
+    z << mxf * G_TO_MS2, myf * G_TO_MS2, mzf * G_TO_MS2;
 
     Eigen::Matrix<precision, 3, 1> gravity;
-    gravity << 0.0, 0.0, -9.81;
+    // gravity << 0.0, 0.0, -9.81; 
+    gravity << mxi, myi, mzi; //  not actually gravity
 
-    if (std::abs(z.norm() - 9.81) < 0.7)
+    if (false)//(std::abs(z.norm() - 9.81) < 0.7)
     {
         // set acc to zero
         // z
@@ -237,13 +247,13 @@ void ESKF<precision>::correctAcc(const float ax, const float ay, const float az)
 
         // eq. 42
         Eigen::Matrix<precision, 3, 1> error = x_.segment(9, 3);
-        // Eigen::Matrix<precision, 3, 3> Aa = toRotationMatrix<precision>(error);
+        // Eigen::Matrix<float, 3, 3> Aa = toRotationMatrix<float>(error); // commented out in original
         Eigen::Matrix<precision, 3, 3> Aq = qref_.toRotationMatrix();
         Eigen::Matrix<precision, 3, 1> vb_pred = Aq * vi;
 
         // H
         // eq. 44
-        Eigen::Matrix<precision, 3, 3> Ha = toCrossMatrix<precision>(vb_pred);
+        Eigen::Matrix<precision, 3, 3> Ha = this->toCrossMatrix(vb_pred);
 
         // eq. 46
         Eigen::Matrix<precision, 3, 3> K;
@@ -262,19 +272,21 @@ void ESKF<precision>::correctAcc(const float ax, const float ay, const float az)
 
         // eq. 42
         Eigen::Matrix<precision, 3, 1> error = x_.segment(9, 3);
-        Eigen::Matrix<precision, 3, 3> Aa = toRotationMatrix<precision>(error);
+        // Eigen::Vector<precision, 3> error = x_.segment(9,3);
+        Eigen::AngleAxis<precision> errorRot(error.norm(), error.normalized());
+        Eigen::Matrix<precision, 3, 3> Aa = errorRot.toRotationMatrix();
         Eigen::Matrix<precision, 3, 3> Aq = qref_.toRotationMatrix();
         Eigen::Matrix<precision, 3, 1> vb_pred = Aq * vi;
 
         // H
         // eq. 44
-        Eigen::Matrix<precision, 3, 6> H;
-        Eigen::Matrix<precision, 3, 3> Ha = toCrossMatrix<precision>(vb_pred);
+        Matrix<precision, 3, 6> H;
+        Eigen::Matrix<precision, 3, 3> Ha = this->toCrossMatrix(vb_pred);
         H.topLeftCorner(3, 3) = Aa * Aq;
         H.bottomRightCorner(3, 3) = Ha;
 
         // eq. 46
-        Eigen::Matrix<precision, 6, 3> K;
+        MatrixXf K(6,3);
         K = P_.block(6, 6, 6, 6) * H.transpose() * (H * P_.block(6, 6, 6, 6) * H.transpose() + R_Acc_).inverse();
 
         // eq. 47
@@ -290,7 +302,7 @@ template <typename precision>
 void ESKF<precision>::correctMag(const float mx, const float my, const float mz, const float incl, const float B, const Eigen::Matrix<precision, 3, 3> &W, const Eigen::Matrix<precision, 3, 1> &V)
 {
     // z
-    Eigen::Matrix<precision, MEASSUREMENT_MAG_SIZE, 1> z;
+    Eigen::Matrix<precision, 3, 1> z;
     z << mx, my, mz;
 
     Eigen::Matrix<precision, 3, 1> vi;
@@ -299,7 +311,7 @@ void ESKF<precision>::correctMag(const float mx, const float my, const float mz,
 
     // eq. 42
     Eigen::Matrix<precision, 3, 1> error = x_.segment(9, 3);
-    // Eigen::Matrix<precision, 3, 3> Aa = toRotationMatrix<precision>(error);
+    // Eigen::Matrix<float, 3, 3> Aa = toRotationMatrix<float>(error);
     Eigen::Matrix<precision, 3, 3> Aq = qref_.toRotationMatrix();
     Eigen::Matrix<precision, 3, 1> vb_pred = Aq * vi;
 
@@ -308,7 +320,7 @@ void ESKF<precision>::correctMag(const float mx, const float my, const float mz,
 
     // H
     // eq. 44
-    Eigen::Matrix<precision, 3, 3> Ha = W * toCrossMatrix<precision>(vb_pred);
+    Eigen::Matrix<precision, 3, 3> Ha = W * this->toCrossMatrix(vb_pred);
 
     // eq. 46
     Eigen::Matrix<precision, 3, 3> K;
@@ -325,7 +337,8 @@ template <typename precision>
 void ESKF<precision>::reset()
 {
     // eq. 21
-    qref_ = Quaternion<precision>(x_(9), x_(10), x_(11), 2.0) * qref_;
+    Eigen::Quaternion<precision> qUpdate(2.0, x_(9), x_(10), x_(11));
+    qref_ = qUpdate * qref_;
     // eq. 22
     qref_.normalize();
     x_(9) = 0.0;
@@ -342,14 +355,14 @@ Eigen::Matrix<precision, STATE_SIZE, 1> ESKF<precision>::getState() const
 template <typename precision>
 void ESKF<precision>::getAttitude(float &roll, float &pitch, float &yaw) const
 {
-    Eigen::Matrix<precision, 3, 1> angles = qref_.toEulerAngles();
+    Eigen::Matrix<precision, 3, 1> angles = qref_.toRotationMatrix().eulerAngles();
     roll = angles(0);
     pitch = angles(1);
     yaw = angles(2);
 }
 
 template <typename precision>
-Quaternion<precision> ESKF<precision>::getAttitude() const
+Eigen::Quaternion<precision> ESKF<precision>::getAttitude() const
 {
     return qref_;
 }
@@ -360,6 +373,15 @@ void ESKF<precision>::getAcceleration(float &x, float &y, float &z) const
     x = x_(6);
     y = x_(7);
     z = x_(8);
+}
+
+template <typename precision>
+Eigen::Matrix<precision, 3, 3> ESKF<precision>::toCrossMatrix(Eigen::Matrix<precision, 3, 1> vec) {
+    Eigen::Matrix<precision,3,3> mat;
+    mat << 0,     -vec(2), vec(1),
+           vec(2), 0,     -vec(0),
+          -vec(1), vec(0), 0;
+    return mat;
 }
 } // namespace IMU_EKF
 

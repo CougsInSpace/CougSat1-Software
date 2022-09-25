@@ -5,15 +5,15 @@
 #include "interfaces/CDH.h"
 #include <mbed.h>
 #include <rtos.h>
-#include "vectorFunctions.h"
+// #include "vectorFunctions.h"
 #include <BNO055.h>
 #include <photodiode.h>
 #include "kalmanFilterMultiplicative.h"
-#include <ESKF.h>
+// #include <ESKF.h>
 // #include <Eigen.h>
 
 using namespace std;
-using namespace IMU_EKF;
+// using namespace IMU_EKF;
 
 #define PI 3.141592653589793238
 

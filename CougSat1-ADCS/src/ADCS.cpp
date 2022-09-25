@@ -85,31 +85,31 @@ void ADCS::attitudeDetermination() {
   //                    {-0.12726127, -0.16126741,  0.05436621}};
 
   //Kalman filter 2 stuff
-  Vector3f magi(magData.x, magData.y, magData.z);
-  Vector3f suni(volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
-  Vector3f magiNorm = magi.normalized();
-  Vector3f suniNorm = suni.normalized();
+  Vector3d magi(magData.x, magData.y, magData.z);
+  Vector3d suni(volts->volt_pos_x, volts->volt_pos_y, -1 * volts->volt_pos_z);
+  Vector3d magiNorm = magi.normalized();
+  Vector3d suniNorm = suni.normalized();
 
-  // Vector3f wk_B2I_B(gyroData.x, gyroData.y, gyroData.z);
-  // Quaternionf qk_I2B(1,0,0,0);
-  // Vector3f biask(0,0,0);
+  Vector3d wk_B2I_B(gyroData.x, gyroData.y, gyroData.z);
+  Quaterniond qk_I2B(1,0,0,0);
+  Vector3d biask(0,0,0);
   bool eclp = true;
   float dt = .25;
-  // float sig_r = .1; // standard deviation of noise
-  // float sig_w = .05; // standard deviation of bias
-  // Matrix3f R_ss = .5*Matrix3f::Identity();
-  // Matrix3f R_m = .1*Matrix3f::Identity(); // IF THE FACTOR IS EXTREMELY HIGH IT WILL STAY STABLE FOR LONGER, BUT ANY MOTION STILL HAS ERRONEOUS RESULTS
-  // MatrixXf Pk = MatrixXf::Identity(6,6);
+  float sig_r = 3; // standard deviation of noise
+  float sig_w = 1; // standard deviation of bias
+  Matrix3d R_ss = .5*Matrix3d::Identity();
+  Matrix3d R_m = .5*Matrix3d::Identity(); // IF THE FACTOR IS EXTREMELY HIGH IT WILL STAY STABLE FOR LONGER, BUT ANY MOTION STILL HAS ERRONEOUS RESULTS
+  MatrixXd Pk = 1*MatrixXd::Identity(6,6);
 
-  Eigen::Matrix<float, 3, 3> W;
-  W << 0,0,0,0,0,0,0,0,0;
-  Eigen::Matrix<float, 3, 1> V;
-  V << 0,0,0;
-  float incl = 0; //  no idea what this is
-  float B = 1; // geomagnetic field strength
+  // Eigen::Matrix<float, 3, 3> W;
+  // W << 0,0,0,0,0,0,0,0,0;
+  // Eigen::Matrix<float, 3, 1> V;
+  // V << 0,0,0;
+  // float incl = 0; //  no idea what this is
+  // float B = 1; // geomagnetic field strength
 
-  IMU_EKF::ESKF<float> kalmanFilter;
-  kalmanFilter.initWithAccAndMag(suni(0), suni(1), suni(2), magi(0), magi(1), magi(2), W.inverse(), V);
+  // IMU_EKF::ESKF<float> kalmanFilter;
+  // kalmanFilter.initWithAcc(magiNorm(0), magiNorm(1), magiNorm(2));
   while (true) { 
     // using namespace std::chrono_literals;
 
@@ -134,60 +134,68 @@ void ADCS::attitudeDetermination() {
     volts = photodiodes.getVoltages();
 
     // Create vectors from measurements
-    Vector3f magf(magData.x, magData.y, magData.z); //  units of mG???
-    Vector3f sunf(volts->volt_pos_x, volts->volt_pos_y, -1* volts->volt_pos_z);
-    Vector3f omega(gyroData.x, gyroData.y, gyroData.z); // units of degrees per second
-    omega *= (PI / 180.0);
-    Vector3f magfNorm = magf.normalized();
-    Vector3f sunfNorm = sunf.normalized();
+    Vector3d magf(magData.x, magData.y, magData.z); //  units of micro teslas
+    Vector3d sunf(volts->volt_pos_x, volts->volt_pos_y, -1* volts->volt_pos_z);
+    // Vector3f omega(gyroData.x, gyroData.y, gyroData.z); // units of degrees per second, need to stay that way apparently
+    Vector3d omega = Vector3d::Zero();
+    // omega *= (PI / 180.0);
+    Vector3d magfNorm = magf.normalized();
+    Vector3d sunfNorm = sunf.normalized();
 
     printf("x\r\n");
-    kalmanFilter.predict(dt);
-    kalmanFilter.correctGyr(omega(0), omega(1), omega(2));
-    if (eclp == false) {
-      kalmanFilter.correctAcc(sunfNorm(0), sunfNorm(1), sunfNorm(2));
-    }
-    kalmanFilter.correctMag(magfNorm(0), magfNorm(1), magfNorm(2), incl, B, W, V);
-    kalmanFilter.reset();
+    // kalmanFilter.predict(dt);
+    // cout << "test" << endl;
+    // kalmanFilter.correctGyr(omega(0), omega(1), omega(2));
+    // cout << "test" << endl;
+    // if (eclp == false) {
+    //   kalmanFilter.correctMeasurement(suniNorm(0), suniNorm(1), suniNorm(2), sunfNorm(0), sunfNorm(1), sunfNorm(2));
+    // }
+    // cout << "test" << endl;
+    // kalmanFilter.correctMeasurement(magiNorm(0), magiNorm(1), magiNorm(2),magfNorm(0), magfNorm(1), magfNorm(2));
+    // cout << "test" << endl;
+    // kalmanFilter.reset();
+    // cout << "test" << endl;
 
-    IMU_EKF::Quaternion<float> qEKF = kalmanFilter.getAttitude(); // order xyzw
-    Quaternionf q(qEKF[w],qEKF[v1], qEKF[v2], qEKF[v3]);
+
+    // Quaternionf q = kalmanFilter.getAttitude(); // order xyzw
 
     // Code to determine orientation (only for mag sensor right now)
-    // ReturnKalman returnVars =  multiplicativeFilter(
-    //   omega, 
-    //   qk_I2B,
-    //   biask, 
-    //   sunfNorm, 
-    //   suniNorm,
-    //   eclp,
-    //   magfNorm,
-    //   magiNorm,
-    //   dt,
-    //   sig_r,
-    //   sig_w,
-    //   R_ss,
-    //   R_m,
-    //   Pk
-    // );
+    ReturnKalman returnVars =  multiplicativeFilter(
+      omega, 
+      qk_I2B,
+      biask, 
+      sunfNorm, 
+      suniNorm,
+      eclp,
+      magfNorm,
+      magiNorm,
+      dt,
+      sig_r,
+      sig_w,
+      R_ss,
+      R_m,
+      Pk
+    );
 
-    // wk_B2I_B = returnVars.wk1_B2I_B;
-    // qk_I2B = returnVars.qk1_I2B;
-    // biask = returnVars.biask1;
-    // Pk = returnVars.Pk1;
+    wk_B2I_B = returnVars.wk1_B2I_B;
+    qk_I2B = returnVars.qk1_I2B;
+    biask = returnVars.biask1;
+    Pk = returnVars.Pk1;
      
-    // Quaternionf qAttitude = determineAttitude(magi.normalized(), magfNorm, suni.normalized(), sunfNorm);
+    // Quaterniond qAttitude = determineAttitude(magi.normalized(), magfNorm, suni.normalized(), sunfNorm);
 
 
     // Print statements for pyserial
     // cout << "omega" << endl;
-    // cout << omega << endl;
+    cout << omega << endl;
     // cout << "wk_B2I_B" << endl;
     // cout << wk_B2I_B << endl;
-    // // cout << "biask" << endl;
-    // // cout << biask << endl;
-    // // cout << magfNorm << endl;
-    cout << q.coeffs() << endl;
+    // cout << "biask" << endl;
+    // cout << biask << endl;
+    cout << magfNorm << endl;
+    // cout << magf<< endl;
+    // cout << "mag above" << endl;
+    cout << qk_I2B << endl;
 
     // cout << magfNorm << endl;
 

@@ -1,6 +1,6 @@
 #include <iostream>
-#include "../../CISLibrary/Eigen/Dense"
-#include "../../CISLibrary/Eigen/Geometry"
+#include "../../CISLibrary/Eigen/Eigen_Repo/Eigen/Dense"
+#include "../../CISLibrary/Eigen/Eigen_Repo/Eigen/Geometry"
 
 using Eigen::MatrixXd;
 using Eigen::Quaternion;
