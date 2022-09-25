@@ -9,13 +9,8 @@
 #include <BNO055.h>
 #include <photodiode.h>
 #include "kalmanFilterMultiplicative.h"
-<<<<<<< HEAD
 // #include <ESKF.h>
 // #include <Eigen.h>
-=======
-#include <DRV8837.h>
-#include "PinNames.h"
->>>>>>> 46c2e1890daed59852beaf924457f839b18a4cc2
 
 using namespace std;
 // using namespace IMU_EKF;
@@ -27,16 +22,12 @@ private:
   Thread monitor;
   Thread cdhRead;
   Thread attitudeDeterminationThread;
-  Thread attitudeControlThread;
   char   message[9];
   CDH    cdh;
   void   cdhThread();
   I2C    sensorBus;
   BNO055 imu;
   uint32_t stackSize = 8192;
-  float dt;
-  DRV8837 hBridgeCoilX;
-
 
   IMUValueSet_t magData;
   IMUValueSet_t gyroData;
@@ -45,7 +36,7 @@ private:
   voltages* volts;
 
 public:
-  ADCS(float dtInit);
+  ADCS();
   void startThread();
   void attitudeDetermination();
   void attitudeDeterminationLoop();
