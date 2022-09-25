@@ -181,7 +181,20 @@ typedef enum {
 
   BUS_I2C0_SCL = PB_10,
   BUS_I2C0_SDA = PB_11,
-  BUS_I2C0_IRQ = PB_12
+  BUS_I2C0_IRQ = PB_12,
+
+  // coil pins 
+  COIL_X_FWD = PA_2,
+  COIL_X_REV = PA_3,
+  COIL_X_SLEEP_N = PB_1,
+
+  COIL_Y_FWD = PA_0,
+  COIL_Y_REV = PA_1,
+  COIL_Y_SLEEP_N = PA_4,
+
+  COIL_Z_FWD = PA_8,
+  COIL_Z_REV = PA_11,
+  COIL_Z_SLEEP_N = PA_12
 
 } PinName;
 
