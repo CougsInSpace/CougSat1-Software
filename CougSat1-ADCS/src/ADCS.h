@@ -22,6 +22,7 @@ private:
   Thread monitor;
   Thread cdhRead;
   Thread attitudeDeterminationThread;
+  Thread attitudeControlThread;
   char   message[9];
   CDH    cdh;
   void   cdhThread();
@@ -34,9 +35,10 @@ private:
   BNO055_EULER_TypeDef eulerData;
   BNO055_QUATERNION_TypeDef quatData;
   voltages* volts;
+  float dt;
 
 public:
-  ADCS();
+  ADCS(float dtInit);
   void startThread();
   void attitudeDetermination();
   void attitudeDeterminationLoop();
