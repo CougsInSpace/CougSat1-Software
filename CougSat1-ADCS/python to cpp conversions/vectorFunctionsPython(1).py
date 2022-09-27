@@ -30,11 +30,48 @@ def main(): #just for testing
     # outputs for identical inputs. Test them separetly from rest of ADCS code
     # before putting them in the vectorFunctions.h file
 
-    #Example
-    x = np.array([1,2,3])
-    y = np.array([3,4,1])
 
-    print(rodRotation(x,y))
+
+    ##Saturate and torque2Dipole seem to be working fine, still requires testing
+
+
+  ##saturate tests
+  satTest1 = np.array([5,10,15])
+  satTest2 = np.array([9,20,-4])
+  satTest3 = np.array([-3,-4,9.5])
+  satTest4 = np.array([20,30,-90])
+
+  print(saturate(satTest1)) 
+  print(saturate(satTest2)) 
+  print(saturate(satTest3)) 
+  print(saturate(satTest4)) 
+
+  ##findTorque test
+  u = np.array([5,5,5])
+  v = np.array([7,7,7])
+  mag = np.array([3,2,1])
+
+  print(findTorque(u,v,mag))
+
+  ##applyRodRotation test
+  v2 = np.array([4,4,4])
+  rod = np.array([4,4,4,50])
+
+  print(applyRodRotation(v2,rod))
+
+  ## torque2Dipole test
+  tordqueDir = np.array([5,5,5])
+  mag2 = np.array([6,6,6])
+
+  print(torque2Dipole(tordqueDir,mag2))
+
+
+
+    #Example
+  x = np.array([1,2,3])
+  y = np.array([3,4,1])
+
+  print(rodRotation(x,y))
 
 
 def rodRotation(a: np.ndarray, aT: np.ndarray):
