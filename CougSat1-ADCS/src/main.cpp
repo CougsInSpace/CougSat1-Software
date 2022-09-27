@@ -11,7 +11,7 @@
  * @return error code
  */
 int main(void) {
-  ADCS adcs;
+  ADCS adcs(.25);
   adcs.startThread();
 
 

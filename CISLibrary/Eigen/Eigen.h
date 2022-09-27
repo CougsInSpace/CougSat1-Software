@@ -4,4 +4,5 @@
 #include "Eigen_Repo\Eigen\Geometry"
 #include "Eigen_Repo\Eigen\LU"
 #include "Eigen_Repo\Eigen\Dense"
+#include "EIgen_Repo\Eigen\Cholesky"
 #endif

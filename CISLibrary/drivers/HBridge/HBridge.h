@@ -12,7 +12,7 @@ public:
    * @brief Construct a new HBridge object
    *
    */
-  HBridge() {}
+  HBridge() {};
 
   /**
    * @brief Destroy the HBridge object

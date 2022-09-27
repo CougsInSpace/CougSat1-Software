@@ -12,7 +12,7 @@
 // #include <ESKF.h>
 // #include <Eigen.h>
 #include "DRV8837.h"
-#include "PinNames.h"
+#include "PinNames.h"// there are multiple pinnames.h files for some reason
 
 using namespace std;
 // using namespace IMU_EKF;
@@ -41,7 +41,10 @@ private:
   BNO055_EULER_TypeDef eulerData;
   BNO055_QUATERNION_TypeDef quatData;
   voltages* volts;
+  
   float dt;
+  Vector3f dipoleTarget;
+  Vector3f lastMag;
 
 public:
   ADCS(float dtInit);
@@ -49,5 +52,6 @@ public:
   void attitudeDetermination();
   void attitudeDeterminationLoop();
   void attitudeControl();
+  void updateSensors();
 };
 #endif /* ADCS_H */
