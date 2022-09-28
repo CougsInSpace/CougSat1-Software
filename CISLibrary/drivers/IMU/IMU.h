@@ -2,20 +2,20 @@
 #define _LIBRARY_DRIVER_IMU_IMU_H_
 
 #include <mbed.h>
-
-struct IMUValueSet_t {
+#include "../tools/CISConsole.h"
+typedef struct imuValueSet_t {
   double x          = nan("");
   double y          = nan("");
   double z          = nan("");
   double w          = nan("");
   bool   quaternion = true;
-};
+}IMUValueSet_t;
 
-struct IMUData_t {
+typedef struct imuData_t{
   IMUValueSet_t mag;
   IMUValueSet_t gyro;
   IMUValueSet_t accel;
-};
+}IMUData_t;
 
 class IMU {
 public:
