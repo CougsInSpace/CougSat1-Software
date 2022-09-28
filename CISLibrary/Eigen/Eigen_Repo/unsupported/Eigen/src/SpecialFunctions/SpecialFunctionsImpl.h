@@ -10,6 +10,8 @@
 #ifndef EIGEN_SPECIAL_FUNCTIONS_H
 #define EIGEN_SPECIAL_FUNCTIONS_H
 
+#include "./InternalHeaderCheck.h"
+
 namespace Eigen {
 namespace internal {
 
@@ -43,10 +45,10 @@ namespace internal {
 
 template <typename Scalar>
 struct lgamma_impl {
-  EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                      THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
     return Scalar(0);
   }
 };
@@ -126,10 +128,10 @@ struct digamma_retval {
  */
 template <typename Scalar>
 struct digamma_impl_maybe_poly {
-  EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                        THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
     return Scalar(0);
   }
 };
@@ -390,10 +392,10 @@ struct erf_impl<double> {
 
 template <typename Scalar>
 struct erfc_impl {
-  EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                      THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
     return Scalar(0);
   }
 };
@@ -599,13 +601,12 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE T generic_ndtri_lt_exp_neg_two(
     ScalarType(6.79019408009981274425e-9)
   };
   const T eight = pset1<T>(ScalarType(8.0));
-  const T one = pset1<T>(ScalarType(1));
   const T neg_two = pset1<T>(ScalarType(-2));
   T x, x0, x1, z;
 
   x = psqrt(pmul(neg_two, plog(b)));
   x0 = psub(x, pdiv(plog(x), x));
-  z = pdiv(one, x);
+  z = preciprocal(x);
   x1 = pmul(
       z, pselect(
           pcmp_lt(x, eight),
@@ -650,10 +651,10 @@ struct ndtri_retval {
 
 template <typename Scalar>
 struct ndtri_impl {
-  EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                      THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
     return Scalar(0);
   }
 };
@@ -786,7 +787,7 @@ struct igammac_cf_impl {
     Scalar ax = main_igamma_term<Scalar>(a, x);
     // This is independent of mode. If this value is zero,
     // then the function value is zero. If the function value is zero,
-    // then we are in a neighborhood where the function value evalutes to zero,
+    // then we are in a neighborhood where the function value evaluates to zero,
     // so the derivative is zero.
     if (ax == zero) {
       return zero;
@@ -897,7 +898,7 @@ struct igamma_series_impl {
 
     // This is independent of mode. If this value is zero,
     // then the function value is zero. If the function value is zero,
-    // then we are in a neighborhood where the function value evalutes to zero,
+    // then we are in a neighborhood where the function value evaluates to zero,
     // so the derivative is zero.
     if (ax == zero) {
       return zero;
@@ -952,10 +953,10 @@ struct igamma_series_impl {
 
 template <typename Scalar>
 struct igammac_impl {
-  EIGEN_DEVICE_FUNC
-  static Scalar run(Scalar a, Scalar x) {
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                      THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static Scalar run(Scalar a, Scalar x) {
     return Scalar(0);
   }
 };
@@ -1051,10 +1052,10 @@ struct igammac_impl {
 
 template <typename Scalar, IgammaComputationMode mode>
 struct igamma_generic_impl {
-  EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE Scalar run(Scalar a, Scalar x) {
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                      THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(Scalar a, Scalar x) {
     return Scalar(0);
   }
 };
@@ -1255,10 +1256,10 @@ struct zeta_retval {
 
 template <typename Scalar>
 struct zeta_impl_series {
-  EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                      THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(const Scalar) {
     return Scalar(0);
   }
 };
@@ -1387,7 +1388,7 @@ struct zeta_impl {
             };
 
         const Scalar maxnum = NumTraits<Scalar>::infinity();
-        const Scalar zero = 0.0, half = 0.5, one = 1.0;
+        const Scalar zero = Scalar(0.0), half = Scalar(0.5), one = Scalar(1.0);
         const Scalar machep = cephes_helper<Scalar>::machep();
         const Scalar nan = NumTraits<Scalar>::quiet_NaN();
 
@@ -1429,11 +1430,19 @@ struct zeta_impl {
             return s;
         }
 
+        // If b is zero, then the tail sum will also end up being zero.
+        // Exiting early here can prevent NaNs for some large inputs, where
+        // the tail sum computed below has term `a` which can overflow to `inf`.
+        if (numext::equal_strict(b, zero)) {
+          return s;
+        }
+
         w = a;
         s += b*w/(x-one);
         s -= half * b;
         a = one;
         k = zero;
+        
         for( i=0; i<12; i++ )
         {
             a *= x + k;
@@ -1466,10 +1475,10 @@ struct polygamma_retval {
 
 template <typename Scalar>
 struct polygamma_impl {
-    EIGEN_DEVICE_FUNC
-    static EIGEN_STRONG_INLINE Scalar run(Scalar n, Scalar x) {
-        EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                            THIS_TYPE_IS_NOT_SUPPORTED);
+    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                        THIS_TYPE_IS_NOT_SUPPORTED)
+
+    EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(Scalar n, Scalar x) {
         return Scalar(0);
     }
 };
@@ -1515,10 +1524,10 @@ struct betainc_retval {
 
 template <typename Scalar>
 struct betainc_impl {
-  EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE Scalar run(Scalar a, Scalar b, Scalar x) {
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                      THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(Scalar a, Scalar b, Scalar x) {
     return Scalar(0);
   }
 };
@@ -1527,8 +1536,10 @@ struct betainc_impl {
 
 template <typename Scalar>
 struct betainc_impl {
-  EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE Scalar run(Scalar, Scalar, Scalar) {
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
+                      THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(Scalar, Scalar, Scalar) {
     /*	betaincf.c
      *
      *	Incomplete beta integral
@@ -1597,9 +1608,6 @@ struct betainc_impl {
      * incbet domain      x<0, x>1          nan
      * incbet underflow                     nan
      */
-
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, Scalar>::value == false),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
     return Scalar(0);
   }
 };
@@ -1609,11 +1617,11 @@ struct betainc_impl {
  */
 template <typename Scalar>
 struct incbeta_cfe {
-  EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE Scalar run(Scalar a, Scalar b, Scalar x, bool small_branch) {
-    EIGEN_STATIC_ASSERT((internal::is_same<Scalar, float>::value ||
-                         internal::is_same<Scalar, double>::value),
-                        THIS_TYPE_IS_NOT_SUPPORTED);
+  EIGEN_STATIC_ASSERT((internal::is_same<Scalar, float>::value ||
+                       internal::is_same<Scalar, double>::value),
+                      THIS_TYPE_IS_NOT_SUPPORTED)
+
+  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE Scalar run(Scalar a, Scalar b, Scalar x, bool small_branch) {
     const Scalar big = cephes_helper<Scalar>::big();
     const Scalar machep = cephes_helper<Scalar>::machep();
     const Scalar biginv = cephes_helper<Scalar>::biginv();

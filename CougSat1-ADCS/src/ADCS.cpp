@@ -9,13 +9,13 @@
 #define TEST_IHU_ADDRESS 0xAC
 #define BUS_I2C0_SDA PinName(25)
 #define BUS_I2C0_SCL PinName(24)
-ADCS::ADCS(float dtInit) : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL), sensorBus(D14,D15), imu(sensorBus,NC,(0X28<<1)), coilX(COIL_X_FWD, COIL_X_REV, COIL_X_SLEEP_N) coilY(COIL_Y_FWD, COIL_Y_REV, COIL_Y_SLEEP_N), coilZ(COIL_Z_FWD, COIL_Z_REV, COIL_Z_SLEEP_N) {
+ADCS::ADCS(float dtInit) : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL), sensorBus(D14,D15), imu(sensorBus,NC,(0X28<<1)), coilX(COIL_X_FWD, COIL_X_REV, COIL_X_SLEEP_N), coilY(COIL_Y_FWD, COIL_Y_REV, COIL_Y_SLEEP_N), coilZ(COIL_Z_FWD, COIL_Z_REV, COIL_Z_SLEEP_N) {
   this->dt = dtInit;
   // monitor.set_priority(osPriorityNormal);
   // cdhRead.set_priority(osPriorityNormal);
   // cdhRead.start(callback(this, &ADCS::cdhThread));
   // attitudeDeterminationThread.start(callback(this, &ADCS::attitudeDetermination));
-  attitudeControlThread(callback(this,&ADCS::attitudeControl))
+  attitudeControlThread.start(callback(this,&ADCS::attitudeControl));
   // monitor.start(callback(this, &ADCS::monitorThread));
 }
 
@@ -36,7 +36,7 @@ void ADCS::cdhThread() {
 }
 
 void ADCS::attitudeDetermination() {
-  /*
+  
   IMUValueSet_t magData;
   BNO055_EULER_TypeDef eulerData;
   BNO055_QUATERNION_TypeDef quatData;
@@ -45,9 +45,7 @@ void ADCS::attitudeDetermination() {
   //A1 = -z
   //A2 = +y
   //A3 = +x
-  Photodiodes photodiodes(A3, A3, A2, A2, A1, A1);
   voltages* volts;
-  */
   Photodiodes photodiodes(A3, A3, A2, A2, A1, A1);
 
   photodiodes.setOffset(.002, .002, .002, .002, .008, .008);
@@ -209,7 +207,25 @@ void ADCS::attitudeDetermination() {
 }
 
 void ADCS::attitudeControl() {
-  
+  lastMag = Vector3f::Zero();
+  while(true) {
+    IMUValueSet_t magData;
+    this->updateSensors();
+    
+    Vector3f magNorm(magData.x, magData.y, magData.z); //  units of micro teslas
+    magNorm.normalize();
+    Vector3f bDot = (magNorm - lastMag) / this->dt;
+    this->lastMag = magNorm;
+    this->dipoleTarget = 1*bDot;
+  }
+}
+
+void ADCS::updateSensors() {
+  imu.readMag(magData);
+  imu.readGyro(gyroData);
+  imu.get_Euler_Angles(&eulerData);
+  imu.get_quaternion(&quatData);
+  return;
 }
 
 /**
