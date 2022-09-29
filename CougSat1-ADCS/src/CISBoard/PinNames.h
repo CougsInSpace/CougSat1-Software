@@ -194,7 +194,12 @@ typedef enum {
 
   COIL_Z_FWD = PA_8,
   COIL_Z_REV = PA_11,
-  COIL_Z_SLEEP_N = PA_12
+  COIL_Z_SLEEP_N = PA_12,
+
+  // ADC Pins
+  ADCS_I2C0_SCL = PB_6,
+  ADCS_I2C0_SDA = PB_7, 
+  ADCS_ADC_RESET_N = PC_4, 
 
 } PinName;
 
