@@ -12,7 +12,7 @@
 // #include <ESKF.h>
 // #include <Eigen.h>
 #include "DRV8837.h"
-#include "PinNames.h"// there are multiple pinnames.h files for some reason
+#include "CISBoard/PinNames.h"// there are multiple pinnames.h files for some reason
 
 using namespace std;
 // using namespace IMU_EKF;
