@@ -216,7 +216,7 @@ void ADCS::attitudeControl() {
     magNorm.normalize();
     Vector3f bDot = (magNorm - lastMag) / this->dt;
     this->lastMag = magNorm;
-    this->dipoleTarget = 1*bDot;
+    this->dipoleTarget = saturate(bDot,0, this->maxMTCurrent);
   }
 }
 

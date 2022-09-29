@@ -41,29 +41,29 @@ def main(): #just for testing
   satTest3 = np.array([-3,-4,9.5])
   satTest4 = np.array([20,30,-90])
 
-  print(saturate(satTest1)) 
-  print(saturate(satTest2)) 
-  print(saturate(satTest3)) 
-  print(saturate(satTest4)) 
+  print(saturate(satTest1, 3, 12)) 
+  print(saturate(satTest2, 3, 12)) 
+  print(saturate(satTest3, 3, 12)) 
+  print(saturate(satTest4, 3, 12)) 
 
   ##findTorque test
   u = np.array([5,5,5])
   v = np.array([7,7,7])
   mag = np.array([3,2,1])
 
-  print(findTorque(u,v,mag))
+  # print(findTorque(u,v,mag))
 
   ##applyRodRotation test
   v2 = np.array([4,4,4])
   rod = np.array([4,4,4,50])
 
-  print(applyRodRotation(v2,rod))
+  # print(applyRodRotation(v2,rod))
 
   ## torque2Dipole test
   tordqueDir = np.array([5,5,5])
   mag2 = np.array([6,6,6])
 
-  print(torque2Dipole(tordqueDir,mag2))
+  # print(torque2Dipole(tordqueDir,mag2))
 
 
 
@@ -71,7 +71,7 @@ def main(): #just for testing
   x = np.array([1,2,3])
   y = np.array([3,4,1])
 
-  print(rodRotation(x,y))
+  # print(rodRotation(x,y))
 
 
 def rodRotation(a: np.ndarray, aT: np.ndarray):

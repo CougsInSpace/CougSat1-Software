@@ -17,5 +17,6 @@ Vector3f planeProject(Vector3f v, Vector3f n);
 Vector3f vectorProject(Vector3f v, Vector3f u);
 float vecAngle(Vector3f u, Vector3f v);
 float vecOrthoAngle(Vector3f u, Vector3f v, Vector3f ax);
+Vector3f saturate(Vector3f v, float min, float max);
 
 #endif /*vectorFunctions_H_*/

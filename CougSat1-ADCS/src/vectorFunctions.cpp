@@ -155,3 +155,12 @@ float vecOrthoAngle(Vector3f u, Vector3f v, Vector3f ax) {
     return vecAngle(uOrtho, vOrtho);
 }
 
+Vector3f saturate(Vector3f v, float min, float max) {
+    for (int i = 0; i < v.size(); i++) {
+        if (v[i] > max || v[i] < min) {
+            v *= abs(max / v[i]);
+        }
+    }
+    return v; 
+}
+

@@ -1,6 +1,7 @@
 #include <iostream>
-#include "../../CISLibrary/Eigen/Dense"
-#include "../../CISLibrary/Eigen/Geometry"
+// #include "../../CISLibrary/Eigen/Dense"
+// #include "../../CISLibrary/Eigen/Geometry"
+#include "Eigen.h"
 
 using Eigen::MatrixXd;
 using Eigen::Quaternion;
@@ -157,7 +158,8 @@ Vector3f norm = w1.cross(w2);
 Vector3f torque = (norm.cross(mag)); 
 
 float theta = vecOrthoAngle(u,v,torque);
-Vector3f rod((-1 * torque), theta);
+Vector4f rod;
+rod << -1*torque, theta;
 Vector3f vec = applyRodRotation(u,rod); 
 
 if (vecAngle(vec,v) < 0.00001){

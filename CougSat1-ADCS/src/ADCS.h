@@ -5,7 +5,7 @@
 #include "interfaces/CDH.h"
 #include <mbed.h>
 #include <rtos.h>
-// #include "vectorFunctions.h"
+#include "vectorFunctions.h"
 #include <BNO055.h>
 #include <photodiode.h>
 #include "kalmanFilterMultiplicative.h"
@@ -45,6 +45,7 @@ private:
   float dt;
   Vector3f dipoleTarget;
   Vector3f lastMag;
+  const float maxMTCurrent = .1; // amps
 
 public:
   ADCS(float dtInit);
