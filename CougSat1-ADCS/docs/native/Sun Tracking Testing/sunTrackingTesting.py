@@ -7,7 +7,7 @@ import datetime as dt
 def main():
     # CURRENT TIME MUST BE IN UTC TIME ZONE 
     # currenttime = dt.datetime(2023,3,20, hour=12,minute=9,second=4) # default minute 9
-    currenttime = dt.datetime(2022,10,2, hour=0,minute=20)
+    currenttime = dt.datetime(2022,10,2, hour=21,minute=42)
     # currenttime = dt.datetime.now()#dt.datetime(2020,8,20, hour=3)
     ra, lat = astronomy.sun_ra_dec(currenttime)
     long = ra - astronomy.gmst(currenttime)
