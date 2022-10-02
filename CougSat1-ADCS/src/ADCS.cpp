@@ -1,15 +1,15 @@
 #include "ADCS.h"
-
+// #include "CISBoard/PinNames.h"
 
 
 /**
  * @brief Construct a new ADCS::ADCS object
  *
  */
-#define TEST_IHU_ADDRESS 0xAC
-#define BUS_I2C0_SDA PinName(25)
-#define BUS_I2C0_SCL PinName(24)
-ADCS::ADCS(float dtInit) : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL), sensorBus(D14,D15), imu(sensorBus,NC,(0X28<<1)), coilX(COIL_X_FWD, COIL_X_REV, COIL_X_SLEEP_N), coilY(COIL_Y_FWD, COIL_Y_REV, COIL_Y_SLEEP_N), coilZ(COIL_Z_FWD, COIL_Z_REV, COIL_Z_SLEEP_N) {
+// #define TEST_IHU_ADDRESS 0xAC
+// #define BUS_I2C0_SDA PinName(25)
+// #define BUS_I2C0_SCL PinName(24)
+ADCS::ADCS(float dtInit) : sensorBus(ADCS_I2C0_SCL,ADCS_I2C0_SDA), imu(sensorBus,NC,(0X28<<1)), coilX(COIL_X_FWD, COIL_X_REV, COIL_X_SLEEP_N), coilY(COIL_Y_FWD, COIL_Y_REV, COIL_Y_SLEEP_N), coilZ(COIL_Z_FWD, COIL_Z_REV, COIL_Z_SLEEP_N), adc(&sensorBus, HH) {
   this->dt = dtInit;
   // monitor.set_priority(osPriorityNormal);
   // cdhRead.set_priority(osPriorityNormal);
@@ -23,17 +23,17 @@ ADCS::ADCS(float dtInit) : cdh(TEST_IHU_ADDRESS, BUS_I2C0_SDA, BUS_I2C0_SCL), se
  * @brief Function for cdh communication thread
  *
  */
-void ADCS::cdhThread() {
-  while (true) {
-    if (cdh.messageReceived()) {
-      cdh.readI2C();
-    }
-    if (cdh.messageRequested()) {
-      cdh.writeI2C();
-    }
-    ThisThread::sleep_for(PERIOD_MS_POLLING_SLEEP);
-  }
-}
+// void ADCS::cdhThread() {
+//   while (true) {
+//     if (cdh.messageReceived()) {
+//       cdh.readI2C();
+//     }
+//     if (cdh.messageRequested()) {
+//       cdh.writeI2C();
+//     }
+//     ThisThread::sleep_for(PERIOD_MS_POLLING_SLEEP);
+//   }
+// }
 
 void ADCS::attitudeDetermination() {
   

@@ -12,7 +12,9 @@
 // #include <ESKF.h>
 // #include <Eigen.h>
 #include "DRV8837.h"
-#include "CISBoard/PinNames.h"// there are multiple pinnames.h files for some reason
+#include "AD7291.h"
+// #include "CISBoard/PinNames.h"// there are multiple pinnames.h files for some reason
+#include "PinNames.h"
 
 using namespace std;
 // using namespace IMU_EKF;
@@ -26,7 +28,7 @@ private:
   Thread attitudeDeterminationThread;
   Thread attitudeControlThread;
   char   message[9];
-  CDH    cdh;
+  // CDH    cdh;
   void   cdhThread();
   I2C    sensorBus;
   BNO055 imu;
@@ -35,6 +37,7 @@ private:
   DRV8837 coilX;
   DRV8837 coilY;
   DRV8837 coilZ;
+  AD7291 adc;
 
   IMUValueSet_t magData;
   IMUValueSet_t gyroData;
