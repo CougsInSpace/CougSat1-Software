@@ -9,7 +9,7 @@
 // #define TEST_IHU_ADDRESS 0xAC
 // #define BUS_I2C0_SDA PinName(25)
 // #define BUS_I2C0_SCL PinName(24)
-ADCS::ADCS(float dtInit) : sensorBus(ADCS_I2C0_SCL,ADCS_I2C0_SDA), imu(sensorBus,NC,(0X28<<1)), coilX(COIL_X_FWD, COIL_X_REV, COIL_X_SLEEP_N), coilY(COIL_Y_FWD, COIL_Y_REV, COIL_Y_SLEEP_N), coilZ(COIL_Z_FWD, COIL_Z_REV, COIL_Z_SLEEP_N), adc(&sensorBus, HH) {
+ADCS::ADCS(float dtInit) : sensorBus(ADCS_I2C0_SCL,ADCS_I2C0_SDA), imu(sensorBus,NC,(0X28<<1)), coilX(COIL_X_FWD, COIL_X_REV, COIL_X_SLEEP_N), coilY(COIL_Y_FWD, COIL_Y_REV, COIL_Y_SLEEP_N), coilZ(COIL_Z_FWD, COIL_Z_REV, COIL_Z_SLEEP_N), adc(sensorBus, HH) {
   this->dt = dtInit;
   // monitor.set_priority(osPriorityNormal);
   // cdhRead.set_priority(osPriorityNormal);
@@ -209,6 +209,7 @@ void ADCS::attitudeDetermination() {
 void ADCS::attitudeControl() {
   lastMag = Vector3f::Zero();
   while(true) {
+    // find bDot dipole direction
     IMUValueSet_t magData;
     this->updateSensors();
     
@@ -216,7 +217,10 @@ void ADCS::attitudeControl() {
     magNorm.normalize();
     Vector3f bDot = (magNorm - lastMag) / this->dt;
     this->lastMag = magNorm;
-    this->dipoleTarget = saturate(bDot,0, this->maxMTCurrent);
+    dipoleTarget = saturate(bDot,0, this->maxMTCurrent);
+
+    // control current through magnetorquers
+
   }
 }
 
