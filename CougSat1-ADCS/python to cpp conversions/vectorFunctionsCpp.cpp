@@ -1,7 +1,7 @@
 #include <iostream>
 // #include "../../CISLibrary/Eigen/Dense"
 // #include "../../CISLibrary/Eigen/Geometry"
-#include "Eigen.h"
+#include "../../CISLibrary/Eigen/Eigen.h"
 
 using Eigen::MatrixXd;
 using Eigen::Quaternion;
@@ -125,7 +125,8 @@ Vector3f rotationVector(Vector3f a, Vector3f aT) {
 //TODO: untested, implementation needed, need to doulbe check 
  Vector3f applyRodRotation(Vector3f v, Vector4f rod) {
 
-   Vector3f k = rod;
+   Vector3f k;
+   k << rod(0), rod(1), rod(2);
 
     float theta = rod[3]; 
 
