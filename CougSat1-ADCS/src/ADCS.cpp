@@ -9,7 +9,7 @@
 // #define TEST_IHU_ADDRESS 0xAC
 // #define BUS_I2C0_SDA PinName(25)
 // #define BUS_I2C0_SCL PinName(24)
-ADCS::ADCS(float dtInit) : sensorBus(ADCS_I2C0_SCL,ADCS_I2C0_SDA), imu(sensorBus,NC,(0X28<<1)), coilX(COIL_X_FWD, COIL_X_REV, COIL_X_SLEEP_N), coilY(COIL_Y_FWD, COIL_Y_REV, COIL_Y_SLEEP_N), coilZ(COIL_Z_FWD, COIL_Z_REV, COIL_Z_SLEEP_N), adc(sensorBus, HH) {
+ADCS::ADCS(float dtInit) : sensorBus(ADCS_I2C0_SCL,ADCS_I2C0_SDA), imu(sensorBus,NC,(0X28<<1)), coilX(COIL_X_FWD, COIL_X_REV, COIL_X_SLEEP_N), coilY(COIL_Y_FWD, COIL_Y_REV, COIL_Y_SLEEP_N), coilZ(COIL_Z_FWD, COIL_Z_REV, COIL_Z_SLEEP_N), adc(sensorBus, AD7291Addr_t::HH) {
   this->dt = dtInit;
   // monitor.set_priority(osPriorityNormal);
   // cdhRead.set_priority(osPriorityNormal);
@@ -208,6 +208,11 @@ void ADCS::attitudeDetermination() {
 
 void ADCS::attitudeControl() {
   lastMag = Vector3f::Zero();
+  Matrix3f iPropGain = .5*Matrix3f::Identity(); // TODO tune gain
+  Matrix3f mtResistance;
+  mtResistance << 28, 0, 0,
+                  0, 28, 0,
+                  0, 0, 28; // ohms TODO measure exact value, maybe make into gain matrix
   while(true) {
     // find bDot dipole direction
     IMUValueSet_t magData;
@@ -217,10 +222,27 @@ void ADCS::attitudeControl() {
     magNorm.normalize();
     Vector3f bDot = (magNorm - lastMag) / this->dt;
     this->lastMag = magNorm;
-    dipoleTarget = saturate(bDot,0, this->maxMTCurrent);
+
+    Vector3f iTarget = saturate(bDot,-1*this->maxMTCurrent, this->maxMTCurrent); // set target dipole
 
     // control current through magnetorquers
+    double voltX;
+    double voltY;
+    double voltZ;
+    adc.readVoltage(ADCChannel_t::CM_00, voltX); // read voltage through x mt
+    adc.readVoltage(ADCChannel_t::CM_01, voltY); // read voltage through y mt
+    adc.readVoltage(ADCChannel_t::CM_02, voltZ); // read voltage through z mt
+    Vector3f iMagnetorquer(voltX, voltY, voltZ); 
+    iMagnetorquer = mtResistance.inverse() * iMagnetorquer;// TODO find conversion from voltage to current
 
+    Vector3f iError = iTarget - iMagnetorquer; // 
+
+    Vector3f vCommand = saturate(mtResistance*(iTarget + iPropGain*iError), -3.3, 3.3); // commanded mt voltage
+
+    // set coil PWM
+    coilX.set(vCommand(0) / 3.3);
+    coilY.set(vCommand(1) / 3.3);
+    coilZ.set(vCommand(2) / 3.3);
   }
 }
 

@@ -30,27 +30,15 @@ operator/(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   *
   * \sa max()
   */
-template <int NaNPropagation=PropagateFast, typename OtherDerived>
-EIGEN_DEVICE_FUNC
-EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_min_op<Scalar,Scalar,NaNPropagation>, const Derived, const OtherDerived>
-#ifdef EIGEN_PARSED_BY_DOXYGEN
-min
-#else
-(min)
-#endif
-(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
-{
-  return CwiseBinaryOp<internal::scalar_min_op<Scalar,Scalar,NaNPropagation>, const Derived, const OtherDerived>(derived(), other.derived());
-}
+EIGEN_MAKE_CWISE_BINARY_OP(min,min)
 
 /** \returns an expression of the coefficient-wise min of \c *this and scalar \a other
   *
   * \sa max()
   */
-template <int NaNPropagation=PropagateFast>
 EIGEN_DEVICE_FUNC
-EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_min_op<Scalar,Scalar,NaNPropagation>, const Derived,
-    const CwiseNullaryOp<internal::scalar_constant_op<Scalar>, PlainObject> >
+EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_min_op<Scalar,Scalar>, const Derived,
+                                        const CwiseNullaryOp<internal::scalar_constant_op<Scalar>, PlainObject> >
 #ifdef EIGEN_PARSED_BY_DOXYGEN
 min
 #else
@@ -58,7 +46,7 @@ min
 #endif
 (const Scalar &other) const
 {
-  return (min<NaNPropagation>)(Derived::PlainObject::Constant(rows(), cols(), other));
+  return (min)(Derived::PlainObject::Constant(rows(), cols(), other));
 }
 
 /** \returns an expression of the coefficient-wise max of \c *this and \a other
@@ -68,26 +56,14 @@ min
   *
   * \sa min()
   */
-template <int NaNPropagation=PropagateFast, typename OtherDerived>
-EIGEN_DEVICE_FUNC
-EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_max_op<Scalar,Scalar,NaNPropagation>, const Derived, const OtherDerived>
-#ifdef EIGEN_PARSED_BY_DOXYGEN
-max
-#else
-(max)
-#endif
-(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
-{
-  return CwiseBinaryOp<internal::scalar_max_op<Scalar,Scalar,NaNPropagation>, const Derived, const OtherDerived>(derived(), other.derived());
-}
+EIGEN_MAKE_CWISE_BINARY_OP(max,max)
 
 /** \returns an expression of the coefficient-wise max of \c *this and scalar \a other
   *
   * \sa min()
   */
-template <int NaNPropagation=PropagateFast>
 EIGEN_DEVICE_FUNC
-    EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_max_op<Scalar,Scalar,NaNPropagation>, const Derived,
+EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_max_op<Scalar,Scalar>, const Derived,
                                         const CwiseNullaryOp<internal::scalar_constant_op<Scalar>, PlainObject> >
 #ifdef EIGEN_PARSED_BY_DOXYGEN
 max
@@ -96,7 +72,7 @@ max
 #endif
 (const Scalar &other) const
 {
-  return (max<NaNPropagation>)(Derived::PlainObject::Constant(rows(), cols(), other));
+  return (max)(Derived::PlainObject::Constant(rows(), cols(), other));
 }
 
 /** \returns an expression of the coefficient-wise absdiff of \c *this and \a other
@@ -133,6 +109,26 @@ absolute_difference
   * Output: \verbinclude Cwise_array_power_array.out
   */
 EIGEN_MAKE_CWISE_BINARY_OP(pow,pow)
+
+#ifndef EIGEN_PARSED_BY_DOXYGEN
+EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(pow,pow)
+#else
+/** \returns an expression of the coefficients of \c *this rasied to the constant power \a exponent
+  *
+  * \tparam T is the scalar type of \a exponent. It must be compatible with the scalar type of the given expression.
+  *
+  * This function computes the coefficient-wise power. The function MatrixBase::pow() in the
+  * unsupported module MatrixFunctions computes the matrix power.
+  *
+  * Example: \include Cwise_pow.cpp
+  * Output: \verbinclude Cwise_pow.out
+  *
+  * \sa ArrayBase::pow(ArrayBase), square(), cube(), exp(), log()
+  */
+template<typename T>
+const CwiseBinaryOp<internal::scalar_pow_op<Scalar,T>,Derived,Constant<T> > pow(const T& exponent) const;
+#endif
+
 
 // TODO code generating macros could be moved to Macros.h and could include generation of documentation
 #define EIGEN_MAKE_CWISE_COMP_OP(OP, COMPARATOR) \

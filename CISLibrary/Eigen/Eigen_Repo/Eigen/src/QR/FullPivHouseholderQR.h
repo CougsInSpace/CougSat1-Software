@@ -11,14 +11,12 @@
 #ifndef EIGEN_FULLPIVOTINGHOUSEHOLDERQR_H
 #define EIGEN_FULLPIVOTINGHOUSEHOLDERQR_H
 
-#include "./InternalHeaderCheck.h"
-
 namespace Eigen { 
 
 namespace internal {
 
-template<typename MatrixType_> struct traits<FullPivHouseholderQR<MatrixType_> >
- : traits<MatrixType_>
+template<typename _MatrixType> struct traits<FullPivHouseholderQR<_MatrixType> >
+ : traits<_MatrixType>
 {
   typedef MatrixXpr XprKind;
   typedef SolverStorage StorageKind;
@@ -42,7 +40,7 @@ struct traits<FullPivHouseholderQRMatrixQReturnType<MatrixType> >
   *
   * \brief Householder rank-revealing QR decomposition of a matrix with full pivoting
   *
-  * \tparam MatrixType_ the type of the matrix of which we are computing the QR decomposition
+  * \tparam _MatrixType the type of the matrix of which we are computing the QR decomposition
   *
   * This class performs a rank-revealing QR decomposition of a matrix \b A into matrices \b P, \b P', \b Q and \b R
   * such that 
@@ -59,12 +57,12 @@ struct traits<FullPivHouseholderQRMatrixQReturnType<MatrixType> >
   * 
   * \sa MatrixBase::fullPivHouseholderQr()
   */
-template<typename MatrixType_> class FullPivHouseholderQR
-        : public SolverBase<FullPivHouseholderQR<MatrixType_> >
+template<typename _MatrixType> class FullPivHouseholderQR
+        : public SolverBase<FullPivHouseholderQR<_MatrixType> >
 {
   public:
 
-    typedef MatrixType_ MatrixType;
+    typedef _MatrixType MatrixType;
     typedef SolverBase<FullPivHouseholderQR> Base;
     friend class SolverBase<FullPivHouseholderQR>;
 
@@ -76,8 +74,8 @@ template<typename MatrixType_> class FullPivHouseholderQR
     typedef internal::FullPivHouseholderQRMatrixQReturnType<MatrixType> MatrixQReturnType;
     typedef typename internal::plain_diag_type<MatrixType>::type HCoeffsType;
     typedef Matrix<StorageIndex, 1,
-                   internal::min_size_prefer_dynamic(ColsAtCompileTime,RowsAtCompileTime), RowMajor, 1,
-                   internal::min_size_prefer_fixed(MaxColsAtCompileTime, MaxRowsAtCompileTime)> IntDiagSizeVectorType;
+                   EIGEN_SIZE_MIN_PREFER_DYNAMIC(ColsAtCompileTime,RowsAtCompileTime), RowMajor, 1,
+                   EIGEN_SIZE_MIN_PREFER_FIXED(MaxColsAtCompileTime,MaxRowsAtCompileTime)> IntDiagSizeVectorType;
     typedef PermutationMatrix<ColsAtCompileTime, MaxColsAtCompileTime> PermutationType;
     typedef typename internal::plain_row_type<MatrixType>::type RowVectorType;
     typedef typename internal::plain_col_type<MatrixType>::type ColVectorType;
@@ -210,21 +208,6 @@ template<typename MatrixType_> class FullPivHouseholderQR
       return m_rows_transpositions;
     }
 
-    /** \returns the determinant of the matrix of which
-      * *this is the QR decomposition. It has only linear complexity
-      * (that is, O(n) where n is the dimension of the square matrix)
-      * as the QR decomposition has already been computed.
-      *
-      * \note This is only for square matrices.
-      *
-      * \warning a determinant can be very big or small, so for matrices
-      * of large enough dimension, there is a risk of overflow/underflow.
-      * One way to work around that is to use logAbsDeterminant() instead.
-      *
-      * \sa absDeterminant(), logAbsDeterminant(), MatrixBase::determinant()
-      */
-    typename MatrixType::Scalar determinant() const;
-
     /** \returns the absolute value of the determinant of the matrix of which
       * *this is the QR decomposition. It has only linear complexity
       * (that is, O(n) where n is the dimension of the square matrix)
@@ -236,7 +219,7 @@ template<typename MatrixType_> class FullPivHouseholderQR
       * of large enough dimension, there is a risk of overflow/underflow.
       * One way to work around that is to use logAbsDeterminant() instead.
       *
-      * \sa determinant(), logAbsDeterminant(), MatrixBase::determinant()
+      * \sa logAbsDeterminant(), MatrixBase::determinant()
       */
     typename MatrixType::RealScalar absDeterminant() const;
 
@@ -250,7 +233,7 @@ template<typename MatrixType_> class FullPivHouseholderQR
       * \note This method is useful to work around the risk of overflow/underflow that's inherent
       * to determinant computation.
       *
-      * \sa determinant(), absDeterminant(), MatrixBase::determinant()
+      * \sa absDeterminant(), MatrixBase::determinant()
       */
     typename MatrixType::RealScalar logAbsDeterminant() const;
 
@@ -420,7 +403,10 @@ template<typename MatrixType_> class FullPivHouseholderQR
 
   protected:
 
-    EIGEN_STATIC_ASSERT_NON_INTEGER(Scalar)
+    static void check_template_parameters()
+    {
+      EIGEN_STATIC_ASSERT_NON_INTEGER(Scalar);
+    }
 
     void computeInPlace();
 
@@ -434,18 +420,8 @@ template<typename MatrixType_> class FullPivHouseholderQR
     RealScalar m_prescribedThreshold, m_maxpivot;
     Index m_nonzero_pivots;
     RealScalar m_precision;
-    Index m_det_p;
+    Index m_det_pq;
 };
-
-template<typename MatrixType>
-typename MatrixType::Scalar FullPivHouseholderQR<MatrixType>::determinant() const
-{
-  eigen_assert(m_isInitialized && "HouseholderQR is not initialized.");
-  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
-  Scalar detQ;
-  internal::householder_determinant<HCoeffsType, Scalar, NumTraits<Scalar>::IsComplex>::run(m_hCoeffs, detQ);
-  return m_qr.diagonal().prod() * detQ * Scalar(m_det_p);
-}
 
 template<typename MatrixType>
 typename MatrixType::RealScalar FullPivHouseholderQR<MatrixType>::absDeterminant() const
@@ -482,6 +458,8 @@ FullPivHouseholderQR<MatrixType>& FullPivHouseholderQR<MatrixType>::compute(cons
 template<typename MatrixType>
 void FullPivHouseholderQR<MatrixType>::computeInPlace()
 {
+  check_template_parameters();
+
   using std::abs;
   Index rows = m_qr.rows();
   Index cols = m_qr.cols();
@@ -556,14 +534,14 @@ void FullPivHouseholderQR<MatrixType>::computeInPlace()
   for(Index k = 0; k < size; ++k)
     m_cols_permutation.applyTranspositionOnTheRight(k, m_cols_transpositions.coeff(k));
 
-  m_det_p = (number_of_transpositions%2) ? -1 : 1;
+  m_det_pq = (number_of_transpositions%2) ? -1 : 1;
   m_isInitialized = true;
 }
 
 #ifndef EIGEN_PARSED_BY_DOXYGEN
-template<typename MatrixType_>
+template<typename _MatrixType>
 template<typename RhsType, typename DstType>
-void FullPivHouseholderQR<MatrixType_>::_solve_impl(const RhsType &rhs, DstType &dst) const
+void FullPivHouseholderQR<_MatrixType>::_solve_impl(const RhsType &rhs, DstType &dst) const
 {
   const Index l_rank = rank();
 
@@ -595,9 +573,9 @@ void FullPivHouseholderQR<MatrixType_>::_solve_impl(const RhsType &rhs, DstType 
   for(Index i = l_rank; i < cols(); ++i) dst.row(m_cols_permutation.indices().coeff(i)).setZero();
 }
 
-template<typename MatrixType_>
+template<typename _MatrixType>
 template<bool Conjugate, typename RhsType, typename DstType>
-void FullPivHouseholderQR<MatrixType_>::_solve_impl_transposed(const RhsType &rhs, DstType &dst) const
+void FullPivHouseholderQR<_MatrixType>::_solve_impl_transposed(const RhsType &rhs, DstType &dst) const
 {
   const Index l_rank = rank();
 

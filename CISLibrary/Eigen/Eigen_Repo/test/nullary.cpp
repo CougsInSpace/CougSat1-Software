@@ -13,20 +13,24 @@
 template<typename MatrixType>
 bool equalsIdentity(const MatrixType& A)
 {
+  typedef typename MatrixType::Scalar Scalar;
+  Scalar zero = static_cast<Scalar>(0);
+
   bool offDiagOK = true;
   for (Index i = 0; i < A.rows(); ++i) {
     for (Index j = i+1; j < A.cols(); ++j) {
-      offDiagOK = offDiagOK && numext::is_exactly_zero(A(i, j));
+      offDiagOK = offDiagOK && (A(i,j) == zero);
     }
   }
   for (Index i = 0; i < A.rows(); ++i) {
     for (Index j = 0; j < (std::min)(i, A.cols()); ++j) {
-      offDiagOK = offDiagOK && numext::is_exactly_zero(A(i, j));
+      offDiagOK = offDiagOK && (A(i,j) == zero);
     }
   }
 
   bool diagOK = (A.diagonal().array() == 1).all();
   return offDiagOK && diagOK;
+
 }
 
 template<typename VectorType>

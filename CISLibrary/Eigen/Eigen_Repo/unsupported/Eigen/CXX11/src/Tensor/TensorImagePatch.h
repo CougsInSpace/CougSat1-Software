@@ -10,8 +10,6 @@
 #ifndef EIGEN_CXX11_TENSOR_TENSOR_IMAGE_PATCH_H
 #define EIGEN_CXX11_TENSOR_TENSOR_IMAGE_PATCH_H
 
-#include "./InternalHeaderCheck.h"
-
 namespace Eigen {
 
 /** \class TensorImagePatch
@@ -33,14 +31,14 @@ namespace internal {
 template<DenseIndex Rows, DenseIndex Cols, typename XprType>
 struct traits<TensorImagePatchOp<Rows, Cols, XprType> > : public traits<XprType>
 {
-  typedef std::remove_const_t<typename XprType::Scalar> Scalar;
+  typedef typename internal::remove_const<typename XprType::Scalar>::type Scalar;
   typedef traits<XprType> XprTraits;
   typedef typename XprTraits::StorageKind StorageKind;
   typedef typename XprTraits::Index Index;
   typedef typename XprType::Nested Nested;
-  typedef std::remove_reference_t<Nested> Nested_;
-  static constexpr int NumDimensions = XprTraits::NumDimensions + 1;
-  static constexpr int Layout = XprTraits::Layout;
+  typedef typename remove_reference<Nested>::type _Nested;
+  static const int NumDimensions = XprTraits::NumDimensions + 1;
+  static const int Layout = XprTraits::Layout;
   typedef typename XprTraits::PointerType PointerType;
 };
 
@@ -189,7 +187,7 @@ class TensorImagePatchOp : public TensorBase<TensorImagePatchOp<Rows, Cols, XprT
     Scalar padding_value() const { return m_padding_value; }
 
     EIGEN_DEVICE_FUNC
-    const internal::remove_all_t<typename XprType::Nested>&
+    const typename internal::remove_all<typename XprType::Nested>::type&
     expression() const { return m_xpr; }
 
   protected:
@@ -217,25 +215,25 @@ struct TensorEvaluator<const TensorImagePatchOp<Rows, Cols, ArgType>, Device>
 {
   typedef TensorImagePatchOp<Rows, Cols, ArgType> XprType;
   typedef typename XprType::Index Index;
-  static constexpr int NumInputDims = internal::array_size<typename TensorEvaluator<ArgType, Device>::Dimensions>::value;
-  static constexpr int NumDims = NumInputDims + 1;
+  static const int NumInputDims = internal::array_size<typename TensorEvaluator<ArgType, Device>::Dimensions>::value;
+  static const int NumDims = NumInputDims + 1;
   typedef DSizes<Index, NumDims> Dimensions;
-  typedef std::remove_const_t<typename XprType::Scalar> Scalar;
+  typedef typename internal::remove_const<typename XprType::Scalar>::type Scalar;
   typedef TensorEvaluator<const TensorImagePatchOp<Rows, Cols, ArgType>,
                           Device> Self;
   typedef TensorEvaluator<ArgType, Device> Impl;
   typedef typename XprType::CoeffReturnType CoeffReturnType;
   typedef typename PacketType<CoeffReturnType, Device>::type PacketReturnType;
-  static constexpr int PacketSize = PacketType<CoeffReturnType, Device>::size;
+  static const int PacketSize = PacketType<CoeffReturnType, Device>::size;
   typedef StorageMemory<CoeffReturnType, Device> Storage;
   typedef typename Storage::Type EvaluatorPointerType;
 
-  static constexpr int Layout = TensorEvaluator<ArgType, Device>::Layout;
   enum {
     IsAligned         = false,
     PacketAccess      = TensorEvaluator<ArgType, Device>::PacketAccess,
     BlockAccess       = false,
     PreferBlockAccess = true,
+    Layout            = TensorEvaluator<ArgType, Device>::Layout,
     CoordAccess       = false,
     RawAccess         = false
   };
@@ -449,6 +447,7 @@ struct TensorEvaluator<const TensorImagePatchOp<Rows, Cols, ArgType>, Device>
   template<int LoadMode>
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE PacketReturnType packet(Index index) const
   {
+    EIGEN_STATIC_ASSERT((PacketSize > 1), YOU_MADE_A_PROGRAMMING_MISTAKE)
     eigen_assert(index+PacketSize-1 < dimensions().TotalSize());
 
     if (m_in_row_strides != 1 || m_in_col_strides != 1 || m_row_inflate_strides != 1 || m_col_inflate_strides != 1) {
@@ -541,7 +540,7 @@ struct TensorEvaluator<const TensorImagePatchOp<Rows, Cols, ArgType>, Device>
  protected:
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE PacketReturnType packetWithPossibleZero(Index index) const
   {
-    EIGEN_ALIGN_MAX std::remove_const_t<CoeffReturnType> values[PacketSize];
+    EIGEN_ALIGN_MAX typename internal::remove_const<CoeffReturnType>::type values[PacketSize];
     EIGEN_UNROLL_LOOP
     for (int i = 0; i < PacketSize; ++i) {
       values[i] = coeff(index+i);

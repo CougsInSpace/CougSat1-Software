@@ -46,7 +46,6 @@ private:
   voltages* volts;
   
   float dt;
-  Vector3f dipoleTarget;
   Vector3f lastMag;
   const float maxMTCurrent = .1; // amps
 
@@ -57,5 +56,7 @@ public:
   void attitudeDeterminationLoop();
   void attitudeControl();
   void updateSensors();
+
+  short adcsMode; // 0 is off, 1 is bDot, 2 is charge, 3 is bbq roll, 4 is antenna (?)
 };
 #endif /* ADCS_H */
