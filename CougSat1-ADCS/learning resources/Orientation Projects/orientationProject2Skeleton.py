@@ -20,7 +20,6 @@ import os
 from pyorbital.orbital import Orbital
 from pyorbital import astronomy
 import quaternion
-# import numpy_quaternion as quat
 from tqdm import tqdm
 import pickle
 import math
@@ -28,19 +27,21 @@ import random
 
 '''Initilization Section Start'''
 # Inertia matrix
-Ixx = 1.5
+Ixx = 1
 Ixy = 0
 Ixz = 0
-Iyy = -1
+Iyy = 1
 Iyz = 0
-Izz = .2
+Izz = 1
 iLocal = np.array([[Ixx, Ixy, Ixz],
                   [Ixy, Iyy, Iyz],
                   [Ixz, Iyz, Izz]]) #/ 1e6
 
-tStep = 0.001 # in seconds
-tMax = 1 # in seconds
-
+tStep = 0.01 # in seconds
+tMax = 10 # in seconds
+magGlobal = np.array([0, 0, 1]).reshape((3,1))
+rCamera = np.array([1, 0, 0]).reshape((3,1))
+targetGlobal = np.array([0, 1, 0]).reshape((3,1))
 # input 3 numbers, create torque vector
 m = np.array([1, 2, 3]).reshape((3,1))
 '''Initilization Section End'''
@@ -48,8 +49,7 @@ m = np.array([1, 2, 3]).reshape((3,1))
 # initial conditions
 l = np.array([0, 0, 0]).reshape((3,1))
 omega = np.array([0, 0, 0]).reshape((3,1))
-# q = quaternion.from_float_array([1, 0, 0, 0])
-q = np.quaternion(1,0,0,0)
+q = quaternion.from_float_array([1, 0, 0, 0])
 axisX = np.array([1, 0, 0]).reshape((3,1))
 axisY = np.array([0, 1, 0]).reshape((3,1))
 axisZ = np.array([0, 0, 1]).reshape((3,1))
@@ -61,6 +61,10 @@ axisListZ = []
 torqueList = []
 momentumList = []
 omegaList = []
+cameraList = []
+targetList = []
+magList = []
+
 #qAxisList = []
 
 for i in range(int(tMax/tStep)):
@@ -70,27 +74,41 @@ for i in range(int(tMax/tStep)):
 
     # transform rotation matrix into global frame
     iGlobal = r @ iLocal @ r.T
-    iInv = np.linalg.inv(iGlobal)
+    iInv = np.linalg.inv(iGlobal) 
 
     # calculate new rotational momentum from torque
-    l = l + m * tStep
+    l = l + m*tStep #angular momentum changes by amount equal to torque*time, m = I*(d(omega)/dt) where the right side term is derivative of angular momentum
 
     # calculate current angular velocity from momentum. 
     # Note: angular momentum must be conserved in the Global frame
-    omega = iInv @ m
+    omega = iInv @ m #basically dividing m by the inertia matrix (ie, multiplying by inverse inertia matrix)
 
     # convert omega to quaternion so it can multiplied by the quaternion orienation
-    # omegaq = quaternion.from_float_array(np.append([0], omega))
-    omegaq = np.quaternion(0, omega[0], omega[1], omega[2])
+    omegaq = quaternion.from_float_array(np.append([0], omega))
 
     # calculate quaternion angular velocity using the formula qdot = .5 * omegaq * q
-    qdot = 0.5 * omegaq * q
+    qdot = .5 * omegaq * q #EXPLAIN THIS FORMULA
 
     # update quaternion orientation
-    q = q + qdot * tStep
+    q = q + qdot*tStep
+
+    # update Local axes in Global frame
     axisXGlobal = r @ axisX
     axisYGlobal = r @ axisY
     axisZGlobal = r @ axisZ
+
+    #Convert camera direction vector (rCamera) to global frame
+    rCameraGlobal = # TODO
+
+    #define plane of torques to get from Camera to target. Plane will be defined by w1 and w2,
+    # the order doesn't matter. An explanation of how to calculate these two vectors
+    # can be found here: https://www.youtube.com/watch?v=lS-L49FbJQw
+    w1 = # TODO
+    w2 = # TODO
+    planeNorm = # TODO find norm of the plane that contains the vectors w1 and w2
+
+    #Cross the norm of this plane with the magnetic field to find the one torque that is possible for the magnetorquers to generate
+    m = 10*np.cross('''two vectors to cross go here''').reshape((3,1)) # TODO
     
     # append updated vectors to their respective lists to be plotted later
     axisListX.append(axisXGlobal)
@@ -99,6 +117,10 @@ for i in range(int(tMax/tStep)):
     torqueList.append(m)
     momentumList.append(l)
     omegaList.append(omega)
+    cameraList.append(rCameraGlobal)
+    targetList.append(targetGlobal)
+    magList.append(magGlobal)
+
 
 
 # plot everything
@@ -108,6 +130,9 @@ axisListZ = np.array(axisListZ)
 torqueList = np.array(torqueList)
 momentumList = np.array(momentumList)
 omegaList = np.array(omegaList)
+cameraList = np.array(cameraList)
+targetList = np.array(targetList)
+magList = np.array(magList)
 
 lines = []
 fig = pyplot.figure()
@@ -163,6 +188,36 @@ z = list[:, 2, 0]
 
 ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='grey')
 lines.append(ax.plot3D(x,y,z, 'grey', label='Angular Velocity'))
+
+norm = np.max(np.linalg.norm(cameraList, axis=1))
+list = cameraList / norm
+
+x = list[:, 0, 0]
+y = list[:, 1, 0]
+z = list[:, 2, 0]
+
+ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='yellow')
+lines.append(ax.plot3D(x,y,z, 'yellow', label='Camera'))
+
+norm = np.max(np.linalg.norm(magList, axis=1))
+list = magList / norm
+
+x = list[:, 0, 0]
+y = list[:, 1, 0]
+z = list[:, 2, 0]
+
+ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='lime')
+lines.append(ax.plot3D(x,y,z, 'lime', label='Magnetic Field'))
+
+norm = np.max(np.linalg.norm(targetList, axis=1))
+list = targetList / norm
+
+x = list[:, 0, 0]
+y = list[:, 1, 0]
+z = list[:, 2, 0]
+
+ax.quiver([0], [0], [0], [x[-1]], [y[-1]], [z[-1]], colors='c')
+lines.append(ax.plot3D(x,y,z, 'c', label='Target'))
 
 ax.set_xlim(-1, 1)
 ax.set_ylim(-1, 1)
