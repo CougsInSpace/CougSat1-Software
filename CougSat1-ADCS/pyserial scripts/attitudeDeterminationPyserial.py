@@ -38,34 +38,46 @@ for i in range(1000):
         string = line.decode().strip()
         vec2[j] = float(string)
 
-    vec3 = [0,0,0,0]
-    for j in range(4):
+    vec3 = [0,0,0]
+    for j in range(3):
         line = ser.readline()
         string = line.decode().strip()
         vec3[j] = float(string)
     ser.readline() # move past "x" in serial output
 
-    q = quaternion.from_float_array([vec3[3], vec3[0], vec3[1], vec3[2]])
-    r = quaternion.as_rotation_matrix(q)
-
-    axesT = axes @ r
-
-    plt.cla()
-    ax.set_xlim(-1, 1)
-    ax.set_ylim(-1, 1)
-    ax.set_zlim(-1, 1)
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
-
-    ax.quiver(0, 0, 0, axes[0,:], axes[1,:], axes[2,:])
-    ax.quiver(0, 0, 0, axesT[0,:], axesT[1,:], axesT[2,:], colors="red")
-    ax.quiver(0, 0, 0, vec1[0], vec1[1], vec1[2], colors="yellow")
-    ax.quiver(0, 0, 0, vec2[0], vec2[1], vec2[2], colors="green")
-
-    plt.pause(.05)
+    # TODO YOUR CODE GOES HERE
 
 
+    # q = quaternion.from_float_array([vec3[3], vec3[0], vec3[1], vec3[2]])
+    # r = quaternion.as_rotation_matrix(q)
+
+    # axesT = axes @ r
+
+    # plt.cla()
+    # ax.set_xlim(-1, 1)
+    # ax.set_ylim(-1, 1)
+    # ax.set_zlim(-1, 1)
+    # ax.set_xlabel('x')
+    # ax.set_ylabel('y')
+    # ax.set_zlabel('z')
+
+    # ax.quiver(0, 0, 0, axes[0,:], axes[1,:], axes[2,:])
+    # ax.quiver(0, 0, 0, axesT[0,:], axesT[1,:], axesT[2,:], colors="red")
+    # ax.quiver(0, 0, 0, vec1[0], vec1[1], vec1[2], colors="yellow")
+    # ax.quiver(0, 0, 0, vec2[0], vec2[1], vec2[2], colors="green")
+
+    # plt.pause(.05)
+
+
+
+
+
+
+##output array code for taking all inputs of vec1,vec2,vec3 and translating to output .csv
+vecArray = np.array([vec1[0],vec1[1],vec1[2],vec2[0],vec2[1],vec2[2],vec3[0],vec3[1],vec3[2]], np.float64)  
+ 
+ #outputs all data in a column - when writing code to read/parse it then an object or node should be created for each vector and after the third read, it should jump to a new one 
+save = np.savetxt('outputCode.csv',vecArray,delimiter=',', header="start of file:", footer="eof")
 
 
 
