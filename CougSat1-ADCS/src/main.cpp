@@ -14,6 +14,7 @@
  * @return error code
  */
 int main(void) {
+  printf("yayay\n");
   ADCS adcs;
   adcs.startThread();
 }
