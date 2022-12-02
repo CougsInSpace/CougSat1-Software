@@ -9,11 +9,13 @@
  * @param cs connected to the synth
  * @param variant of the ADF4360 [0, 9]
  * @param ref clock in Hertz
+ * @param minCounterR to divide ref clock by (defines smallest frequency
+ * adjustment)
  */
-ADF4360::ADF4360(
-    SPI & spi, const PinName cs, const uint8_t variant, const uint32_t ref) :
+ADF4360::ADF4360(SPI & spi, const PinName cs, const uint8_t variant,
+    const uint32_t ref, const uint16_t minCounterR) :
   Synth(ref),
-  spi(spi), cs(cs, 1), variant(variant) {
+  spi(spi), cs(cs, 1), variant(variant), minCounterR(minCounterR) {
   MBED_ASSERT(variant <= 9);
 }
 
@@ -36,7 +38,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
     return MBED_ERROR_INVALID_ARGUMENT;
 
   uint32_t frequencyPFD;
-  counterR = 0;
+  counterR = max(minCounterR, (uint16_t)1) - 1;
   if (variant >= 8) {
     prescaler = 1;
     counterA  = 0; // A counter does not exist
@@ -102,7 +104,7 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
   error = write(Register_t::CONTROL);
   if (error)
     return error;
-  ThisThread::sleep_for(10ms);
+  wait_us(10e3);
   error = write(Register_t::COUNTER_N);
   if (error)
     return error;
@@ -116,8 +118,8 @@ mbed_error_status_t ADF4360::setFrequency(uint32_t freq) {
  * @param enable
  * @return mbed_error_status_t
  */
-mbed_error_status_t ADF4360::setEnable(bool enable) {
-  powerDown = enable ? PowerDown_t::ON : PowerDown_t::SYNC_OFF;
+  mbed_error_status_t ADF4360::setEnable(bool enable) {
+  powerDown = enable ? PowerDown_t::ON : PowerDown_t::ASYNC_OFF;
   return write(Register_t::CONTROL);
 }
 

@@ -24,8 +24,6 @@ from PyQt5 import Qt
 from gnuradio import qtgui
 from gnuradio.filter import firdes
 import sip
-from gnuradio import analog
-from gnuradio import audio
 from gnuradio import filter
 from gnuradio import gr
 from gnuradio.fft import window
@@ -82,15 +80,10 @@ class fmradio(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self.rational_resampler_xxx_0 = filter.rational_resampler_ccc(
-                interpolation=12,
-                decimation=5,
-                taps=[],
-                fractional_bw=0)
         self.qtgui_sink_x_0 = qtgui.sink_c(
             1024, #fftsize
             window.WIN_BLACKMAN_hARRIS, #wintype
-            435e6, #fc
+            433.333e6, #fc
             20e6, #bw
             "", #name
             True, #plotfreq
@@ -110,7 +103,7 @@ class fmradio(gr.top_block, Qt.QWidget):
         )
         self.osmosdr_source_0.set_time_unknown_pps(osmosdr.time_spec_t())
         self.osmosdr_source_0.set_sample_rate(samp_rate)
-        self.osmosdr_source_0.set_center_freq(435e6, 0)
+        self.osmosdr_source_0.set_center_freq(433.333e6, 0)
         self.osmosdr_source_0.set_freq_corr(0, 0)
         self.osmosdr_source_0.set_dc_offset_mode(0, 0)
         self.osmosdr_source_0.set_iq_balance_mode(0, 0)
@@ -120,32 +113,14 @@ class fmradio(gr.top_block, Qt.QWidget):
         self.osmosdr_source_0.set_bb_gain(20, 0)
         self.osmosdr_source_0.set_antenna('', 0)
         self.osmosdr_source_0.set_bandwidth(0, 0)
-        self.low_pass_filter_0 = filter.fir_filter_ccf(
-            20,
-            firdes.low_pass(
-                1,
-                samp_rate,
-                75e3,
-                25e3,
-                window.WIN_HAMMING,
-                6.76))
         self.dc_blocker_xx_0 = filter.dc_blocker_cc(1024, True)
-        self.audio_sink_0 = audio.sink(48000, '', True)
-        self.analog_wfm_rcv_0 = analog.wfm_rcv(
-        	quad_rate=480e3,
-        	audio_decimation=10,
-        )
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_wfm_rcv_0, 0), (self.audio_sink_0, 0))
-        self.connect((self.dc_blocker_xx_0, 0), (self.low_pass_filter_0, 0))
         self.connect((self.dc_blocker_xx_0, 0), (self.qtgui_sink_x_0, 0))
-        self.connect((self.low_pass_filter_0, 0), (self.rational_resampler_xxx_0, 0))
         self.connect((self.osmosdr_source_0, 0), (self.dc_blocker_xx_0, 0))
-        self.connect((self.rational_resampler_xxx_0, 0), (self.analog_wfm_rcv_0, 0))
 
 
     def closeEvent(self, event):
@@ -161,7 +136,6 @@ class fmradio(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.low_pass_filter_0.set_taps(firdes.low_pass(1, self.samp_rate, 75e3, 25e3, window.WIN_HAMMING, 6.76))
         self.osmosdr_source_0.set_sample_rate(self.samp_rate)
 
 

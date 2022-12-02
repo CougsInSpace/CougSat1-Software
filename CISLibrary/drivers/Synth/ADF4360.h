@@ -32,7 +32,8 @@ public:
   ADF4360(const ADF4360 &) = delete;
   ADF4360 & operator=(const ADF4360 &) = delete;
 
-  ADF4360(SPI & spi, PinName cs, const uint8_t variant, const uint32_t ref);
+  ADF4360(SPI & spi, PinName cs, const uint8_t variant, const uint32_t ref,
+      const uint16_t minCounterR = 1);
   ~ADF4360();
 
   mbed_error_status_t setFrequency(uint32_t freq);
@@ -105,7 +106,7 @@ private:
   bool             cpGainUse2              = false; // true=current 2, false=1
   bool             cpOutputTriState        = false;
   bool             phaseDetectPositive     = true;
-  MuxOutput_t      muxOutput               = MuxOutput_t::N_DIVIDER;
+  MuxOutput_t      muxOutput               = MuxOutput_t::DVDD;
   bool             countersReset           = false;
   CorePower_t      corePower               = CorePower_t::MA_5;
   bool             divide2Select           = false;
@@ -116,6 +117,8 @@ private:
   bool             lockDetectHighPrecision = false; // true=5 cycles, false=3
   AntiBacklash_t   antiBacklash            = AntiBacklash_t::NS_3_0;
   uint16_t         counterR                = 0;
+
+  uint16_t minCounterR = 1;
 
   static const uint32_t MAX_FREQ_PFD = 8000000;
 };

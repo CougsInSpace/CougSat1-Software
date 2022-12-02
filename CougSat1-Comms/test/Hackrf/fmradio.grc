@@ -61,7 +61,7 @@ blocks:
     bus_structure: null
     coordinate: [1552, 128.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: audio_sink_0
   id: audio_sink
   parameters:
@@ -78,7 +78,7 @@ blocks:
     bus_structure: null
     coordinate: [1808, 176.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: dc_blocker_xx_0
   id: dc_blocker_xx
   parameters:
@@ -120,7 +120,7 @@ blocks:
     bus_structure: null
     coordinate: [1040, 80.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: osmosdr_source_0
   id: osmosdr_source
   parameters:
@@ -296,7 +296,7 @@ blocks:
     dc_offset_mode7: '0'
     dc_offset_mode8: '0'
     dc_offset_mode9: '0'
-    freq0: 435e6
+    freq0: 433.333e6
     freq1: 100e6
     freq10: 100e6
     freq11: 100e6
@@ -485,7 +485,7 @@ blocks:
     alias: ''
     bw: 20e6
     comment: ''
-    fc: 435e6
+    fc: 433.333e6
     fftsize: '1024'
     gui_hint: ''
     maxoutbuf: '0'
@@ -526,11 +526,10 @@ blocks:
     bus_structure: null
     coordinate: [1304, 104.0]
     rotation: 0
-    state: true
+    state: disabled
 
 connections:
 - [analog_wfm_rcv_0, '0', audio_sink_0, '0']
-- [dc_blocker_xx_0, '0', low_pass_filter_0, '0']
 - [dc_blocker_xx_0, '0', qtgui_sink_x_0, '0']
 - [low_pass_filter_0, '0', rational_resampler_xxx_0, '0']
 - [osmosdr_source_0, '0', dc_blocker_xx_0, '0']
