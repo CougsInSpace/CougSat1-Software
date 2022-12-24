@@ -7,6 +7,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#define EIGEN_NO_STATIC_ASSERT
 #include "product.h"
 #include <Eigen/LU>
 
@@ -40,12 +41,12 @@ const TC& ref_prod(TC &C, const TA &A, const TB &B)
 }
 
 template<typename T, int Rows, int Cols, int Depth, int OC, int OA, int OB>
-std::enable_if_t<! ( (Rows ==1&&Depth!=1&&OA==ColMajor)
+typename internal::enable_if<! ( (Rows ==1&&Depth!=1&&OA==ColMajor)
                               || (Depth==1&&Rows !=1&&OA==RowMajor)
                               || (Cols ==1&&Depth!=1&&OB==RowMajor)
                               || (Depth==1&&Cols !=1&&OB==ColMajor)
                               || (Rows ==1&&Cols !=1&&OC==ColMajor)
-                              || (Cols ==1&&Rows !=1&&OC==RowMajor)),void>
+                              || (Cols ==1&&Rows !=1&&OC==RowMajor)),void>::type
 test_lazy_single(int rows, int cols, int depth)
 {
   Matrix<T,Rows,Depth,OA> A(rows,depth); A.setRandom();
@@ -80,12 +81,12 @@ void test_dynamic_bool()
 }
 
 template<typename T, int Rows, int Cols, int Depth, int OC, int OA, int OB>
-std::enable_if_t<  ( (Rows ==1&&Depth!=1&&OA==ColMajor)
+typename internal::enable_if<  ( (Rows ==1&&Depth!=1&&OA==ColMajor)
                               || (Depth==1&&Rows !=1&&OA==RowMajor)
                               || (Cols ==1&&Depth!=1&&OB==RowMajor)
                               || (Depth==1&&Cols !=1&&OB==ColMajor)
                               || (Rows ==1&&Cols !=1&&OC==ColMajor)
-                              || (Cols ==1&&Rows !=1&&OC==RowMajor)),void>
+                              || (Cols ==1&&Rows !=1&&OC==RowMajor)),void>::type
 test_lazy_single(int, int, int)
 {
 }

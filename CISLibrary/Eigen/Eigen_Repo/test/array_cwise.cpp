@@ -72,179 +72,14 @@ void pow_test() {
     for (int j = 0; j < num_cases; ++j) {
       Scalar e = static_cast<Scalar>(std::pow(x(i,j), y(i,j)));
       Scalar a = actual(i, j);
-      bool success = (a==e) || ((numext::isfinite)(e) && internal::isApprox(a, e, tol)) || ((numext::isnan)(a) && (numext::isnan)(e));
-      all_pass &= success;
-      if (!success) {
+      bool fail = !(a==e) && !internal::isApprox(a, e, tol) && !((numext::isnan)(a) && (numext::isnan)(e));
+      all_pass &= !fail;
+      if (fail) {
         std::cout << "pow(" << x(i,j) << "," << y(i,j) << ")   =   " << a << " !=  " << e << std::endl;
       }
     }
   }
-
-  typedef typename internal::make_integer<Scalar>::type Int_t;
-
-  // ensure both vectorized and non-vectorized paths taken
-  Index test_size = 2 * internal::packet_traits<Scalar>::size + 1;
-  
-  Array<Scalar, Dynamic, 1> eigenPow(test_size);
-  for (int i = 0; i < num_cases; ++i) {
-    Array<Scalar, Dynamic, 1> bases = x.col(i);
-    for (Scalar abs_exponent : abs_vals){
-      for (Scalar exponent : {-abs_exponent, abs_exponent}){
-        // test floating point exponent code path
-        eigenPow.setZero();
-        eigenPow = bases.pow(exponent);
-        for (int j = 0; j < num_repeats; j++){
-          Scalar e = static_cast<Scalar>(std::pow(bases(j), exponent));
-          Scalar a = eigenPow(j);
-          bool success = (a == e) || ((numext::isfinite)(e) && internal::isApprox(a, e, tol)) || ((numext::isnan)(a) && (numext::isnan)(e));
-          all_pass &= success;
-          if (!success) {
-            std::cout << "pow(" << x(i, j) << "," << y(i, j) << ")   =   " << a << " !=  " << e << std::endl;
-          }
-        }
-        // test integer exponent code path
-        bool exponent_is_integer = (numext::isfinite)(exponent) && (numext::round(exponent) == exponent) && (numext::abs(exponent) < static_cast<Scalar>(NumTraits<Int_t>::highest()));
-        if (exponent_is_integer)
-        {
-          Int_t exponent_as_int = static_cast<Int_t>(exponent);
-          eigenPow.setZero();
-          eigenPow = bases.pow(exponent_as_int);
-          for (int j = 0; j < num_repeats; j++){
-            Scalar e = static_cast<Scalar>(std::pow(bases(j), exponent));
-            Scalar a = eigenPow(j);
-            bool success = (a == e) || ((numext::isfinite)(e) && internal::isApprox(a, e, tol)) || ((numext::isnan)(a) && (numext::isnan)(e));
-            all_pass &= success;
-            if (!success) {
-              std::cout << "pow(" << x(i, j) << "," << y(i, j) << ")   =   " << a << " !=  " << e << std::endl;
-            }
-          }
-        }
-      }
-    }
-  }
-
   VERIFY(all_pass);
-}
-
-template <typename Scalar, typename ScalarExponent>
-Scalar calc_overflow_threshold(const ScalarExponent exponent) {
-    EIGEN_USING_STD(exp2);
-    EIGEN_USING_STD(log2);
-    EIGEN_STATIC_ASSERT((NumTraits<Scalar>::digits() < 2 * NumTraits<double>::digits()), BASE_TYPE_IS_TOO_BIG);
-
-    if (exponent < 2)
-        return NumTraits<Scalar>::highest();
-    else {
-        // base^e <= highest ==> base <= 2^(log2(highest)/e)
-        // For floating-point types, consider the bound for integer values that can be reproduced exactly = 2 ^ digits
-        double highest_bits = numext::mini(static_cast<double>(NumTraits<Scalar>::digits()),
-                                           static_cast<double>(log2(NumTraits<Scalar>::highest())));
-        return static_cast<Scalar>(
-          numext::floor(exp2(highest_bits / static_cast<double>(exponent))));
-    }
-}
-
-template <typename Base, typename Exponent, bool ExpIsInteger = NumTraits<Exponent>::IsInteger>
-struct ref_pow {
-  static Base run(Base base, Exponent exponent) {
-    EIGEN_USING_STD(pow);
-    return pow(base, static_cast<Base>(exponent));
-  }
-};
-
-template <typename Base, typename Exponent>
-struct ref_pow<Base, Exponent, true> {
-  static Base run(Base base, Exponent exponent) {
-    EIGEN_USING_STD(pow);
-    return pow(base, exponent);
-  }
-};
-
-template <typename Base, typename Exponent>
-void test_exponent(Exponent exponent) {
-  const Base max_abs_bases = static_cast<Base>(10000);
-  // avoid integer overflow in Base type
-  Base threshold = calc_overflow_threshold<Base, Exponent>(numext::abs(exponent));
-  // avoid numbers that can't be verified with std::pow
-  double double_threshold = calc_overflow_threshold<double, Exponent>(numext::abs(exponent));
-  // use the lesser of these two thresholds
-  Base testing_threshold =
-      static_cast<double>(threshold) < double_threshold ? threshold : static_cast<Base>(double_threshold);
-  // test both vectorized and non-vectorized code paths
-  const Index array_size = 2 * internal::packet_traits<Base>::size + 1;
-
-  Base max_base = numext::mini(testing_threshold, max_abs_bases);
-  Base min_base = NumTraits<Base>::IsSigned ? -max_base : Base(0);
-
-  ArrayX<Base> x(array_size), y(array_size);
-  bool all_pass = true;
-  for (Base base = min_base; base <= max_base; base++) {
-    if (exponent < 0 && base == 0) continue;
-    x.setConstant(base);
-    y = x.pow(exponent);
-    for (Base a : y) {
-      Base e = ref_pow<Base, Exponent>::run(base, exponent);
-      bool pass = (a == e);
-      if (!NumTraits<Base>::IsInteger) {
-        pass = pass || (((numext::isfinite)(e) && internal::isApprox(a, e)) ||
-                        ((numext::isnan)(a) && (numext::isnan)(e)));
-      }
-      all_pass &= pass;
-      if (!pass) {
-        std::cout << "pow(" << base << "," << exponent << ")   =   " << a << " !=  " << e << std::endl;
-      }
-    }
-  }
-  VERIFY(all_pass);
-}
-
-template <typename Base, typename Exponent>
-void unary_pow_test() {
-  Exponent max_exponent = static_cast<Exponent>(NumTraits<Base>::digits());
-  Exponent min_exponent = static_cast<Exponent>(NumTraits<Exponent>::IsSigned ? -max_exponent : 0);
-
-  for (Exponent exponent = min_exponent; exponent < max_exponent; ++exponent) {
-    test_exponent<Base, Exponent>(exponent);
-  }
-};
-
-void mixed_pow_test() {
-  // The following cases will test promoting a smaller exponent type
-  // to a wider base type.
-  unary_pow_test<double, int>();
-  unary_pow_test<double, float>();
-  unary_pow_test<float, half>();
-  unary_pow_test<double, half>();
-  unary_pow_test<float, bfloat16>();
-  unary_pow_test<double, bfloat16>();
-
-  // Although in the following cases the exponent cannot be represented exactly
-  // in the base type, we do not perform a conversion, but implement
-  // the operation using repeated squaring.
-  unary_pow_test<float, int>();
-  unary_pow_test<double, long long>();
-
-  // The following cases will test promoting a wider exponent type
-  // to a narrower base type. This should compile but generate a
-  // deprecation warning:
-  unary_pow_test<float, double>();
-}
-
-void int_pow_test() {
-  unary_pow_test<int, int>();
-  unary_pow_test<unsigned int, unsigned int>();
-  unary_pow_test<long long, long long>();
-  unary_pow_test<unsigned long long, unsigned long long>();
-
-  // Although in the following cases the exponent cannot be represented exactly
-  // in the base type, we do not perform a conversion, but implement the
-  // operation using repeated squaring.
-  unary_pow_test<long long, int>();
-  unary_pow_test<int, unsigned int>();
-  unary_pow_test<unsigned int, int>();
-  unary_pow_test<long long, unsigned long long>();
-  unary_pow_test<unsigned long long, long long>();
-  unary_pow_test<long long, int>();
 }
 
 template<typename ArrayType> void array(const ArrayType& m)
@@ -257,20 +92,8 @@ template<typename ArrayType> void array(const ArrayType& m)
   Index rows = m.rows();
   Index cols = m.cols();
 
-  ArrayType m1 = ArrayType::Random(rows, cols);
-  if (NumTraits<RealScalar>::IsInteger && NumTraits<RealScalar>::IsSigned
-      && !NumTraits<Scalar>::IsComplex) {
-    // Here we cap the size of the values in m1 such that pow(3)/cube()
-    // doesn't overflow and result in undefined behavior. Notice that because
-    // pow(int, int) promotes its inputs and output to double (according to
-    // the C++ standard), we have to make sure that the result fits in 53 bits
-    // for int64,
-    RealScalar max_val =
-        numext::mini(RealScalar(std::cbrt(NumTraits<RealScalar>::highest())),
-                     RealScalar(std::cbrt(1LL << 53)))/2;
-    m1.array() = (m1.abs().array() <= max_val).select(m1, Scalar(max_val));
-  }
-  ArrayType  m2 = ArrayType::Random(rows, cols),
+  ArrayType m1 = ArrayType::Random(rows, cols),
+             m2 = ArrayType::Random(rows, cols),
              m3(rows, cols);
   ArrayType m4 = m1; // copy constructor
   VERIFY_IS_APPROX(m1, m4);
@@ -296,23 +119,23 @@ template<typename ArrayType> void array(const ArrayType& m)
   VERIFY_IS_APPROX(m3, m1 - s1);
 
   // scalar operators via Maps
-  m3 = m1;  m4 = m1;
-  ArrayType::Map(m4.data(), m4.rows(), m4.cols()) -= ArrayType::Map(m2.data(), m2.rows(), m2.cols());
-  VERIFY_IS_APPROX(m4, m3 - m2);
+  m3 = m1;
+  ArrayType::Map(m1.data(), m1.rows(), m1.cols()) -= ArrayType::Map(m2.data(), m2.rows(), m2.cols());
+  VERIFY_IS_APPROX(m1, m3 - m2);
 
-  m3 = m1;  m4 = m1;
-  ArrayType::Map(m4.data(), m4.rows(), m4.cols()) += ArrayType::Map(m2.data(), m2.rows(), m2.cols());
-  VERIFY_IS_APPROX(m4, m3 + m2);
+  m3 = m1;
+  ArrayType::Map(m1.data(), m1.rows(), m1.cols()) += ArrayType::Map(m2.data(), m2.rows(), m2.cols());
+  VERIFY_IS_APPROX(m1, m3 + m2);
 
-  m3 = m1; m4 = m1;
-  ArrayType::Map(m4.data(), m4.rows(), m4.cols()) *= ArrayType::Map(m2.data(), m2.rows(), m2.cols());
-  VERIFY_IS_APPROX(m4, m3 * m2);
+  m3 = m1;
+  ArrayType::Map(m1.data(), m1.rows(), m1.cols()) *= ArrayType::Map(m2.data(), m2.rows(), m2.cols());
+  VERIFY_IS_APPROX(m1, m3 * m2);
 
-  m3 = m1; m4 = m1;
+  m3 = m1;
   m2 = ArrayType::Random(rows,cols);
   m2 = (m2==0).select(1,m2);
-  ArrayType::Map(m4.data(), m4.rows(), m4.cols()) /= ArrayType::Map(m2.data(), m2.rows(), m2.cols());
-  VERIFY_IS_APPROX(m4, m3 / m2);
+  ArrayType::Map(m1.data(), m1.rows(), m1.cols()) /= ArrayType::Map(m2.data(), m2.rows(), m2.cols());
+  VERIFY_IS_APPROX(m1, m3 / m2);
 
   // reductions
   VERIFY_IS_APPROX(m1.abs().colwise().sum().sum(), m1.abs().sum());
@@ -353,6 +176,7 @@ template<typename ArrayType> void array(const ArrayType& m)
     FixedArrayType f4(f1.data());
     VERIFY_IS_APPROX(f4, f1);
   }
+  #if EIGEN_HAS_CXX11
   {
     FixedArrayType f1{s1};
     VERIFY_IS_APPROX(f1, FixedArrayType::Constant(s1));
@@ -364,6 +188,7 @@ template<typename ArrayType> void array(const ArrayType& m)
     FixedArrayType f4{f1.data()};
     VERIFY_IS_APPROX(f4, f1);
   }
+  #endif
 
   // pow
   VERIFY_IS_APPROX(m1.pow(2), m1.square());
@@ -389,12 +214,14 @@ template<typename ArrayType> void array(const ArrayType& m)
     OneDArrayType o2(static_cast<int>(rows));
     VERIFY(o2.size()==rows);
   }
+  #if EIGEN_HAS_CXX11
   {
     OneDArrayType o1{rows};
     VERIFY(o1.size()==rows);
     OneDArrayType o4{int(rows)};
     VERIFY(o4.size()==rows);
   }
+  #endif
   // Check possible conflicts with 2D ctor
   typedef Array<Scalar, Dynamic, Dynamic> TwoDArrayType;
   typedef Array<Scalar, 2, 1> ArrayType2;
@@ -411,6 +238,7 @@ template<typename ArrayType> void array(const ArrayType& m)
     ArrayType2 o4(static_cast<int>(rows),static_cast<int>(cols));
     VERIFY(o4(0)==Scalar(rows) && o4(1)==Scalar(cols));
   }
+  #if EIGEN_HAS_CXX11
   {
     TwoDArrayType o1{rows,cols};
     VERIFY(o1.rows()==rows);
@@ -424,6 +252,7 @@ template<typename ArrayType> void array(const ArrayType& m)
     ArrayType2 o4{int(rows),int(cols)};
     VERIFY(o4(0)==Scalar(rows) && o4(1)==Scalar(cols));
   }
+  #endif
 }
 
 template<typename ArrayType> void comparisons(const ArrayType& m)
@@ -628,7 +457,7 @@ template<typename ArrayType> void array_real(const ArrayType& m)
   const RealScalar tiny = sqrt(std::numeric_limits<RealScalar>::epsilon());
   s1 += Scalar(tiny);
   m1 += ArrayType::Constant(rows,cols,Scalar(tiny));
-  VERIFY_IS_CWISE_APPROX(s1/m1, s1 * m1.inverse());
+  VERIFY_IS_APPROX(s1/m1, s1 * m1.inverse());
 
   // check inplace transpose
   m3 = m1;
@@ -637,7 +466,6 @@ template<typename ArrayType> void array_real(const ArrayType& m)
   m3.transposeInPlace();
   VERIFY_IS_APPROX(m3, m1);
 }
-
 
 template<typename ArrayType> void array_complex(const ArrayType& m)
 {
@@ -870,11 +698,6 @@ EIGEN_DECLARE_TEST(array_cwise)
   }
   for(int i = 0; i < g_repeat; i++) {
     CALL_SUBTEST_4( array_complex(ArrayXXcf(internal::random<int>(1,EIGEN_TEST_MAX_SIZE), internal::random<int>(1,EIGEN_TEST_MAX_SIZE))) );
-  }
-
-  for(int i = 0; i < g_repeat; i++) {
-    CALL_SUBTEST_6( int_pow_test() );
-    CALL_SUBTEST_7( mixed_pow_test() );
   }
 
   VERIFY((internal::is_same< internal::global_math_functions_filtering_base<int>::type, int >::value));

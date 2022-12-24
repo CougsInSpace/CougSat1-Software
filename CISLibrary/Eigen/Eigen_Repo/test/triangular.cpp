@@ -7,7 +7,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#if defined(EIGEN_TEST_PART_100) || defined(EIGEN_TEST_PART_ALL)
+#ifdef EIGEN_TEST_PART_100
 #  define EIGEN_NO_DEPRECATED_WARNING
 #endif
 
@@ -139,6 +139,7 @@ template<typename MatrixType> void triangular_square(const MatrixType& m)
   m3.setZero();
   m3.template triangularView<Upper>().setOnes();
   VERIFY_IS_APPROX(m2,m3);
+  VERIFY_RAISES_STATIC_ASSERT(m1.template triangularView<Eigen::Lower>().swap(m2.template triangularView<Eigen::Upper>()));
 
   m1.setRandom();
   m3 = m1.template triangularView<Upper>();

@@ -10,8 +10,6 @@
 #ifndef EIGEN_CXX11_TENSOR_TENSOR_ASSIGN_H
 #define EIGEN_CXX11_TENSOR_TENSOR_ASSIGN_H
 
-#include "./InternalHeaderCheck.h"
-
 namespace Eigen {
 
 /** \class TensorAssign
@@ -32,10 +30,10 @@ struct traits<TensorAssignOp<LhsXprType, RhsXprType> >
                                       typename traits<RhsXprType>::Index>::type Index;
   typedef typename LhsXprType::Nested LhsNested;
   typedef typename RhsXprType::Nested RhsNested;
-  typedef std::remove_reference_t<LhsNested> LhsNested_;
-  typedef std::remove_reference_t<RhsNested> RhsNested_;
-  static constexpr std::size_t NumDimensions = internal::traits<LhsXprType>::NumDimensions;
-  static constexpr int Layout = internal::traits<LhsXprType>::Layout;
+  typedef typename remove_reference<LhsNested>::type _LhsNested;
+  typedef typename remove_reference<RhsNested>::type _RhsNested;
+  static const std::size_t NumDimensions = internal::traits<LhsXprType>::NumDimensions;
+  static const int Layout = internal::traits<LhsXprType>::Layout;
   typedef typename traits<LhsXprType>::PointerType PointerType;
 
   enum {
@@ -70,23 +68,23 @@ class TensorAssignOp : public TensorBase<TensorAssignOp<LhsXprType, RhsXprType> 
   typedef typename Eigen::internal::traits<TensorAssignOp>::StorageKind StorageKind;
   typedef typename Eigen::internal::traits<TensorAssignOp>::Index Index;
 
-  static constexpr int NumDims = Eigen::internal::traits<TensorAssignOp>::NumDimensions;
+  static const int NumDims = Eigen::internal::traits<TensorAssignOp>::NumDimensions;
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE TensorAssignOp(LhsXprType& lhs, const RhsXprType& rhs)
       : m_lhs_xpr(lhs), m_rhs_xpr(rhs) {}
 
     /** \returns the nested expressions */
     EIGEN_DEVICE_FUNC
-    internal::remove_all_t<typename LhsXprType::Nested>&
-    lhsExpression() const { return *((internal::remove_all_t<typename LhsXprType::Nested>*)&m_lhs_xpr); }
+    typename internal::remove_all<typename LhsXprType::Nested>::type&
+    lhsExpression() const { return *((typename internal::remove_all<typename LhsXprType::Nested>::type*)&m_lhs_xpr); }
 
     EIGEN_DEVICE_FUNC
-    const internal::remove_all_t<typename RhsXprType::Nested>&
+    const typename internal::remove_all<typename RhsXprType::Nested>::type&
     rhsExpression() const { return m_rhs_xpr; }
 
   protected:
-    internal::remove_all_t<typename LhsXprType::Nested>& m_lhs_xpr;
-    const internal::remove_all_t<typename RhsXprType::Nested>& m_rhs_xpr;
+    typename internal::remove_all<typename LhsXprType::Nested>::type& m_lhs_xpr;
+    const typename internal::remove_all<typename RhsXprType::Nested>::type& m_rhs_xpr;
 };
 
 
@@ -102,9 +100,8 @@ struct TensorEvaluator<const TensorAssignOp<LeftArgType, RightArgType>, Device>
   typedef StorageMemory<CoeffReturnType, Device> Storage;
   typedef typename Storage::Type EvaluatorPointerType;
 
-  static constexpr int PacketSize = PacketType<CoeffReturnType, Device>::size;
-  static constexpr int NumDims = XprType::NumDims;
-  static constexpr int Layout = TensorEvaluator<LeftArgType, Device>::Layout;
+  static const int PacketSize = PacketType<CoeffReturnType, Device>::size;
+  static const int NumDims = XprType::NumDims;
 
   enum {
     IsAligned         = int(TensorEvaluator<LeftArgType, Device>::IsAligned) &
@@ -115,6 +112,7 @@ struct TensorEvaluator<const TensorAssignOp<LeftArgType, RightArgType>, Device>
                         int(TensorEvaluator<RightArgType, Device>::BlockAccess),
     PreferBlockAccess = int(TensorEvaluator<LeftArgType, Device>::PreferBlockAccess) |
                         int(TensorEvaluator<RightArgType, Device>::PreferBlockAccess),
+    Layout            = TensorEvaluator<LeftArgType, Device>::Layout,
     RawAccess         = TensorEvaluator<LeftArgType, Device>::RawAccess
   };
 

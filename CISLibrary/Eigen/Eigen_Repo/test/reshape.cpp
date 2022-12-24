@@ -10,11 +10,8 @@
 
 #include "main.h"
 
-using Eigen::placeholders::last;
-using Eigen::placeholders::all;
-
 template<typename T1,typename T2>
-std::enable_if_t<internal::is_same<T1,T2>::value,bool>
+typename internal::enable_if<internal::is_same<T1,T2>::value,bool>::type
 is_same_eq(const T1& a, const T2& b)
 {
   return (a.array() == b.array()).all();

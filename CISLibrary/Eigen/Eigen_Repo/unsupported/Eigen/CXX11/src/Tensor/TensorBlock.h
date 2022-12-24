@@ -8,8 +8,6 @@
 #ifndef EIGEN_CXX11_TENSOR_TENSOR_BLOCK_H
 #define EIGEN_CXX11_TENSOR_TENSOR_BLOCK_H
 
-#include "./InternalHeaderCheck.h"
-
 namespace Eigen {
 namespace internal {
 
@@ -244,7 +242,7 @@ class TensorBlockDescriptor {
     const DestinationBufferKind& kind() const { return m_kind; }
 
    private:
-    friend class TensorBlockDescriptor<NumDims, IndexType>;
+    friend class TensorBlockDescriptor;
 
     DestinationBuffer() : m_data(NULL), m_data_type_size(0), m_kind(kEmpty) {}
 
@@ -708,7 +706,7 @@ class TensorMaterializedBlock {
     }
 
    private:
-    friend class TensorMaterializedBlock<Scalar, NumDims, Layout, IndexType>;
+    friend class TensorMaterializedBlock;
 
     Storage(Scalar* data, const Dimensions& dimensions,
             const Dimensions& strides, bool materialized_in_output,
@@ -835,14 +833,14 @@ class TensorMaterializedBlock {
 
 template <typename UnaryOp, typename ArgTensorBlock>
 class TensorCwiseUnaryBlock {
-  static constexpr bool NoArgBlockAccess =
+  static const bool NoArgBlockAccess =
       internal::is_void<typename ArgTensorBlock::XprType>::value;
 
  public:
-  typedef std::conditional_t<
+  typedef typename conditional<
       NoArgBlockAccess, void,
-      TensorCwiseUnaryOp<UnaryOp, const typename ArgTensorBlock::XprType> >
-      XprType;
+      TensorCwiseUnaryOp<UnaryOp, const typename ArgTensorBlock::XprType> >::
+      type XprType;
 
   typedef typename XprScalar<XprType>::type Scalar;
 
@@ -866,15 +864,15 @@ class TensorCwiseUnaryBlock {
 
 template <typename BinaryOp, typename LhsTensorBlock, typename RhsTensorBlock>
 class TensorCwiseBinaryBlock {
-  static constexpr bool NoArgBlockAccess =
+  static const bool NoArgBlockAccess =
       internal::is_void<typename LhsTensorBlock::XprType>::value ||
       internal::is_void<typename RhsTensorBlock::XprType>::value;
 
  public:
-  typedef std::conditional_t<
+  typedef typename conditional<
       NoArgBlockAccess, void,
       TensorCwiseBinaryOp<BinaryOp, const typename LhsTensorBlock::XprType,
-                          const typename RhsTensorBlock::XprType> >
+                          const typename RhsTensorBlock::XprType> >::type
       XprType;
 
   typedef typename XprScalar<XprType>::type Scalar;
@@ -913,12 +911,12 @@ class TensorCwiseBinaryBlock {
 template <typename BlockFactory, typename ArgTensorBlock>
 class TensorUnaryExprBlock {
   typedef typename ArgTensorBlock::XprType ArgXprType;
-  static constexpr bool NoArgBlockAccess = internal::is_void<ArgXprType>::value;
+  static const bool NoArgBlockAccess = internal::is_void<ArgXprType>::value;
 
  public:
-  typedef std::conditional_t<
+  typedef typename conditional<
       NoArgBlockAccess, void,
-      typename BlockFactory::template XprType<ArgXprType>::type> XprType;
+      typename BlockFactory::template XprType<ArgXprType>::type>::type XprType;
 
   typedef typename XprScalar<XprType>::type Scalar;
 
@@ -947,15 +945,15 @@ class TensorTernaryExprBlock {
   typedef typename Arg2TensorBlock::XprType Arg2XprType;
   typedef typename Arg3TensorBlock::XprType Arg3XprType;
 
-  static constexpr bool NoArgBlockAccess = internal::is_void<Arg1XprType>::value ||
-                                           internal::is_void<Arg2XprType>::value ||
-                                           internal::is_void<Arg3XprType>::value;
+  static const bool NoArgBlockAccess = internal::is_void<Arg1XprType>::value ||
+                                       internal::is_void<Arg2XprType>::value ||
+                                       internal::is_void<Arg3XprType>::value;
 
  public:
-  typedef std::conditional_t<
+  typedef typename conditional<
       NoArgBlockAccess, void,
       typename BlockFactory::template XprType<Arg1XprType, Arg2XprType,
-                                              Arg3XprType>::type> XprType;
+                                              Arg3XprType>::type>::type XprType;
 
   typedef typename XprScalar<XprType>::type Scalar;
 
@@ -1143,7 +1141,7 @@ class StridedLinearBufferCopy {
 
 template <typename Scalar, typename IndexType, int NumDims, int Layout>
 class TensorBlockIO {
-  static constexpr bool IsColMajor = (Layout == ColMajor);
+  static const bool IsColMajor = (Layout == ColMajor);
 
   typedef StridedLinearBufferCopy<Scalar, IndexType> LinCopy;
 
