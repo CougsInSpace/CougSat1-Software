@@ -141,12 +141,12 @@
 #define RANK_PR_BATT_5 (2)
 #define RANK_PR_BATT_6 (1)
 
-#define INITIAL_PR_3V3_0 (false)
+#define INITIAL_PR_3V3_0 (true) // comms?
 #define INITIAL_PR_3V3_1 (false)
 #define INITIAL_PR_3V3_2 (false)
 #define INITIAL_PR_3V3_3 (false)
 #define INITIAL_PR_3V3_4 (false)
-#define INITIAL_PR_3V3_5 (false)
+#define INITIAL_PR_3V3_5 (true) // comms?
 #define INITIAL_PR_3V3_6 (true) // Comms
 #define INITIAL_PR_3V3_7 (false)
 #define INITIAL_PR_3V3_8 (false)
@@ -161,7 +161,7 @@
 #define INITIAL_PR_BATT_2 (false)
 #define INITIAL_PR_BATT_3 (false)
 #define INITIAL_PR_BATT_4 (false)
-#define INITIAL_PR_BATT_5 (false)
+#define INITIAL_PR_BATT_5 (true) // TODO
 #define INITIAL_PR_BATT_6 (true) // Comms
 
 #define INITIAL_BH_0 (false)
