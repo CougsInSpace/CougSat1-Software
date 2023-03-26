@@ -8,21 +8,22 @@
 #include <Trig.h>
 
 DigitalOut statusLED(LED1, 1);
+DigitalOut amp5(PA_PD, 0);
 
-DigitalOut regEn5(REG_EN_5, 0); // goes to TPS61236P, steps up voltage while stepping down current
+DigitalOut regEn5(REG_EN_5, 0); // enable pin for 5V voltage regulator
 
-DigitalOut pcMod3(PC_3V1_1, 0); // LP5907MFX-3.1, voltage regulator  
-DigitalOut pcMod5(PC_5V0_1_N, 1); // INA199C1, current shunt monitor
-DigitalOut pcDemod(PC_3V1_2, 0);
+DigitalOut pcMod3(PC_3V1_1, 0); // 3.1V rail for modulator
+DigitalOut pcMod5(PC_5V0_1_N, 0); // 5V rail for modulator
+DigitalOut pcDemod(PC_3V1_2, 0); // 3.1V regulator for demodulator
 
-DigitalOut antennaSwRX(ANTENNA_SW, 0); // goes directly to antenna
+DigitalOut antennaSwRX(ANTENNA_SW, 0); // switch antenna between mod/demod 0 = modulation, 1 = demodulation
 
-SPI     spi(SPI_MOSI, SPI_MISO, SPI_SCK); // Serial Peripheral Interface, similiar to I2C
-ADF4360 rfClkMod(spi, RFCLK_CS_MOD_N, 7, 20000000); // signal send oscillator?
-ADF4360 rfClkDemod(spi, RFCLK_CS_DEMOD_N, 7, 20000000); // signal receive oscillator?
+SPI     spi(SPI_MOSI, SPI_MISO, SPI_SCK); // set up SPI
+ADF4360 rfClkMod(spi, RFCLK_CS_MOD_N, 7, 20000000); // set up modulator synthesizer or 20k Hz crystal oscilator
+ADF4360 rfClkDemod(spi, RFCLK_CS_DEMOD_N, 7, 20000000); // set up demodulator synthesizer for 20k Hz crystal oscilator
 
-PortOut    dacBus(PortE, 0xFFC8); // PortE enum to 4. 0xFFC8=1111111111001000 is a mask, decides which bits in the output will be used. Apparently used to control the signal. Is 32 bit?
-PortOut    dacClk(PortE, 0x0010); // 0x0010=00010000 just the clock pin?
+PortOut    dacBus(PortE, 0xFFC8);
+PortOut    dacClk(PortE, 0x0010);
 DigitalOut dacSleep(MODDAC_SLEEP, 0);
 
 DigitalIn  lockDetect(RFCLK_MUXOUT_MOD);
@@ -65,7 +66,7 @@ int main(void) {
   // unsigned int phase = 45;
   while (true) {
     // LOG("main", "Lock Detected: %d", lockDetect.read());
-    // statusLED = !statusLED;
+    statusLED = !statusLED;
     // LOG("Loop", "%d", index);
     // phase = (phase + 90) % 360;
     for (int i = 0; i < 1/*138*360*/; ++i) { // 10e3 is .4 baud, 1e3 is around 11.9
