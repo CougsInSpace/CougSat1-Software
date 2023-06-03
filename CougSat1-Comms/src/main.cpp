@@ -45,8 +45,8 @@ int main(void) {
   pcDemod = 1;
   pcMod5 = 1;
   wait_us(10e3);
-  rfClkDemod.setFrequency(435000000 * 2);
-  rfClkMod.setFrequency(435000000);
+  rfClkDemod.setFrequency(443150000 * 2);
+  rfClkMod.setFrequency(443150000);
   LOG("main", "has anthing changed");
   wait_us(10e3);
 
