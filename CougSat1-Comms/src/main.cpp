@@ -56,20 +56,43 @@ int main(void) {
   wait_us(10e3);
   // cout << "hello" << endl;
 
-  // int dataLen = 24;
-  // uint16_t data[24] = {512,1023,512,512, 512, 512, 1023, 1023, 
-  //   512,1023,512,512, 1023, 512, 512, 1023,
-  //   512,1023,512,1023, 512, 512, 1023, 1023};
-  // int dataLen = 2;
-  // uint16_t data[2] = {512, 1023};
+  short KK7MWC[26] = {1,3,1,0,     // K
+                      1,3,1,0,     // K
+                      1,1,3,3,3,0, // 7
+                      1,1,0,       // M
+                      3,1,1,0,     // W
+                      1,3,1,3,0};  // C
+
   int index = 0;
   // unsigned int phase = 45;
   while (true) {
     // LOG("main", "Lock Detected: %d", lockDetect.read());
     statusLED = !statusLED;
-    // LOG("Loop", "%d", index);
-    // phase = (phase + 90) % 360;
-    for (int i = 0; i < 1/*138*360*/; ++i) { // 10e3 is .4 baud, 1e3 is around 11.9
+    // Morse code identification
+    for (int i = 0; i < 26; i++) {
+      if (KK7MWC[i] == 0) {
+        wait_us(390e3);
+      } else {
+
+        for (int j = 0; j < KK7MWC[i]*10000; j++) {
+          uint16_t codeI = LUT_SINE_10b[(j + 0) % TRIG_LUT_SIZE];
+          dacClk         = 0x00;
+          dacBus         = (codeI << 6) | 0x8;
+          dacClk         = 0x10;
+          wait_us(13);
+
+          uint16_t codeQ = LUT_SINE_10b[(j + TRIG_LUT_COSINE) % TRIG_LUT_SIZE];
+          dacClk         = 0x00;
+          dacBus         = (codeQ << 6) | 0x0;
+          dacClk         = 0x10;
+          wait_us(13);
+        }
+        wait_us(130e3);
+      }
+    }
+
+    // Go cougs! transmission
+    for (int i = 0; i < 138*360; ++i) { // 10e3 is .4 baud, 1e3 is around 11.9
       // uint16_t codeI = uint16_t((LUT_SINE[i % TRIG_LUT_SIZE] + 1) / 2 * 1023
       // + 0.5);
 
