@@ -74,7 +74,7 @@ int main(void) {
         wait_us(180e3);
       } else {
 
-        for (int j = 0; j < KK7MWC[i]*00000; j++) {
+        for (int j = 0; j < KK7MWC[i]*100000; j++) {
           uint16_t codeI = LUT_SINE_10b[(j + 0) % TRIG_LUT_SIZE];
           dacClk         = 0x00;
           dacBus         = (codeI << 6) | 0x8;
