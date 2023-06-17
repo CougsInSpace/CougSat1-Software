@@ -71,23 +71,22 @@ int main(void) {
     // Morse code identification
     for (int i = 0; i < 26; i++) {
       if (KK7MWC[i] == 0) {
-        wait_us(100e3);
+        wait_us(25e3);
       } else {
+        for (int j = 0; j < KK7MWC[i]*2500; j++) {
+            uint16_t codeI = LUT_SINE_10b[(j + 0) % TRIG_LUT_SIZE];
+            dacClk         = 0x00;
+            dacBus         = (codeI << 6) | 0x8;
+            dacClk         = 0x10;
+            wait_us(5);
 
-        for (int j = 0; j < KK7MWC[i]*50000; j++) {
-          uint16_t codeI = LUT_SINE_10b[(j + 0) % TRIG_LUT_SIZE];
-          dacClk         = 0x00;
-          dacBus         = (codeI << 6) | 0x8;
-          dacClk         = 0x10;
-          wait_us(1);
-
-          uint16_t codeQ = LUT_SINE_10b[(j + TRIG_LUT_COSINE) % TRIG_LUT_SIZE];
-          dacClk         = 0x00;
-          dacBus         = (codeQ << 6) | 0x0;
-          dacClk         = 0x10;
-          wait_us(1);
+            uint16_t codeQ = LUT_SINE_10b[(j + TRIG_LUT_COSINE) % TRIG_LUT_SIZE];
+            dacClk         = 0x00;
+            dacBus         = (codeQ << 6) | 0x0;
+            dacClk         = 0x10;
+            wait_us(5);
         }
-        wait_us(300e3);
+        wait_us(75e3);
       }
     }
 
