@@ -71,7 +71,7 @@ int main(void) {
     // Morse code identification
     for (int i = 0; i < 26; i++) {
       if (KK7MWC[i] == 0) {
-        wait_us(50e3);
+        wait_us(150e3);
       } else {
         for (int j = 0; j < KK7MWC[i]*5000; j++) {
             uint16_t codeI = LUT_SINE_10b[(j + 0) % TRIG_LUT_SIZE];
@@ -86,7 +86,7 @@ int main(void) {
             dacClk         = 0x10;
             wait_us(5);
         }
-        wait_us(150e3);
+        wait_us(50e3);
       }
     }
 
