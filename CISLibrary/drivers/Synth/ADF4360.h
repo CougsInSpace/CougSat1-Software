@@ -114,13 +114,13 @@ private:
   uint16_t         counterB                = 0;
   uint8_t          counterA                = 0;
   BandSelect_t     bandSelect              = BandSelect_t::ONE;
-  bool             lockDetectHighPrecision = false; // true=5 cycles, false=3
+  bool             lockDetectHighPrecision = true; // true=5 cycles, false=3
   AntiBacklash_t   antiBacklash            = AntiBacklash_t::NS_3_0;
   uint16_t         counterR                = 0;
 
   uint16_t minCounterR = 1;
 
-  static const uint32_t MAX_FREQ_PFD = 8000000;
+  static const uint32_t MAX_FREQ_PFD = 640000;
 };
 
 #endif /* _LIBRARY_DRIVER_SYNTH_ADF4360_H_ */

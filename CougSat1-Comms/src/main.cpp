@@ -42,12 +42,12 @@ int main(void) {
   regEn5 = 1;
   wait_us(10e3);
   pcMod3 = 1;
-  pcDemod = 1;
+  pcDemod = 0;
   pcMod5 = 1;
   wait_us(10e3);
-  rfClkDemod.setFrequency(443150000 * 2);
+  // rfClkDemod.setFrequency(443150000 * 2);
   rfClkMod.setFrequency(443150000);
-  LOG("main", "has anthing changed");
+  LOG("main", "has anything changed");
   wait_us(10e3);
 
   dacSleep = 1;
