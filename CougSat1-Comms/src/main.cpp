@@ -92,7 +92,7 @@ int main(void) {
     }
 
     // Go cougs! transmission
-    for (int i = 0; i < 48240; ++i) { // 10e3 is .4 baud, 1e3 is around 11.9
+    for (int i = 0; i < IQArrLen; ++i) { // 10e3 is .4 baud, 1e3 is around 11.9
       // uint16_t codeI = uint16_t((LUT_SINE[i % TRIG_LUT_SIZE] + 1) / 2 * 1023
       // + 0.5);
 
@@ -119,9 +119,10 @@ int main(void) {
       dacClk         = 0x10;
       wait_ns(9000);
       // 1/(10us*360) = 277Hz
+
+      index = (index + 1) % IQArrLen;
     }
     // index = (index + 1) % dataLen;
-    index = (index + 1) % IQArrLen;
   }
   return MBED_SUCCESS;
 }
