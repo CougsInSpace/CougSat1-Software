@@ -92,7 +92,7 @@ int main(void) {
     }
 
     // Go cougs! transmission
-    for (int i = 0; i < 138*360; ++i) { // 10e3 is .4 baud, 1e3 is around 11.9
+    for (int i = 0; i < 48240; ++i) { // 10e3 is .4 baud, 1e3 is around 11.9
       // uint16_t codeI = uint16_t((LUT_SINE[i % TRIG_LUT_SIZE] + 1) / 2 * 1023
       // + 0.5);
 
